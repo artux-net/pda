@@ -5,7 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="software.artux.pdanetwork.activities.QuestActivity">
+    tools:context="net.artux.pda.activities.QuestActivity">
 
     <ImageView
         android:id="@+id/background"

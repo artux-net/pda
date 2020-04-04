@@ -8,5 +8,5 @@
     android:layout_height="match_parent"
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
-    tools:context="software.artux.pdanetwork.activities.PickImageActivity"
+    tools:context="net.artux.pda.activities.PickImageActivity"
     tools:listitem="@layout/item_photo" />

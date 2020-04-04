@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.devilsoftware.pdanetwork">
+    package="net.artux.pda">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -12,14 +12,14 @@
 
 
     <application
-        android:name="software.artux.pdanetwork.app.App"
+        android:name="net.artux.pda.app.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="software.artux.pdanetwork.activities.LoginActivity"
+            android:name="net.artux.pda.activities.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="sensorLandscape">
             <intent-filter>
@@ -36,24 +36,24 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="software.artux.pdanetwork.activities.MainActivity"
+            android:name="net.artux.pda.activities.MainActivity"
             android:screenOrientation="sensorLandscape"/>
         <activity
-            android:name="software.artux.pdanetwork.activities.RegisterActivity"
+            android:name="net.artux.pda.activities.RegisterActivity"
             android:screenOrientation="sensorLandscape" />
         <activity
-            android:name="software.artux.pdanetwork.activities.PickImageActivity"
+            android:name="net.artux.pda.activities.PickImageActivity"
             android:screenOrientation="sensorLandscape" />
         <activity
-            android:name="software.artux.pdanetwork.activities.QuestActivity"
+            android:name="net.artux.pda.activities.QuestActivity"
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|keyboardHidden|screenSize" />
         <activity
-            android:name="software.artux.pdanetwork.activities.SettingsActivity"
+            android:name="net.artux.pda.activities.SettingsActivity"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/AppTheme" />
         <activity
-            android:name="software.artux.pdanetwork.activities.LoadingActivity"
+            android:name="net.artux.pda.activities.LoadingActivity"
             android:screenOrientation="sensorLandscape" />
     </application>
 
