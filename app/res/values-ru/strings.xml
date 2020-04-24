@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ПДА</string>
+    <string name="app_full_name">Сталкерская сеть</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_user">Пользователь</string>
+    <string name="prompt_password">Пароль</string>
+    <string name="action_sign_in">Войти</string>
+    <string name="error_incorrect_user">Такого пользователя не существует</string>
+    <string name="error_invalid_password">Пароль слишком короткий</string>
+    <string name="error_invalid_email">Не корректный e-mail</string>
+    <string name="error_incorrect_password">Не корректный пароль</string>
+    <string name="error_field_required">Это поле пустое</string>
+    <string name="action_registration">Регистрация</string>
+    <string name="action_forgot_password">Забыли пароль?</string>
+
+    <!-- Strings related to register -->
+    <string name="prompt_login">Логин</string>
+    <string name="prompt_name">Имя</string>
+    <string name="action_register">Зарегистрироваться</string>
+
+    <!-- Strings related to main view -->
+    <string name="news">Новости</string>
+    <string name="chat">Чат</string>
+    <string name="messages">Сообщения</string>
+    <string name="profile">Профиль</string>
+    <string name="settings">Рейтинг</string>
+    <string name="quest">Квест</string>
+    <string name="chsavatar">Выберите аватар</string>
+
+    <!-- Strings related to messenger -->
+    <string name="general_chat_channel">Основной Чат-канал</string>
+    <string name="write_with_id">Написать по PDAID</string>
+    <string name="inptmsg">Введите сообщение</string>
+    <string name="action_sign_out">Выйти из аккаунта</string>
+    <string name="action_clear_saved_images">Очистить кеш изображений</string>
+    <string name="version">Версия ПДА:</string>
+    <string name="action_input_login_or_email">Введите логин или почту..</string>
+    <string name="action_cancel">Закрыть</string>
+    <string name="group_chat">Чат группировки</string>
+
+    <!-- Strings related to statistic view -->
+    <string name="profile_inventory">Инвентарь</string>
+    <string name="profile_equipment">Снаряжение</string>
+    <string name="profile_achievements">Достижения</string>
+    <string name="profile_brief">Сводка</string>
+    <string name="profile_arena">Арена</string>
+    <string name="profile_shop">Shop</string>
+</resources>

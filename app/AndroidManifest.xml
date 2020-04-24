@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="net.artux.pda">
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+
+    <application
+        android:name="net.artux.pda.app.App"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:isGame="true"
+        android:appCategory="game"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name="net.artux.pda.activities.LoginActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="sensorLandscape">
+
+        </activity>
+        <activity
+            android:name="net.artux.pda.activities.MainActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity
+            android:name="net.artux.pda.activities.RegisterActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name="net.artux.pda.activities.PickImageActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name="net.artux.pda.activities.QuestActivity"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity
+            android:name="net.artux.pda.activities.SettingsActivity"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name="net.artux.pda.activities.LoadingActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity android:name=".activities.CoreStarter"
+            android:screenOrientation="sensorLandscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http"
+                    android:host="www.artux.net"
+                    android:pathPrefix="/pda" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
