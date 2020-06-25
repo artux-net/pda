@@ -1,18 +1,19 @@
 package net.artux.pda.activities;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
@@ -26,9 +27,9 @@ import net.artux.pda.R;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class MainActivity extends Activity{
+public class MainActivity extends FragmentActivity {
 
-    FragmentTransaction mFragmentTransaction = getFragmentManager().beginTransaction();
+    FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
 
 
     TextView mTitleTextView;
@@ -55,14 +56,14 @@ public class MainActivity extends Activity{
 
     public void setupMainFragment(Fragment fragment){
         mainFragment = fragment;
-        mFragmentTransaction = getFragmentManager().beginTransaction();
+        mFragmentTransaction = getSupportFragmentManager().beginTransaction();
         mFragmentTransaction.replace(R.id.containerView, fragment);
         mFragmentTransaction.commit();
     }
 
     public void setupAdditionalFragment(Fragment fragment){
         addFragment = fragment;
-        mFragmentTransaction = getFragmentManager().beginTransaction();
+        mFragmentTransaction = getSupportFragmentManager().beginTransaction();
         mFragmentTransaction.replace(R.id.addСontainerView, fragment);
         mFragmentTransaction.commit();
     }
@@ -124,7 +125,7 @@ public class MainActivity extends Activity{
                     @Override
                     public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
                         if (resource instanceof GifDrawable) {
-                            if(!loadingState) ((GifDrawable)resource).setLoopCount(1);
+                            if(!loadingState) resource.setLoopCount(1);
                         }
                         return false;
                     }

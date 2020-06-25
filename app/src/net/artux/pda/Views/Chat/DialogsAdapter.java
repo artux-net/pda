@@ -1,10 +1,8 @@
 package net.artux.pda.Views.Chat;
 
 import android.app.AlertDialog;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.Models.Dialog;
 import net.artux.pda.R;
@@ -130,28 +131,44 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
 
         public void bind(final Dialog dialog){
-            avatarView.setImageDrawable(mContext.getResources().
-                    getDrawable(App.avatars[dialog.getToPdaAvatarId()]));
+            if (dialog.type==0) {
+                avatarView.setImageDrawable(mContext.getResources().
+                        getDrawable(App.avatars[dialog.getAvatarId()]));
 
-            lastMessage.setText(dialog.getLastMessage());
-            titleView.setText(dialog.getToPdaLogin() + " PDA #" + dialog.getToPdaId());
-            mainView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ViewHolder.this.onClick(dialog);
-                }
-            });
+                lastMessage.setText(dialog.lastMessage);
+                titleView.setText(dialog.login + " PDA #" + dialog.pda);
+                mainView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ViewHolder.this.onClick(dialog);
+                    }
+                });
+            }else {
+                lastMessage.setText(dialog.lastMessage);
+                titleView.setText("Беседа #"+dialog.name);
+                mainView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ViewHolder.this.onClick(dialog);
+                    }
+                });
+            }
         }
 
         @Override
         public void onClick(Dialog dialog) {
-            FragmentTransaction fragmentTransaction = mContext.getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
 
             ChatFragment chatFragment = new ChatFragment();
 
             Bundle bundle = new Bundle();
-            bundle.putInt("chatMode", 1);
-            bundle.putInt("toPdaId", dialog.getToPdaId());
+            bundle.putInt("type", dialog.type);
+            if (dialog.type==0)
+                bundle.putInt("to", dialog.pda);
+            else if (dialog.type == 1)
+                bundle.putString("c", dialog.name);
+
+
 
             chatFragment.setArguments(bundle);
 
@@ -179,12 +196,9 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     mainView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            FragmentTransaction fragmentTransaction = mContext.getFragmentManager().beginTransaction();
+                            FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
 
                             ChatFragment chatFragment = new ChatFragment();
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("chatMode", 0);
-                            chatFragment.setArguments(bundle);
                             fragmentTransaction.replace(R.id.containerView, chatFragment);
                             fragmentTransaction.addToBackStack(null);
                             fragmentTransaction.commit();
@@ -196,11 +210,10 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     mainView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            FragmentTransaction fragmentTransaction = mContext.getFragmentManager().beginTransaction();
+                            FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
 
                             ChatFragment chatFragment = new ChatFragment();
                             Bundle bundle = new Bundle();
-                            bundle.putInt("chatMode", 2);
                             bundle.putInt("group", App.getDataManager().getMember().getGroup());
                             chatFragment.setArguments(bundle);
                             fragmentTransaction.replace(R.id.containerView, chatFragment);
@@ -210,14 +223,14 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     });
                     break;
                 case 2:
-                    titleView.setText(mContext.getResources().getText(R.string.write_with_id));
+                    titleView.setText("Enter pdaID | Create a conversation");
                     mainView.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
 
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                            builder.setTitle("Input PdaID..");
+                            builder.setTitle("Input PdaID.. | Create a conversation");
 
                             final EditText input = new EditText(mContext);
                             input.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -227,14 +240,14 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
 
-                                    FragmentTransaction fragmentTransaction = mContext.getFragmentManager().beginTransaction();
+                                    FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
 
                                     ChatFragment chatFragment = new ChatFragment();
                                     Bundle bundle = new Bundle();
-                                    bundle.putInt("chatMode", 1);
+                                    bundle.putInt("type", 0);
 
                                     if (Integer.parseInt(input.getText().toString())!=0){
-                                        bundle.putInt("toPdaId", Integer.parseInt(input.getText().toString()));
+                                        bundle.putInt("to", Integer.parseInt(input.getText().toString()));
                                         chatFragment.setArguments(bundle);
 
                                         fragmentTransaction.replace(R.id.containerView, chatFragment);

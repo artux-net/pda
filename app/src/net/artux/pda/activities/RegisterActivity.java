@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,6 +17,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import net.artux.pda.Models.RegisterUser;
 import net.artux.pda.Models.Status;
@@ -73,12 +74,6 @@ public class RegisterActivity extends AppCompatActivity {
                 startActivityForResult(new Intent(RegisterActivity.this, PickImageActivity.class),0);
             }
         });
-
-
-        mLoginView.setText("hhh");
-        mEmailView.setText("hhdshfsjkhfjksdhfjksdhf131231432543543654343341234578798h@gmail.com");
-        mPasswordView.setText("12345678");
-        mNameView.setText("hhh");
 
         Button mRegisterBtn = findViewById(R.id.registerBtn);
         mRegisterBtn.setOnClickListener(new View.OnClickListener() {

@@ -1,33 +1,16 @@
 package net.artux.pda.Models;
+
 public class Dialog {
 
     public String name;
-    private int toPdaId;
-    private int toPdaAvatarId;
-    private String toPdaLogin;
-    private String lastMessage;
+    public int type;
+    public String lastMessage;
+    public String login;
+    public int pda;
+    public int group;
+    public String avatar;
 
-    public Dialog(String name, int toPdaId, String toPdaLogin, int toPdaAvatarId, String lastMessage) {
-        this.name = name;
-        this.toPdaId = toPdaId;
-        this.toPdaLogin = toPdaLogin;
-        this.toPdaAvatarId = toPdaAvatarId;
-        this.lastMessage = lastMessage;
-    }
-
-    public int getToPdaId() {
-        return toPdaId;
-    }
-
-    public int getToPdaAvatarId() {
-        return toPdaAvatarId;
-    }
-
-    public String getToPdaLogin() {
-        return toPdaLogin;
-    }
-
-    public String getLastMessage() {
-        return lastMessage;
+    public int getAvatarId(){
+        return Integer.parseInt(avatar);
     }
 }

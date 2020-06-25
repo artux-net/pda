@@ -3,24 +3,24 @@ package net.artux.pda.activities;
 import android.content.Intent;
 import android.view.View;
 
-
 import net.artux.pda.R;
 import net.artux.pda.Views.Additional.AdditionalFragment;
-import net.artux.pda.Views.Chat.DialogsFragment;
 import net.artux.pda.Views.Additional.InfoFragment;
+import net.artux.pda.Views.Chat.DialogsFragment;
 import net.artux.pda.Views.News.NewsFragment;
 import net.artux.pda.Views.Profile.BackpackFragment;
 import net.artux.pda.Views.Profile.ProfileFragment;
+import net.artux.pda.Views.Quest.StoriesFragment;
 import net.artux.pda.app.App;
 
 public class MainActivityController implements View.OnClickListener {
 
-    MainActivity mainActivity;
+    private MainActivity mainActivity;
 
-    NewsFragment mNewsFragment;
-    InfoFragment mInfoFragment;
-    DialogsFragment mDialogsFragment;
-    ProfileFragment mProfileFragment;
+    private NewsFragment mNewsFragment;
+    private InfoFragment mInfoFragment;
+    private DialogsFragment mDialogsFragment;
+    private ProfileFragment mProfileFragment;
 
     MainActivityController(MainActivity mainActivity){
         this.mainActivity = mainActivity;
@@ -99,7 +99,8 @@ public class MainActivityController implements View.OnClickListener {
                 mainActivity.startActivity(new Intent(mainActivity, SettingsActivity.class));
                 break;
             case R.id.quest:
-                mainActivity.startActivity(new Intent(mainActivity, QuestActivity.class));
+                mainActivity.setupMainFragment(new StoriesFragment());
+                mainActivity.setTitle("Квесты");
                 break;
         }
     }

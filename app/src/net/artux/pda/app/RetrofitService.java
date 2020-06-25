@@ -15,11 +15,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitService {
 
-    private Retrofit mRetrofit;
-
     private PdaAPI mPdaAPI;
 
-    public void initRetrofit(String url, final DataManager dataManager){
+    void initRetrofit(String url, final DataManager dataManager){
         OkHttpClient.Builder httpClient =
                 new OkHttpClient.Builder();
         httpClient.readTimeout(1, TimeUnit.MINUTES);
@@ -39,7 +37,7 @@ public class RetrofitService {
             }
         });
 
-        mRetrofit = new Retrofit.Builder()
+        Retrofit mRetrofit = new Retrofit.Builder()
                 .baseUrl("http://" + url)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(httpClient.build())

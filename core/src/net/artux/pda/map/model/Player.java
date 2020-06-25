@@ -1,14 +1,11 @@
 package net.artux.pda.map.model;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
-
-import java.util.List;
 
 public class Player{
 
@@ -17,15 +14,14 @@ public class Player{
 
     private Vector2 position;
     private Vector2 velocity;
-    public Sprite sprite;
+    private Sprite sprite;
 
-
-    public Player(float x, float y){
-        position = new Vector2(x, y);
+    public Player(Vector2 playerPosition) {
+        position = playerPosition;
         velocity = new Vector2(0,0);
         sprite = new Sprite(new Texture("gg.png"), 0, 0, 2000, 2000);
         sprite.setSize(32, 32);
-        sprite.setPosition(x,y);
+        sprite.setPosition(playerPosition.x, playerPosition.y);
         sprite.setOriginCenter();
     }
 
@@ -45,7 +41,6 @@ public class Player{
         if(x!=0 && y!=0)
             sprite.setRotation((float) degrees);
     }
-
 
     Pixmap pixmap;
     public Texture bounds;

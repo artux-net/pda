@@ -47,4 +47,8 @@
     <string name="profile_brief">Сводка</string>
     <string name="profile_arena">Арена</string>
     <string name="profile_shop">Shop</string>
+    <string name="error_server_connection">Ошибка поключения</string>
+    <string name="profile_error">Не удалось найти pdaId</string>
+    <string name="backpack">Рюкзак</string>
+    <string name="unable_connect">Не удалось подключится к серверу</string>
 </resources>

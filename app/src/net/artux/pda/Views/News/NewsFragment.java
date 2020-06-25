@@ -1,19 +1,21 @@
 package net.artux.pda.Views.News;
 
-import android.app.Fragment;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.artux.pda.R;
-import net.artux.pda.activities.MainActivity;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.prof.rssparser.Article;
 import com.prof.rssparser.Parser;
+
+import net.artux.pda.R;
+import net.artux.pda.activities.MainActivity;
 
 import java.util.ArrayList;
 

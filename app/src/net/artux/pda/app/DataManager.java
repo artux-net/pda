@@ -2,11 +2,11 @@ package net.artux.pda.app;
 
 import android.content.SharedPreferences;
 
-import at.favre.lib.armadillo.Armadillo;
-
 import net.artux.pda.Models.Member;
 
 import java.security.SecureRandom;
+
+import at.favre.lib.armadillo.Armadillo;
 
 public class DataManager {
 
@@ -77,6 +77,6 @@ public class DataManager {
     }
 
     public int getChapter(int story){
-        return 0;
+        return member.getData().getStories().get(0).getLastChapter();
     }
 }

@@ -1,18 +1,20 @@
 package net.artux.pda.Views.News;
 
-import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.prof.rssparser.Article;
+
 import net.artux.pda.R;
 import net.artux.pda.activities.MainActivity;
-import com.prof.rssparser.Article;
 
 public class
 OpenNewsFragment extends Fragment {

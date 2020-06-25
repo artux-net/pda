@@ -1,6 +1,5 @@
 package net.artux.pda.Views.Additional;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +9,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+
+import net.artux.pda.BuildConfig;
+import net.artux.pda.R;
+import net.artux.pda.Views.Encyclopedia.EncyclopediaFragment;
+import net.artux.pda.activities.MainActivity;
+import net.artux.pda.activities.MainActivityController;
+import net.artux.pda.app.App;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -18,12 +26,6 @@ import java.util.LinkedHashMap;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import net.artux.pda.R;
-import net.artux.pda.Views.Encyclopedia.EncyclopediaFragment;
-import net.artux.pda.activities.MainActivity;
-import net.artux.pda.activities.MainActivityController;
-import net.artux.pda.app.App;
 
 public class AdditionalFragment extends Fragment implements AdapterView.OnItemClickListener {
 
@@ -89,6 +91,6 @@ public class AdditionalFragment extends Fragment implements AdapterView.OnItemCl
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String value = (new ArrayList<>(categories.values())).get(position);
-        ((EncyclopediaFragment)((MainActivity)getActivity()).mainFragment).load("http://" + App.URL + value);
+        ((EncyclopediaFragment)((MainActivity)getActivity()).mainFragment).load("http://" + BuildConfig.URL + value);
     }
 }

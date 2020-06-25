@@ -1,10 +1,7 @@
 package net.artux.pda.Views.Quest;
 
-import android.app.Fragment;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +9,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import net.artux.pda.Models.profile.Data;
 import net.artux.pda.Models.profile.Item;
@@ -25,11 +26,10 @@ import java.util.List;
 
 public class QuestFragment extends Fragment implements View.OnClickListener {
 
-    View mainView;
-    TextView mainText;
-    LinearLayout sceneResponses;
-    Stage stage;
-    ColorStateList colorStateList;
+    private View mainView;
+    private LinearLayout sceneResponses;
+    private Stage stage;
+    private ColorStateList colorStateList;
 
     @Nullable
     @Override
@@ -43,8 +43,8 @@ public class QuestFragment extends Fragment implements View.OnClickListener {
         return mainView;
     }
 
-    public void loadScene(){
-        mainText = mainView.findViewById(R.id.sceneText);
+    private void loadScene(){
+        TextView mainText = mainView.findViewById(R.id.sceneText);
         sceneResponses = mainView.findViewById(R.id.sceneResponses);
 
 
@@ -61,7 +61,7 @@ public class QuestFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    public void setSceneResponses(){
+    private void setSceneResponses(){
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         for (final Transfer transfer : stage.getTransfers()) {
             if(checkTransfer(transfer)) {
@@ -84,7 +84,7 @@ public class QuestFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    boolean containsItem(List<Item> items, String sid){
+    private boolean containsItem(List<Item> items, String sid){
         if(isInteger(sid)){
             int id = Integer.parseInt(sid);
             for (Item item : items){
@@ -120,7 +120,7 @@ public class QuestFragment extends Fragment implements View.OnClickListener {
         return true;
     }
 
-    boolean checkTransfer(Transfer transfer){
+    private boolean checkTransfer(Transfer transfer){
         if (transfer.condition!=null){
             if (!transfer.condition.keySet().isEmpty()){
                 Data data = App.getDataManager().getMember().getData();
@@ -151,7 +151,7 @@ public class QuestFragment extends Fragment implements View.OnClickListener {
         } else return true;
     }
 
-    public void setStage(Stage stage){
+    void setStage(Stage stage){
         this.stage = stage;
     }
 

@@ -1,21 +1,23 @@
 package net.artux.pda.Views.Chat;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import net.artux.pda.Models.Dialog;
 import net.artux.pda.R;
 import net.artux.pda.activities.MainActivity;
 import net.artux.pda.app.App;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -35,7 +37,7 @@ public class DialogsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-
+        System.out.println("DIALOGS");
         if (mainView==null){
             mainView = inflater.inflate(R.layout.fragment_messages, container, false);
 
@@ -55,6 +57,7 @@ public class DialogsFragment extends Fragment {
 
             mRecyclerView.setAdapter(dialogsAdapter);
 
+            System.out.println("DIALOGS-try0");
             updateDialog();
         }
 
@@ -81,11 +84,12 @@ public class DialogsFragment extends Fragment {
                 dialogsAdapter.notifyDataSetChanged();
                 mRecyclerView.setAdapter(dialogsAdapter);
 
+
             }
 
             @Override
             public void onFailure(Call<List<Dialog>> call, Throwable t) {
-
+                t.printStackTrace();
             }
         });
     }

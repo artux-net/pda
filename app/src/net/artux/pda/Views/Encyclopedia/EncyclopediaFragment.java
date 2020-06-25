@@ -1,6 +1,5 @@
 package net.artux.pda.Views.Encyclopedia;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +9,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-
+import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.App;
 
 public class EncyclopediaFragment extends Fragment {
 
@@ -42,9 +41,9 @@ public class EncyclopediaFragment extends Fragment {
 
             if(getArguments()!=null){
                 int id = getArguments().getInt("id");
-                load("http://" + App.URL + "/enc/" + id);
+                load("http://" + BuildConfig.URL + "/enc/" + id);
             }else{
-                load("http://" + App.URL + "/enc/" + "pistols");
+                load("http://" + BuildConfig.URL + "/enc/" + "pistols");
             }
             webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
         }

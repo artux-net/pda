@@ -1,16 +1,17 @@
 package net.artux.pda.Views.Profile;
 
-import android.app.Fragment;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.bumptech.glide.Glide;
 
+import net.artux.pda.BuildConfig;
 import net.artux.pda.Models.profile.Data;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
@@ -33,7 +34,7 @@ public class ProfileFragment extends Fragment {
 
         Glide.with(getActivity())
                 .asGif()
-                .load("http://"+ App.URL+"/files?file="+data.getEquipment().toString())
+                .load("http://"+ BuildConfig.URL +"/files?file="+data.getEquipment().toString())
                 .into((ImageView) mainView.findViewById(R.id.slot1));
 
         Glide.with(getActivity())

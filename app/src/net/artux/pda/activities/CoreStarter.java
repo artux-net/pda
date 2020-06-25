@@ -1,41 +1,62 @@
 package net.artux.pda.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.google.gson.Gson;
 
 import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.Map;
-import net.artux.pda.map.model.Point;
-import net.artux.pda.map.model.Position;
 import net.artux.pda.map.platform.PlatformInterface;
 
-import java.nio.file.FileSystems;
-import java.util.LinkedList;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class CoreStarter extends AndroidApplication implements PlatformInterface {
+
+    private GdxAdapter gdxAdapter;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        Position position = new Position();
-        position.x = 330;
-        position.y = 960;
-        Map map = new Map("Кордон","maps/map_escape.png",
-                "maps/bounds.png", position, new LinkedList<Point>());
-        initialize(new GdxAdapter(this, map), config);
-
+        Map map = null;
+        HashMap<String, String> data = (HashMap<String, String>) getIntent().getSerializableExtra("data");
+        try {
+            InputStream inputStream = getAssets().open("0.sm");
+            try(Scanner s = new Scanner(inputStream)) {
+                StringBuilder stringBuilder = new StringBuilder();
+                while (s.hasNext())
+                    stringBuilder.append(s.next());
+                String result = stringBuilder.toString();
+                System.out.println(result);
+                map = new Gson().fromJson(result, Map.class);
+            }
+            if (data != null && data.containsKey("pos")) {
+                map.setPlayerPos(data.get("pos"));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        gdxAdapter = new GdxAdapter(this, map);
+        initialize(gdxAdapter, config);
     }
 
     @Override
-    public void send(final String[] params) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), params[0], Toast.LENGTH_SHORT).show();
+    public void send(final HashMap<String, String> data) {
+        runOnUiThread(() -> {
+            if (data!=null) {
+                if(data.containsKey("chapter")){
+                    Intent intent = new Intent(this, QuestActivity.class);
+                    intent.putExtra("chapter", Integer.parseInt(data.get("chapter")));
+                    intent.putExtra("stage", Integer.parseInt(data.get("stage")));
+                    startActivity(intent);
+                    finish();
+                }
 
             }
         });

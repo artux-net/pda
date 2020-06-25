@@ -5,33 +5,38 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 
+import net.artux.pda.Models.profile.Story;
 import net.artux.pda.R;
 import net.artux.pda.Views.Quest.SceneController;
-import net.artux.pda.app.DataManager;
+import net.artux.pda.app.App;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 
-import static com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade;
 
 public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, View.OnClickListener {
 
@@ -51,16 +56,28 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quest);
         glide = Glide.get(this);
-        DataManager dataManager = new DataManager();
 
         tvTime = findViewById(R.id.sceneTime);
         musicImage = findViewById(R.id.musicSetup);
         musicImage.setOnClickListener(this);
         background = findViewById(R.id.background);
-        try {
-            sceneController = new SceneController( this);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        HashMap<String, String> temp = App.getDataManager().getMember().getData().getTemp();
+        String currentStory = temp.get("currentStory");
+        if(currentStory!=null){
+            for (Story story : App.getDataManager().getMember().getData().getStories()){
+                if (story.getId()==Integer.parseInt(currentStory)){
+                    System.out.println("Story: " + story.getId());
+                    System.out.println("Chapter: " + story.getLastChapter());
+                    System.out.println("Stage: " + story.getLastStage());
+                    int chapter = getIntent().getIntExtra("chapter", story.getLastChapter());
+                    int stage = getIntent().getIntExtra("stage", story.getLastStage());
+                    sceneController = new SceneController( this, story.getId(), chapter, stage);
+                }
+            }
+        } else {
+            System.out.println("null");
+            sceneController = new SceneController( this, getIntent().getIntExtra("story",0), 0, 0);
         }
     }
 
@@ -72,15 +89,65 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
         if(!background_url.equals(backgroundURL)) {
             background_url = backgroundURL;
 
-            Log.d("QuestData", "setup background");
             Glide.with(this)
                     .asBitmap()
                     .load(backgroundURL)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(new SimpleTarget<Bitmap>() {
+                    .into(new Target<Bitmap>() {
+                        @Override
+                        public void onLoadStarted(@Nullable Drawable placeholder) {
+
+                        }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+
+                        }
+
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
                             ImageViewAnimatedChange(QuestActivity.this, background, resource);
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                        }
+
+                        @Override
+                        public void getSize(@NonNull SizeReadyCallback cb) {
+
+                        }
+
+                        @Override
+                        public void removeCallback(@NonNull SizeReadyCallback cb) {
+
+                        }
+
+                        @Override
+                        public void setRequest(@Nullable Request request) {
+
+                        }
+
+                        @Nullable
+                        @Override
+                        public Request getRequest() {
+                            return null;
+                        }
+
+                        @Override
+                        public void onStart() {
+
+                        }
+
+                        @Override
+                        public void onStop() {
+
+                        }
+
+                        @Override
+                        public void onDestroy() {
+
                         }
                     });
         }
@@ -112,7 +179,6 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
 
         mediaPlayer = new MediaPlayer();
         try {
-            Log.d("Music src: ", url);
             mediaPlayer.setDataSource(url);
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.setOnPreparedListener(this);
@@ -164,7 +230,7 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
 
 
     BroadcastReceiver _broadcastReceiver;
-    private final SimpleDateFormat _sdfWatchTime = new SimpleDateFormat("HH:mm");
+    private final SimpleDateFormat _sdfWatchTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
     @Override
     public void onStart() {
@@ -173,7 +239,7 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
         _broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
-                if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0)
+                if (intent.getAction() != null && intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0)
                     tvTime.setText(_sdfWatchTime.format(new Date()));
             }
         };

@@ -58,12 +58,12 @@
 
     <!-- Strings related to register -->
     <string name="prompt_login">Login</string>
-    <string name="prompt_email">Email</string>
+    <string name="prompt_email" translatable="false">Email</string>
     <string name="prompt_name">Name</string>
     <string name="action_register">Register</string>
 
     <!-- Strings related to main view -->
-    <string name="doubleSlash">//</string>
+    <string name="doubleSlash" translatable="false">//</string>
     <string name="news">News</string>
     <string name="chat">Chat</string>
     <string name="messages">Messages</string>
@@ -74,7 +74,7 @@
     <string name="chsavatar">Choose avatarId</string>
 
     <!-- Strings related to messenger -->
-    <string name="general_chat_channel">General Chat-Channel</string>
+    <string name="general_chat_channel">General Chat Channel</string>
     <string name="write_with_id">Write with PDAID..</string>
     <string name="action_sign_out">Sign out of your account</string>
     <string name="action_clear_saved_images">Clear cache of images</string>
@@ -82,7 +82,7 @@
     <string name="action_input_login_or_email">Input your Login or Email..</string>
     <string name="action_cancel">Cancel</string>
     <string name="unable_connect">Unable to connect server</string>
-    <string name="group_chat">Group-chat channel</string>
+    <string name="group_chat">Group Chat channel</string>
 
     <!-- Strings related to profile view -->
     <string name="profile_inventory">Inventory</string>
@@ -90,6 +90,7 @@
     <string name="profile_achievements">Achievements</string>
     <string name="profile_brief">Сводка</string>
     <string name="profile_arena">Арена</string>
+    <string name="profile_shop">Shop</string>
     <string name="profile_error">Cannot find this pdaId</string>
 
     <string name="backpack">Backpack</string>

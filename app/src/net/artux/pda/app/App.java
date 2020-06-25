@@ -3,6 +3,7 @@ package net.artux.pda.app;
 import android.app.Application;
 import android.content.Context;
 
+import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 
 
@@ -45,18 +46,12 @@ public class App extends Application {
             R.drawable.a0
     };
 
-    public static String URL = "192.168.0.3";
-
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
         sDataManager = new DataManager();
-        mRetrofitService.initRetrofit(URL , sDataManager);
-    }
-
-    public void setURL(String url){
-        URL = url;
+        mRetrofitService.initRetrofit(BuildConfig.URL, sDataManager);
     }
 
     public static DataManager getDataManager() {

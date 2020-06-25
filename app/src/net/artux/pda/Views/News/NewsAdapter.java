@@ -1,8 +1,6 @@
 package net.artux.pda.Views.News;
 
 import android.annotation.SuppressLint;
-import android.app.FragmentTransaction;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,11 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
+import com.prof.rssparser.Article;
 
 import net.artux.pda.R;
 import net.artux.pda.activities.MainActivity;
-import com.prof.rssparser.Article;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             mMainActivity.setTitle(article.getTitle());
             mMainActivity.setLoadingState(true);
 
-            FragmentTransaction fragmentTransaction = mMainActivity.getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = mMainActivity.getSupportFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.containerView, openNewsFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();

@@ -1,6 +1,5 @@
 package net.artux.pda.map.states;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -10,10 +9,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -22,39 +19,41 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import net.artux.pda.map.model.Map;
 import net.artux.pda.map.model.Player;
-import net.artux.pda.map.model.QuestPoint;
+import net.artux.pda.map.model.Point;
+import net.artux.pda.map.model.Spawn;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 
 
 public class PlayState extends State {
 
-    Player player;
-    Touchpad touchpad;
-    Stage stage;
-    Texture background;
-    Texture blur;
-    OrthographicCamera cam;
+    private Map map;
+
+    private Player player;
+    private Touchpad touchpad;
+    private Stage stage;
+    private Texture background;
+    private Texture blur;
+    private OrthographicCamera cam;
 
     private Touchpad.TouchpadStyle style;
     private Button.ButtonStyle textButtonStyle;
-
-    private List<QuestPoint> questPoints = new ArrayList<>();
+    private HashMap<String, Texture> textures =  new HashMap<>();
 
     public PlayState(GameStateManager gsm, Batch batch) {
         super(gsm);
+        map = gsm.getMap();
         Viewport viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage = new Stage(viewport, batch);
-        background = new Texture(Gdx.files.internal(gsm.getMap().getSrc()));
+        background = map.getTexture();
         blur = new Texture("maps/map_escape_bg.jpg");
 
         background.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
         TextureRegion imgTextureRegion = new TextureRegion(background);
         imgTextureRegion.setRegion(0,0,background.getWidth()*3,background.getHeight()*3);
 
-        initializePlayer(gsm.getMap());
+        initializePlayer(map);
+        textures.put("0", new Texture("quest.png"));
 
         Skin buttonSkin = new Skin();
         buttonSkin.add("up-d", new Texture("dialog.png"));
@@ -90,7 +89,6 @@ public class PlayState extends State {
         });
         stage.addActor(runButton);
 
-
         Button.ButtonStyle pauseButtonStyle = new Button.ButtonStyle();
         pauseButtonStyle.up = buttonSkin.getDrawable("pause");
         pauseButton = new Button(pauseButtonStyle);
@@ -104,13 +102,14 @@ public class PlayState extends State {
         cam.update();
 
         initTouchpad(w,h);
-
-        questPoints.add(new QuestPoint(new Texture("quest.png"), 580, 1250));
+        for (Spawn spawn : map.getSpawns()){
+            spawn.create(batch);
+        }
     }
 
     private void initializePlayer(Map map){
-        player = new Player(map.getPlayerPosition().x,map.getPlayerPosition().y);
-        player.setBoundsTexture(new Texture(map.getBoundsSrc()));
+        player = new Player(map.getPlayerPosition());
+        player.setBoundsTexture(map.getBoundsTexture());
     }
 
 
@@ -148,7 +147,8 @@ public class PlayState extends State {
     @Override
     public void update(float dt) {
         player.update(dt);
-
+        for (Spawn spawn:map.getSpawns())
+            spawn.update(dt);
     }
 
     @Override
@@ -167,23 +167,25 @@ public class PlayState extends State {
         batch.draw(background, 0, 0);
 
         player.draw(batch);
-        for(QuestPoint questPoint : questPoints){
-            questPoint.draw(batch);
-        }
-
+        drawQuests(batch);
+        for (Spawn spawn:map.getSpawns())
+            spawn.draw(batch);
         batch.end();
         stage.act();
         stage.draw();
-        checkQuests();
+
     }
     Button button = null;
     Button runButton = null;
     Button pauseButton = null;
 
-    void checkQuests(){
-        for(QuestPoint questPoint : questPoints) {
-            if (Math.sqrt(sq(questPoint.getPosition().x - player.getPosition().x)
-                    + sq(questPoint.getPosition().y - player.getPosition().y)) < 35f) {
+    void drawQuests(Batch batch){
+        for(final Point point: map.getPoints()) {
+            if (point.type==0){
+                batch.draw(textures.get("0"), point.getPosition().x, point.getPosition().y);
+            }
+            if (Math.sqrt(sq(point.getPosition().x - player.getPosition().x)
+                    + sq(point.getPosition().y - player.getPosition().y)) < 35f) {
                 float w = Gdx.graphics.getWidth();
                 float h = Gdx.graphics.getHeight();
                 if (!contains("b")) {
@@ -193,8 +195,7 @@ public class PlayState extends State {
                     button.addListener(new ChangeListener() {
                         @Override
                         public void changed(ChangeEvent event, Actor actor) {
-                            String[] strings = {"hello"};
-                             gsm.getPlatformInterface().send(strings);
+                             gsm.getPlatformInterface().send(point.getData());
                         }
                     });
                     button.setName("b");

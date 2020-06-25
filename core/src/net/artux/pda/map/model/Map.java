@@ -1,45 +1,46 @@
 package net.artux.pda.map.model;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+
 import java.util.List;
 
 public class Map {
 
+    private int id;
     private String title;
-    private String src;
-    private String boundsSrc;
-    private Position playerPosition;
+    private String texture;
+    private String boundsTexture;
+    private String defPos;
     private List<Point> points;
-    private List<Bot> bots;
-
-    public Map(String title, String src, String boundsSrc, Position playerPosition, List<Point> points) {
-        this.title = title;
-        this.src = src;
-        this.boundsSrc = boundsSrc;
-        this.playerPosition = playerPosition;
-        this.points = points;
-    }
+    private List<Spawn> spawns;
 
     public String getTitle() {
         return title;
-    }
-
-    public String getSrc() {
-        return src;
-    }
-
-    public String getBoundsSrc() {
-        return boundsSrc;
     }
 
     public List<Point> getPoints() {
         return points;
     }
 
-    public List<Bot> getBots() {
-        return bots;
+    public List<Spawn> getSpawns() {
+        return spawns;
     }
 
-    public Position getPlayerPosition() {
-        return playerPosition;
+    public void setPlayerPos(String pos) {
+        this.defPos = pos;
+    }
+
+    public Vector2 getPlayerPosition() {
+        String[] s = defPos.split(":");
+        return new Vector2(Integer.parseInt(s[0]), Integer.parseInt(s[1]));
+    }
+
+    public Texture getTexture() {
+        return new Texture(texture);
+    }
+
+    public Texture getBoundsTexture() {
+        return new Texture(boundsTexture);
     }
 }

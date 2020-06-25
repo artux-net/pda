@@ -16,7 +16,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -31,12 +30,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import net.artux.pda.Models.LoginStatus;
 import net.artux.pda.Models.LoginUser;
 import net.artux.pda.Models.Member;
 import net.artux.pda.Models.Status;
 import net.artux.pda.PdaAPI;
-
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.app.DataManager;
@@ -139,10 +139,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-
-        mEmailView.setText("Prisoner");
-        mPasswordView.setText("12345678");
-
 
         if(!App.getDataManager().getAuthToken().equals("")){
             startActivity(new Intent(this, LoadingActivity.class));

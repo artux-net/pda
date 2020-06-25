@@ -14,12 +14,12 @@ import androidx.annotation.Nullable;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.util.List;
-
+import net.artux.pda.BuildConfig;
 import net.artux.pda.Models.profile.Item;
 import net.artux.pda.R;
 import net.artux.pda.activities.MainActivity;
-import net.artux.pda.app.App;
+
+import java.util.List;
 
 public class BackpackAdapter extends ArrayAdapter<Item>{
 
@@ -62,7 +62,7 @@ public class BackpackAdapter extends ArrayAdapter<Item>{
 
         Glide.with(getContext())
                 .asGif()
-                .load("http://"+App.URL+"/files?file="+item.icon)
+                .load("http://"+ BuildConfig.URL+"/files?file="+item.icon)
                 .apply(options)
                 .into(image);
 

@@ -2,12 +2,13 @@ package net.artux.pda.Views.Chat;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.Models.LimitedArrayList;
 import net.artux.pda.Models.UserMessage;
@@ -68,13 +69,15 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     class ViewHolder extends RecyclerView.ViewHolder{
 
         ImageView avatarView;
-        TextView titleView;
+        TextView nicknameView;
+        TextView infoView;
         TextView messageView;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             avatarView = itemView.findViewById(R.id.avatar);
-            titleView = itemView.findViewById(R.id.title);
+            nicknameView = itemView.findViewById(R.id.nickname);
+            infoView = itemView.findViewById(R.id.info);
             messageView = itemView.findViewById(R.id.message);
         }
 
@@ -97,8 +100,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             tz = cal.getTimeZone();
             outputFormat.setTimeZone(tz);
 
-            titleView.setText(userMessage.senderLogin
-                    + " [PDA #" + userMessage.pdaId+"] "
+            nicknameView.setText(userMessage.senderLogin);
+            infoView.setText(" [PDA #" + userMessage.pdaId+"] "
                     + mContext.getResources().getStringArray(R.array.groups)[userMessage.groupId]
                     + " - " + outputFormat.format(localTime));
             messageView.setText(userMessage.message);
