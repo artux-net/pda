@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -45,13 +46,13 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
     private TextInputEditText mInputEditText;
 
     private WebSocket ws;
-    private Gson mGson;
+    private Gson gson;
 
     private Member user = App.getDataManager().getMember();
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 
         if(mainView==null){
             mainView = inflater.inflate(R.layout.fragment_chat, container,false);
@@ -68,7 +69,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
             sendButton.setOnClickListener(this);
 
             OkHttpClient client = new OkHttpClient();
-            mGson = new Gson();
+            gson = new Gson();
             Request request;
             Bundle args= getArguments();
 
@@ -78,13 +79,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
                             .addHeader("t", App.getDataManager().getAuthToken())
                             .build();
                 }else{
-                    int type = args.getInt("type",0);
-                    if (type == 0)
-                        request = new Request.Builder().url("ws://" + BuildConfig.URL + "/dialog"
-                                + "?to=" + getArguments().getInt("to"))
-                                .addHeader("t", App.getDataManager().getAuthToken())
-                                .build();
-                    else if (type == 1)
+                    if (args.containsKey("c"))
                         request = new Request.Builder().url("ws://" + BuildConfig.URL + "/dialog"
                                 + "?c=" + getArguments().getInt("c"))
                                 .addHeader("t", App.getDataManager().getAuthToken())
@@ -115,43 +110,48 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.sendButton:
-                if(!mInputEditText.getText().toString().equals("")) {
-                    UserMessage userMessage = new UserMessage();
-                    userMessage.senderLogin = user.getLogin();
-                    userMessage.message = mInputEditText.getText().toString();
-                    userMessage.avatarId = Integer.parseInt(user.getAvatarId());
-                    userMessage.groupId = user.getGroup();
-                    userMessage.pdaId = user.getPdaId();
+        if (v.getId() == R.id.sendButton) {
+            if (!mInputEditText.getText().toString().equals("")) {
+                UserMessage userMessage = new UserMessage();
+                userMessage.senderLogin = user.getLogin();
+                userMessage.message = mInputEditText.getText().toString();
+                userMessage.avatarId = Integer.parseInt(user.getAvatarId());
+                userMessage.groupId = user.getGroup();
+                userMessage.pdaId = user.getPdaId();
 
-                    SimpleDateFormat dateFormatGmt = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                    dateFormatGmt.setTimeZone(TimeZone.getTimeZone("UTC"));
+                SimpleDateFormat dateFormatGmt = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                dateFormatGmt.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-                    userMessage.time = dateFormatGmt.format(new Date());
+                userMessage.time = dateFormatGmt.format(new Date());
 
-                    if (ws.send(mGson.toJson(userMessage))) {
-                        mInputEditText.setText("");
-                    }
+                if (ws.send(gson.toJson(userMessage))) {
+                    mInputEditText.setText("");
                 }
-                break;
+            }
         }
     }
 
     private void updateAdapter(final String text){
+        if (getActivity()!=null)
         getActivity().runOnUiThread(() -> {
             System.out.println(text);
 
             Type listType = new TypeToken<LimitedArrayList<UserMessage>>(){}.getType();
 
             try {
-                LimitedArrayList<UserMessage> list = mGson.fromJson(text, listType);
+                LimitedArrayList<UserMessage> list = gson.fromJson(text, listType);
                 mChatAdapter.setItems(list);
             }catch (JsonSyntaxException e){
-                mChatAdapter.addMessage(mGson.fromJson(text,UserMessage.class));
+                mChatAdapter.addMessage(gson.fromJson(text,UserMessage.class));
                 mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount()-1);
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ws.close(1000, "Closed by user");
     }
 
     private final class EchoWebSocketListener extends WebSocketListener {
@@ -168,7 +168,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener{
 
         @Override
         public void onClosing(WebSocket webSocket, int code, String reason) {
-            webSocket.close(NORMAL_CLOSURE_STATUS, null);
+            webSocket.close(NORMAL_CLOSURE_STATUS, reason);
         }
 
         @Override

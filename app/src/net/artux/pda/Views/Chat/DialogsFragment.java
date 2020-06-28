@@ -28,16 +28,16 @@ import retrofit2.Response;
 
 public class DialogsFragment extends Fragment {
 
-    View mainView;
-    RecyclerView mRecyclerView;
-    Gson mGson = new Gson();
+    private View mainView;
+    private RecyclerView mRecyclerView;
+    private Gson mGson = new Gson();
+    private DialogsAdapter dialogsAdapter;
 
-    Handler updateDialogHandler = new Handler();
-    int delay = 10000; // 10 seconds
+    private Handler updateDialogHandler = new Handler();
+    private int delay = 10000; // 10 seconds
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        System.out.println("DIALOGS");
         if (mainView==null){
             mainView = inflater.inflate(R.layout.fragment_messages, container, false);
 
@@ -47,17 +47,15 @@ public class DialogsFragment extends Fragment {
             manager.setOrientation(LinearLayoutManager.VERTICAL);
             mRecyclerView.setLayoutManager(manager);
 
-            DialogsAdapter dialogsAdapter = new DialogsAdapter((MainActivity) getActivity(), App.getDataManager().getMember().getGroup());
+            dialogsAdapter = new DialogsAdapter((MainActivity) getActivity());
             Type listType = new TypeToken<List<Dialog>>(){}.getType();
             List<Dialog> dialogs = mGson.fromJson(App.getDataManager().getDialogsJson(), listType);
             if(dialogs!=null){
                 dialogsAdapter.setDialogs(dialogs);
-                dialogsAdapter.notifyDataSetChanged();
             }
 
             mRecyclerView.setAdapter(dialogsAdapter);
 
-            System.out.println("DIALOGS-try0");
             updateDialog();
         }
 
@@ -77,14 +75,7 @@ public class DialogsFragment extends Fragment {
             @Override
             public void onResponse(Call<List<Dialog>> call, Response<List<Dialog>> response) {
                 List<Dialog> dialogs = response.body();
-
-                App.getDataManager().setDialogsJson(mGson.toJson(dialogs));
-                DialogsAdapter dialogsAdapter = new DialogsAdapter((MainActivity) getActivity(), App.getDataManager().getMember().getGroup());
                 dialogsAdapter.setDialogs(dialogs);
-                dialogsAdapter.notifyDataSetChanged();
-                mRecyclerView.setAdapter(dialogsAdapter);
-
-
             }
 
             @Override

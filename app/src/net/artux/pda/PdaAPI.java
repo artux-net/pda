@@ -43,13 +43,13 @@ public interface PdaAPI{
     @GET("/reset")
     Call<Status> resetPassword(@Query("q") String loginOrEmail);
 
-    @GET("/user")
+    @GET("/profile")
     Call<Profile> getProfile(@Query("pdaId") int pdaId);
 
-    @GET("/user")
+    @GET("/profile")
     Call<Profile> getMyProfile();
 
-    @POST("/user")
+    @POST("/profile")
     Call<Member> synchronize(@Body HashMap<String, List<String>> actions);
 
     @GET("/stories")

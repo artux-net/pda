@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/titleDialog"
+        android:id="@+id/chat_general"
         android:text="@string/general_chat_channel"
         android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_margin="16dp"/>
+        android:layout_weight="1" />
 
+    <TextView
+        android:id="@+id/chat_group"
+        android:text="@string/group_chat"
+        android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/chat_create"
+        android:text="pdaID, новая беседа"
+        android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_weight="1" />
 </LinearLayout>

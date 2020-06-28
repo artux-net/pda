@@ -4,22 +4,27 @@ import com.google.gson.Gson;
 
 import net.artux.pda.Models.profile.Data;
 
+import java.util.List;
+
 public class Member {
 
     private String login;
-    private String name;
     private String email;
-    private String password;
+    private String name;
+    private String avatar;
+    private String token;
+    private int pdaId;
     private byte admin;
     private byte blocked;
     private int group;
-    private String avatar;
-    private int pdaId;
     private int xp;
     private String location;
-    private String registrationDate;
     private String data;
-    private String dialogs;
+    private List<Integer> dialogs;
+    private List<Integer> friends;
+    private List<Integer> friendRequests;
+    private String lastModified;
+    private String registrationDate;
 
 
     public String getEmail() {
@@ -28,14 +33,6 @@ public class Member {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getName() {
@@ -84,14 +81,6 @@ public class Member {
 
     public void setPdaId(int pdaId) {
         this.pdaId = pdaId;
-    }
-
-    public String getDialogs() {
-        return dialogs;
-    }
-
-    public void setDialogs(String dialogs) {
-        this.dialogs = dialogs;
     }
 
     public int getXp() {

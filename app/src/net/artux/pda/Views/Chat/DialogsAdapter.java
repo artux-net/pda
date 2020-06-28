@@ -1,7 +1,6 @@
 package net.artux.pda.Views.Chat;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -11,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,47 +28,29 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<Dialog> mDialogList = new ArrayList<>();
 
     private MainActivity mContext;
-    private int groupId = 0;
 
-    DialogsAdapter(MainActivity context, int groupId){
-        // TODO
+    DialogsAdapter(MainActivity context) {
         mContext = context;
-        this.groupId = groupId;
     }
 
-    public void setDialogs(List<Dialog> dialogs) {
-        if (dialogs!=null) mDialogList.addAll(dialogs);
+    void setDialogs(List<Dialog> dialogs) {
+        mDialogList = dialogs;
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemViewType(int position) {
-
-        if (groupId!=0) {
-            switch (position) {
-                case 0:
-                    return 0;
-                case 1:
-                    return 0;
-                case 2:
-                    return 0;
-            }
-        } else {
-            switch (position) {
-                case 0:
-                    return 0;
-                case 1:
-                    return 0;
-            }
+        if (position == 0) {
+            return 0;
         }
-
-        return 2;
+        return 1;
     }
 
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
-        if(viewType==0){
+        if (viewType == 0) {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_general_chat, parent, false);
             return new GeneralChatViewHolder(view);
@@ -82,47 +64,32 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
-        switch (holder.getItemViewType()){
+        switch (holder.getItemViewType()) {
             case 0:
-
                 GeneralChatViewHolder generalChatViewHolder = (GeneralChatViewHolder) holder;
-                generalChatViewHolder.bind(position);
-
+                generalChatViewHolder.bind();
                 break;
-            case 2:
-
-                if(groupId!=0){
-                    ViewHolder viewHolder = (ViewHolder) holder;
-                    viewHolder.bind(mDialogList.get(position-3));
-                } else {
-                    ViewHolder viewHolder = (ViewHolder) holder;
-                    viewHolder.bind(mDialogList.get(position-2));
-                }
-
+            case 1:
+                ViewHolder viewHolder = (ViewHolder) holder;
+                viewHolder.bind(mDialogList.get(position - 1));
                 break;
         }
-
-
     }
 
     @Override
     public int getItemCount() {
-
-        int addItems = 2;
-        if (groupId!=0)  addItems +=1;
-        if(mDialogList!=null) return mDialogList.size()+addItems;
-        else return 2;
+        if (mDialogList != null) return mDialogList.size() + 1;
+        else return 1;
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements DialogsClickListener{
+    class ViewHolder extends RecyclerView.ViewHolder implements DialogsClickListener {
 
         ImageView avatarView;
         TextView titleView;
         TextView lastMessage;
         View mainView;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             avatarView = itemView.findViewById(R.id.avatarDialog);
             titleView = itemView.findViewById(R.id.titleDialog);
@@ -130,29 +97,19 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             mainView = itemView;
         }
 
-        public void bind(final Dialog dialog){
-            if (dialog.type==0) {
-                avatarView.setImageDrawable(mContext.getResources().
+        void bind(final Dialog dialog) {
+            if (dialog.type == 0) {
+                avatarView.setImageDrawable(avatarView.getContext().getResources().
                         getDrawable(App.avatars[dialog.getAvatarId()]));
 
                 lastMessage.setText(dialog.lastMessage);
-                titleView.setText(dialog.login + " PDA #" + dialog.pda);
-                mainView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ViewHolder.this.onClick(dialog);
-                    }
-                });
-            }else {
+                titleView.setText(dialog.title);
+
+            } else {
                 lastMessage.setText(dialog.lastMessage);
-                titleView.setText("Беседа #"+dialog.name);
-                mainView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ViewHolder.this.onClick(dialog);
-                    }
-                });
+                titleView.setText(dialog.title);
             }
+            mainView.setOnClickListener(view -> ViewHolder.this.onClick(dialog));
         }
 
         @Override
@@ -163,12 +120,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             Bundle bundle = new Bundle();
             bundle.putInt("type", dialog.type);
-            if (dialog.type==0)
-                bundle.putInt("to", dialog.pda);
-            else if (dialog.type == 1)
-                bundle.putString("c", dialog.name);
-
-
+            bundle.putInt("c", dialog.id);
 
             chatFragment.setArguments(bundle);
 
@@ -178,98 +130,73 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    class GeneralChatViewHolder extends RecyclerView.ViewHolder{
+    class GeneralChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView titleView;
+        TextView generalView;
+        TextView groupView;
+        TextView createView;
         View mainView;
 
-        public GeneralChatViewHolder(View itemView) {
+        GeneralChatViewHolder(View itemView) {
             super(itemView);
             mainView = itemView;
-            titleView = mainView.findViewById(R.id.titleDialog);
+            generalView = mainView.findViewById(R.id.chat_general);
+            groupView = mainView.findViewById(R.id.chat_group);
+            createView = mainView.findViewById(R.id.chat_create);
         }
 
-        public void bind(int pos){
-            switch (pos){
-                case 0:
-                    titleView.setText(mContext.getResources().getText(R.string.general_chat_channel));
-                    mainView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
+        void bind() {
+            generalView.setOnClickListener(this);
+            groupView.setOnClickListener(this);
+            createView.setOnClickListener(this);
+        }
 
-                            ChatFragment chatFragment = new ChatFragment();
-                            fragmentTransaction.replace(R.id.containerView, chatFragment);
-                            fragmentTransaction.addToBackStack(null);
-                            fragmentTransaction.commit();
+        @Override
+        public void onClick(View view) {
+            switch (view.getId()){
+                case R.id.chat_general:
+                    FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
+                    ChatFragment chatFragment = new ChatFragment();
+                    fragmentTransaction.replace(R.id.containerView, chatFragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                    break;
+                case R.id.chat_group:
+                    fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
+                    chatFragment = new ChatFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("group", true);
+                    chatFragment.setArguments(bundle);
+                    fragmentTransaction.replace(R.id.containerView, chatFragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                    break;
+                case R.id.chat_create:
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                    builder.setTitle("Input PdaID.. | Create a conversation");
+
+                    final EditText input = new EditText(mContext);
+                    input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    builder.setView(input);
+                    builder.setPositiveButton("OK", (dialog, which) -> {
+                        FragmentTransaction fragmentTransaction1 = mContext.getSupportFragmentManager().beginTransaction();
+                        ChatFragment chatFragment1 = new ChatFragment();
+                        Bundle bundle1 = new Bundle();
+                        bundle1.putInt("type", 0);
+                        if (Integer.parseInt(input.getText().toString()) != 0) {
+                            bundle1.putInt("to", Integer.parseInt(input.getText().toString()));
+                            chatFragment1.setArguments(bundle1);
+
+                            fragmentTransaction1.replace(R.id.containerView, chatFragment1);
+                            fragmentTransaction1.addToBackStack(null);
+                            fragmentTransaction1.commit();
                         }
                     });
+                    builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+                    builder.show();
                     break;
-                case 1:
-                    titleView.setText(mContext.getResources().getString(R.string.group_chat));
-                    mainView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
-
-                            ChatFragment chatFragment = new ChatFragment();
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("group", App.getDataManager().getMember().getGroup());
-                            chatFragment.setArguments(bundle);
-                            fragmentTransaction.replace(R.id.containerView, chatFragment);
-                            fragmentTransaction.addToBackStack(null);
-                            fragmentTransaction.commit();
-                        }
-                    });
-                    break;
-                case 2:
-                    titleView.setText("Enter pdaID | Create a conversation");
-                    mainView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-
-
-                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-                            builder.setTitle("Input PdaID.. | Create a conversation");
-
-                            final EditText input = new EditText(mContext);
-                            input.setInputType(InputType.TYPE_CLASS_NUMBER);
-                            builder.setView(input);
-
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                    FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
-
-                                    ChatFragment chatFragment = new ChatFragment();
-                                    Bundle bundle = new Bundle();
-                                    bundle.putInt("type", 0);
-
-                                    if (Integer.parseInt(input.getText().toString())!=0){
-                                        bundle.putInt("to", Integer.parseInt(input.getText().toString()));
-                                        chatFragment.setArguments(bundle);
-
-                                        fragmentTransaction.replace(R.id.containerView, chatFragment);
-                                        fragmentTransaction.addToBackStack(null);
-                                        fragmentTransaction.commit();
-                                    }
-                                }
-                            });
-                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-                                }
-                            });
-
-                            builder.show();
-                        }
-                    });
-                    break;
-
             }
         }
     }
-
 }
