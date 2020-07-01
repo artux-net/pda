@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +15,7 @@ import com.google.gson.reflect.TypeToken;
 
 import net.artux.pda.Models.Dialog;
 import net.artux.pda.R;
+import net.artux.pda.activities.BaseFragment;
 import net.artux.pda.activities.MainActivity;
 import net.artux.pda.app.App;
 
@@ -26,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DialogsFragment extends Fragment {
+public class DialogsFragment extends BaseFragment {
 
     private View mainView;
     private RecyclerView mRecyclerView;
@@ -38,6 +38,7 @@ public class DialogsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        navigationPresenter.setTitle(getResources().getString(R.string.chat));
         if (mainView==null){
             mainView = inflater.inflate(R.layout.fragment_messages, container, false);
 

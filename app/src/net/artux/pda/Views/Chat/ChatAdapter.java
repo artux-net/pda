@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.artux.pda.Models.LimitedArrayList;
 import net.artux.pda.Models.UserMessage;
 import net.artux.pda.R;
+import net.artux.pda.Views.PdaAlertDialog;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,7 +26,6 @@ import static net.artux.pda.app.App.avatars;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
-
     private LimitedArrayList<UserMessage> mMessageList = new LimitedArrayList<>();
 
     private Context mContext;
@@ -34,7 +34,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         mContext = context;
     }
 
-    public void setItems(LimitedArrayList<UserMessage> messages) {
+    void setItems(LimitedArrayList<UserMessage> messages) {
         mMessageList.addAll(messages);
         notifyDataSetChanged();
     }
@@ -44,7 +44,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void addMessage(UserMessage userMessage){
+    void addMessage(UserMessage userMessage){
         mMessageList.add(userMessage);
         notifyDataSetChanged();
     }
@@ -82,7 +82,28 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
 
         @SuppressLint("SetTextI18n")
-        public void bind(UserMessage userMessage){
+        void bind(UserMessage userMessage){
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    PdaAlertDialog builder = new PdaAlertDialog(mContext);
+                    builder.addButton("Перейти к диалогу", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                        }
+                    });
+                    builder.addButton("Посмотреть профиль", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+                        }
+                    });
+                    builder.show();
+
+                    return false;
+                }
+            });
             SimpleDateFormat outputFormat =
                     new SimpleDateFormat("HH:mm", Locale.getDefault());
             outputFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

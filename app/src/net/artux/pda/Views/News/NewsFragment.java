@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,11 +14,12 @@ import com.prof.rssparser.Article;
 import com.prof.rssparser.Parser;
 
 import net.artux.pda.R;
+import net.artux.pda.activities.BaseFragment;
 import net.artux.pda.activities.MainActivity;
 
 import java.util.ArrayList;
 
-public class NewsFragment extends Fragment {
+public class NewsFragment extends BaseFragment {
 
     View mView;
     RecyclerView mRecyclerView;
@@ -29,7 +29,7 @@ public class NewsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-
+        navigationPresenter.setTitle(getResources().getString(R.string.news));
         if(mView==null){
             mainActivity = (MainActivity) getActivity();
             mView = inflater.inflate(R.layout.frament_news,container,false);

@@ -8,22 +8,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import net.artux.pda.Models.Profile;
 import net.artux.pda.R;
+import net.artux.pda.activities.BaseFragment;
 import net.artux.pda.app.App;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends BaseFragment {
 
     View mainView;
     ImageView avatar;
-
-
 
     @Nullable
     @Override

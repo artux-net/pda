@@ -8,15 +8,14 @@ import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import net.artux.pda.Models.profile.Item;
 import net.artux.pda.R;
-import net.artux.pda.activities.MainActivity;
+import net.artux.pda.activities.BaseFragment;
 
 import java.util.List;
 
-public class BackpackFragment extends Fragment {
+public class BackpackFragment extends BaseFragment {
 
     private View mainView;
 
@@ -31,7 +30,7 @@ public class BackpackFragment extends Fragment {
             mainView = inflater.inflate(R.layout.fragment_profile_backpack, container, false);
             grid = mainView.findViewById(R.id.grid);
 
-            BackpackAdapter backpackAdapter = new BackpackAdapter(getActivity(), R.layout.item_backpack, items, (MainActivity) getActivity());
+            BackpackAdapter backpackAdapter = new BackpackAdapter(getContext(), R.layout.item_backpack, items, navigationPresenter);
             grid.setAdapter(backpackAdapter);
             adjustGrid();
 

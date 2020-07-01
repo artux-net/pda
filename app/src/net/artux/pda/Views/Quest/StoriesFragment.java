@@ -8,13 +8,13 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
 import net.artux.pda.Views.Quest.Models.Stories;
 import net.artux.pda.Views.Quest.Models.StoriesAdapter;
+import net.artux.pda.activities.BaseFragment;
 import net.artux.pda.activities.QuestActivity;
 import net.artux.pda.app.App;
 
@@ -22,7 +22,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class StoriesFragment extends Fragment implements StoriesAdapter.OnItemClickListener {
+public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnItemClickListener {
 
     @Nullable
     @Override
@@ -33,6 +33,7 @@ public class StoriesFragment extends Fragment implements StoriesAdapter.OnItemCl
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        navigationPresenter.setTitle(getResources().getString(R.string.quest));
         RecyclerView recyclerView = view.findViewById(R.id.list_quests);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         App.getRetrofitService().getPdaAPI().getStories().enqueue(new Callback<Stories>() {

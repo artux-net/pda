@@ -51,4 +51,6 @@
     <string name="profile_error">Не удалось найти pdaId</string>
     <string name="backpack">Рюкзак</string>
     <string name="unable_connect">Не удалось подключится к серверу</string>
+    <string name="enc">Энциклопедия</string>
+    <string name="kinds">Разделы</string>
 </resources>

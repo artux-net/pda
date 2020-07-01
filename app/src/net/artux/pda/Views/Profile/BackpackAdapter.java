@@ -17,7 +17,7 @@ import com.bumptech.glide.request.RequestOptions;
 import net.artux.pda.BuildConfig;
 import net.artux.pda.Models.profile.Item;
 import net.artux.pda.R;
-import net.artux.pda.activities.MainActivity;
+import net.artux.pda.activities.FragmentNavigation;
 
 import java.util.List;
 
@@ -26,15 +26,15 @@ public class BackpackAdapter extends ArrayAdapter<Item>{
     private List<Item> items;
     LayoutInflater lInflater;
     Context context;
-    MainActivity mainActivity;
+    FragmentNavigation.Presenter presenter;
 
-    public BackpackAdapter(@NonNull Context context, int resource, @NonNull List<Item> objects, MainActivity mainActivity) {
+    public BackpackAdapter(@NonNull Context context, int resource, @NonNull List<Item> objects, FragmentNavigation.Presenter presenter) {
         super(context, resource, objects);
         this.items = objects;
         this.context = context;
         lInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.mainActivity = mainActivity;
+        this.presenter = presenter;
     }
 
 
@@ -49,7 +49,7 @@ public class BackpackAdapter extends ArrayAdapter<Item>{
 
         Item item = items.get(position);
 
-        itemView.setOnClickListener(new UltimateClickListener(item, context, mainActivity));
+        itemView.setOnClickListener(new UltimateClickListener(item, context, presenter));
 
         TextView title = itemView.findViewById(R.id.itemTitle);
         ImageView image = itemView.findViewById(R.id.itemImage);

@@ -10,10 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import net.artux.pda.Models.Member;
 import net.artux.pda.R;
+import net.artux.pda.activities.AdditionalBaseFragment;
 import net.artux.pda.app.App;
 import net.artux.pda.app.DataManager;
 
@@ -25,7 +25,7 @@ import java.util.Locale;
 
 import me.grantland.widget.AutofitHelper;
 
-public class InfoFragment extends Fragment {
+public class InfoFragment extends AdditionalBaseFragment {
 
     View mainView;
 

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,11 +24,18 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import net.artux.pda.R;
+import net.artux.pda.Views.Additional.AdditionalFragment;
+import net.artux.pda.Views.Additional.InfoFragment;
+import net.artux.pda.Views.Chat.DialogsFragment;
+import net.artux.pda.Views.News.NewsFragment;
+import net.artux.pda.Views.Profile.ProfileFragment;
+import net.artux.pda.Views.Quest.StoriesFragment;
+import net.artux.pda.app.App;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements MainContract.View, View.OnClickListener {
 
     FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
 
@@ -36,9 +44,8 @@ public class MainActivity extends FragmentActivity {
     TextView mAdditionalTitleTextView;
     private TextView tvTime;
     public Fragment mainFragment;
-    Fragment addFragment;
 
-    MainActivityController mainActivityController;
+    MainPresenter presenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,39 +56,59 @@ public class MainActivity extends FragmentActivity {
         mAdditionalTitleTextView = findViewById(R.id.addTitleView);
         tvTime = findViewById(R.id.tvTime);
 
-        mainActivityController = new MainActivityController(this);
-        mainActivityController.firstSetup();
+        presenter = new MainPresenter();
+        presenter.attachView(this);
+
+        setFragment(new NewsFragment());
+        setAdditionalFragment(new InfoFragment());
+        if(App.getDataManager().getMember()!=null){
+            setAdditionalTitle("PDA #" + App.getDataManager().getMember().getPdaId());
+        }
+
         setOnClickListeners();
     }
 
-    public void setupMainFragment(Fragment fragment){
-        mainFragment = fragment;
-        mFragmentTransaction = getSupportFragmentManager().beginTransaction();
-        mFragmentTransaction.replace(R.id.containerView, fragment);
-        mFragmentTransaction.commit();
-    }
 
-    public void setupAdditionalFragment(Fragment fragment){
-        addFragment = fragment;
-        mFragmentTransaction = getSupportFragmentManager().beginTransaction();
-        mFragmentTransaction.replace(R.id.addСontainerView, fragment);
-        mFragmentTransaction.commit();
-    }
 
+    @Override
     public void setTitle(String title){
         mTitleTextView.setText(title);
     }
 
+    @Override
     public void setAdditionalTitle(String title){
         mAdditionalTitleTextView.setText(title);
     }
 
     void setOnClickListeners(){
-        findViewById(R.id.news).setOnClickListener(mainActivityController);
-        findViewById(R.id.messages).setOnClickListener(mainActivityController);
-        findViewById(R.id.profile).setOnClickListener(mainActivityController);
-        findViewById(R.id.settings).setOnClickListener(mainActivityController);
-        findViewById(R.id.quest).setOnClickListener(mainActivityController);
+        findViewById(R.id.news).setOnClickListener(this);
+        findViewById(R.id.messages).setOnClickListener(this);
+        findViewById(R.id.profile).setOnClickListener(this);
+        findViewById(R.id.settings).setOnClickListener(this);
+        findViewById(R.id.quest).setOnClickListener(this);
+    }
+
+    @Override
+    public void setFragment(BaseFragment fragment) {
+        fragment.attachPresenter(presenter);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.containerView,fragment)
+                .commit();
+    }
+
+    @Override
+    public void setAdditionalFragment(AdditionalBaseFragment fragment) {
+        fragment.attachPresenter(presenter);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.addСontainerView,fragment)
+                .commit();
+    }
+
+    @Override
+    public void attachPresenter(MainContract.Presenter presenter) {
+
     }
 
     BroadcastReceiver _broadcastReceiver;
@@ -124,13 +151,35 @@ public class MainActivity extends FragmentActivity {
 
                     @Override
                     public boolean onResourceReady(GifDrawable resource, Object model, Target<GifDrawable> target, DataSource dataSource, boolean isFirstResource) {
-                        if (resource instanceof GifDrawable) {
+                        if (resource != null) {
                             if(!loadingState) resource.setLoopCount(1);
                         }
                         return false;
                     }
                 })
                 .into((ImageView) findViewById(R.id.loadingCube));
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.news:
+                setFragment(new NewsFragment());
+                break;
+            case R.id.messages:
+                setFragment(new DialogsFragment());
+                break;
+            case R.id.profile:
+                setFragment(new ProfileFragment());
+                setAdditionalFragment(new AdditionalFragment());
+                break;
+            case R.id.settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            case R.id.quest:
+                setFragment(new StoriesFragment());
+                break;
+        }
     }
 }
 

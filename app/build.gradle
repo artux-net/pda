@@ -33,7 +33,7 @@ android {
 
         }
         debug {
-            buildConfigField("String", "URL", "\"192.168.0.104\"")
+            buildConfigField("String", "URL", "\"192.168.1.106\"")
         }
     }
     compileOptions {
@@ -44,10 +44,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation ("com.squareup.okhttp3:okhttp:3.12.12"){
-        force = true //API 19 support
-    }
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.12'
     implementation 'at.favre.lib:armadillo:0.8.0'
     implementation 'com.prof.rssparser:rssparser:1.4.4'
     implementation 'com.github.bumptech.glide:glide:4.11.0'

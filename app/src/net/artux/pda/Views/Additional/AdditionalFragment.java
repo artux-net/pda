@@ -9,13 +9,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import androidx.fragment.app.Fragment;
-
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.Views.Encyclopedia.EncyclopediaFragment;
+import net.artux.pda.activities.AdditionalBaseFragment;
 import net.artux.pda.activities.MainActivity;
-import net.artux.pda.activities.MainActivityController;
 import net.artux.pda.app.App;
 
 import org.jetbrains.annotations.Nullable;
@@ -27,29 +25,21 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class AdditionalFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class AdditionalFragment extends AdditionalBaseFragment implements AdapterView.OnItemClickListener {
 
     View mainView;
     ListView listView;
-    MainActivityController controller;
     MapAdapter adapter;
     LinkedHashMap<String, String> categories;
-
-    public AdditionalFragment setController(MainActivityController controller){
-        this.controller = controller;
-        return this;
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        navigationPresenter.setAdditionalTitle(getString(R.string.kinds));
         if (mainView==null){
             mainView = inflater.inflate(R.layout.fragment_add_profile, container, false);
 
             if(getArguments()!=null){
-
-
-
                 App.getRetrofitService().getPdaAPI()
                         .getCategories(getResources().getConfiguration().locale.getISO3Language()).enqueue(new Callback<LinkedHashMap<String, String>>() {
                     @Override
@@ -81,7 +71,8 @@ public class AdditionalFragment extends Fragment implements AdapterView.OnItemCl
                         android.R.layout.simple_list_item_1);
                 listView.setAdapter(adapter);
                 listView.setOnItemClickListener((parent, view, position, id) -> {
-                    controller.setFragmentFromAdditional(position);
+                    //TODO check
+                    //controller.setFragmentFromAdditional(position);
                 });
             }
         }

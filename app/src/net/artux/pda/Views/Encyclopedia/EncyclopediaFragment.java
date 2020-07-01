@@ -9,12 +9,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
+import net.artux.pda.activities.BaseFragment;
 
-public class EncyclopediaFragment extends Fragment {
+public class EncyclopediaFragment extends BaseFragment {
 
     View view;
     WebView webView;
@@ -26,7 +26,7 @@ public class EncyclopediaFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-
+        navigationPresenter.setTitle(getString(R.string.enc));
         if(view==null){
             view = inflater.inflate(R.layout.fragment_enc, container, false);
             webView = view.findViewById(R.id.webview);

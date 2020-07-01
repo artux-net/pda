@@ -11,32 +11,31 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-
 import com.google.gson.Gson;
 
 import net.artux.pda.Models.profile.Item;
 import net.artux.pda.R;
 import net.artux.pda.Views.Additional.AdditionalFragment;
 import net.artux.pda.Views.Encyclopedia.EncyclopediaFragment;
-import net.artux.pda.activities.MainActivity;
+import net.artux.pda.activities.FragmentNavigation;
 
 public class UltimateClickListener implements View.OnClickListener {
 
     private Item item;
     private Context context;
-    private MainActivity mainActivity;
+    private FragmentNavigation.Presenter presenter;
 
-    UltimateClickListener(Item item, Context context, MainActivity mainActivity){
+    UltimateClickListener(Item item, Context context, FragmentNavigation.Presenter presenter){
         this.item = item;
         this.context = context;
-        this.mainActivity = mainActivity;
+        this.presenter = presenter;
     }
 
     @Override
     public void onClick(View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogStyle);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        View view = LayoutInflater.from(context).inflate(R.layout.dialog_item, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_item_backpack, null);
 
         Log.e("backpack", new Gson().toJson(item));
 
@@ -64,24 +63,20 @@ public class UltimateClickListener implements View.OnClickListener {
         }
 
         Button button = view.findViewById(R.id.d);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EncyclopediaFragment encyclopediaFragment = new EncyclopediaFragment();
-                Bundle bundle = new Bundle();
-                bundle.putInt("id", item.library_id);
-                bundle.putInt("type", item.type);
+        button.setOnClickListener(v1 -> {
+            EncyclopediaFragment encyclopediaFragment = new EncyclopediaFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt("id", item.library_id);
+            bundle.putInt("type", item.type);
 
-                encyclopediaFragment.setArguments(bundle);
-                AdditionalFragment additionalFragment = new AdditionalFragment();
-                additionalFragment.setArguments(bundle);
+            encyclopediaFragment.setArguments(bundle);
+            AdditionalFragment additionalFragment = new AdditionalFragment();
+            additionalFragment.setArguments(bundle);
 
-                mainActivity.setTitle("Энциклопедия");
-                mainActivity.setupMainFragment(encyclopediaFragment);
-                mainActivity.setAdditionalTitle("Разделы");
-                mainActivity.setupAdditionalFragment(additionalFragment);
+            presenter.addFragment(encyclopediaFragment);
 
-            }
+            presenter.addAdditionalFragment(additionalFragment);
+
         });
         view.setMinimumWidth((int) (context.getResources().getDisplayMetrics().widthPixels * 0.6f));
         view.setMinimumHeight((int) (context.getResources().getDisplayMetrics().heightPixels * 0.6f));
