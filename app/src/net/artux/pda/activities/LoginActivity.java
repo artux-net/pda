@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -25,23 +24,18 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import net.artux.pda.Models.LoginStatus;
-import net.artux.pda.Models.LoginUser;
-import net.artux.pda.Models.Member;
-import net.artux.pda.Models.Status;
-import net.artux.pda.PdaAPI;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pda.app.DataManager;
+import net.artux.pdalib.LoginStatus;
+import net.artux.pdalib.LoginUser;
+import net.artux.pdalib.Status;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +46,6 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     LoginUser loginUser;
-    private UserLoginTask mAuthTask = null;
-
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -64,93 +56,82 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-
-        mResetPassword = findViewById(R.id.forgotPassword);
-        mResetPassword.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-                builder.setTitle(R.string.action_input_login_or_email);
-
-                final EditText input = new EditText(LoginActivity.this);
-                input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-                builder.setView(input);
-
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        App.getRetrofitService().getPdaAPI().resetPassword(input.getText().toString()).enqueue(new Callback<Status>() {
-                            @Override
-                            public void onResponse(Call<Status> call, Response<Status> response) {
-                                Status status = response.body();
-                                if (status != null) {
-                                    if (status.isSuccess()) Toast.makeText(LoginActivity.this, status.getDescription(), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<Status> call, Throwable t) {
-
-                            }
-                        });
-
-                    }
-                });
-                builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-            }
-        });
-        mEmailView = findViewById(R.id.email);
-
-        mPasswordView = findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    hideKeyboard(LoginActivity.this);
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-        findViewById(R.id.register).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-            }
-        });
-
-        Button mEmailSignInButton = findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
-
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
 
         if(!App.getDataManager().getAuthToken().equals("")){
             startActivity(new Intent(this, LoadingActivity.class));
             finish();
+        }else {
+            setContentView(R.layout.activity_login);
+            mResetPassword = findViewById(R.id.forgotPassword);
+            mResetPassword.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                    builder.setTitle(R.string.action_input_login_or_email);
+
+                    final EditText input = new EditText(LoginActivity.this);
+                    input.setText(mEmailView.getText());
+                    input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                    builder.setView(input);
+
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            App.getRetrofitService().getPdaAPI().resetPassword(input.getText().toString()).enqueue(new Callback<Status>() {
+                                @Override
+                                public void onResponse(Call<Status> call, Response<Status> response) {
+                                    Status status = response.body();
+                                    if (status != null)
+                                        Toast.makeText(LoginActivity.this, status.getDescription(), Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onFailure(Call<Status> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    });
+                    builder.setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+                    builder.show();
+                }
+            });
+            mEmailView = findViewById(R.id.email);
+
+            mPasswordView = findViewById(R.id.password);
+            mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                    if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                        hideKeyboard(LoginActivity.this);
+                        attemptLogin();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            findViewById(R.id.register).setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                }
+            });
+
+            View mEmailSignInButton = findViewById(R.id.email_sign_in_button);
+            mEmailSignInButton.setOnClickListener(view -> attemptLogin());
+
+            mLoginFormView = findViewById(R.id.login_form);
+            mProgressView = findViewById(R.id.login_progress);
         }
     }
 
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
@@ -185,8 +166,38 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // perform the user login attempt.
             loginUser = new LoginUser(email, password);
             showProgress(true);
-            mAuthTask = new UserLoginTask(loginUser);
-            mAuthTask.execute((Void) null);
+            App.getRetrofitService().getPdaAPI().loginUser(loginUser).enqueue(new Callback<LoginStatus>() {
+                @Override
+                public void onResponse(Call<LoginStatus> call, Response<LoginStatus> response) {
+                    showProgress(false);
+                    LoginStatus loginStatus = response.body();
+                    if (response.code() == 502)
+                        Toast.makeText(LoginActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
+                    else if (loginStatus != null)
+                        if (loginStatus.isSuccess()) {
+                            App.getDataManager().setAuthToken(loginStatus.getToken());
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            finish();
+                        } else {
+                            switch (loginStatus.getCode()) {
+                                case 1:
+                                    mEmailView.setError(getString(R.string.error_incorrect_user));
+                                    break;
+                                case 2:
+                                    mPasswordView.setError(getString(R.string.error_incorrect_password));
+                                    break;
+                            }
+                            Toast.makeText(LoginActivity.this, loginStatus.getDescription(), Toast.LENGTH_LONG).show();
+                        }
+                }
+
+                @Override
+                public void onFailure(Call<LoginStatus> call, Throwable throwable) {
+                    Toast.makeText(LoginActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
+                    showProgress(false);
+                    throwable.printStackTrace();
+                }
+            });
         }
     }
 
@@ -232,13 +243,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             });
 
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            /*mProgressView.animate().setDuration(shortAnimTime).alpha(
                     show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
                 }
-            });
+            });*/
         } else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
@@ -296,78 +308,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         };
 
         int ADDRESS = 0;
-    }
-
-    public class UserLoginTask extends AsyncTask<Void, Void, LoginStatus> {
-
-        private final LoginUser mLoginUser;
-
-
-        UserLoginTask(LoginUser loginUser) {
-            mLoginUser = loginUser;
-        }
-
-        @Override
-        protected LoginStatus doInBackground(Void... params) {
-
-            LoginStatus loginStatus = new LoginStatus(false,4,
-                    getResources().getString(R.string.error_server_connection),null);
-            PdaAPI pdaAPI = App.getRetrofitService().getPdaAPI();
-            DataManager dataManager = App.getDataManager();
-
-            try {
-                System.out.println("hmhhm");
-                Response<LoginStatus> response = pdaAPI.loginUser(mLoginUser).execute();
-                loginStatus = response.body();
-                if(loginStatus!=null){
-                    if(loginStatus.isSuccess()){
-
-                        dataManager.setAuthToken(loginStatus.getToken());
-                        Response<Member> user = pdaAPI.loginUser().execute();
-
-                        Member member = user.body();
-
-                        if(member!=null) {
-                            dataManager.setMember(member);
-                            return loginStatus;
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return loginStatus;
-        }
-
-        @Override
-        protected void onPostExecute(final LoginStatus loginStatus) {
-            mAuthTask = null;
-            showProgress(false);
-            if (loginStatus != null) {
-                if (loginStatus.isSuccess()) {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    finish();
-                } else {
-                    switch (loginStatus.getCode()) {
-                        case 1:
-                            mEmailView.setError(getString(R.string.error_incorrect_user));
-                            break;
-                        case 2:
-                            mPasswordView.setError(getString(R.string.error_incorrect_password));
-                            break;
-                    }
-                }
-            } else {
-                Toast.makeText(LoginActivity.this, getString(R.string.error_server_connection), Toast.LENGTH_SHORT)
-                        .show();
-            }
-        }
-
-        @Override
-        protected void onCancelled() {
-            mAuthTask = null;
-            showProgress(false);
-        }
     }
 }
 

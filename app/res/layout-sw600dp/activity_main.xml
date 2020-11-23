@@ -173,7 +173,7 @@
             </LinearLayout>
 
             <FrameLayout
-                android:id="@+id/addСontainerView"
+                android:id="@+id/additionalView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginStart="18dp"

@@ -7,10 +7,23 @@
     android:orientation="vertical"
     tools:context="net.artux.pda.activities.QuestActivity">
 
-    <ImageView
-        android:id="@+id/background"
+
+    <ImageSwitcher
+        android:id="@+id/switcher"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/image2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </ImageSwitcher>
 
 
     <RelativeLayout
@@ -25,8 +38,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_close"
             android:background="@null"
-            android:layout_margin="10dp"
-            android:layout_alignParentLeft="true" />
+            android:layout_margin="10dp" />
 
         <TextView
             android:id="@+id/sceneTitle"
@@ -35,9 +47,18 @@
             android:layout_alignTop="@+id/closeButton"
             android:layout_alignBottom="@id/closeButton"
             android:gravity="center"
-            android:layout_toRightOf="@id/closeButton"
-            android:textSize="20sp"
-            android:text="Бар ШТИ" />
+            android:layout_toEndOf="@id/closeButton"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/log"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_alignTop="@+id/sceneTime"
+            android:layout_alignBottom="@+id/sceneTime"
+            android:layout_toStartOf="@id/musicSetup"
+            android:src="@drawable/ic_bug" />
 
         <ImageView
             android:id="@+id/musicSetup"
@@ -46,17 +67,15 @@
             android:layout_alignTop="@+id/sceneTime"
             android:layout_alignBottom="@+id/sceneTime"
             android:layout_toStartOf="@id/sceneTime"
-            android:layout_toLeftOf="@id/sceneTime"
             android:src="@drawable/ic_vol_on" />
 
         <TextView
             android:id="@+id/sceneTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="18:26"
             android:textSize="20sp"
             android:layout_margin="10dp"
-            android:layout_alignParentRight="true"/>
+            android:layout_alignParentEnd="true"/>
 
     </RelativeLayout>
 

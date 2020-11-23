@@ -10,9 +10,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -24,28 +25,30 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import net.artux.pda.R;
-import net.artux.pda.Views.Additional.AdditionalFragment;
-import net.artux.pda.Views.Additional.InfoFragment;
-import net.artux.pda.Views.Chat.DialogsFragment;
-import net.artux.pda.Views.News.NewsFragment;
-import net.artux.pda.Views.Profile.ProfileFragment;
-import net.artux.pda.Views.Quest.StoriesFragment;
 import net.artux.pda.app.App;
+import net.artux.pda.views.additional.AdditionalFragment;
+import net.artux.pda.views.additional.InfoFragment;
+import net.artux.pda.views.chat.DialogsFragment;
+import net.artux.pda.views.news.NewsFragment;
+import net.artux.pda.views.profile.ProfileFragment;
+import net.artux.pda.views.quest.StoriesFragment;
+import net.artux.pdalib.Member;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends FragmentActivity implements MainContract.View, View.OnClickListener {
-
-    FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
-
 
     TextView mTitleTextView;
     TextView mAdditionalTitleTextView;
     private TextView tvTime;
-    public Fragment mainFragment;
+    public BaseFragment mainFragment;
 
-    MainPresenter presenter;
+    public MainPresenter presenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,16 +62,16 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         presenter = new MainPresenter();
         presenter.attachView(this);
 
-        setFragment(new NewsFragment());
+        setFragment(new NewsFragment(), false);
         setAdditionalFragment(new InfoFragment());
+
         if(App.getDataManager().getMember()!=null){
             setAdditionalTitle("PDA #" + App.getDataManager().getMember().getPdaId());
-        }
+        }else
+            startActivity(new Intent(this, LoadingActivity.class));
 
         setOnClickListeners();
     }
-
-
 
     @Override
     public void setTitle(String title){
@@ -80,6 +83,11 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         mAdditionalTitleTextView.setText(title);
     }
 
+    @Override
+    public void passData(Bundle data) {
+        mainFragment.receiveData(data);
+    }
+
     void setOnClickListeners(){
         findViewById(R.id.news).setOnClickListener(this);
         findViewById(R.id.messages).setOnClickListener(this);
@@ -89,10 +97,14 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     }
 
     @Override
-    public void setFragment(BaseFragment fragment) {
+    public void setFragment(BaseFragment fragment, boolean addToBackStack) {
+        mainFragment = fragment;
         fragment.attachPresenter(presenter);
-        getSupportFragmentManager()
-                .beginTransaction()
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager()
+                .beginTransaction();
+        if (addToBackStack)
+            fragmentTransaction.addToBackStack(null);
+        fragmentTransaction
                 .replace(R.id.containerView,fragment)
                 .commit();
     }
@@ -102,14 +114,10 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         fragment.attachPresenter(presenter);
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.addСontainerView,fragment)
+                .replace(R.id.additionalView,fragment)
                 .commit();
     }
 
-    @Override
-    public void attachPresenter(MainContract.Presenter presenter) {
-
-    }
 
     BroadcastReceiver _broadcastReceiver;
     @SuppressLint("SimpleDateFormat")
@@ -122,7 +130,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         _broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
-                if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0)
+                if (intent.getAction()!=null && intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0)
                     tvTime.setText(_sdfWatchTime.format(new Date()));
             }
         };
@@ -164,22 +172,55 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.news:
-                setFragment(new NewsFragment());
+                setFragment(new NewsFragment(), false);
+                setAdditionalFragment(new InfoFragment());
                 break;
             case R.id.messages:
-                setFragment(new DialogsFragment());
+                setFragment(new DialogsFragment(), false);
+                setAdditionalFragment(new InfoFragment());
                 break;
             case R.id.profile:
-                setFragment(new ProfileFragment());
+                setFragment(new ProfileFragment(), false);
                 setAdditionalFragment(new AdditionalFragment());
                 break;
             case R.id.settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
             case R.id.quest:
-                setFragment(new StoriesFragment());
+                setFragment(new StoriesFragment(), false);
+                setAdditionalFragment(new InfoFragment());
                 break;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        App.getRetrofitService().getPdaAPI()
+                .loginUser().enqueue(new Callback<Member>() {
+            @Override
+            public void onResponse(@NonNull Call<Member> call, @NonNull Response<Member> response) {
+                Member member = response.body();
+                if (response.code()==502)
+                    Toast.makeText(MainActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
+                else if (member!=null) {
+                    System.out.println("Member updated");
+                    App.getDataManager().setMember(member);
+                } else {
+                    Toast.makeText(MainActivity.this, "Member error, try to login again", Toast.LENGTH_SHORT).show();
+                    App.getDataManager().removeAllData();
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    MainActivity.this.finish();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Member> call, Throwable t) {
+                t.printStackTrace();
+                Toast.makeText(MainActivity.this, R.string.error_server_connection, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
 

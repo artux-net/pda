@@ -6,19 +6,18 @@
     <!-- Strings related to login -->
     <string name="prompt_user">Пользователь</string>
     <string name="prompt_password">Пароль</string>
-    <string name="action_sign_in">Войти</string>
+    <string name="action_sign_in">ВОЙТИ</string>
     <string name="error_incorrect_user">Такого пользователя не существует</string>
     <string name="error_invalid_password">Пароль слишком короткий</string>
     <string name="error_invalid_email">Не корректный e-mail</string>
     <string name="error_incorrect_password">Не корректный пароль</string>
     <string name="error_field_required">Это поле пустое</string>
-    <string name="action_registration">Регистрация</string>
-    <string name="action_forgot_password">Забыли пароль?</string>
+    <string name="action_register">РЕГИСТРАЦИЯ</string>
+    <string name="action_forgot_password">Забыл пароль</string>
 
     <!-- Strings related to register -->
     <string name="prompt_login">Логин</string>
     <string name="prompt_name">Имя</string>
-    <string name="action_register">Зарегистрироваться</string>
 
     <!-- Strings related to main view -->
     <string name="news">Новости</string>
@@ -27,7 +26,7 @@
     <string name="profile">Профиль</string>
     <string name="settings">Рейтинг</string>
     <string name="quest">Квест</string>
-    <string name="chsavatar">Выберите аватар</string>
+    <string name="choose_avatar">Выберите аватар</string>
 
     <!-- Strings related to messenger -->
     <string name="general_chat_channel">Основной Чат-канал</string>
@@ -35,7 +34,6 @@
     <string name="inptmsg">Введите сообщение</string>
     <string name="action_sign_out">Выйти из аккаунта</string>
     <string name="action_clear_saved_images">Очистить кеш изображений</string>
-    <string name="version">Версия ПДА:</string>
     <string name="action_input_login_or_email">Введите логин или почту..</string>
     <string name="action_cancel">Закрыть</string>
     <string name="group_chat">Чат группировки</string>
@@ -53,4 +51,31 @@
     <string name="unable_connect">Не удалось подключится к серверу</string>
     <string name="enc">Энциклопедия</string>
     <string name="kinds">Разделы</string>
+    <string name="in_zone_time">В зоне:</string>
+    <string name="group">Группировка:</string>
+    <string name="rang">Ранг:</string>
+    <string name="jobs">Заданий:</string>
+    <string name="friends">Друзья - %1$s</string>
+    <string name="subscribers">Подписчики - %1$s</string>
+    <string name="add_friend">Добавить в друзья</string>
+    <string name="is_friend">" %1$s ваш друг"</string>
+    <string name="is_sub">%1$s ваш подписчик</string>
+    <string name="requested">Вы отправили заявку в друзья</string>
+    <string name="location">Локация:</string>
+    <string name="rating">Рейтинг</string>
+    <string name="nickname">Кличка</string>
+    <string name="repeat_password">Повторите пароль</string>
+    <string name="agreement">Нажимая кнопку \"РЕГИСТРАЦИЯ\", \nвы принимаете <font color="#f2cd34">условия пользования</font>.</string>
+    <string name="member_debug">Member информация</string>
+    <string name="build">Сборка: %1$s</string>
+    <string name="version">Версия ПДА: %1$s</string>
+    <string name="resetData">Сбросить раздел data</string>
+    <string name="weight">%1$s кг</string>
+    <string name="wr_message">Написать сообщение</string>
+    <string name="okay">Окей</string>
+    <string name="rating_desc">Группировка - %1$s, в зоне уже %2$s, последний раз замечен на территории %3$s</string>
+    <string name="item_desc">Цена: %1$s \nВес: %2$s \nКоличество: %3$s - %4$s кг всего\n</string>
+    <string name="weapon_desc">Точность: %1$s \nСкорость: %2$s \nУрон: %3$s \nСостояние: %4$s \n</string>
+    <string name="armor_desc">Термо: %1$s \nЭлектро: %2$s \nХим: %3$s \nРадио: %4$s \nПси: %5$s \nУрон: %6$s \nСостояние: %7$s \n</string>
+    <string name="artifact_desc">Здоровье: %1$s \nРадио: %2$s \nУрон: %3$s \nКровотечь: %4$s \nТермо: %5$s \nХим: %6$s \nВыносливость: %7$s \nЭлектро: %8$s \n</string>
 </resources>

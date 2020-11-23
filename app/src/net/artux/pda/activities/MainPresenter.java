@@ -1,12 +1,14 @@
 package net.artux.pda.activities;
 
+import android.os.Bundle;
+
 public class MainPresenter implements MainContract.Presenter, FragmentNavigation.Presenter {
 
     private MainContract.View view;
 
     @Override
-    public void addFragment(BaseFragment fragment) {
-        view.setFragment(fragment);
+    public void addFragment(BaseFragment fragment, boolean addToBackStack) {
+        view.setFragment(fragment, addToBackStack);
     }
 
     @Override
@@ -22,6 +24,11 @@ public class MainPresenter implements MainContract.Presenter, FragmentNavigation
     @Override
     public void setAdditionalTitle(String title) {
         view.setAdditionalTitle(title);
+    }
+
+    @Override
+    public void passData(Bundle data) {
+        view.passData(data);
     }
 
     @Override

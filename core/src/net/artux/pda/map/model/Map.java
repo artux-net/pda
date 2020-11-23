@@ -1,6 +1,5 @@
 package net.artux.pda.map.model;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.List;
@@ -11,12 +10,30 @@ public class Map {
     private String title;
     private String texture;
     private String boundsTexture;
+    private String blurTexture;
     private String defPos;
     private List<Point> points;
+    private List<Transfer> transfers;
     private List<Spawn> spawns;
+
+    public void setTexture(String texture) {
+        this.texture = texture;
+    }
+
+    public void setBoundsTexture(String boundsTexture) {
+        this.boundsTexture = boundsTexture;
+    }
+
+    public void setBlurTexture(String blurTexture) {
+        this.blurTexture = blurTexture;
+    }
 
     public String getTitle() {
         return title;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public List<Point> getPoints() {
@@ -32,15 +49,26 @@ public class Map {
     }
 
     public Vector2 getPlayerPosition() {
-        String[] s = defPos.split(":");
-        return new Vector2(Integer.parseInt(s[0]), Integer.parseInt(s[1]));
+        if (defPos!=null) {
+            String[] s = defPos.split(":");
+            return new Vector2(Integer.parseInt(s[0]), Integer.parseInt(s[1]));
+        }else
+            return new Vector2(500,500);
     }
 
-    public Texture getTexture() {
-        return new Texture(texture);
+    public String getTextureUri() {
+        return texture;
     }
 
-    public Texture getBoundsTexture() {
-        return new Texture(boundsTexture);
+    public String getBoundsTextureUri() {
+        return boundsTexture;
+    }
+
+    public String getBlurTextureUri() {
+        return blurTexture;
+    }
+
+    public List<Transfer> getTransfers() {
+        return transfers;
     }
 }

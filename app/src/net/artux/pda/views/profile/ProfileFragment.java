@@ -1,0 +1,255 @@
+package net.artux.pda.views.profile;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import net.artux.pda.R;
+import net.artux.pda.activities.BaseFragment;
+import net.artux.pda.app.App;
+import net.artux.pda.models.ProfileHelper;
+import net.artux.pda.views.PdaAlertDialog;
+import net.artux.pda.views.chat.ChatFragment;
+import net.artux.pdalib.Profile;
+import net.artux.pdalib.Status;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ProfileFragment extends BaseFragment implements View.OnClickListener {
+
+    ImageView avatar;
+    private Profile profile;
+    RecyclerView recyclerView;
+    GroupsAdapter groupsAdapter = new GroupsAdapter();
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_profile, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if (navigationPresenter!=null)
+            navigationPresenter.setTitle(getString(R.string.profile));
+
+        recyclerView = view.findViewById(R.id.list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(groupsAdapter);
+
+
+        int pda = App.getDataManager().getMember().getPdaId();
+        if (getArguments()!=null)
+            pda = getArguments().getInt("pdaId", App.getDataManager().getMember().getPdaId());
+        App.getRetrofitService().getPdaAPI().getProfile(pda).enqueue(new Callback<Profile>() {
+            @Override
+            public void onResponse(Call<Profile> call, Response<Profile> response) {
+                Profile profile = response.body();
+                if (profile != null)
+                        setProfile(profile, view);
+            }
+
+            @Override
+            public void onFailure(Call<Profile> call, Throwable throwable) {
+            }
+        });
+
+    }
+
+    public void setProfile(Profile profile, View mainView) {
+        this.profile = profile;
+        avatar = mainView.findViewById(R.id.profile_avatar);
+        avatar.setImageDrawable(ProfileHelper.getAvatar(profile,mainView.getContext()));
+
+        ((TextView)mainView.findViewById(R.id.profile_login)).setText(profile.getLogin());
+        ((TextView)mainView.findViewById(R.id.profile_group)).setText(getString(R.string.group_p, ProfileHelper.getGroup(profile, mainView.getContext())));
+        ((TextView)mainView.findViewById(R.id.profile_location)).setText(getString(R.string.location_p, profile.getLocation()));
+        ((TextView)mainView.findViewById(R.id.profile_time)).setText(getString(R.string.in_zone_time_p, ProfileHelper.getDays(profile)));
+        ((TextView)mainView.findViewById(R.id.profile_rang)).setText(getString(R.string.rang_p, ProfileHelper.getRang(profile,mainView.getContext())));
+
+        Button friends = mainView.findViewById(R.id.profile_friends);
+        friends.setText(mainView.getContext().getString(R.string.friends, String.valueOf(profile.getFriends())));
+        friends.setOnClickListener(this);
+        Button requests = mainView.findViewById(R.id.profile_requests);
+        requests.setText(mainView.getContext().getString(R.string.subscribers, String.valueOf(profile.getRequests())));
+        requests.setOnClickListener(this);
+
+        groupsAdapter.setRelations(profile.getRelations());
+
+        Button friendButton = mainView.findViewById(R.id.profile_friend);
+        Button messageButton = mainView.findViewById(R.id.write_message);
+        messageButton.setOnClickListener(this);
+        if (App.getDataManager().getMember().getPdaId()!=profile.getPdaId()) {
+            switch (profile.getFriendStatus()) {
+                case 0:
+                    friendButton.setText(R.string.add_friend);
+                    friendButton.setOnClickListener(view -> {
+                        PdaAlertDialog pdaAlertDialog = new PdaAlertDialog(getContext(), (ViewGroup) mainView, R.style.AlertDialogStyle);
+                        pdaAlertDialog.setTitle(R.string.add_friend_q);
+                        pdaAlertDialog.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                App.getRetrofitService().getPdaAPI().reqFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
+                                    @Override
+                                    public void onResponse(Call<Status> call, Response<Status> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Status> call, Throwable throwable) {
+
+                                    }
+                                });
+                            }
+                        });
+                        pdaAlertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        pdaAlertDialog.show();
+                    });
+
+                    break;
+                case 1:
+                    friendButton.setText(getString(R.string.is_friend, profile.getName()));
+                    friendButton.setOnClickListener(view -> {
+                        AlertDialog.Builder pdaAlertDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle);
+                        pdaAlertDialog.setTitle(R.string.remove_friend_q);
+                        pdaAlertDialog.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                App.getRetrofitService().getPdaAPI().removeFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
+                                    @Override
+                                    public void onResponse(Call<Status> call, Response<Status> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Status> call, Throwable throwable) {
+
+                                    }
+                                });
+                            }
+                        });
+                        pdaAlertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        pdaAlertDialog.show();
+                    });
+
+                    break;
+                case 2:
+                    friendButton.setText(getString(R.string.is_sub, profile.getName()));
+                    friendButton.setOnClickListener(view -> {
+                        AlertDialog.Builder pdaAlertDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle);
+                        pdaAlertDialog.setTitle(R.string.add_friend_q);
+                        pdaAlertDialog.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                App.getRetrofitService().getPdaAPI().addFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
+                                    @Override
+                                    public void onResponse(Call<Status> call, Response<Status> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Status> call, Throwable throwable) {
+
+                                    }
+                                });
+                            }
+                        });
+                        pdaAlertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        pdaAlertDialog.show();
+                    });
+                    break;
+                case 3:
+                    friendButton.setText(getString(R.string.requested));
+                    friendButton.setOnClickListener(view -> {
+                        AlertDialog.Builder pdaAlertDialog = new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle);
+                        pdaAlertDialog.setTitle(R.string.cancel_friend_q);
+                        pdaAlertDialog.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                App.getRetrofitService().getPdaAPI().removeFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
+                                    @Override
+                                    public void onResponse(Call<Status> call, Response<Status> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Status> call, Throwable throwable) {
+
+                                    }
+                                });
+                            }
+                        });
+                        pdaAlertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                            }
+                        });
+                        pdaAlertDialog.show();
+                    });
+                    break;
+            }
+        }else{
+            friendButton.setVisibility(View.GONE);
+            messageButton.setVisibility(View.GONE);
+
+        }
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        FriendsFragment friendsFragment = new FriendsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("pdaId", profile.getPdaId());
+
+        switch (view.getId()){
+            case R.id.profile_friends:
+                bundle.putInt("type", 0);
+                friendsFragment.setArguments(bundle);
+                navigationPresenter.addFragment(friendsFragment, true);
+                break;
+            case R.id.profile_requests:
+                bundle.putInt("type", 1);
+                friendsFragment.setArguments(bundle);
+                navigationPresenter.addFragment(friendsFragment, true);
+                break;
+            case R.id.write_message:
+                bundle.putInt("to", profile.getPdaId());
+                ChatFragment chatFragment = new ChatFragment();
+                chatFragment.setArguments(bundle);
+                navigationPresenter.addFragment(chatFragment, true);
+                break;
+        }
+    }
+}

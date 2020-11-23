@@ -1,9 +1,7 @@
 package net.artux.pda.app;
 
 import android.app.Application;
-import android.content.Context;
 
-import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 
 
@@ -11,8 +9,7 @@ public class App extends Application {
 
     static RetrofitService mRetrofitService = new RetrofitService();
     static DataManager sDataManager;
-    static Context mContext;
-    public static int[] avatars = new int[]{
+    public static int[] avatars = {
             R.drawable.a1,
             R.drawable.a2,
             R.drawable.a3,
@@ -46,20 +43,27 @@ public class App extends Application {
             R.drawable.a0
     };
 
+    public static int[] group_avatars = {
+            R.drawable.g0,
+            R.drawable.g1,
+            R.drawable.g2,
+            R.drawable.g3,
+            R.drawable.g4,
+            R.drawable.g5,
+            R.drawable.g6,
+            R.drawable.g6,//8
+            R.drawable.g6//9
+    };
+
     @Override
     public void onCreate() {
         super.onCreate();
-        mContext = getApplicationContext();
-        sDataManager = new DataManager();
-        mRetrofitService.initRetrofit(BuildConfig.URL, sDataManager);
+        sDataManager = new DataManager(getApplicationContext());
+        mRetrofitService.initRetrofit("pda.artux.net", sDataManager);
     }
 
     public static DataManager getDataManager() {
         return sDataManager;
-    }
-
-    public static Context getContext() {
-        return mContext;
     }
 
     public static RetrofitService getRetrofitService(){

@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <ScrollView
-        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <ImageView
@@ -44,17 +40,16 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="@dimen/infosp"
-                        android:gravity="left"
-                        android:text="В зоне:"/>
+                        android:gravity="start"
+                        android:text="@string/in_zone_time"/>
 
                     <TextView
                         android:id="@+id/daysInfo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="right"
-                        android:textSize="@dimen/infosp"
-                        android:text="4 дня"/>
+                        android:gravity="end"
+                        android:textSize="@dimen/infosp" />
 
                 </LinearLayout>
 
@@ -69,17 +64,16 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="@dimen/infosp"
-                        android:gravity="left"
-                        android:text="Группировка:"/>
+                        android:gravity="start"
+                        android:text="@string/group"/>
 
                     <TextView
                         android:id="@+id/groupInfo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="right"
-                        android:textSize="@dimen/infosp"
-                        android:text="Свобода"/>
+                        android:gravity="end"
+                        android:textSize="@dimen/infosp" />
 
                 </LinearLayout>
 
@@ -94,17 +88,16 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="@dimen/infosp"
-                        android:gravity="left"
-                        android:text="Ранг:"/>
+                        android:gravity="start"
+                        android:text="@string/rang"/>
 
                     <TextView
                         android:id="@+id/rangInfo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="right"
-                        android:textSize="@dimen/infosp"
-                        android:text="Ветеран"/>
+                        android:gravity="end"
+                        android:textSize="@dimen/infosp"/>
 
                 </LinearLayout>
 
@@ -119,17 +112,16 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="@dimen/infosp"
-                        android:gravity="left"
-                        android:text="Заданий:"/>
+                        android:gravity="start"
+                        android:text="@string/jobs"/>
 
                     <TextView
                         android:id="@+id/achievementsInfo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="right"
-                        android:textSize="@dimen/infosp"
-                        android:text="8"/>
+                        android:gravity="end"
+                        android:textSize="@dimen/infosp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -142,17 +134,16 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textSize="@dimen/infosp"
-                        android:gravity="left"
-                        android:text="Локация:"/>
+                        android:gravity="start"
+                        android:text="@string/location"/>
 
                     <TextView
                         android:id="@+id/locationInfo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="right"
-                        android:textSize="@dimen/infosp"
-                        android:text="Свалка"/>
+                        android:gravity="end"
+                        android:textSize="@dimen/infosp" />
 
                 </LinearLayout>
 
@@ -161,7 +152,5 @@
 
         </LinearLayout>
 
-    </ScrollView>
+</ScrollView>
 
-
-</LinearLayout>

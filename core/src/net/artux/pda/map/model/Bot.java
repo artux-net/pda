@@ -1,67 +1,43 @@
 package net.artux.pda.map.model;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import net.artux.pdalib.profile.items.Weapon;
 
-public class Bot {
+import static com.badlogic.gdx.math.MathUtils.random;
 
-    private static float MOVEMENT = 0.3f;
-    private boolean run;
+public class Bot extends Entity {
 
-    private Vector2 position;
-    private Vector2 velocity;
-    private Sprite sprite;
-    private Vector2 target;
-    boolean waiting;
-    boolean timerStarted;
     private Spawn spawn;
-
-    public Bot(Vector2 playerPosition, Spawn spawn) {
-        position = playerPosition;
+    public Bot(int id, Vector2 position, Spawn spawn) {
+        super(position);
+        this.id = id;
+        MOVEMENT = 0.2f;
+        this.position = position;
         velocity = new Vector2(0,0);
-        sprite = new Sprite(new Texture("quest.png"), 0, 0, 23, 23);
-        sprite.setSize(32, 32);
-        sprite.setPosition(playerPosition.x, playerPosition.y);
+        if (id == 1)
+            sprite = new Sprite(new Texture("red.png"), 0, 0, 128, 128);
+        else if (id == 2)
+            sprite = new Sprite(new Texture("green.png"), 0, 0, 128, 128);
+        else if (id == 3)
+            sprite = new Sprite(new Texture("yellow.png"), 0, 0, 128, 128);
+        sprite.setSize(8, 8);
+        sprite.setPosition(position.x, position.y);
         sprite.setOriginCenter();
+        Weapon w = new Weapon();
+        w.speed=5;
+        w.damage=2;
+        w.precision=30;
+
+        setWeapon(w, 0);
         this.spawn = spawn;
     }
 
-    public void setDestination(Vector2 point){
-        target = point;
-    }
-
-    public void draw(Batch batch){
-        sprite.draw(batch);
-    }
-
-    public void update(float dt){
-        if (!waiting&&target!=null) {
-            float x = target.x - position.x;
-            float y = target.y - position.y;
-            if (Math.abs(x) > 0) position.add(x/Math.abs(x)* MOVEMENT, 0);
-            if (Math.abs(y) > 0) position.add(0, y/Math.abs(y)* MOVEMENT);
-            if (Math.abs(x) <=5 && Math.abs(y)<=5) waiting = true;
-            sprite.setPosition(position.x, position.y);
-        }else{
-            if (!timerStarted){
-                final Random random = new Random();
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        setDestination(spawn.getRandomPoint(random));
-                        waiting = false;
-                        timerStarted = false;
-                    }
-                }, 1000*(Math.abs(random.nextLong()%30)));
-            }
-            timerStarted = true;
-        }
+    @Override
+    public Vector2 getTarget() {
+        return spawn.getRandomPoint(random);
     }
 
 }

@@ -1,13 +1,16 @@
 package net.artux.pda.activities;
 
+import android.os.Bundle;
+
 public interface MainContract {
 
     interface View {
-        void setFragment(BaseFragment fragment);
+        void setFragment(BaseFragment fragment, boolean addToBackStack);
         void setAdditionalFragment(AdditionalBaseFragment fragment);
-        void attachPresenter(Presenter presenter);
+
         void setTitle(String title);
         void setAdditionalTitle(String title);
+        void passData(Bundle data);
     }
 
     interface Model {

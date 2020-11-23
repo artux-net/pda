@@ -3,14 +3,18 @@ package net.artux.pda.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.bumptech.glide.Glide;
-import net.artux.pda.Models.Member;
+import com.google.gson.Gson;
+
 import net.artux.pda.R;
 import net.artux.pda.app.App;
+import net.artux.pdalib.Member;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,24 +34,26 @@ public class LoadingActivity extends AppCompatActivity {
         App.getRetrofitService().getPdaAPI()
                 .loginUser().enqueue(new Callback<Member>() {
             @Override
-            public void onResponse(Call<Member> call, Response<Member> response) {
+            public void onResponse(@NonNull Call<Member> call, @NonNull Response<Member> response) {
                 Member member = response.body();
-                if (member!=null) {
+                if (response.code()==502)
+                    Toast.makeText(LoadingActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
+                else if (member!=null) {
+                    System.out.println("set member: " + new Gson().toJson(member));
                     App.getDataManager().setMember(member);
                     startActivity(new Intent(LoadingActivity.this, MainActivity.class));
-                    LoadingActivity.this.finish();
-                }else{
+                } else {
                     Toast.makeText(LoadingActivity.this, "Member error, try to login again", Toast.LENGTH_SHORT).show();
                     App.getDataManager().removeAllData();
                     startActivity(new Intent(LoadingActivity.this, LoginActivity.class));
-                    LoadingActivity.this.finish();
                 }
-
+                LoadingActivity.this.finish();
             }
 
             @Override
-            public void onFailure(Call<Member> call, Throwable t) {
-                Toast.makeText(LoadingActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
+            public void onFailure(@NonNull Call<Member> call, Throwable t) {
+                t.printStackTrace();
+                Toast.makeText(LoadingActivity.this, R.string.error_server_connection, Toast.LENGTH_SHORT).show();
                 LoadingActivity.this.finish();
             }
         });

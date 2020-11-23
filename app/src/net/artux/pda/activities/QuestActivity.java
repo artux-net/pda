@@ -4,45 +4,43 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.Request;
-import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.bumptech.glide.request.transition.Transition;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-import net.artux.pda.Models.profile.Story;
+import net.artux.pda.LogActivity;
 import net.artux.pda.R;
-import net.artux.pda.Views.Quest.SceneController;
 import net.artux.pda.app.App;
+import net.artux.pda.views.quest.SceneController;
+import net.artux.pda.views.quest.models.Stage;
+import net.artux.pdalib.profile.Story;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
 
-public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, View.OnClickListener {
+public class QuestActivity extends AppCompatActivity implements View.OnClickListener {
 
     SceneController sceneController;
     Glide glide;
-    MediaPlayer mediaPlayer;
 
     TextView tvTime;
     ImageView musicImage;
@@ -50,6 +48,7 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
     boolean mute;
 
     private String background_url = "";
+    ImageSwitcher switcher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,25 +59,45 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
         tvTime = findViewById(R.id.sceneTime);
         musicImage = findViewById(R.id.musicSetup);
         musicImage.setOnClickListener(this);
-        background = findViewById(R.id.background);
+        findViewById(R.id.closeButton).setOnClickListener(this);
+        findViewById(R.id.log).setOnClickListener(this);
+        switcher = findViewById(R.id.switcher);
+        switcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
+        switcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
 
-        HashMap<String, String> temp = App.getDataManager().getMember().getData().getTemp();
-        String currentStory = temp.get("currentStory");
-        if(currentStory!=null){
-            for (Story story : App.getDataManager().getMember().getData().getStories()){
-                if (story.getId()==Integer.parseInt(currentStory)){
-                    System.out.println("Story: " + story.getId());
-                    System.out.println("Chapter: " + story.getLastChapter());
-                    System.out.println("Stage: " + story.getLastStage());
-                    int chapter = getIntent().getIntExtra("chapter", story.getLastChapter());
-                    int stage = getIntent().getIntExtra("stage", story.getLastStage());
-                    sceneController = new SceneController( this, story.getId(), chapter, stage);
-                }
+
+        int[] keys = getIntent().getIntArrayExtra("keys");
+        if (keys==null) {
+            HashMap<String, String> temp = App.getDataManager().getMember().getData().getTemp();
+
+            int storyId = getIntent().getIntExtra("story", -1);
+
+            if (storyId < 0) {
+                String currentStory = temp.get("currentStory");
+                if (currentStory != null)
+                    storyId = Integer.parseInt(currentStory);
+                else storyId = 0;
             }
-        } else {
-            System.out.println("null");
-            sceneController = new SceneController( this, getIntent().getIntExtra("story",0), 0, 0);
-        }
+
+            int map = getIntent().getIntExtra("map", -1);
+            if (map != -1) {
+                sceneController = new SceneController(this, storyId, map, getIntent().getStringExtra("pos"));
+            } else {
+                boolean found = false;
+                for (Story story : App.getDataManager().getMember().getData().getStories()) {
+                    if (story.getStoryId() == storyId) {
+                        found = true;
+                        int chapter = getIntent().getIntExtra("chapter", story.getLastChapter());
+                        int stage = getIntent().getIntExtra("stage", story.getLastStage());
+                        System.out.println(storyId + " : " + chapter + " : " + stage);
+                        sceneController = new SceneController(this, story.getStoryId(), chapter, stage);
+                    }
+                }
+                if (!found)
+                    sceneController = new SceneController(this, storyId, 0, 0);
+            }
+        }else
+            sceneController = new SceneController(this, keys[0], keys[1], keys[2]);
     }
 
     public void setTitle(String title){
@@ -90,107 +109,23 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
             background_url = backgroundURL;
 
             Glide.with(this)
-                    .asBitmap()
                     .load(backgroundURL)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(new Target<Bitmap>() {
+                    .listener(new RequestListener<Drawable>() {
                         @Override
-                        public void onLoadStarted(@Nullable Drawable placeholder) {
-
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            return false;
                         }
 
                         @Override
-                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
-
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            return false;
                         }
-
-                        @Override
-                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                            ImageViewAnimatedChange(QuestActivity.this, background, resource);
-                        }
-
-                        @Override
-                        public void onLoadCleared(@Nullable Drawable placeholder) {
-
-                        }
-
-                        @Override
-                        public void getSize(@NonNull SizeReadyCallback cb) {
-
-                        }
-
-                        @Override
-                        public void removeCallback(@NonNull SizeReadyCallback cb) {
-
-                        }
-
-                        @Override
-                        public void setRequest(@Nullable Request request) {
-
-                        }
-
-                        @Nullable
-                        @Override
-                        public Request getRequest() {
-                            return null;
-                        }
-
-                        @Override
-                        public void onStart() {
-
-                        }
-
-                        @Override
-                        public void onStop() {
-
-                        }
-
-                        @Override
-                        public void onDestroy() {
-
-                        }
-                    });
+                    })
+                    .into((ImageView) switcher.getNextView());
+            switcher.showNext();
         }
     }
-
-    public static void ImageViewAnimatedChange(Context c, final ImageView v, final Bitmap new_image) {
-        final Animation anim_out = AnimationUtils.loadAnimation(c, android.R.anim.fade_out);
-        final Animation anim_in  = AnimationUtils.loadAnimation(c, android.R.anim.fade_in);
-        anim_out.setAnimationListener(new Animation.AnimationListener()
-        {
-            @Override public void onAnimationStart(Animation animation) {}
-            @Override public void onAnimationRepeat(Animation animation) {}
-            @Override public void onAnimationEnd(Animation animation)
-            {
-                v.setImageBitmap(new_image);
-                anim_in.setAnimationListener(new Animation.AnimationListener() {
-                    @Override public void onAnimationStart(Animation animation) {}
-                    @Override public void onAnimationRepeat(Animation animation) {}
-                    @Override public void onAnimationEnd(Animation animation) {}
-                });
-                v.startAnimation(anim_in);
-            }
-        });
-        v.startAnimation(anim_out);
-    }
-
-    public void setMusic(String url){
-        releaseMediaPlayer();
-
-        mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(url);
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            mediaPlayer.setOnPreparedListener(this);
-            mediaPlayer.setLooping(true);
-            mediaPlayer.setOnCompletionListener(this);
-            mediaPlayer.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
 
     @Override
     public void onClick(View v) {
@@ -199,33 +134,33 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
                 if(mute){
                     musicImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_vol_on));
                     mute = false;
-                    mediaPlayer.start();
+                    sceneController.unmute();
                 } else {
                     musicImage.setImageDrawable(getResources().getDrawable(R.drawable.ic_vol_off));
                     mute = true;
-                    mediaPlayer.pause();
+                    sceneController.mute();
                 }
                 break;
             case R.id.closeButton:
+                startActivity(new Intent(this, MainActivity.class));
                 finish();
                 break;
+            case R.id.log:
+                Stage stage = sceneController.getActualStage();
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("Story: ").append(sceneController.getStory()).append("\n");
+                stringBuilder.append("Chapter: ").append(sceneController.getChapterId()).append("\n");
+
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                String json = gson.toJson(stage);
+                stringBuilder.append(json);
+
+                Intent intent = new Intent(this, LogActivity.class);
+                intent.putExtra("text", stringBuilder.toString());
+                startActivity(intent);
+
+                break;
         }
-    }
-
-    private void releaseMediaPlayer() {
-        if (mediaPlayer != null) {
-            try {
-                mediaPlayer.release();
-                mediaPlayer = null;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-
     }
 
 
@@ -249,6 +184,7 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
 
     @Override
     public void onStop() {
+        sceneController.release();
         super.onStop();
         if (_broadcastReceiver != null)
             unregisterReceiver(_broadcastReceiver);
@@ -258,16 +194,4 @@ public class QuestActivity extends AppCompatActivity implements MediaPlayer.OnPr
         return sceneController;
     }
 
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        if(!mute){
-            mp.start();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        releaseMediaPlayer();
-    }
 }
