@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="net.artux.pda.activities.SettingsActivity">
+    tools:context=".ui.activities.SettingsActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -44,6 +44,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/resetData"/>
+
+            <Button
+                android:id="@+id/resetStory"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Выйти из истории"/>
 
             <Button
                 android:id="@+id/signOut"

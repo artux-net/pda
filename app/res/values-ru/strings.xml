@@ -24,8 +24,8 @@
     <string name="chat">Чат</string>
     <string name="messages">Сообщения</string>
     <string name="profile">Профиль</string>
-    <string name="settings">Рейтинг</string>
-    <string name="quest">Квест</string>
+    <string name="notes">Заметки</string>
+    <string name="map">Карта</string>
     <string name="choose_avatar">Выберите аватар</string>
 
     <!-- Strings related to messenger -->
@@ -78,4 +78,18 @@
     <string name="weapon_desc">Точность: %1$s \nСкорость: %2$s \nУрон: %3$s \nСостояние: %4$s \n</string>
     <string name="armor_desc">Термо: %1$s \nЭлектро: %2$s \nХим: %3$s \nРадио: %4$s \nПси: %5$s \nУрон: %6$s \nСостояние: %7$s \n</string>
     <string name="artifact_desc">Здоровье: %1$s \nРадио: %2$s \nУрон: %3$s \nКровотечь: %4$s \nТермо: %5$s \nХим: %6$s \nВыносливость: %7$s \nЭлектро: %8$s \n</string>
+    <string name="money">Денег: %1$s</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="cancel_friend_q">Отменить заявку?</string>
+    <string name="remove_friend_q">Удалить из друзей?</string>
+    <string name="add_friend_q">Добавить в друзья?</string>
+    <string name="quit">Выйти</string>
+    <string name="rating_p">Рейтинг: %1$s</string>
+    <string name="rang_p">Ранг: %1$s</string>
+    <string name="group_p">Группировка: %1$s</string>
+    <string name="in_zone_time_p">В зоне: %1$s</string>
+    <string name="location_p">Локация: %1$s</string>
+    <string name="empty">Здесь пусто..</string>
+    <string name="note_isnt_selected">Note isn\'t selected.</string>
 </resources>

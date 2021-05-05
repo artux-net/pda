@@ -1,6 +1,5 @@
 package net.artux.pda.map.model;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -24,7 +23,7 @@ public class Hit extends Actor {
         damage = weapon.damage;
         author= entity;
         this.target = target;
-        sprite = new Sprite(new Texture("quest.png"), 0, 0, 23, 23);
+       // sprite = new Sprite(new Texture("quest.png"), 0, 0, 23, 23);
         sprite.setSize(16, 16);
         position = entity.getPosition();
         velocity.x = (target.x - position.x)/100;

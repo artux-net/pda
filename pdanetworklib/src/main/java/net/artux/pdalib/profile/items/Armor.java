@@ -127,4 +127,13 @@ public class Armor extends Item{
         this.condition = condition;
     }
 
+    @Override
+    public int priceToSell() {
+        return (int) (super.priceToSell() * condition / 100);
+    }
+
+    @Override
+    public String toString() {
+        return GsonProvider.getInstance().toJson(this);
+    }
 }

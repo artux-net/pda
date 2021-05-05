@@ -1,8 +1,16 @@
 package net.artux.pda.app;
 
 import android.app.Application;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
+import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
+
+import timber.log.Timber;
 
 
 public class App extends Application {
@@ -59,7 +67,30 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         sDataManager = new DataManager(getApplicationContext());
-        mRetrofitService.initRetrofit("pda.artux.net", sDataManager);
+        mRetrofitService.initRetrofit(sDataManager);
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        } else {
+            Timber.plant(new CrashReportingTree());
+        }
+        Timber.d("App started.");
+    }
+
+    /** A tree which logs important information for crash reporting. */
+    private static class CrashReportingTree extends Timber.Tree {
+        @Override protected void log(int priority, String tag, @NonNull String message, Throwable t) {
+            if (priority == Log.VERBOSE || priority == Log.DEBUG) {
+                return;
+            }
+            if (tag!=null)
+                message = tag + " : " + message;
+            FirebaseCrashlytics.getInstance().log(message);
+            System.out.println(message);
+            if (t != null) {
+                FirebaseCrashlytics.getInstance().recordException(t);
+                t.printStackTrace();
+            }
+        }
     }
 
     public static DataManager getDataManager() {

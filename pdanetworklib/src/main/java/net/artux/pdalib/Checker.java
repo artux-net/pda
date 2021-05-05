@@ -54,7 +54,7 @@ public class Checker {
     }
 
 
-    private static boolean isInteger(String str) {
+    public static boolean isInteger(String str) {
         if (str == null) {
             return false;
         }

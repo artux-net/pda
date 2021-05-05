@@ -14,7 +14,8 @@ import java.lang.reflect.Type;
 public class GsonInstantAdapter implements JsonSerializer<Instant>, JsonDeserializer<Instant> {
 
     @Override public synchronized Instant deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) {
-        return Instant.parse(jsonElement.getAsString());
+        return new Instant(jsonElement.getAsJsonObject().get("seconds").getAsLong());
+        //Instant.parse(jsonElement.getAsString());
     }
 
     @Override

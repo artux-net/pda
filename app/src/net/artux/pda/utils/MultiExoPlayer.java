@@ -6,7 +6,8 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 
-import net.artux.pda.views.quest.models.Sound;
+import net.artux.pda.BuildConfig;
+import net.artux.pda.ui.fragments.quest.models.Sound;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,10 +17,11 @@ import java.util.Map;
 
 public class MultiExoPlayer {
 
-    private Context context;
-    private List<Sound> sounds;
-    private HashMap<Sound, SimpleExoPlayer> player = new HashMap<>();
+    private final Context context;
+    private final List<Sound> sounds;
+    private final HashMap<Sound, SimpleExoPlayer> player = new HashMap<>();
     private MyDownloadService myDownloadService;
+    boolean muted;
 
     public MultiExoPlayer(Context context, List<Sound> soundList){
         this.context = context;
@@ -93,7 +95,10 @@ public class MultiExoPlayer {
                 }
             }
         }
-        play.setMediaItem(MediaItem.fromUri(sound.getUrl()));
+        if(!sound.getUrl().contains("http")){
+            play.setMediaItem(MediaItem.fromUri("https://" + BuildConfig.URL + "/" + sound.getUrl()));
+        }else play.setMediaItem(MediaItem.fromUri(sound.getUrl()));
+
 
         play.prepare();
         play.play();
@@ -139,7 +144,7 @@ public class MultiExoPlayer {
     }
 
     public void unmute(){
-        System.out.println("UNMUTE");
+        muted = false;
         for (Map.Entry<Sound, SimpleExoPlayer> s : player.entrySet())
             if (s.getValue()!=null)
                 for (String param : s.getKey().getParams())
@@ -154,10 +159,14 @@ public class MultiExoPlayer {
     }
 
     public void mute(){
-        System.out.println("MUTE");
+        muted = true;
         for (SimpleExoPlayer exoPlayer : player.values()) {
             if (exoPlayer!=null)
                 exoPlayer.setVolume(0);
         }
+    }
+
+    public boolean isMuted() {
+        return muted;
     }
 }

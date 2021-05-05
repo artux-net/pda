@@ -62,4 +62,9 @@ public class Detector extends Item{
     public void setPrice(int price) {
         this.price = price;
     }
+
+    @Override
+    public String toString() {
+        return GsonProvider.getInstance().toJson(this);
+    }
 }

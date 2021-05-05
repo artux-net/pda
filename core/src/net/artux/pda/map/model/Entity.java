@@ -13,17 +13,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.badlogic.gdx.math.MathUtils.random;
-import static net.artux.pda.map.states.PlayState.distance;
 import static net.artux.pda.map.states.PlayState.registerHit;
 
 public abstract class Entity extends Actor {
 
-    static float MOVEMENT = 0.4f;
+    protected float MOVEMENT = 0.4f;
     public boolean run = false;
 
     public int id;
-    Vector2 position;
-    Vector2 velocity;
+    Vector2 velocity = new Vector2();
     Sprite sprite;
 
     public double health = 100;
@@ -42,6 +40,9 @@ public abstract class Entity extends Actor {
 
     Entity(Vector2 position) {
         startPosition = position;
+        setX(position.x);
+        setY(position.y);
+        setSize(32,32);
     }
 
     @Override
@@ -55,7 +56,7 @@ public abstract class Entity extends Actor {
     @Override
     public int hashCode() {
         boolean shot = false;
-        return Objects.hash(run, id, position, velocity, sprite, health, target, waiting, timerStarted, startPosition, enemy, armor, weapon1, weapon2, weapon, shot);
+        return Objects.hash(run, id, velocity, sprite, health, target, waiting, timerStarted, startPosition, enemy, armor, weapon1, weapon2, weapon, shot);
     }
 
     @Override
@@ -66,13 +67,13 @@ public abstract class Entity extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        sprite.draw(batch);
 
+        batch.draw(sprite, getX(), getY(), sprite.getOriginX(), sprite.getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
     }
 
 
     public Vector2 getPosition() {
-        return new Vector2(position.x - 16, position.y - 16);
+        return new Vector2(getX(), getY());
     }
 
     public void setEnemy(Entity enemy) {
@@ -111,23 +112,23 @@ public abstract class Entity extends Actor {
     }
 
     void move() {
-        velocity.x = (target.x - position.x) / Math.abs(target.x - position.x);
-        velocity.y = (target.y - position.y) / Math.abs(target.y - position.y);
+        velocity.x = (target.x - getX()) / Math.abs(target.x - getX());
+        velocity.y = (target.y - getY()) / Math.abs(target.y - getY());
 
-        position.add(velocity.x * MOVEMENT, velocity.y * MOVEMENT);
+        moveBy(velocity.x * MOVEMENT, velocity.y * MOVEMENT);
     }
 
     public void update(float dt) {
-
+        if (this instanceof Bot)
         if (getEnemy() != null) {
-            double distance = distance(position, getEnemy().getPosition());
+            double distance = getPosition().dst(getEnemy().getPosition());
             if (distance >= 300) {
                 setEnemy(null);
                 setDestination(getTarget());
                 timerStarted = false;
                 waiting = false;
             } else {
-                setDestination(getEnemy().position);
+                setDestination(getEnemy().getPosition());
                 waiting = false;
                 if (distance < getHitDistance()) {
                     hit(dt);
@@ -136,9 +137,8 @@ public abstract class Entity extends Actor {
         }
         if (!waiting && target != null) {
             move();
-            double distance = distance(position, target);
+            double distance = getPosition().dst(target);
             if (distance < 5) waiting = true;
-            sprite.setPosition(position.x, position.y);
         }else {
             if (!timerStarted) {
                 new Timer().schedule(new TimerTask() {
@@ -156,7 +156,7 @@ public abstract class Entity extends Actor {
 
     public Vector2 getTarget(){
         if (this instanceof Bot){
-         return ((Bot) this).getTarget();
+         return this.getTarget();
         }else return startPosition;
     }
 
@@ -187,4 +187,5 @@ public abstract class Entity extends Actor {
     public void damage(double damage){
         health-=damage;
     }
+
 }

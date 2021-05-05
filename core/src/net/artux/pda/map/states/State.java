@@ -29,6 +29,9 @@ public abstract class State {
     public abstract void resize(int width, int height);
     public abstract void dispose();
     public Member getMember(){
-        return gsm.getMember();
+        if (gsm.getMember()==null)
+            return (Member) gsm.get("member");
+        else
+            return gsm.getMember();
     }
 }

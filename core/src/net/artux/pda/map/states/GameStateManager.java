@@ -5,33 +5,36 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import net.artux.pda.map.model.Map;
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pdalib.Member;
 
+import java.util.HashMap;
 import java.util.Stack;
 
 public class GameStateManager {
 
-    private PlatformInterface platformInterface;
-    private Map map;
-    private Stack<net.artux.pda.map.states.State> states;
+    private final PlatformInterface platformInterface;
+    HashMap<String, Object> bundle = new HashMap<>();
+    private final Stack<net.artux.pda.map.states.State> states;
     private Member member;
-    private InputMultiplexer multiplexer = new InputMultiplexer();
+    private final InputMultiplexer multiplexer = new InputMultiplexer();
 
-    public GameStateManager(PlatformInterface platformInterface, Map map, Member member){
-        states = new Stack<net.artux.pda.map.states.State>();
+    public GameStateManager(PlatformInterface platformInterface, Member member){
+        states = new Stack<>();
         this.platformInterface = platformInterface;
-        this.map = map;
         this.member = member;
+    }
+
+    public void put(String key, Object o){
+        bundle.put(key, o);
+    }
+
+    public Object get(String key){
+        return bundle.get(key);
     }
 
     public PlatformInterface getPlatformInterface() {
         return platformInterface;
-    }
-
-    public Map getMap() {
-        return map;
     }
 
     public void push(net.artux.pda.map.states.State state){
@@ -43,13 +46,20 @@ public class GameStateManager {
 
     public void pop(){
         states.peek().stop();
-        states.pop().dispose();
+        states.pop();
         states.peek().handleInput();
     }
 
     public void set(State state){
         states.pop().dispose();
         states.push(state);
+    }
+
+    public void dispose(){
+        for (State state: states){
+            state.dispose();
+        }
+        member = null;
     }
 
     public void update(float dt){
@@ -69,14 +79,14 @@ public class GameStateManager {
     }
 
     public void addInputProcessor(InputProcessor inputProcessor){
-        if (!multiplexer.getProcessors().contains(inputProcessor, true))
+        if (!multiplexer.getProcessors().contains(inputProcessor, false))
             multiplexer.addProcessor(inputProcessor);
         if (multiplexer.size()>=1)
             Gdx.input.setInputProcessor(multiplexer);
     }
 
     public void removeInputProcessor(InputProcessor inputProcessor){
-        if (multiplexer.getProcessors().contains(inputProcessor, true))
+        if (multiplexer.getProcessors().contains(inputProcessor, false))
             multiplexer.removeProcessor(inputProcessor);
     }
 }

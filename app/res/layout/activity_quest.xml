@@ -5,8 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="net.artux.pda.activities.QuestActivity">
-
+    tools:context=".ui.activities.QuestActivity">
 
     <ImageSwitcher
         android:id="@+id/switcher"

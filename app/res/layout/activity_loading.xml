@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="net.artux.pda.activities.LoadingActivity">
-    
+    tools:context=".ui.activities.LoadingActivity">
+
     <ImageView
         android:id="@+id/imageGif"
         android:layout_width="match_parent"

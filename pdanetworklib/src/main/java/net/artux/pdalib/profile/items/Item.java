@@ -69,4 +69,13 @@ public class Item {
     public void setPrice(int price) {
         this.price = price;
     }
+
+    public int priceToSell() {
+        return (int) (0.9 * price);
+    }
+
+    @Override
+    public String toString() {
+        return GsonProvider.getInstance().toJson(this);
+    }
 }

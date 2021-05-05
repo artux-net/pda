@@ -1,6 +1,9 @@
 package net.artux.pda.map.model;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import net.artux.pda.map.states.PlayState;
 
@@ -32,14 +35,43 @@ public class Spawn {
         return position;
     }
 
-    public void create(){
+    public void create(AssetManager skin, List<Mob> mobs, Player player){
         getPosition();
 
         final Random random = new Random();
+        Mob mob = new Mob();
+        for (Mob m:mobs){
+            if (id==m.id){
+                mob = m;
+                System.out.println("Mob found "+ id +" " + mob.name);
+            }
+        }
         for(int i=0;i<n;i++) {
-            final Bot bot = new Bot(id, getRandomPoint(random), this);
+            final Bot bot = new Bot(id, getRandomPoint(random), this, skin, mob, player);
             bots.add(bot);
             PlayState.entities.add(bot);
+            final Mob finalMob = mob;
+            bot.addListener(new ClickListener(){
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    final Text text = new Text(finalMob.name, PlayState.font);
+                    text.setPosition(position.x, position.y);
+                    System.out.println("Add text " + text);
+                    PlayState.stage.addActor(text);
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(5000);
+                                text.remove();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
+            });
             PlayState.stage.addActor(bot);
         }
     }

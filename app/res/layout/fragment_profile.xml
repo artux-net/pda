@@ -101,12 +101,12 @@
                     android:layout_height="wrap_content" />
 
                 <TextView
-                    android:id="@+id/profile_achievements"
+                    android:id="@+id/profile_rating"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
                 <TextView
-                    android:id="@+id/profile_rating"
+                    android:id="@+id/profile_achievements"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
@@ -121,7 +121,6 @@
 
             <Button
                 android:id="@+id/profile_friends"
-                android:text="@string/friends"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -129,7 +128,6 @@
 
             <Button
                 android:id="@+id/profile_requests"
-                android:text="@string/subscribers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -139,7 +137,6 @@
 
         <Button
             android:id="@+id/profile_friend"
-            android:text="@string/is_friend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"

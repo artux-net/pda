@@ -2,28 +2,29 @@ package net.artux.pda.map.states;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
 
+import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.Entity;
 import net.artux.pda.map.model.Hit;
 import net.artux.pda.map.model.Map;
+import net.artux.pda.map.model.Mob;
 import net.artux.pda.map.model.Player;
 import net.artux.pda.map.model.Point;
 import net.artux.pda.map.model.Quest;
@@ -31,194 +32,149 @@ import net.artux.pda.map.model.Spawn;
 import net.artux.pda.map.model.Text;
 import net.artux.pda.map.model.Transfer;
 import net.artux.pda.map.model.TransferPoint;
-import net.artux.pda.map.ui.FrameRate;
-import net.artux.pda.map.ui.HealthBar;
+import net.artux.pda.map.ui.UserInterface;
 import net.artux.pdalib.Checker;
 import net.artux.pdalib.profile.Story;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
+import static net.artux.pda.map.GdxAdapter.RUSSIAN_CHARACTERS;
+import static net.artux.pda.map.GdxAdapter.RUSSIAN_FONT_NAME;
 
 
 public class PlayState extends State {
 
+    private Player player;
     public static List<Entity> entities = new ArrayList<>();
 
-    private Player player;
-    private Touchpad touchpad;
     public static Stage stage;
     public static Stage uistage;
-    private Texture background;
+
+    private final Texture background;
     private Texture blur;
-    private OrthographicCamera cam;
-
-    private Touchpad.TouchpadStyle style;
-    private Button.ButtonStyle textButtonStyle;
-
-    FrameRate frameRate;
+    private Texture bounds;
 
     int wb;
     int hb;
 
-    PauseState pauseState;
-    Skin skin;
+    public static AssetManager assetManager;
+
+    long heapLoss;
+
+    private final Button.ButtonStyle textButtonStyle;
+    public static BitmapFont font;
+
+    private final UserInterface userInterface;
 
     public PlayState(final GameStateManager gsm, Batch batch) {
         super(gsm);
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
-        Map map = gsm.getMap();
-        pauseState = new PauseState(gsm, map);
+        long before = Gdx.app.getNativeHeap();
+
+
+        Type REVIEW_TYPE = new TypeToken<List<Mob>>() {
+        }.getType();
+        Gson gson = new Gson();
+        JsonReader reader = new JsonReader(Gdx.files.internal("mobs").reader());
+        List<Mob> data = gson.fromJson(reader, REVIEW_TYPE);
+        System.out.println("Mobs data size: " + data.size());
+        font = GdxAdapter.generateFont(RUSSIAN_FONT_NAME, RUSSIAN_CHARACTERS);
+
+        assetManager = new AssetManager();
+        assetManager.load("dialog.png", Texture.class);
+        assetManager.load("beg2.png", Texture.class);
+        assetManager.load("beg1.png", Texture.class);
+        assetManager.load("pause.png", Texture.class);
+        assetManager.load("quest.png", Texture.class);
+        assetManager.load("seller.png", Texture.class);
+        assetManager.load("quest1.png", Texture.class);
+        assetManager.load("cache.png", Texture.class);
+        assetManager.load("direction.png", Texture.class);
+        assetManager.load("transfer.png", Texture.class);
+        assetManager.load("gg1.png", Texture.class);
+        assetManager.load("red.png", Texture.class);
+        assetManager.load("green.png", Texture.class);
+        assetManager.load("yellow.png", Texture.class);
+        assetManager.load("direction.png", Texture.class);
+        assetManager.load("touchpad/knob.png", Texture.class);
+        assetManager.load("touchpad/back.png", Texture.class);
+        assetManager.load("occupations.png", Texture.class);
+        assetManager.finishLoading();
+
+        Map map = (Map) gsm.get("map");
+        background = new Texture(Gdx.files.absolute(map.getTextureUri()));
+        if (map.getBlurTextureUri()!=null)
+            if (Gdx.files.absolute(map.getBlurTextureUri()).exists()) {
+                blur = new Texture(Gdx.files.absolute(map.getBlurTextureUri()));
+                blur.setWrap(Repeat, Repeat);
+                wb = background.getWidth()/2 - blur.getWidth()/2;
+                hb = background.getHeight()/2 - blur.getHeight()/2;
+            }
+
         Viewport viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
         stage = new Stage(viewport, batch);
         uistage = new Stage();
 
-
-        background = new Texture(Gdx.files.absolute(map.getTextureUri()));
-        pauseState.setBackground(background);
-        if (map.getBlurTextureUri()!=null)
-        if (Gdx.files.absolute(map.getBlurTextureUri()).exists()) {
-            blur = new Texture(Gdx.files.absolute(map.getBlurTextureUri()));
-            blur.setWrap(Repeat, Repeat);
-            wb = background.getWidth()/2 - blur.getWidth()/2;
-            hb = background.getHeight()/2 - blur.getHeight()/2;
-        }
-        background.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
-        TextureRegion imgTextureRegion = new TextureRegion(background);
-        imgTextureRegion.setRegion(0,0,background.getWidth()*3,background.getHeight()*3);
-
-        initPlayer(map);
-        frameRate = new FrameRate(player);
-
-        skin = new Skin();
-        skin.add("up-d", new Texture("dialog.png"));
-        skin.add("up", new Texture("beg2.png"));
-        skin.add("down", new Texture("beg1.png"));
-        skin.add("pause", new Texture("pause.png"));
-        skin.add("quest", new Sprite(new Texture("quest.png")));
-        skin.add("transfer", new Sprite(new Texture("transfer.png")));
-
         textButtonStyle = new Button.ButtonStyle();
-        textButtonStyle.up  = skin.getDrawable("up-d");
-
-
-        Button.ButtonStyle runButtonStyle = new Button.ButtonStyle();
-        runButtonStyle.up  = skin.getDrawable("up");
-        runButtonStyle.down  = skin.getDrawable("down");
-        runButton = new Button(runButtonStyle);
-        runButton.setPosition(w - w/12,h/12);
-        runButton.setSize(h/10,h/10);
-        runButton.addListener(new ClickListener(){
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                player.run = true;
-                return super.touchDown(event, x, y, pointer, button);
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                player.run = false;
-                super.touchUp(event, x, y, pointer, button);
-            }
-        });
-        uistage.addActor(runButton);
-
-        Button.ButtonStyle pauseButtonStyle = new Button.ButtonStyle();
-        pauseButtonStyle.up = skin.getDrawable("pause");
-        pauseButton = new Button(pauseButtonStyle);
-        pauseButton.setPosition(w - w/11, h - h/11);
-        pauseButton.setSize(h/12,h/12);
-        pauseButton.addListener(new ClickListener(){
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                super.touchUp(event, x, y, pointer, button);
-                gsm.push(pauseState);
-            }
-        });
-        uistage.addActor(pauseButton);
-
-        cam = new OrthographicCamera(w, h);
-        cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
-        cam.zoom -=0.5;
-        cam.update();
-
-
-        initTouchPad(w,h);
-        System.out.println("spawns: " + map.getSpawns().size());
-        for (Spawn spawn : map.getSpawns()){
-            System.out.println("Create spawn");
-            spawn.create();
-        }
+        textButtonStyle.up  =  new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
+        textButtonStyle.down = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
+        textButtonStyle.checked = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
+        textButtonStyle.over = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
 
         ((OrthographicCamera)stage.getCamera()).zoom -= 0.5f;
 
+        initPlayer(map);
 
+        userInterface = new UserInterface(gsm, player, assetManager, font);
+        uistage.addActor(userInterface);
+
+        for (Spawn spawn : map.getSpawns()){
+            spawn.create(assetManager, data, player);
+        }
 
         for(final Point point: map.getPoints()) {
-            if (Checker.check(point.getCondition(), getMember()))
-            if (point.getData().containsKey("chapter")){
-                int storyId = Integer.parseInt(getMember().getData().getTemp().get("currentStory"));
-                for (Story story : getMember().getData().getStories()) {
-                    if (story.getStoryId() == storyId
-                            && (Integer.parseInt(point.getData().get("chapter")) == story.getLastChapter()
-                            || Integer.parseInt(point.getData().get("chapter")) == 0))
-                            addPoint(point);
-                }
-            }else
-                addPoint(point);
+            if (getMember()!=null && Checker.check(point.getCondition(), getMember()))
+                if (point.getData().containsKey("chapter")){
+                    int storyId = Integer.parseInt(getMember().getData().getTemp().get("currentStory"));
+                    for (Story story : getMember().getData().getStories()) {
+                        if (story.getStoryId() == storyId
+                                && (Integer.parseInt(point.getData().get("chapter")) == story.getLastChapter()
+                                || Integer.parseInt(point.getData().get("chapter")) == 0))
+                                addPoint(point);
+                    }
+                 }else addPoint(point);
 
         }
         for (Transfer transfer : map.getTransfers()){
-            stage.addActor(new TransferPoint(transfer, skin));
+            stage.addActor(new TransferPoint(transfer, assetManager));
         }
+
+        long after = Gdx.app.getNativeHeap();
+        heapLoss = after-before;
+        System.out.println("Play init " + (after-before));
     }
 
     private void addPoint(Point point){
-        if (point.type < 4 && point.type >= 0) {
-            stage.addActor(new Quest(point, skin));
-        }
+        stage.addActor(new Quest(point, assetManager));
+        if (point.type < 2 || point.type > 3)
+            player.setDirection(point.getPosition());
     }
 
     private void initPlayer(Map map){
-        player = new Player(map.getPlayerPosition(), getMember());
+        System.out.println("Heap init:" + Gdx.app.getNativeHeap());
+        player = new Player(map.getPlayerPosition(), getMember(), assetManager);
+        System.out.println("Heap player:" + Gdx.app.getNativeHeap());
+        bounds = new Texture(Gdx.files.absolute(map.getBoundsTextureUri()));
         if (Gdx.files.absolute(map.getBoundsTextureUri()).exists())
-            player.setBoundsTexture(new Texture(Gdx.files.absolute(map.getBoundsTextureUri())));
+            player.setBoundsTexture(bounds);
+        System.out.println("Heap bounds:" + Gdx.app.getNativeHeap());
         entities.add(player);
         stage.addActor(player);
-        HealthBar healthBar = new HealthBar(player);
-        healthBar.setHeight(h/8);
-        healthBar.setWidth(w/4);
-        healthBar.setX(w/12);
-        healthBar.setY(h-h/8-20);
-        healthBar.setScale(1);
-        uistage.addActor(healthBar);
-    }
-
-
-    private void initTouchPad(float w, float h) {
-        Skin skin = new Skin();
-        skin.add("knob", new Texture("touchpad/knob.png"));
-        skin.add("background", new Texture("touchpad/back.png"));
-        style = new Touchpad.TouchpadStyle();
-
-        style.knob = skin.getDrawable("knob");
-        style.knob.setMinHeight(170);
-        style.knob.setMinWidth(170);
-        style.background = skin.getDrawable("background");
-        touchpad = new Touchpad(10, style);
-        touchpad.setBounds(50, 50, h/2.5f, h/2.5f );
-        touchpad.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                float deltaX = ((Touchpad) actor).getKnobPercentX();
-                float deltaY = ((Touchpad) actor).getKnobPercentY();
-
-                player.setVelocity(deltaX, deltaY);
-            }
-        });
-
-        uistage.addActor(touchpad);
+        System.out.println("Heap 2:" + Gdx.app.getNativeHeap());
 
     }
 
@@ -233,11 +189,13 @@ public class PlayState extends State {
 
     @Override
     protected void handleInput() {
+        gsm.addInputProcessor(stage);
         gsm.addInputProcessor(uistage);
     }
 
     @Override
     protected void stop() {
+        gsm.removeInputProcessor(stage);
         gsm.removeInputProcessor(uistage);
     }
 
@@ -246,7 +204,6 @@ public class PlayState extends State {
         uistage.act(dt);
         stage.act(dt);
 
-        frameRate.update();
         for (int i = 0; i<stage.getActors().size; i++){
             Actor actor = stage.getActors().get(i);
 
@@ -266,10 +223,10 @@ public class PlayState extends State {
             }else if (actor instanceof Quest){
                 final Quest point  = (Quest) actor;
                 String name = "q-"+point.hashCode();
-                if (distance(point.getPosition(), player.getPosition()) < 35f) {
+                if (point.getPosition().dst(player.getPosition()) < 35f) {
                     if (point.type!=1 && point.type!=3) {
-                        if (!containsUi(name)) {
-                            button = new Button(textButtonStyle);
+                        if (!userInterface.contains(name)) {
+                            Button button = new Button(textButtonStyle);
                             button.setPosition(w - w / 12, 2.5f * h / 12);
                             button.setSize(h / 10, h / 10);
                             button.addListener(new ChangeListener() {
@@ -279,17 +236,17 @@ public class PlayState extends State {
                                 }
                             });
                             button.setName(name);
-                            Text text =new Text(point.title, point.getPosition());
+                            Text text =new Text(point.title, font);
+                            text.setPosition(point.getPosition().x, point.getPosition().y);
                             text.setName(name);
                             stage.addActor(text);
-                            uistage.addActor(button);
+                            userInterface.addActor(button);
                         }
                     }else {
-                        System.out.println("send");
                         gsm.getPlatformInterface().send(point.getData());
                     }
                 } else {
-                    for(Actor buttons : uistage.getActors()){
+                    for(Actor buttons : userInterface.getChildren()){
                         if(buttons.getName()!=null && buttons.getName().equals(name)) {
                             buttons.remove();
                         }
@@ -304,9 +261,9 @@ public class PlayState extends State {
             }else if (actor instanceof TransferPoint){
                 final TransferPoint point  = (TransferPoint) actor;
                 String name = "t-"+point.hashCode();
-                if (distance(point.getPosition(), player.getPosition()) < 35f) {
-                    if (!containsUi(name)) {
-                        button = new Button(textButtonStyle);
+                if (point.getPosition().dst(player.getPosition()) < 35f) {
+                    if (!userInterface.contains(name)) {
+                        Button button = new Button(textButtonStyle);
                         button.setPosition(w - w/12, 2.5f * h / 12);
                         button.setSize(h/10,h/10);
                         button.addListener(new ChangeListener() {
@@ -316,13 +273,14 @@ public class PlayState extends State {
                             }
                         });
                         button.setName(name);
-                        Text text =new Text(point.getTitle(), point.getPosition());
+                        Text text =new Text(point.getTitle(), font);
+                        text.setPosition(point.getPosition().x, point.getPosition().y);
                         text.setName(name);
                         stage.addActor(text);
-                        uistage.addActor(button);
+                        userInterface.addActor(button);
                     }
                 } else {
-                    for(Actor buttons : uistage.getActors()){
+                    for(Actor buttons : userInterface.getChildren()){
                         if(buttons.getName()!=null && buttons.getName().equals(name)) {
                             buttons.remove();
                         }
@@ -338,7 +296,7 @@ public class PlayState extends State {
 
         for (int i = 0; i<entities.size(); i++)
             for (int j=0; j<entities.size(); j++)
-                if (distance(entities.get(i).getPosition(), entities.get(j).getPosition())<50f)
+                if (entities.get(i).getPosition().dst(entities.get(j).getPosition())<50f)
                     if (checkEnemy(entities.get(i).id, entities.get(j).id)){
                         Entity entity = entities.get(i);
                         entity.setEnemy(entities.get(j));
@@ -348,17 +306,12 @@ public class PlayState extends State {
                         entity.setEnemy(entities.get(i));
                         entities.set(j, entity);
                     }
-
     }
 
     @Override
     public void render(SpriteBatch batch) {
         Gdx.gl.glClearColor(130, 169, 130, 0.5f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        //drawQuests(batch);
-        /*for (Actor actor : stage.getActors())
-            actor.draw(batch,0);*/
 
         stage.getBatch().begin();
 
@@ -371,13 +324,9 @@ public class PlayState extends State {
         stage.draw();
 
         uistage.draw();
-        frameRate.render();
     }
-    Button button = null;
-    Button runButton;
-    Button pauseButton;
 
-    boolean contains(String name){
+    boolean contains(String name, Stage stage){
         for (Actor actor : stage.getActors()) {
             if (actor.getName()!=null && actor.getName().equals(name))
                 return true;
@@ -385,35 +334,33 @@ public class PlayState extends State {
         return false;
     }
 
-    boolean containsUi(String name){
-        for (Actor actor : uistage.getActors()) {
-            if (actor.getName()!=null && actor.getName().equals(name))
-                return true;
-        }
-        return false;
-    }
-
-    public static double sq(double a){
-        return a*a;
-    }
-
-    public static double distance(Vector2 p1, Vector2 p2){
-        return Math.sqrt(sq(p1.x - p2.x)
-                + sq(p1.y - p2.y));
-    }
-
     @Override
     public void resize(int w, int h) {
-        cam.viewportWidth = w;
-        cam.viewportHeight = h;
         System.out.println("Resized: " + w + " : " + h);
         stage.getViewport().update(w, h, true);
-        touchpad.setPosition(w/12, h/10);
+
     }
 
     @Override
     public void dispose() {
-        frameRate.dispose();
+        System.out.println("Dispose PlayState");
+        long before = Gdx.app.getNativeHeap();
+        System.out.println("Before: " );
+        stage.dispose();
+        uistage.dispose();
+        background.dispose();
+        if (bounds!=null)
+            bounds.dispose();
+        if (blur!=null)
+            blur.dispose();
+        font.dispose();
+        assetManager.dispose();
+        player.dispose();
+        userInterface.dispose();
+
+        long after = Gdx.app.getNativeHeap();
+        System.out.println("Play dispose " + (after-before));
+        System.out.println("Total heap loss " + heapLoss);
     }
 
 }

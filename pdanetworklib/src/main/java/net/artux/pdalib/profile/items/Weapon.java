@@ -107,4 +107,13 @@ public class Weapon extends Item{
         this.bullet_id = bullet_id;
     }
 
+    @Override
+    public int priceToSell() {
+        return (int) (super.priceToSell() * condition / 100);
+    }
+
+    @Override
+    public String toString() {
+        return GsonProvider.getInstance().toJson(this);
+    }
 }

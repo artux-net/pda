@@ -143,4 +143,9 @@ public class Artifact extends Item {
     public void setElectric(int electric) {
         this.electric = electric;
     }
+
+    @Override
+    public String toString() {
+        return GsonProvider.getInstance().toJson(this);
+    }
 }

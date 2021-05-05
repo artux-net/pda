@@ -1,7 +1,9 @@
 package net.artux.pdalib;
 
 import net.artux.pdalib.profile.Data;
+import net.artux.pdalib.profile.Note;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,12 +21,15 @@ public class Member {
     private int blocked;
     private int group;
     private int xp;
+    private int money;
     private String location;
     private Data data;
     public List<Integer> dialogs;
     public List<Integer> friends;
     public List<Integer> friendRequests;
     public List<Integer> relations;
+    public List<Note> notes = new ArrayList<>();
+    public List<Integer> achievements = new ArrayList<>();
     private Date lastModified;
     private String registrationDate;
     private Date lastLoginAt;
@@ -114,6 +119,10 @@ public class Member {
 
     public int getXp() {
         return xp;
+    }
+
+    public int getMoney() {
+        return money;
     }
 
     public void setXp(int xp) {
