@@ -1,8 +1,9 @@
 package net.artux.pdalib.arena;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ServerState {
-
-    public HashMap<String, ServerEntity> entities = new HashMap<>();
+    public int frame;
+    public ArrayList<ServerEntity> entities = new ArrayList<>();
 }

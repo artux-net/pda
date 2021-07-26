@@ -30,7 +30,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/itemWeight"
-        android:text="title"
+        android:text="Пусто"
         android:textSize="16sp"/>
 
     <TextView

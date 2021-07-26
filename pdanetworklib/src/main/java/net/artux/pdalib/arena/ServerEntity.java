@@ -5,22 +5,31 @@ import net.artux.pdalib.Profile;
 
 public class ServerEntity {
 
-    final static double MOVEMENT = 0.4;
-
+    public final int pdaId;
     private final Position position;
-    private final Profile profile;
+    private final Position velocity;
+
 
     public ServerEntity(Position position, Member profile) {
         this.position = position;
-        this.profile = new Profile(profile);
+        velocity = new Position(0,0);
+        this.pdaId = profile.getPdaId();
     }
 
     public Position getPosition() {
         return position;
     }
 
-    public void move(Position position){
-        this.position.moveBy(position.x*MOVEMENT, position.y*MOVEMENT);
+    public Position getVelocity() {
+        return velocity;
     }
 
+    @Override
+    public String toString() {
+        return "ServerEntity{" +
+                "pdaId=" + pdaId +
+                ", position=" + position +
+                ", velocity=" + velocity +
+                '}';
+    }
 }

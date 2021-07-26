@@ -1,43 +1,59 @@
 package net.artux.pda.map.model;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Disposable;
 
-public class ServerPlayer extends Actor {
+import net.artux.pda.map.states.ArenaState;
+import net.artux.pda.map.states.State;
+import net.artux.pdalib.Member;
 
-    static float MOVEMENT = 0.4f;
-    public boolean run = false;
-
-    public int id;
-    Vector2 position = new Vector2();
-    Vector2 velocity = new Vector2();
-    Sprite sprite;
-
-    public double health = 100;
+public class ServerPlayer extends Player {
+    Vector2 lastPosition = new Vector2();
+    Vector2 nextPosition = new Vector2();
+    Vector2 serverVelocity = null;
 
 
-    public ServerPlayer(Vector2 position, AssetManager skin) {
+    public ServerPlayer(State state, Vector2 playerPosition, Member member, AssetManager skin) {
+        super(state, playerPosition, member, skin);
+    }
 
-        this.position = position;
-        sprite = new Sprite(skin.get("yellow.png", Texture.class));
-        sprite.setSize(12, 12);
-        sprite.setPosition(0, 0);
-        sprite.setOriginCenter();
+    public void setNextPosition(float x, float y) {
+        lastPosition.x = getX();
+        lastPosition.y = getY();
+        this.nextPosition.x = x;
+        this.nextPosition.y = y;
+        serverVelocity = nextPosition.sub(lastPosition).cpy();
     }
 
     @Override
-    public void draw(Batch batch, float parentAlpha) {
-        sprite.draw(batch);
-    }
+    public void act(float delta) {
+        if(ArenaState.getPing()!=0) {
 
-    @Override
-    public void setPosition(float x, float y) {
-        position.x = x;
-        position.y = y;
-        sprite.setPosition(x,y);
+            float targetX = getX(); //Player's X
+            float targetY = getY(); //Player's Y
+            float spriteX = nextPosition.x; //Enemy's X
+            float spriteY = nextPosition.y; //Enemy's Y
+            float x2 = spriteX; //Enemy's new X
+            float y2 = spriteY; //Enemy's new Y
+            float angle; // We use a triangle to calculate the new trajectory
+            if (Math.abs(targetY - spriteY) > 2 || Math.abs(targetX - spriteX) > 2) {
+                angle = (float) Math
+                        .atan2(targetY - spriteY, targetX - spriteX);
+                x2 += (float) Math.cos(angle) * 125
+                        * Gdx.graphics.getDeltaTime();
+                y2 += (float) Math.sin(angle) * 125
+                        * Gdx.graphics.getDeltaTime();
+                setPosition(x2, y2); //Set enemy's new positions.
+            }
+        }
+
     }
 }

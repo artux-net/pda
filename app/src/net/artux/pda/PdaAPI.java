@@ -12,6 +12,7 @@ import net.artux.pdalib.Member;
 import net.artux.pdalib.Profile;
 import net.artux.pdalib.RegisterUser;
 import net.artux.pdalib.Status;
+import net.artux.pdalib.news.Article;
 import net.artux.pdalib.profile.FriendModel;
 import net.artux.pdalib.profile.Note;
 import net.artux.pdalib.profile.Seller;
@@ -122,4 +123,6 @@ public interface PdaAPI{
     @DELETE("notes")
     Call<Member> deleteNote(@Query("cid") int cid);
 
+    @GET("feed")
+    Call<List<Article>> getFeed();
 }

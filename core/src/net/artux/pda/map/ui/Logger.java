@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.model.Player;
+import net.artux.pda.map.states.ArenaState;
+import net.artux.pda.map.states.State;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +30,12 @@ public class Logger implements Disposable{
     private final Player player;
     private final int x;
     private final int y;
+    private State state;
 
     List<String> texts =  new ArrayList<>();
 
-    public Logger(Player player, int x, int y) {
+    public Logger(State state, Player player, int x, int y) {
+        this.state = state;
         this.player = player;
         this.x = x;
         this.y = y;
@@ -75,14 +79,19 @@ public class Logger implements Disposable{
         batch.begin();
 
         font.draw(batch, (int)frameRate + " fps", x, y - 3);
+
         font.draw(batch, "x: " + player.getPosition().x + ", y: " + player.getPosition().y, x, y - 15);
         font.draw(batch, "Player health: " + player.health, x, y - 30);
         font.draw(batch, "Native Heap: " + Gdx.app.getNativeHeap(), x, y - 60);
         font.draw(batch, "Screen: " + Gdx.app.getGraphics().getWidth() + ":" + Gdx.app.getGraphics().getHeight(), x, y - 75);
         font.draw(batch, "Density: " + Gdx.app.getGraphics().getDensity(), x, y - 90);
         font.draw(batch, "Version: " + Gdx.app.getVersion(), x, y - 105);
+        if (state!=null && state instanceof ArenaState) {
+            font.draw(batch, "Ping: " + ((ArenaState) state).getPing() + "ms", x, y - 120);
+            font.draw(batch, "Server render time: " + ((ArenaState) state).getServerRenderTime() + "ms", x, y - 135);
+        }
         for (int i = 0; i<texts.size(); i++){
-            font.draw(batch, texts.get(i), x, y - 130 - i*15);
+            font.draw(batch, texts.get(i), x, y - 150 - i*15);
         }
 
         batch.end();

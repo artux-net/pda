@@ -40,8 +40,9 @@ public class Quest1Scene extends SceneFragment {
             else
                 button.setText(getActivity().getString(R.string.okay));
 
-            button.setOnClickListener(v ->
-                    ((QuestActivity) getActivity()).getSceneController().loadStage(getTransfers().get(0).stage_id));
+            button.setOnClickListener(v -> {
+                        ((QuestActivity) getActivity()).getSceneController().showAd((getTransfers().get(0).stage_id));
+            });
         }
 
         //if (stage.getMessage()!=null && !stage.getMessage().equals(""))

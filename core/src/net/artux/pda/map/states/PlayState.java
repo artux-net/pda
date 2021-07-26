@@ -132,6 +132,7 @@ public class PlayState extends State {
         userInterface = new UserInterface(gsm, player, assetManager, font);
         uistage.addActor(userInterface);
 
+
         for (Spawn spawn : map.getSpawns()){
             spawn.create(assetManager, data, player);
         }
@@ -166,7 +167,7 @@ public class PlayState extends State {
 
     private void initPlayer(Map map){
         System.out.println("Heap init:" + Gdx.app.getNativeHeap());
-        player = new Player(map.getPlayerPosition(), getMember(), assetManager);
+        player = new Player(this, map.getPlayerPosition(), getMember(), assetManager);
         System.out.println("Heap player:" + Gdx.app.getNativeHeap());
         bounds = new Texture(Gdx.files.absolute(map.getBoundsTextureUri()));
         if (Gdx.files.absolute(map.getBoundsTextureUri()).exists())

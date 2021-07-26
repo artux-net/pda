@@ -187,7 +187,7 @@ public class UserInterface extends Group implements Disposable {
         addActor(menu);
         addActor(menuButton);
 
-        logger = new Logger(player, 3, (int) (6*h/8));
+        logger = new Logger(null, player, 3, (int) (6*h/8));
     }
 
     public boolean contains(String name){

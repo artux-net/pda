@@ -24,6 +24,7 @@ import com.bumptech.glide.request.target.Target;
 
 import net.artux.pda.R;
 import net.artux.pda.app.App;
+import net.artux.pda.app.NotificationService;
 import net.artux.pda.databinding.ActivityMainBinding;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
@@ -78,6 +79,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
             startActivity(new Intent(this, LoadingActivity.class));
 
         setListeners();
+        startService(new Intent(this, NotificationService.class));
     }
 
     @Override
@@ -137,6 +139,9 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
     @Override
     public void onStart() {
+
+        if (App.getDataManager().getMember()==null)
+            startActivity(new Intent(this, LoginActivity.class));
         super.onStart();
         binding.timeView.setText(timeFormat.format(new Date()));
         timeReceiver = new BroadcastReceiver() {
@@ -161,7 +166,6 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
     @Override
     public void setLoadingState(final boolean loadingState){
-        Timber.d("Loading state: %s", loadingState);
         runOnUiThread(() -> Glide.with(getApplicationContext())
             .asGif()
             .load(Uri.parse("file:///android_asset/loadCube.gif"))

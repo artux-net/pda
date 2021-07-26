@@ -21,6 +21,7 @@ import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
 import net.artux.pda.ui.fragments.chat.ChatFragment;
 import net.artux.pda.ui.fragments.chat.Dialog;
+import net.artux.pdalib.UserMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +43,14 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void setDialogs(List<Dialog> dialogs) {
         mDialogList = dialogs;
         notifyDataSetChanged();
+    }
+
+    public void updateDialog(UserMessage message){
+        for (Dialog d :
+                mDialogList) {
+            if (d.id == message.cid)
+                d.lastMessage = message.senderLogin + ": " + message.message;
+        }
     }
 
     @Override

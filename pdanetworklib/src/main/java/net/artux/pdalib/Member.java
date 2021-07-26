@@ -27,12 +27,12 @@ public class Member {
     public List<Integer> dialogs;
     public List<Integer> friends;
     public List<Integer> friendRequests;
-    public List<Integer> relations;
+    public List<Integer> relations = new ArrayList<>();
     public List<Note> notes = new ArrayList<>();
     public List<Integer> achievements = new ArrayList<>();
-    private Date lastModified;
-    private String registrationDate;
-    private Date lastLoginAt;
+    private Long lastModified;
+    private Long registrationDate;
+    private Long lastLoginAt;
 
     public Member() {
     }
@@ -161,27 +161,47 @@ public class Member {
         this.friendRequests = friendRequests;
     }
 
-    public Date getLastModified() {
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public List<Note> getNotes() {
+        return notes;
+    }
+
+    public void setNotes(List<Note> notes) {
+        this.notes = notes;
+    }
+
+    public List<Integer> getAchievements() {
+        return achievements;
+    }
+
+    public void setAchievements(List<Integer> achievements) {
+        this.achievements = achievements;
+    }
+
+    public Long getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Date lastModified) {
+    public void setLastModified(Long lastModified) {
         this.lastModified = lastModified;
     }
 
-    public String getRegistrationDate() {
+    public Long getRegistrationDate() {
         return registrationDate;
     }
 
-    public void setRegistrationDate(String registrationDate) {
+    public void setRegistrationDate(Long registrationDate) {
         this.registrationDate = registrationDate;
     }
 
-    public Date getLastLoginAt() {
+    public Long getLastLoginAt() {
         return lastLoginAt;
     }
 
-    public void setLastLoginAt(Date lastLoginAt) {
+    public void setLastLoginAt(Long lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
     }
 

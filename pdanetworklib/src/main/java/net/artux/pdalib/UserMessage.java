@@ -1,7 +1,10 @@
 package net.artux.pdalib;
 
-public class UserMessage {
+import java.io.Serializable;
 
+public class UserMessage implements Serializable {
+
+    public int cid = -1;
     public String senderLogin;
     public String message;
     public long time;
@@ -9,4 +12,16 @@ public class UserMessage {
     public int avatarId;
     public int pdaId;
 
+    @Override
+    public String toString() {
+        return "UserMessage{" +
+                "cid=" + cid +
+                ", senderLogin='" + senderLogin + '\'' +
+                ", message='" + message + '\'' +
+                ", time=" + time +
+                ", groupId=" + groupId +
+                ", avatarId=" + avatarId +
+                ", pdaId=" + pdaId +
+                '}';
+    }
 }

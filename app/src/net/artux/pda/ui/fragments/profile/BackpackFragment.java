@@ -91,7 +91,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
         });
 
         if (item instanceof Armor || item instanceof Weapon)
-        builder.setNeutralButton("Set as main", new DialogInterface.OnClickListener() {
+        builder.setNeutralButton("Сделать основным", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (item instanceof Armor) {

@@ -44,6 +44,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static androidx.core.app.ActivityCompat.requestPermissions;
+
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     LoginUser loginUser;
@@ -57,7 +61,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions( new String[]{WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE}, 1);
+        }
         if(!App.getDataManager().getAuthToken().equals("")){
             startActivity(new Intent(this, LoadingActivity.class));
             finish();
@@ -172,6 +178,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 public void onResponse(Call<LoginStatus> call, Response<LoginStatus> response) {
                     showProgress(false);
                     LoginStatus loginStatus = response.body();
+                    Timber.d(loginStatus.toString());
                     if (response.code() == 502)
                         Toast.makeText(LoginActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
                     else if (loginStatus != null)
@@ -191,7 +198,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             Toast.makeText(LoginActivity.this, loginStatus.getDescription(), Toast.LENGTH_LONG).show();
                         }
                     else {
-                        Toast.makeText(getApplicationContext(), response.code() + ":" + response.message(), Toast.LENGTH_LONG).show();
+                        if (response.message()!=null && !response.message().equals(""))
+                            Toast.makeText(getApplicationContext(), response.code() + ":" + response.message(), Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(getApplicationContext(), response.code() + ":" + getString(R.string.unable_connect), Toast.LENGTH_LONG).show();
                         Timber.e("Login error - " + response.toString());
                     }
 
@@ -201,7 +211,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 public void onFailure(Call<LoginStatus> call, Throwable throwable) {
                     Toast.makeText(LoginActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
                     showProgress(false);
-                    throwable.printStackTrace();
+                    Timber.e(throwable);
                 }
             });
         }

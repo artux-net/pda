@@ -11,20 +11,24 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.prof.rssparser.Article;
+import com.google.gson.Gson;
 
 import net.artux.pda.R;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
+import net.artux.pdalib.news.Article;
+
+import org.joda.time.Instant;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
 
-    private final ArrayList<Article> mArticles = new ArrayList<>();
+    private List<Article> mArticles = new ArrayList<>();
 
     FragmentNavigation.Presenter presenter;
 
@@ -33,7 +37,7 @@ public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     }
 
     public void setNews(List<Article> articles) {
-        mArticles.addAll(articles);
+        mArticles = articles;
         notifyDataSetChanged();
     }
 
@@ -73,16 +77,16 @@ public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
         @SuppressLint("SetTextI18n")
         public void bind(View mainView, final Article article){
-            titleView.setText(Html.fromHtml(article.getTitle()));
-            Glide.with(imageView.getContext()).load(article.getImage()).into(imageView);
-            contentView.setText(Html.fromHtml(article.getDescription()).subSequence(0,200) + "...");
+            System.out.println(new Gson().toJson(article));
+            titleView.setText(Html.fromHtml(article.title));
+            contentView.setText(Html.fromHtml(article.description));
 
             SimpleDateFormat outputFormat =
                     new SimpleDateFormat("dd.MM", Locale.getDefault());
-            String localTime = article.getPubDate();
-            dateView.setText(localTime);
-            mainView.setOnClickListener(v -> ViewHolder.this.onClick(article));
 
+            dateView.setText(outputFormat.format(new Date(article.published)));
+            mainView.setOnClickListener(v -> ViewHolder.this.onClick(article));
+            Glide.with(imageView.getContext()).load(article.image).placeholder(R.mipmap.ic_launcher).into(imageView);
         }
 
         @Override
@@ -90,7 +94,7 @@ public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             OpenNewsFragment openNewsFragment = new OpenNewsFragment();
             openNewsFragment.setArticle(article);
             if (presenter!=null) {
-                presenter.setTitle(article.getTitle());
+                presenter.setTitle(article.title);
                 //presenter.setLoadingState(true);
                 presenter.addFragment(openNewsFragment, false);
             }

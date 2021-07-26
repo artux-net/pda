@@ -5,10 +5,10 @@ apply plugin: 'com.google.firebase.crashlytics'
 android {
     signingConfigs {
         release {
-            storeFile file('/home/maxim/Documents/Development/Projects/Android/pdanetwork/app/test1')
-            storePassword 'Maks1234'
-            keyAlias 'key0'
-            keyPassword 'Maks1234'
+            storeFile file('C:\\artux.jks')
+            storePassword 'pass'
+            keyAlias 'pda'
+            keyPassword 'pass'
         }
     }
     buildToolsVersion "30.0.0"
@@ -42,10 +42,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "URL_API", "\"api.artux.net/pda/\"")
             buildConfigField("String", "URL", "\"api.artux.net/\"")
+            buildConfigField("String", "QuestAdId", "\"ca-app-pub-4707001480680280/1079779549\"")
+            buildConfigField("String", "NewsAdId", "\"ca-app-pub-4707001480680280/2723145658\"")
         }
         debug {
-            buildConfigField("String", "URL_API", "\"api.artux.net/pda/\"")
+            debuggable true
+            buildConfigField("String", "URL_API", "\"192.168.0.200:8080/test\"")
             buildConfigField("String", "URL", "\"api.artux.net/\"")
+            buildConfigField("String", "QuestAdId", "\"ca-app-pub-3940256099942544/1033173712\"")
+            buildConfigField("String", "NewsAdId", "\"ca-app-pub-3940256099942544/2247696110\"")
         }
     }
     compileOptions {
@@ -64,6 +69,7 @@ dependencies {
     implementation 'com.prof.rssparser:rssparser:3.1.2'
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.12.0'
+    implementation 'com.google.firebase:firebase-ads:20.2.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

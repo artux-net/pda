@@ -5,19 +5,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.gson.reflect.TypeToken;
 import com.prof.rssparser.Channel;
 import com.prof.rssparser.OnTaskCompleted;
 import com.prof.rssparser.Parser;
 
 import net.artux.pda.R;
+import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
+import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
+import net.artux.pda.ui.fragments.chat.Dialog;
+import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
+import net.artux.pdalib.news.Article;
+import net.artux.pdalib.profile.items.GsonProvider;
 
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
 public class NewsFragment extends BaseFragment {
@@ -43,32 +56,30 @@ public class NewsFragment extends BaseFragment {
         adapter = new NewsAdapter(navigationPresenter);
         binding.list.setAdapter(adapter);
 
-        String urlString = "https://pda-news.ucoz.net/news/rss/";
+        Type listType = new TypeToken<List<Article>>(){}.getType();
+        List<Article> news = GsonProvider.getInstance().fromJson(App.getDataManager().getString("news"), listType);
+        if(news!=null){
+            binding.list.setVisibility(View.VISIBLE);
+            binding.viewMessage.setVisibility(View.GONE);
+            adapter.setNews(news);
+        }
 
-        Parser parser = new Parser.Builder()
-                .charset(StandardCharsets.UTF_8)
-                .build();
-        parser.onFinish(new OnTaskCompleted() {
-
+        App.getRetrofitService().getPdaAPI().getFeed().enqueue(new Callback<List<Article>>() {
             @Override
-            public void onTaskCompleted(Channel channel) {
-                if (getActivity()!=null)
-                    getActivity().runOnUiThread(() -> {
-                        if (navigationPresenter!=null)
-                            navigationPresenter.setLoadingState(false);
-                        binding.list.setVisibility(View.VISIBLE);
-                        binding.viewMessage.setVisibility(View.GONE);
-                        adapter.setNews(channel.getArticles());
-                    });
+            public void onResponse(Call<List<Article>> call, Response<List<Article>> response) {
+                List<Article> list = response.body();
+                if (list!=null) {
+                    binding.list.setVisibility(View.VISIBLE);
+                    binding.viewMessage.setVisibility(View.GONE);
+                    adapter.setNews(list);
+                    App.getDataManager().setString("news", GsonProvider.getInstance().toJson(list));
+                }
             }
 
             @Override
-            public void onError(Exception e) {
-                navigationPresenter.setLoadingState(false);
-                Timber.tag("RSS").e(e);
+            public void onFailure(Call<List<Article>> call, Throwable t) {
+                Timber.tag("News").e(t);
             }
-            
         });
-        parser.execute(urlString);
     }
 }

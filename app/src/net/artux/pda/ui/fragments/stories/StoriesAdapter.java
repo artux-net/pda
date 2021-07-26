@@ -9,22 +9,34 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.artux.pda.R;
 import net.artux.pda.ui.fragments.quest.models.StoryItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StoriesAdapter extends RecyclerView.Adapter<StoryHolder> {
 
-    private final List<StoryItem> stories;
+    private List<StoryItem> stories = new ArrayList<>();
     private final OnStoryClickListener listener;
 
-    public StoriesAdapter(List<StoryItem> stories, OnStoryClickListener listener) {
+    public StoriesAdapter( OnStoryClickListener listener) {
+        this.listener = listener;
+    }
+
+    public void setStories(List<StoryItem> stories) {
         this.stories = stories;
         StoryItem item = new StoryItem();
         item.id = -1;
-        item.title = "Load any stage.";
-        item.desc = "Load any stage that you want.";
+        item.title = "Загрузка стадии на выбор";
+        item.desc = "..";
 
         this.stories.add(item);
-        this.listener = listener;
+
+        StoryItem item1 = new StoryItem();
+        item1.id = -2;
+        item1.title = "Тестирование арены";
+        item1.desc = "..";
+
+        this.stories.add(item1);
+        notifyDataSetChanged();
     }
 
     @NonNull

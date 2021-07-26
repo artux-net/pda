@@ -39,11 +39,13 @@ public class EquipmentFragment extends BaseFragment {
                 .getEquipment();
 
         if (equipment.getArmor()!=null)
-            defineSlot(view, R.id.slot1, equipment.getArmor());
+            defineSlot(view, R.id.mainSlot, equipment.getArmor());
+
+
         if (equipment.getFirstWeapon()!=null)
-            defineSlot(view, R.id.slot3, equipment.getFirstWeapon());
+            defineSlot(view, R.id.slot2, equipment.getFirstWeapon());
         if (equipment.getSecondWeapon()!=null)
-            defineSlot(view, R.id.slot4, equipment.getSecondWeapon());
+            defineSlot(view, R.id.slot1, equipment.getSecondWeapon());
     }
 
     private void defineSlot(View view, int slotId, Item item){

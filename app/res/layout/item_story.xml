@@ -7,7 +7,7 @@
     <ImageView
         android:id="@+id/storyIcon"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="70dp"
         android:paddingTop="3dp"
         android:src="@mipmap/ic_launcher"
         android:layout_weight="5"/>
@@ -23,6 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Player"
+            android:textSize="20sp"
+            android:textColor="#FFF"
             android:paddingLeft="10dp"/>
 
         <TextView

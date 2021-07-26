@@ -7,6 +7,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.gson.Gson;
 
+import net.artux.pda.BuildConfig;
 import net.artux.pda.app.App;
 import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.Map;
@@ -14,6 +15,7 @@ import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
+import net.artux.pdalib.arena.Connection;
 
 import java.util.HashMap;
 
@@ -29,11 +31,16 @@ public class CoreStarter extends AndroidApplication implements PlatformInterface
         super.onCreate(savedInstanceState);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
-        Map map = gson.fromJson(getIntent().getStringExtra("map"), Map.class);
-
-        gdxAdapter = new GdxAdapter(CoreStarter.this,  App.getDataManager().getMember(), false);
-        gdxAdapter.put("map", map);
-        gdxAdapter.put("member", App.getDataManager().getMember());
+        Timber.d("Core start, isArena: " + getIntent().getBooleanExtra("arena", false));
+        if(getIntent().getBooleanExtra("arena", false)){
+            Connection connection = new Connection("192.168.1.104:8080", App.getDataManager().getAuthToken(), "1");
+            gdxAdapter = new GdxAdapter(CoreStarter.this,  App.getDataManager().getMember(), connection);
+        }else{
+            Map map = gson.fromJson(getIntent().getStringExtra("map"), Map.class);
+            gdxAdapter = new GdxAdapter(CoreStarter.this,  App.getDataManager().getMember());
+            gdxAdapter.put("map", map);
+            gdxAdapter.put("member", App.getDataManager().getMember());
+        }
         initialize(gdxAdapter, config);
     }
 

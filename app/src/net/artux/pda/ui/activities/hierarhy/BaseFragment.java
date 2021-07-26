@@ -17,49 +17,43 @@ public abstract class BaseFragment extends Fragment implements FragmentNavigatio
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Timber.d("View created %s", getClass().getName());
+        Timber.d("Fragment %s created", getClass().getName());
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        Timber.d("Fragment attached");
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Timber.d("Fragment create");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Timber.d("Fragment destroyed");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Timber.d("Fragment start");
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Timber.d("Fragment resume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Timber.d("Fragment pause");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Timber.d("Fragment stop");
+        Timber.d("Fragment %s stopped.", getClass().getName());
     }
 
     @Override

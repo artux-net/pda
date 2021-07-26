@@ -12,6 +12,7 @@ import net.artux.pda.map.states.ArenaState;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.PlayState;
 import net.artux.pdalib.Member;
+import net.artux.pdalib.arena.Connection;
 
 import java.net.URISyntaxException;
 
@@ -24,15 +25,14 @@ public class GdxAdapter extends ApplicationAdapter {
 	public static final String RUSSIAN_FONT_NAME = "fonts/Imperial Web.ttf";
 	public static final String RUSSIAN_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;:,{}\"´`'<>";
 
-	boolean arena = false;
-
+	private Connection connection;
     public GdxAdapter(PlatformInterface platformInterface, Member member){
 		gsm = new GameStateManager(platformInterface, member);
 	}
 
-	public GdxAdapter(PlatformInterface platformInterface, Member member, boolean arena){
+	public GdxAdapter(PlatformInterface platformInterface, Member member, Connection connection){
 		gsm = new GameStateManager(platformInterface, member);
-		this.arena =arena;
+		this.connection = connection;
 	}
 
 
@@ -43,9 +43,9 @@ public class GdxAdapter extends ApplicationAdapter {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		if (arena) {
+		if (connection != null) {
 			try {
-				gsm.push(new ArenaState(gsm, batch));
+				gsm.push(new ArenaState(gsm, batch, connection));
 			} catch (URISyntaxException e) {
 				e.printStackTrace();
 			}

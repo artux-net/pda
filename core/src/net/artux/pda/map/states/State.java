@@ -28,6 +28,11 @@ public abstract class State {
     public abstract void render(SpriteBatch sb);
     public abstract void resize(int width, int height);
     public abstract void dispose();
+
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
+
     public Member getMember(){
         if (gsm.getMember()==null)
             return (Member) gsm.get("member");

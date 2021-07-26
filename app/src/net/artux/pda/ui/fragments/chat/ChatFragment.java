@@ -132,11 +132,13 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
                 Type listType = new TypeToken<LimitedArrayList<UserMessage>>(){}.getType();
 
                 try {
+                    UserMessage userMessage = App.getRetrofitService().getGson().fromJson(text,UserMessage.class);
+                    mChatAdapter.addMessage(userMessage);
+                    mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount()-1);
+                }catch (JsonSyntaxException e){
+                    mChatAdapter.clearItems();
                     LimitedArrayList<UserMessage> list = gson.fromJson(text, listType);
                     mChatAdapter.setItems(list);
-                }catch (JsonSyntaxException e){
-                    mChatAdapter.addMessage(App.getRetrofitService().getGson().fromJson(text,UserMessage.class));
-                    mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount()-1);
                 }
             });
     }

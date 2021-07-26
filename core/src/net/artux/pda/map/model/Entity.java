@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import net.artux.pdalib.arena.ServerEntity;
 import net.artux.pdalib.profile.items.Armor;
 import net.artux.pdalib.profile.items.Weapon;
 
@@ -22,11 +23,11 @@ public abstract class Entity extends Actor {
 
     public int id;
     Vector2 velocity = new Vector2();
-    Sprite sprite;
+    public Sprite sprite;
 
     public double health = 100;
 
-    private Vector2 target;
+
     boolean waiting;
     boolean timerStarted;
     Vector2 startPosition;
@@ -38,7 +39,7 @@ public abstract class Entity extends Actor {
     private Weapon weapon2;
     int weapon = 0;
 
-    Entity(Vector2 position) {
+    public Entity(Vector2 position) {
         startPosition = position;
         setX(position.x);
         setY(position.y);
@@ -56,12 +57,15 @@ public abstract class Entity extends Actor {
     @Override
     public int hashCode() {
         boolean shot = false;
-        return Objects.hash(run, id, velocity, sprite, health, target, waiting, timerStarted, startPosition, enemy, armor, weapon1, weapon2, weapon, shot);
+        return Objects.hash(run, id, velocity, sprite, health, waiting, timerStarted, startPosition, enemy, armor, weapon1, weapon2, weapon, shot);
     }
 
     @Override
     public void act(float delta) {
-        update(delta);
+        System.out.println("moved by " + velocity.x * MOVEMENT +" : "+  velocity.y * MOVEMENT);
+        System.out.println("moved by 60 times " + 60 * velocity.x * MOVEMENT +" : "+  60 * velocity.y * MOVEMENT);
+        System.out.println("moved by " + 1/delta + " times " + 1/delta * velocity.x * MOVEMENT +" : "+ 1/delta * velocity.y * MOVEMENT);
+        moveBy(velocity.x * MOVEMENT, velocity.y * MOVEMENT);
     }
 
     @Override
@@ -84,21 +88,6 @@ public abstract class Entity extends Actor {
         return enemy;
     }
 
-    public void setDestination(Vector2 point) {
-        target = point;
-    }
-
-    float timer;
-
-    public void hit(float dt) {
-        if (timer>0.1f) {
-            registerHit(new Hit(Entity.this,getWeapon(), target));
-            timer = 0;
-        }else {
-            timer += dt;
-        }
-    }
-
     double getHitDistance() {
         if (getWeapon() == null)
             return 0;
@@ -111,48 +100,7 @@ public abstract class Entity extends Actor {
         return velocity;
     }
 
-    void move() {
-        velocity.x = (target.x - getX()) / Math.abs(target.x - getX());
-        velocity.y = (target.y - getY()) / Math.abs(target.y - getY());
 
-        moveBy(velocity.x * MOVEMENT, velocity.y * MOVEMENT);
-    }
-
-    public void update(float dt) {
-        if (this instanceof Bot)
-        if (getEnemy() != null) {
-            double distance = getPosition().dst(getEnemy().getPosition());
-            if (distance >= 300) {
-                setEnemy(null);
-                setDestination(getTarget());
-                timerStarted = false;
-                waiting = false;
-            } else {
-                setDestination(getEnemy().getPosition());
-                waiting = false;
-                if (distance < getHitDistance()) {
-                    hit(dt);
-                }
-            }
-        }
-        if (!waiting && target != null) {
-            move();
-            double distance = getPosition().dst(target);
-            if (distance < 5) waiting = true;
-        }else {
-            if (!timerStarted) {
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        setDestination(getTarget());
-                        waiting = false;
-                        timerStarted = false;
-                    }
-                }, 1000 * (Math.abs(random.nextLong() % 30)));
-            }
-            timerStarted = true;
-        }
-    }
 
     public Vector2 getTarget(){
         if (this instanceof Bot){

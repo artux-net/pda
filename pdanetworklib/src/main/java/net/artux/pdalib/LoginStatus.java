@@ -45,4 +45,14 @@ public class LoginStatus {
     public void setCode(int code) {
         this.code = code;
     }
+
+    @Override
+    public String toString() {
+        return "LoginStatus{" +
+                "success=" + success +
+                ", code=" + code +
+                ", description='" + description + '\'' +
+                ", token='" + token + '\'' +
+                '}';
+    }
 }

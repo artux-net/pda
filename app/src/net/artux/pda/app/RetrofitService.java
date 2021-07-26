@@ -9,13 +9,17 @@ import net.artux.pda.ui.activities.hierarhy.MainContract;
 
 import org.joda.time.Instant;
 
+import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.EventListener;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.Route;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import timber.log.Timber;
@@ -29,10 +33,7 @@ public class RetrofitService {
     void initRetrofit(final DataManager dataManager){
         OkHttpClient.Builder httpClient =
                 new OkHttpClient.Builder();
-        httpClient.writeTimeout(2, TimeUnit.MINUTES);
-//        httpClient.callTimeout(2, TimeUnit.MINUTES);
-        httpClient.readTimeout(2, TimeUnit.MINUTES);
-        httpClient.connectTimeout(65, TimeUnit.SECONDS);
+
         httpClient.addInterceptor(chain -> {
             Request original = chain.request();
 

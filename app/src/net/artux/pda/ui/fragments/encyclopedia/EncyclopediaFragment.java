@@ -55,9 +55,9 @@ public class EncyclopediaFragment extends BaseFragment {
 
         if(getArguments()!=null){
             int id = getArguments().getInt("id");
-            webView.loadUrl("http://" + BuildConfig.URL_API + "/enc/" + id);
+            webView.loadUrl("https://" + BuildConfig.URL_API + "enc/" + id);
         }else{
-            webView.loadUrl("http://" + BuildConfig.URL_API + "/enc/" + "pistols");
+            webView.loadUrl("https://" + BuildConfig.URL_API + "enc/" + "pistols");
         }
         webView.setWebViewClient(new WebViewClient(){
             @Override

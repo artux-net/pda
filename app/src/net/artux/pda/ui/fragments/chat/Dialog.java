@@ -1,6 +1,8 @@
 package net.artux.pda.ui.fragments.chat;
 
-public class Dialog {
+import java.io.Serializable;
+
+public class Dialog implements Serializable {
 
      public String title;
      public int id;

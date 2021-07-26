@@ -54,8 +54,12 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         recyclerView = view.findViewById(R.id.list);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(groupsAdapter);
+        int pda = 0;
+        if(App.getDataManager().getMember()!=null) {
+            setProfile(new Profile(App.getDataManager().getMember()), view);
 
-        int pda = App.getDataManager().getMember().getPdaId();
+            pda = App.getDataManager().getMember().getPdaId();
+        }
         if (getArguments()!=null)
             pda = getArguments().getInt("pdaId", App.getDataManager().getMember().getPdaId());
         App.getRetrofitService().getPdaAPI().getProfile(pda).enqueue(new Callback<Profile>() {
@@ -80,9 +84,9 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     public void setProfile(Profile profile, View mainView) {
         this.profile = profile;
         avatar = mainView.findViewById(R.id.profile_avatar);
-        avatar.setImageDrawable(ProfileHelper.getAvatar(profile,mainView.getContext()));
+        avatar.setImageDrawable(ProfileHelper.getAvatar(profile, getContext()));
         ((TextView)mainView.findViewById(R.id.profile_login)).setText(profile.getLogin());
-        ((TextView)mainView.findViewById(R.id.profile_group)).setText(getString(R.string.group_p, ProfileHelper.getGroup(profile, mainView.getContext())));
+        ((TextView)mainView.findViewById(R.id.profile_group)).setText(getString(R.string.group_p, ProfileHelper.getGroup(profile, getContext())));
         ((TextView)mainView.findViewById(R.id.profile_location)).setText(getString(R.string.location_p, profile.getLocation()));
         ((TextView)mainView.findViewById(R.id.profile_time)).setText(getString(R.string.in_zone_time_p, ProfileHelper.getDays(profile)));
         ((TextView)mainView.findViewById(R.id.profile_rang)).setText(getString(R.string.rang_p, ProfileHelper.getRang(profile,mainView.getContext())));

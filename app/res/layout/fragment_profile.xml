@@ -19,6 +19,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:padding="5dp"
                 android:background="@drawable/border_background"
                 android:orientation="horizontal">
 
@@ -27,6 +28,7 @@
                     android:layout_width="match_parent"
                     android:textStyle="bold"
                     android:gravity="center"
+                    android:textColor="#FFF"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -82,6 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:padding="5dp"
                 android:background="@drawable/border_background"
                 android:orientation="vertical">
 

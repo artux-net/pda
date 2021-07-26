@@ -16,18 +16,17 @@ public class DataManager {
     private static Member member;
 
     public DataManager(Context context) {
-        mSharedPreferences = Armadillo.create(context, "prefs")
-                .password("f8a9a5t".toCharArray()) //use user provided password
-                .secureRandom(new SecureRandom()) //provide your own secure random for salt/iv generation
-                .encryptionFingerprint(context) //add the user id to fingerprint
-                .supportVerifyPassword(true) //enables optional password validation support `.isValidPassword()`
-                .enableKitKatSupport(true) //enable optional kitkat support
-                .enableDerivedPasswordCache(true) //enable caching for derived password making consecutive getters faster
-                .build();
+        mSharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
     }
 
-    public String getDialogsJson(){
-        return mSharedPreferences.getString("dialogsJson", "");
+    public String getString(String name){
+        return mSharedPreferences.getString(name, "");
+    }
+
+    public void setString(String name, String value) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString(name, value);
+        editor.commit();
     }
 
     public void setAuthToken(String authToken) {

@@ -1,36 +1,51 @@
 package net.artux.pda.ui.fragments.chat;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
+import net.artux.pda.app.NotificationService;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
+import net.artux.pdalib.Status;
+import net.artux.pdalib.UserMessage;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 import timber.log.Timber;
 
-public class DialogsFragment extends BaseFragment {
+public class DialogsFragment extends BaseFragment implements MessageListener {
 
     private final Gson mGson = new Gson();
     private DialogsAdapter dialogsAdapter;
     FragmentListBinding binding;
+    private WebSocket ws;
+    Gson gson = new Gson();
+    NotificationService myService;
 
     @Nullable
     @Override
@@ -47,62 +62,147 @@ public class DialogsFragment extends BaseFragment {
 
         dialogsAdapter = new DialogsAdapter((MainActivity) getActivity(), navigationPresenter);
         Type listType = new TypeToken<List<Dialog>>(){}.getType();
-        List<Dialog> dialogs = mGson.fromJson(App.getDataManager().getDialogsJson(), listType);
+        List<Dialog> dialogs = mGson.fromJson(App.getDataManager().getString("dialogs"), listType);
         if(dialogs!=null){
+            binding.list.setVisibility(View.VISIBLE);
+            binding.viewMessage.setVisibility(View.GONE);
             dialogsAdapter.setDialogs(dialogs);
         }
 
         binding.list.setAdapter(dialogsAdapter);
 
-        load();
-    }
+        Intent intent = new Intent(getActivity(), NotificationService.class).putExtra("t", App.getDataManager().getAuthToken());
+        getActivity().startService(intent);
 
-    void load(){
-        if (navigationPresenter!=null)
-            navigationPresenter.setLoadingState(true);
-        App.getRetrofitService().getPdaAPI().getFirstDialogs("f").enqueue(new Callback<List<Dialog>>() {
-            @Override
-            public void onResponse(Call<List<Dialog>> call, Response<List<Dialog>> response) {
-                List<Dialog> dialogs = response.body();
-                if (dialogs!=null) {
-                    binding.list.setVisibility(View.VISIBLE);
-                    binding.viewMessage.setVisibility(View.GONE);
-                    Timber.d("Set dialogs");
-                    dialogsAdapter.setDialogs(dialogs);
-                    if (navigationPresenter!=null)
-                        navigationPresenter.setLoadingState(false);
-                    updateDialog();
-                }else load();
+        OkHttpClient client = new OkHttpClient();
 
+        Request.Builder builder = new Request.Builder();
+        builder.addHeader("t", App.getDataManager().getAuthToken());
+        navigationPresenter.setLoadingState(true);
+
+        builder.url("wss://" + BuildConfig.URL_API + "dialogs/*");
+        navigationPresenter.setTitle("Chat");
+
+        EchoWebSocketListener listener = new EchoWebSocketListener();
+        ws = client.newWebSocket(builder.build(), listener);
+
+        client.dispatcher().executorService().shutdown();
+
+        Intent serviceIntent = new Intent(getActivity(), NotificationService.class);
+        ServiceConnection sConn = new ServiceConnection() {
+
+            public void onServiceConnected(ComponentName name, IBinder binder) {
+                Timber.d( "MainActivity onServiceConnected");
+                myService = ((NotificationService.MyBinder) binder).getService();
+                myService.setListener(DialogsFragment.this);
+                //bound = true;
             }
 
-            @Override
-            public void onFailure(Call<List<Dialog>> call, Throwable t) {
-                Timber.e(t);
-                load();
+            public void onServiceDisconnected(ComponentName name) {
+                Timber.d( "MainActivity onServiceDisconnected");
+                //bound = false;
             }
-        });
+        };
+
     }
 
-    void updateDialog(){
-        App.getRetrofitService().getPdaAPI().getDialogs().enqueue(new Callback<List<Dialog>>() {
-            @Override
-            public void onResponse(Call<List<Dialog>> call, Response<List<Dialog>> response) {
-                List<Dialog> dialogs = response.body();
-                if (dialogs!=null) {
-                    binding.list.setVisibility(View.VISIBLE);
-                    binding.viewMessage.setVisibility(View.GONE);
-                    Timber.d("Set dialogs");
-                    dialogsAdapter.setDialogs(dialogs);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ws.close(1000, null);
+    }
+
+    private void updateAdapter(final String text){
+        if (getActivity()!=null)
+            getActivity().runOnUiThread(() -> {
+                Type listType = new TypeToken<ArrayList<Dialog>>(){}.getType();
+
+                try {
+                    UserMessage userMessage = App.getRetrofitService().getGson().fromJson(text,UserMessage.class);
+                    if (userMessage.cid == -1) throw new JsonSyntaxException("");
+                    dialogsAdapter.updateDialog(userMessage);
+                    Timber.d("Dialogs, new message: " + userMessage.toString());
+                }catch (JsonSyntaxException e){
+                    try {
+                        ArrayList<Dialog> list = gson.fromJson(text, listType);
+                        if (list!=null) {
+                            binding.list.setVisibility(View.VISIBLE);
+                            binding.viewMessage.setVisibility(View.GONE);
+                            Timber.d("Set dialogs");
+                            dialogsAdapter.setDialogs(list);
+                            App.getDataManager().setString("dialogs",gson.toJson(list));
+                        }
+                    }catch (JsonSyntaxException e1){
+                        Timber.d("Unable to parse: " + text);
+                        Status status = gson.fromJson(text, Status.class);
+                        Toast.makeText(getActivity(), status.getDescription(), Toast.LENGTH_LONG).show();
+                    }
                 }
-                updateDialog();
-            }
+            });
+    }
 
-            @Override
-            public void onFailure(Call<List<Dialog>> call, Throwable t) {
-                Timber.e(t);
-                updateDialog();
-            }
-        });
+    @Override
+    public void newMessage(UserMessage message) {
+
+    }
+
+    @Override
+    public void setDialogs(List<Dialog> message) {
+
+    }
+
+    @Override
+    public void newStatus(Status status) {
+
+    }
+
+    private final class EchoWebSocketListener extends WebSocketListener {
+        private static final int NORMAL_CLOSURE_STATUS = 1000;
+
+        @Override
+        public void onOpen(WebSocket webSocket, okhttp3.Response response) {
+            Timber.d(response.toString());
+            if (getActivity()!=null)
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (navigationPresenter!=null)
+                            navigationPresenter.setLoadingState(false);
+                    }
+                });
+        }
+
+        @Override
+        public void onMessage(WebSocket webSocket, String text) {
+            updateAdapter(text);
+        }
+
+        @Override
+        public void onClosing(WebSocket webSocket, int code, String reason) {
+            Timber.d("WS - closing: %s", reason);
+            if (getActivity()!=null)
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (navigationPresenter!=null)
+                            navigationPresenter.setLoadingState(false);
+                    }
+                });
+            webSocket.close(NORMAL_CLOSURE_STATUS, reason);
+        }
+
+        @Override
+        public void onFailure(WebSocket webSocket, Throwable t, okhttp3.Response response) {
+            if (getActivity()!=null)
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (navigationPresenter!=null)
+                            navigationPresenter.setLoadingState(false);
+                    }
+                });
+
+            Timber.e(t);
+        }
     }
 }

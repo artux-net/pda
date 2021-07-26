@@ -14,12 +14,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.gson.reflect.TypeToken;
+
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
+import net.artux.pda.gdx.CoreStarter;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
+import net.artux.pda.ui.fragments.chat.Dialog;
 import net.artux.pda.ui.fragments.quest.models.Stories;
+import net.artux.pda.ui.fragments.quest.models.StoryItem;
+import net.artux.pdalib.profile.items.GsonProvider;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,6 +57,18 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             navigationPresenter.setTitle(getResources().getString(R.string.map));
             navigationPresenter.setLoadingState(true);
             binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
+
+            StoriesAdapter adapter = new StoriesAdapter( StoriesFragment.this);
+            binding.list.setAdapter(adapter);
+
+
+            Stories stories= GsonProvider.getInstance().fromJson(App.getDataManager().getString("stories"), Stories.class);
+            if(stories!=null){
+                binding.list.setVisibility(View.VISIBLE);
+                binding.viewMessage.setVisibility(View.GONE);
+                adapter.setStories(stories.get());
+            }
+
             App.getRetrofitService().getPdaAPI().getStories().enqueue(new Callback<Stories>() {
                 @Override
                 @EverythingIsNonNull
@@ -55,10 +76,10 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                     Stories stories = response.body();
                     navigationPresenter.setLoadingState(false);
                     if (stories != null) {
-                        StoriesAdapter adapter = new StoriesAdapter(stories.get(), StoriesFragment.this);
                         binding.list.setVisibility(View.VISIBLE);
                         binding.viewMessage.setVisibility(View.GONE);
-                        binding.list.setAdapter(adapter);
+                        adapter.setStories(stories.get());
+                        App.getDataManager().setString("stories", GsonProvider.getInstance().toJson(stories));
                     }
                 }
 
@@ -74,14 +95,14 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
 
     @Override
     public void onClick(int id) {
-        if (id!=-1) {
+        if (id>-1) {
             Intent intent = new Intent(getActivity(), QuestActivity.class);
             intent.putExtra("story", id);
             if (getActivity() != null) {
                 getActivity().startActivity(intent);
                 getActivity().finish();
             }
-        }else{
+        }else if(id==-1){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Input like that {story}:{chapter}:{stage}.");
 
@@ -106,6 +127,12 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             });
             builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             builder.show();
+        }else{
+            Intent intent = new Intent(getActivity(), CoreStarter.class);
+            intent.putExtra("arena", true);
+            if (getActivity() != null)
+                getActivity().startActivity(intent);
+
         }
     }
 }

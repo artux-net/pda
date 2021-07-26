@@ -88,16 +88,7 @@ public class ProfileHelper {
     }
 
     public static String getDays(Profile profile) {
-        Date now = new Date(), past = new Date();
-        DateFormat df = new SimpleDateFormat("dd MM yyyy", Locale.US);
-        try {
-            past = df.parse(profile.getRegistrationDate());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }finally {
-            if (past==null)
-                past = new Date();
-        }
+        Date now = new Date(), past = new Date(profile.getRegistrationDate());
         int days = daysBetween(past, now);
 
         return days + " " + getDayAddition(days);

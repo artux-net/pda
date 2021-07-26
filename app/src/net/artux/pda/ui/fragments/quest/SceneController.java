@@ -14,6 +14,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.gson.Gson;
 
 import net.artux.pda.BuildConfig;
@@ -48,6 +54,7 @@ public class SceneController implements Serializable {
     private final QuestActivity questActivity;
     private int story;
     private int chapterId;
+    private InterstitialAd mInterstitialAd;
 
     private MultiExoPlayer multiExoPlayer;
 
@@ -59,7 +66,8 @@ public class SceneController implements Serializable {
     private void loadChapter(int story, int chapterId, int stageId){
         this.story = story;
         this.chapterId = chapterId;
-        System.out.println(story + " - " + chapterId + " - " + stageId);
+        questActivity.setTitle("Глава " + chapterId);
+        Timber.d("Load quest: " + story + ":" + chapterId + ":" + stageId);
         App.getRetrofitService().getPdaAPI().getQuest(story, chapterId).enqueue(new Callback<Chapter>() {
             @Override
             public void onResponse(Call<Chapter> call, Response<Chapter> response) {
@@ -80,6 +88,7 @@ public class SceneController implements Serializable {
             @Override
             public void onFailure(Call<Chapter> call, Throwable t) {
                 Toast.makeText(questActivity, "Chapter " + chapterId+"("+stageId+")" + " load err, story " + story + " " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Timber.d("Chapter " + chapterId+"("+stageId+")" + " load err, story " + story + " " + t.getMessage());
                 Timber.e(t);
             }
         });
@@ -132,6 +141,50 @@ public class SceneController implements Serializable {
         }
     }
 
+    void showAd(int nextId){
+        AdRequest adRequest = new AdRequest.Builder().build();
+
+
+        InterstitialAd.load(questActivity, BuildConfig.QuestAdId, adRequest, new InterstitialAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                Timber.d( "onAdLoaded");
+                mInterstitialAd = interstitialAd;
+
+                if (mInterstitialAd != null) {
+                    mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
+                        @Override
+                        public void onAdDismissedFullScreenContent() {
+                            Timber.d("The ad was dismissed.");
+                        }
+
+                        @Override
+                        public void onAdFailedToShowFullScreenContent(AdError adError) {
+                            Timber.d("The ad failed to show.");
+                        }
+
+                        @Override
+                        public void onAdShowedFullScreenContent() {
+                            mInterstitialAd = null;
+                            Timber.d("The ad was shown.");
+                        }
+                    });
+                    mInterstitialAd.show(questActivity);
+                } else {
+                    Timber.d("The interstitial ad wasn't ready yet.");
+                }
+                loadStage(nextId);
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                Timber.d(loadAdError.getMessage());
+                mInterstitialAd = null;
+                loadStage(nextId);
+            }
+        });
+    }
+
     void loadStage(int id){
         FragmentTransaction mFragmentTransaction = questActivity.getSupportFragmentManager().beginTransaction();
         actualStage = getStage(id);
@@ -150,6 +203,7 @@ public class SceneController implements Serializable {
                     break;
                 case 4:
                     if (actualStage.getData().containsKey("map")) {
+                        questActivity.setTitle("Загрузка карты..");
                         int mapId = Integer.parseInt(actualStage.getData().get("map"));
                         if (actualStage.getData().containsKey("pos"))
                             loadMap(story, mapId, actualStage.getData().get("pos"));
@@ -175,6 +229,8 @@ public class SceneController implements Serializable {
             }
             multiExoPlayer.setSound(actualStage.getMusics());
         }catch (Exception e){
+            Timber.d("Can not load stage, story: " + story
+                    + " chapter: " + chapterId + " stage: " + actualStage.getId());
             Timber.e(e);
             Toast.makeText(questActivity,"Can not load stage, story: " + story
                     + " chapter: " + chapterId + " stage: " + actualStage.getId(), Toast.LENGTH_LONG).show();
@@ -183,6 +239,7 @@ public class SceneController implements Serializable {
     }
 
     void loadMap(int story, int map, String pos){
+        Timber.d("Load map " + map + " from story " + story + " with pos " + pos);
         App.getRetrofitService().getPdaAPI().getMap(story, map).enqueue(new Callback<Map>() {
             @Override
             public void onResponse(Call<Map> call, Response<Map> response) {
@@ -199,7 +256,7 @@ public class SceneController implements Serializable {
             public void onFailure(Call<Map> call, Throwable throwable) {
                 Toast.makeText(questActivity, "Map " + map + "(" + pos + ")" + " load err, story "
                         + story + " " + throwable.getMessage(), Toast.LENGTH_LONG).show();
-                throwable.printStackTrace();
+                Timber.e(throwable);
             }
         });
     }

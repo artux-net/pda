@@ -114,7 +114,6 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                         found = true;
                         int chapter = getIntent().getIntExtra("chapter", story.getLastChapter());
                         int stage = getIntent().getIntExtra("stage", story.getLastStage());
-                        System.out.println(storyId + " : " + chapter + " : " + stage);
                         sceneController = new SceneController(this, story.getStoryId(), chapter, stage);
                     }
                 }
@@ -197,7 +196,8 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onStop() {
-        sceneController.release();
+        if (sceneController!=null)
+            sceneController.release();
         super.onStop();
         if (_broadcastReceiver != null)
             unregisterReceiver(_broadcastReceiver);

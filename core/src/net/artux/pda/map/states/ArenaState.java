@@ -24,13 +24,13 @@ import com.google.gson.Gson;
 import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.Entity;
 import net.artux.pda.map.model.Hit;
-import net.artux.pda.map.model.Player;
 import net.artux.pda.map.model.ServerPlayer;
+import net.artux.pda.map.model.server.ServerEntity;
 import net.artux.pda.map.ui.HealthBar;
 import net.artux.pda.map.ui.Logger;
 import net.artux.pdalib.arena.Action;
+import net.artux.pdalib.arena.Connection;
 import net.artux.pdalib.arena.Position;
-import net.artux.pdalib.arena.ServerEntity;
 import net.artux.pdalib.arena.ServerState;
 import net.artux.pdalib.profile.items.GsonProvider;
 
@@ -40,8 +40,8 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static net.artux.pda.map.GdxAdapter.RUSSIAN_CHARACTERS;
 import static net.artux.pda.map.GdxAdapter.RUSSIAN_FONT_NAME;
@@ -49,68 +49,40 @@ import static net.artux.pda.map.GdxAdapter.RUSSIAN_FONT_NAME;
 public class ArenaState extends State {
     public static List<Entity> entities = new ArrayList<>();
 
-    private Player player;
-    private Touchpad touchpad;
+    private ServerPlayer player;
+    private Touchpad moveTouchpad;
+    private Touchpad shootTouchpad;
     public static Stage stage;
     public static Stage uistage;
     private final Texture background;
     private final OrthographicCamera cam;
 
-    private final Button.ButtonStyle textButtonStyle;
     private final BitmapFont font;
 
     Logger logger;
 
-    int wb;
-    int hb;
-
-    PauseState pauseState;
     AssetManager assetManager;
 
     long heapLoss;
 
     Gson gson = GsonProvider.getInstance();
 
-    final WebSocketClient socketClient = new WebSocketClient(new URI("ws://192.168.0.200/arena/"+"c532f7c211bce687f13fe1db744bff20a83e0be98c915b2f4f6291f522a2be94")) {
+    ServerState lastServerState;
 
-        ServerState serverState;
+    final WebSocketClient socketClient;
+    float lastJoyX;
+    float lastJoyY;
+    long lastUpdate;
+    static long ping;
+    long serverRenderTime;
+    int lastFrameId;
+    public static long getPing() {
+        return ping;
+    }
 
-        @Override
-        public void onOpen(ServerHandshake handshakedata) {
-            System.out.println("OnOpen - arena");
-        }
-
-        @Override
-        public void onMessage(String message) {
-            serverState = gson.fromJson(message, ServerState.class);
-            for (Map.Entry<String, ServerEntity> s : serverState.entities.entrySet()) {
-                if (s.getKey().equals(String.valueOf(getMember().getPdaId())))
-                    player.setPosition(s.getValue().getPosition().x, s.getValue().getPosition().y);
-                else {
-                    Actor a = getActor(s.getKey(), stage);
-                    if (a == null && assetManager.isFinished()) {
-                        ServerPlayer serverPlayer = new ServerPlayer(new Vector2(s.getValue().getPosition().x, s.getValue().getPosition().y), assetManager);
-                        serverPlayer.setName(s.getKey());
-                        stage.addActor(serverPlayer);
-                    } else if (a instanceof ServerPlayer) {
-                        ServerPlayer serverPlayer = (ServerPlayer) a;
-                        serverPlayer.setPosition(s.getValue().getPosition().x, s.getValue().getPosition().y);
-                    }
-                }
-            }
-        }
-
-        @Override
-        public void onClose(int code, String reason, boolean remote) {
-            System.out.println("OnClose - arena " + reason + " " + code);
-        }
-
-        @Override
-        public void onError(Exception ex) {
-            ex.printStackTrace();
-        }
-
-    };
+    public long getServerRenderTime() {
+        return serverRenderTime;
+    }
 
     Actor getActor(String name, Stage stage){
         Array<Actor> stageActors = stage.getActors();
@@ -130,12 +102,12 @@ public class ArenaState extends State {
         return false;
     }
 
-    public ArenaState(final GameStateManager gsm, Batch batch) throws URISyntaxException {
+    public ArenaState(final GameStateManager gsm, Batch batch, Connection connection) throws URISyntaxException {
         super(gsm);
 
         background = new Texture("servermap.png");
 
-        socketClient.connect();
+
 
         font = GdxAdapter.generateFont(RUSSIAN_FONT_NAME, RUSSIAN_CHARACTERS);
 
@@ -158,6 +130,59 @@ public class ArenaState extends State {
         assetManager.load("touchpad/back.png", Texture.class);
         assetManager.finishLoading();
 
+        socketClient = new WebSocketClient(new URI("ws://"+connection.ip+"/pda/arena/"+connection.token + "/" +connection.session)) {
+
+            @Override
+            public void onOpen(ServerHandshake handshakedata) {
+                System.out.println("OnOpen - arena");
+            }
+
+            @Override
+            public void onMessage(String message) {
+                ping = System.currentTimeMillis() - lastUpdate;
+
+                lastUpdate = System.currentTimeMillis();
+                lastServerState = gson.fromJson(message, ServerState.class);
+
+                for (net.artux.pdalib.arena.ServerEntity s : lastServerState.entities) {
+                    if (s.pdaId == getMember().getPdaId()) {
+                        player.setVelocity(s.getVelocity().x, s.getVelocity().y);
+                        player.setNextPosition(s.getPosition().x, s.getPosition().y);
+                    } else {
+                        Actor a = getActor("a" + s.pdaId, stage);
+                        if (a == null && assetManager.isFinished()) {
+                            ServerEntity serverEntity = new ServerEntity(new Vector2(s.getPosition().x, s.getPosition().y), assetManager);
+                            serverEntity.setName("a" + s.pdaId);
+                            stage.addActor(serverEntity);
+                            System.out.println("add new actor with name: " + "a" + s.pdaId);
+                        } else if (a instanceof ServerEntity) {
+                            ServerEntity serverEntity = (ServerEntity) a;
+                            serverEntity.setVelocity(s.getVelocity());
+                            if (lastServerState.frame - lastFrameId > 10)
+                                serverEntity.setPosition(s.getPosition().x, s.getPosition().y);
+                        }
+                    }
+                }
+                if (lastServerState.frame - lastFrameId > 10){
+                    lastFrameId = lastServerState.frame;
+                }
+                serverRenderTime = System.currentTimeMillis() - lastUpdate;
+            }
+
+            @Override
+            public void onClose(int code, String reason, boolean remote) {
+                System.out.println("OnClose - arena " + reason + " " + code);
+            }
+
+            @Override
+            public void onError(Exception ex) {
+                ex.printStackTrace();
+            }
+
+        };
+        System.out.println("Arena connecting to " + "ws://"+connection.ip+"/pda/arena/"+connection.token + "/" +connection.session);
+
+
         long before = Gdx.app.getNativeHeap();
 
         Viewport viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -166,10 +191,11 @@ public class ArenaState extends State {
         stage = new Stage(viewport, batch);
         uistage = new Stage();
 
-        textButtonStyle = new Button.ButtonStyle();
+        Button.ButtonStyle textButtonStyle = new Button.ButtonStyle();
         textButtonStyle.up  =  new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
 
         initPlayer();
+        socketClient.connect();
         Button.ButtonStyle runButtonStyle = new Button.ButtonStyle();
         runButtonStyle.up  = new TextureRegionDrawable(assetManager.get("beg2.png", Texture.class));
         runButtonStyle.down  = new TextureRegionDrawable(assetManager.get("beg1.png", Texture.class));
@@ -200,7 +226,9 @@ public class ArenaState extends State {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.touchUp(event, x, y, pointer, button);
-                gsm.push(pauseState);
+                HashMap<String, String> data = new HashMap<>();
+                data.put("openPda", "");
+                gsm.getPlatformInterface().send(data);
             }
         });
         uistage.addActor(pauseButton);
@@ -223,7 +251,8 @@ public class ArenaState extends State {
     HealthBar healthBar;
 
     private void initPlayer(){
-        player = new Player(new Vector2(), getMember(), assetManager);
+        player = new ServerPlayer(this, new Vector2(), getMember(), assetManager);
+        player.setServer(true);
         entities.add(player);
         stage.addActor(player);
         healthBar = new HealthBar(player);
@@ -234,7 +263,7 @@ public class ArenaState extends State {
         healthBar.setScale(1);
         uistage.addActor(healthBar);
 
-        logger = new Logger(player,3, (int) (h/10));
+        logger = new Logger(this, player,3, (int) (h-h/10));
     }
 
 
@@ -245,8 +274,11 @@ public class ArenaState extends State {
         style.knob.setMinHeight(170);
         style.knob.setMinWidth(170);
         style.background = new TextureRegionDrawable(assetManager.get("touchpad/back.png", Texture.class));
-        touchpad = new Touchpad(10, style);
-        touchpad.setBounds(50, 50, h/2.5f, h/2.5f );
+        moveTouchpad = new Touchpad(10, style);
+        moveTouchpad.setBounds(50, 50, h/2.5f, h/2.5f );
+
+        shootTouchpad = new Touchpad(10, style);
+        shootTouchpad.setBounds(w -50, 50, h/2.5f, h/2.5f );
 
         Thread thread = new Thread(){
 
@@ -259,11 +291,12 @@ public class ArenaState extends State {
                         e.printStackTrace();
                     }
 
-                    float deltaX = touchpad.getKnobPercentX();
-                    float deltaY = touchpad.getKnobPercentY();
+                    float deltaX = moveTouchpad.getKnobPercentX();
+                    float deltaY = moveTouchpad.getKnobPercentY();
                     Action action = new Action("move", gson.toJson(new Position(deltaX, deltaY)));
-                    if (socketClient.isOpen() && (deltaX!=0 || deltaY!=0)) {
-                        System.out.println(gson.toJson(action));
+                    if (socketClient.isOpen() && (deltaX!= lastJoyX || deltaY!= lastJoyY)) {
+                        lastJoyX = deltaX;
+                        lastJoyY = deltaY;
                         socketClient.send(gson.toJson(action));
                     }
                 }
@@ -271,7 +304,30 @@ public class ArenaState extends State {
         };
         thread.start();
 
-        uistage.addActor(touchpad);
+        Thread thread1 = new Thread(){
+
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    float deltaX = shootTouchpad.getKnobPercentX();
+                    float deltaY = shootTouchpad.getKnobPercentY();
+                    Action action = new Action("shoot", gson.toJson(new Position(deltaX, deltaY)));
+                    if (socketClient.isOpen() && (deltaX!=0 || deltaY!=0)) {
+                        socketClient.send(gson.toJson(action));
+                    }
+                }
+            }
+        };
+        thread1.start();
+
+        uistage.addActor(moveTouchpad);
+        uistage.addActor(shootTouchpad);
     }
 
     public static void registerHit(Hit hit){
@@ -328,11 +384,12 @@ public class ArenaState extends State {
         cam.viewportHeight = h;
         System.out.println("Resized: " + w + " : " + h);
         stage.getViewport().update(w, h, true);
-        touchpad.setPosition(w/12, h/10);
+        shootTouchpad.setPosition(w/12, h/10);
     }
 
     @Override
     public void dispose() {
+        socketClient.close();
         System.out.println("Dispose PlayState");
         long before = Gdx.app.getNativeHeap();
         System.out.println("Before: " );
@@ -344,7 +401,6 @@ public class ArenaState extends State {
         font.dispose();
         assetManager.dispose();
         player.dispose();
-        pauseState.dispose();
 
         long after = Gdx.app.getNativeHeap();
         System.out.println("Play dispose " + (after-before));
