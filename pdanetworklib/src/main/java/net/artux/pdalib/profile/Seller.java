@@ -39,4 +39,18 @@ public class Seller {
         items.addAll(this.items);
         return items;
     }
+
+    @Override
+    public String toString() {
+        return "Seller{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", armors=" + armors +
+                ", pistols=" + pistols +
+                ", rifles=" + rifles +
+                ", artifacts=" + artifacts +
+                ", items=" + items +
+                '}';
+    }
 }

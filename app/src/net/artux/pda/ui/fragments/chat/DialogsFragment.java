@@ -77,10 +77,10 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
         OkHttpClient client = new OkHttpClient();
 
         Request.Builder builder = new Request.Builder();
-        builder.addHeader("t", App.getDataManager().getAuthToken());
+        builder.addHeader("Authorization", App.getDataManager().getAuthToken());
         navigationPresenter.setLoadingState(true);
 
-        builder.url("wss://" + BuildConfig.URL_API + "dialogs/*");
+        builder.url(BuildConfig.WS_PROTOCOL +"://" + BuildConfig.URL_API + "dialogs ");
         navigationPresenter.setTitle("Chat");
 
         EchoWebSocketListener listener = new EchoWebSocketListener();

@@ -1,5 +1,6 @@
 package net.artux.pda.ui.fragments.chat;
 
+import android.os.Binder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,32 +76,32 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         OkHttpClient client = new OkHttpClient();
         gson = new Gson();
         Request.Builder builder = new Request.Builder();
-        builder.addHeader("t", App.getDataManager().getAuthToken());
+        builder.addHeader("Authorization", App.getDataManager().getAuthToken());
         Bundle args = getArguments();
         navigationPresenter.setLoadingState(true);
         if (args != null) {
             if (args.containsKey("group")) {
-                builder.url("wss://" + BuildConfig.URL_API + "groupChat/*/*");
+                builder.url(BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API + "groups");
                 navigationPresenter.setTitle("Group chat");
             } else {
                 if (args.containsKey("c")) {
-                    builder.url("wss://" + BuildConfig.URL_API + "dialog"
+                    builder.url(BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API + "dialog"
                             + "?c=" + getArguments().getInt("c"));
                     System.out.println(getArguments().getInt("c"));
                     navigationPresenter.setTitle("Chat");
                 }
                 else if (args.containsKey("to")) {
-                    builder.url("wss://" + BuildConfig.URL_API + "dialog"
+                    builder.url(BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API + "dialog"
                             + "?to=" + getArguments().getInt("to"));
                     navigationPresenter.setTitle("Dialog with #" + getArguments().getInt("to"));
                 }
                 else {
-                    builder.url("wss://" + BuildConfig.URL_API + "chat/*");
+                    builder.url(BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API + "chat");
                     navigationPresenter.setTitle("Chat");
                 }
             }
         } else {
-            builder.url("wss://" + BuildConfig.URL_API + "chat/*");
+            builder.url(BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API + "chat");
             navigationPresenter.setTitle("Chat");
         }
 

@@ -4,7 +4,6 @@ import net.artux.pdalib.profile.Data;
 import net.artux.pdalib.profile.Note;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Member {
@@ -31,7 +30,7 @@ public class Member {
     public List<Note> notes = new ArrayList<>();
     public List<Integer> achievements = new ArrayList<>();
     private Long lastModified;
-    private Long registrationDate;
+    private Long registration;
     private Long lastLoginAt;
 
     public Member() {
@@ -189,12 +188,12 @@ public class Member {
         this.lastModified = lastModified;
     }
 
-    public Long getRegistrationDate() {
-        return registrationDate;
+    public Long getRegistration() {
+        return registration;
     }
 
-    public void setRegistrationDate(Long registrationDate) {
-        this.registrationDate = registrationDate;
+    public void setRegistration(Long registration) {
+        this.registration = registration;
     }
 
     public Long getLastLoginAt() {

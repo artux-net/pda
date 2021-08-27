@@ -95,7 +95,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (item instanceof Armor) {
-                            App.getRetrofitService().getPdaAPI().setArmor(item.type, (Armor) item).enqueue(new Callback<Status>() {
+                            App.getRetrofitService().getPdaAPI().setArmor((Armor) item).enqueue(new Callback<Status>() {
                                 @Override
                                 public void onResponse(Call<Status> call, Response<Status> response) {
                                     Status status = response.body();

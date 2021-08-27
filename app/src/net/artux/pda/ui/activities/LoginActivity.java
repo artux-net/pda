@@ -34,6 +34,7 @@ import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pdalib.LoginStatus;
 import net.artux.pdalib.LoginUser;
+import net.artux.pdalib.Member;
 import net.artux.pdalib.Status;
 
 import java.util.ArrayList;
@@ -172,46 +173,35 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             loginUser = new LoginUser(email, password);
+            App.getDataManager().setLoginUser(loginUser);
             showProgress(true);
-            App.getRetrofitService().getPdaAPI().loginUser(loginUser).enqueue(new Callback<LoginStatus>() {
+            App.getRetrofitService().getPdaAPI().loginUser().enqueue(new Callback<Member>() {
                 @Override
-                public void onResponse(Call<LoginStatus> call, Response<LoginStatus> response) {
-                    showProgress(false);
-                    LoginStatus loginStatus = response.body();
-                    Timber.d(loginStatus.toString());
-                    if (response.code() == 502)
-                        Toast.makeText(LoginActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
-                    else if (loginStatus != null)
-                        if (loginStatus.isSuccess()) {
-                            App.getDataManager().setAuthToken(loginStatus.getToken());
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
-                        } else {
-                            switch (loginStatus.getCode()) {
-                                case 1:
-                                    mEmailView.setError(getString(R.string.error_incorrect_user));
-                                    break;
-                                case 2:
-                                    mPasswordView.setError(getString(R.string.error_incorrect_password));
-                                    break;
+                public void onResponse(Call<Member> call, Response<Member> response) {
+                        showProgress(false);
+                        Member member = response.body();
+                        Timber.d("Member auth " + App.getDataManager().getAuthToken());
+                        if (response.code() == 502)
+                            Toast.makeText(LoginActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
+                        else if (member != null) {
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                finish();
                             }
-                            Toast.makeText(LoginActivity.this, loginStatus.getDescription(), Toast.LENGTH_LONG).show();
+                        else {
+                            if (response.message()!=null && !response.message().equals(""))
+                                Toast.makeText(getApplicationContext(), response.code() + ":" + response.message(), Toast.LENGTH_LONG).show();
+                            else
+                                Toast.makeText(getApplicationContext(), response.code() + ":" + getString(R.string.unable_connect), Toast.LENGTH_LONG).show();
+                            Timber.e("Login error - " + response.toString());
                         }
-                    else {
-                        if (response.message()!=null && !response.message().equals(""))
-                            Toast.makeText(getApplicationContext(), response.code() + ":" + response.message(), Toast.LENGTH_LONG).show();
-                        else
-                            Toast.makeText(getApplicationContext(), response.code() + ":" + getString(R.string.unable_connect), Toast.LENGTH_LONG).show();
-                        Timber.e("Login error - " + response.toString());
+
                     }
 
-                }
-
                 @Override
-                public void onFailure(Call<LoginStatus> call, Throwable throwable) {
+                public void onFailure(Call<Member> call, Throwable t) {
                     Toast.makeText(LoginActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
                     showProgress(false);
-                    Timber.e(throwable);
+                    Timber.e(t);
                 }
             });
         }

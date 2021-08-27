@@ -21,6 +21,7 @@ import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.Dialog;
 import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
+import net.artux.pdalib.ResponsePage;
 import net.artux.pdalib.news.Article;
 import net.artux.pdalib.profile.items.GsonProvider;
 
@@ -64,20 +65,22 @@ public class NewsFragment extends BaseFragment {
             adapter.setNews(news);
         }
 
-        App.getRetrofitService().getPdaAPI().getFeed().enqueue(new Callback<List<Article>>() {
+        App.getRetrofitService().getPdaAPI().getFeed().enqueue(new Callback<ResponsePage<Article>>() {
             @Override
-            public void onResponse(Call<List<Article>> call, Response<List<Article>> response) {
-                List<Article> list = response.body();
-                if (list!=null) {
+            public void onResponse(Call<ResponsePage<Article>> call, Response<ResponsePage<Article>> response) {
+                ResponsePage<Article> page = response.body();
+                if (page!=null){
+                    List<Article> list = page.getData();
                     binding.list.setVisibility(View.VISIBLE);
                     binding.viewMessage.setVisibility(View.GONE);
                     adapter.setNews(list);
                     App.getDataManager().setString("news", GsonProvider.getInstance().toJson(list));
                 }
+
             }
 
             @Override
-            public void onFailure(Call<List<Article>> call, Throwable t) {
+            public void onFailure(Call<ResponsePage<Article>> call, Throwable t) {
                 Timber.tag("News").e(t);
             }
         });

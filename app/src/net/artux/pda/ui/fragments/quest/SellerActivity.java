@@ -34,6 +34,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class SellerActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -71,7 +72,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    App.getRetrofitService().getPdaAPI().buyItem(sellerId, item.type, sellerAdapter.getItems().get(pos).toString()).enqueue(new Callback<Status>() {
+                    App.getRetrofitService().getPdaAPI().buyItem(item.type, sellerId, sellerAdapter.getItems().get(pos).toString()).enqueue(new Callback<Status>() {
                         @Override
                         public void onResponse(Call<Status> call, Response<Status> response) {
                             Status status = response.body();
@@ -102,14 +103,15 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             public void onResponse(Call<Seller> call, Response<Seller> response) {
                 Seller seller = response.body();
                 if (seller!=null){
+                    Timber.d(seller.toString());
                     sellerAdapter.setItems(seller.getAllItems());
                     ((TextView)findViewById(R.id.sellerName)).setText(seller.name);
                     if (seller.avatar.contains("http"))
-                    Glide.with(getApplicationContext())
-                            .asDrawable()
-                            .centerCrop()
-                            .load(seller.avatar)
-                            .into(background);
+                        Glide.with(getApplicationContext())
+                                .asDrawable()
+                                .centerCrop()
+                                .load(seller.avatar)
+                                .into(background);
                     else
                         Glide.with(getApplicationContext())
                                 .asDrawable()
@@ -117,7 +119,8 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
                                 .load("https://" + BuildConfig.URL + "/" + seller.avatar)
                                 .into(background);
 
-                }
+                }else
+                    Timber.d(response.toString());
             }
 
             @Override

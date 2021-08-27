@@ -39,7 +39,8 @@ public class RetrofitService {
 
             Request.Builder requestBuilder = original.newBuilder()
                     .addHeader("t", dataManager.getAuthToken())
-                    .addHeader("ui", Locale.getDefault().getLanguage());
+                    .addHeader("ui", Locale.getDefault().getLanguage())
+                    .addHeader("Authorization", App.getDataManager().getAuthToken());
             Timber.d("RetrofitService: Request with token - %s", dataManager.getAuthToken());
             Request request = requestBuilder.build();
             return chain.proceed(request);
@@ -67,7 +68,7 @@ public class RetrofitService {
                 .setDateFormat("MMM dd, yyyy, hh:mm:ss a").create();
 
         Retrofit mRetrofit = new Retrofit.Builder()
-                .baseUrl("https://" + BuildConfig.URL_API)
+                .baseUrl(BuildConfig.PROTOCOL+ "://" + BuildConfig.URL_API)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(httpClient.build())
                 .build();

@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Article {
 
-    public int feedId;
+    public String id;
     public String title;
     public String image;
     public List<String> tags;

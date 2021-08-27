@@ -15,7 +15,7 @@ public class Profile {
     private int pdaId;
     private int xp;
     private String location;
-    private Long registrationDate;
+    private Long registration;
     private int friendStatus;
     /*
     0 - is not friend
@@ -43,7 +43,7 @@ public class Profile {
         this.pdaId = member.getPdaId();
         this.xp = member.getXp();
         this.location = member.getLocation();
-        this.registrationDate = member.getRegistrationDate();
+        this.registration = member.getRegistration();
         this.friends = member.getFriends().size();
         this.requests = member.getFriendRequests().size();
         this.relations = member.getRelations();
@@ -59,7 +59,7 @@ public class Profile {
         this.pdaId = member.getPdaId();
         this.xp = member.getXp();
         this.location = member.getLocation();
-        this.registrationDate = member.getRegistrationDate();
+        this.registration = member.getRegistration();
         this.friends = member.getFriends().size();
         this.requests = member.getFriendRequests().size();
         this.relations = member.getRelations();
@@ -103,8 +103,8 @@ public class Profile {
         return location;
     }
 
-    public Long getRegistrationDate() {
-        return registrationDate;
+    public Long getRegistration() {
+        return registration;
     }
 
     public int getFriends() {

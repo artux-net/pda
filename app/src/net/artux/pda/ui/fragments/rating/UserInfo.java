@@ -8,5 +8,5 @@ public class UserInfo {
     public String avatar;
     public String location;
     public int xp;
-    public String regDate;
+    public Long registration;
 }

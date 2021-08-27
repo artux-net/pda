@@ -70,26 +70,28 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
                     input.setHint("Введите заголовок..");
                     builder.setView(input);
                     builder.setPositiveButton("Создать", (dialog, which) -> {
-                        String title = input.getText().toString();
-                        App.getRetrofitService().getPdaAPI().createNote(title).enqueue(new Callback<Member>() {
-                            @Override
-                            public void onResponse(Call<Member> call, Response<Member> response) {
-                                Member member = response.body();
-                                if (member!=null) {
-                                    App.getDataManager().setMember(member);
-                                    Bundle bundle = new Bundle();
-                                    bundle.putInt("updated", 0);
-                                    presenter.passData(bundle);
-                                    Timber.d("Tried to create note " + member.notes.size());
-                                }
-                            }
+                                String title = input.getText().toString();
+                                App.getRetrofitService().getPdaAPI().createNote(title).enqueue(new Callback<Note>() {
+                                    @Override
+                                    public void onResponse(Call<Note> call, Response<Note> response) {
+                                        Note note = response.body();
+                                        if (note != null) {
+                                            Member member = App.getDataManager().getMember();
+                                            member.notes.add(note);
+                                            App.getDataManager().setMember(member);
+                                            Bundle bundle = new Bundle();
+                                            bundle.putInt("updated", 0);
+                                            presenter.passData(bundle);
+                                            Timber.d("Tried to create note " + member.notes.size());
+                                        }
+                                    }
 
-                            @Override
-                            public void onFailure(Call<Member> call, Throwable t) {
-                                Timber.e(t);
-                            }
-                        });
-                    });
+                                    @Override
+                                    public void onFailure(Call<Note> call, Throwable t) {
+
+                                    }
+                                });
+                            });
                     builder.setNegativeButton("Отмена", (dialog, which) -> dialog.cancel());
                     builder.show();
                     App.getRetrofitService().getPdaAPI().createNote("");

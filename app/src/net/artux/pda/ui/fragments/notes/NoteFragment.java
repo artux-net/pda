@@ -14,6 +14,7 @@ import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentNoteBinding;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pdalib.Member;
+import net.artux.pdalib.Status;
 import net.artux.pdalib.profile.Note;
 
 import org.joda.time.DateTime;
@@ -21,18 +22,20 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
 import java.text.SimpleDateFormat;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import timber.log.Timber;
 
 public class NoteFragment extends BaseFragment {
 
     FragmentNoteBinding binding;
-    Note note;
+    Note selectedNote;
 
     @Nullable
     @Override
@@ -47,11 +50,9 @@ public class NoteFragment extends BaseFragment {
 
 
         if (getArguments()!=null){
-            note = (Note) getArguments().getSerializable("note");
-            if (note!=null)
-                bindNote(note);
-        }else{
-
+            selectedNote = (Note) getArguments().getSerializable("note");
+            if (selectedNote !=null)
+                bindNote(selectedNote);
         }
 
 
@@ -75,24 +76,32 @@ public class NoteFragment extends BaseFragment {
         binding.editNoteTitle.addTextChangedListener(textWatcher);
         binding.editNoteContent.addTextChangedListener(textWatcher);
 
-        binding.deleteButton.setOnClickListener(view1 -> App.getRetrofitService().getPdaAPI().deleteNote(note.cid).enqueue(new Callback<Member>() {
-            @Override
-            public void onResponse(Call<Member> call, Response<Member> response) {
-                Member member = response.body();
-                if (member!=null) {
-                    App.getDataManager().setMember(member);
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("updated", 1);
-                    bundle.putInt("deleted", 1);
-                    navigationPresenter.passData(bundle);
-                }
-            }
+        binding.deleteButton.setOnClickListener(view1 -> App.getRetrofitService().getPdaAPI()
+                .deleteNote(selectedNote.cid).enqueue(new Callback<Status>() {
+                    @Override
+                    public void onResponse(Call<Status> call, Response<Status> response) {
+                        Status status = response.body();
+                        if (status!=null){
+                            Member member = App.getDataManager().getMember();
+                            Iterator<Note> iterator = member.notes.iterator();
+                            while(iterator.hasNext()){
+                                Note note = iterator.next();
+                                if(note.cid==selectedNote.cid)
+                                   iterator.remove();
+                            }
+                            App.getDataManager().setMember(member);
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("updated", 1);
+                            bundle.putInt("deleted", 1);
+                            navigationPresenter.passData(bundle);
+                        }
+                    }
 
-            @Override
-            public void onFailure(Call<Member> call, Throwable t) {
-                Timber.e(t);
-            }
-        }));
+                    @Override
+                    public void onFailure(Call<Status> call, Throwable t) {
+
+                    }
+                }));
     }
 
     public void bindNote(Note note){
@@ -110,25 +119,34 @@ public class NoteFragment extends BaseFragment {
     }
 
     public void updateNote(){
-        if (note==null)
-            note = new Note();
-        note.title = binding.editNoteTitle.getEditableText().toString();
-        note.content = binding.editNoteContent.getEditableText().toString();
-        App.getRetrofitService().getPdaAPI().updateNote(note).enqueue(new Callback<Member>() {
+        if (selectedNote ==null)
+            selectedNote = new Note();
+        selectedNote.title = binding.editNoteTitle.getEditableText().toString();
+        selectedNote.content = binding.editNoteContent.getEditableText().toString();
+        App.getRetrofitService().getPdaAPI().updateNote(selectedNote).enqueue(new Callback<Note>() {
             @Override
-            public void onResponse(Call<Member> call, Response<Member> response) {
-                Member member = response.body();
-                if (member!=null){
+            public void onResponse(Call<Note> call, Response<Note> response) {
+                Note note = response.body();
+                if (note!=null){
+                    Member member = App.getDataManager().getMember();
+                    Iterator<Note> iterator = member.notes.iterator();
+                    while(iterator.hasNext()){
+                        Note note1 = iterator.next();
+                        if(note1.cid==selectedNote.cid)
+                            member.notes.remove(note1);
+                    }
+                    member.notes.add(note);
                     App.getDataManager().setMember(member);
                     Bundle bundle = new Bundle();
                     bundle.putInt("updated", 0);
                     navigationPresenter.passData(bundle);
                 }
+
             }
 
             @Override
-            public void onFailure(Call<Member> call, Throwable t) {
-                Timber.e(t);
+            public void onFailure(Call<Note> call, Throwable t) {
+
             }
         });
     }

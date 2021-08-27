@@ -77,7 +77,7 @@ public class OpenNewsFragment extends BaseFragment {
                 navigationPresenter.setLoadingState(false);
             }
         });
-        content.loadUrl("https://api.artux.net/pda/feed?id="+mArticle.feedId);
+        content.loadUrl(BuildConfig.PROTOCOL+"://"+BuildConfig.URL_API+"/feed/"+mArticle.id);
         AdLoader loader = new AdLoader.Builder(getActivity(), BuildConfig.NewsAdId)
                 .forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
                     @Override

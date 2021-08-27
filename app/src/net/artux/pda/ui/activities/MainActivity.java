@@ -32,6 +32,7 @@ import net.artux.pda.ui.activities.hierarhy.MainContract;
 import net.artux.pda.ui.activities.hierarhy.MainPresenter;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.additional.InfoFragment;
+import net.artux.pda.ui.fragments.chat.ChatFragment;
 import net.artux.pda.ui.fragments.chat.DialogsFragment;
 import net.artux.pda.ui.fragments.news.NewsFragment;
 import net.artux.pda.ui.fragments.notes.NoteFragment;

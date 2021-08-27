@@ -75,7 +75,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
             title.setText(title.getContext().getString(R.string.rating_title,userInfo.login,
                     String.valueOf(userInfo.pdaId), String.valueOf(ProfileHelper.getRang(title.getContext(), userInfo.xp))));
             desc.setText(desc.getContext().getString(R.string.rating_desc,ProfileHelper.getGroup(desc.getContext(), userInfo.group),
-                    ProfileHelper.getDays(userInfo.regDate), userInfo.location));
+                    ProfileHelper.getDays(userInfo.registration), userInfo.location));
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -16,6 +16,7 @@ import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.profile.ProfileFragment;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
+import net.artux.pdalib.ResponsePage;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ import retrofit2.Response;
 import timber.log.Timber;
 
 public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClickListener {
+
+    private int number = 1;
 
     @Nullable
     @Override
@@ -46,42 +49,41 @@ public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClick
         RatingAdapter ratingAdapter = new RatingAdapter(this);
         recyclerView.setAdapter(ratingAdapter);
 
-        App.getRetrofitService().getPdaAPI().getRating(0).enqueue(new Callback<List<UserInfo>>() {
+        App.getRetrofitService().getPdaAPI().getRating(number).enqueue(new Callback<ResponsePage<UserInfo>>() {
             @Override
-            public void onResponse(Call<List<UserInfo>> call, Response<List<UserInfo>> response) {
-                List<UserInfo> rating = response.body();
-                if (navigationPresenter!=null)
-                    navigationPresenter.setLoadingState(false);
+            public void onResponse(Call<ResponsePage<UserInfo>> call, Response<ResponsePage<UserInfo>> response) {
+                ResponsePage<UserInfo> rating = response.body();
                 if(rating!=null){
+                    List<UserInfo> list = rating.getData();
+                    if (navigationPresenter!=null)
+                        navigationPresenter.setLoadingState(false);
                     recyclerView.setVisibility(View.VISIBLE);
                     v.setVisibility(View.GONE);
-                    ratingAdapter.addData(rating);
+                    ratingAdapter.addData(list);
                 }
             }
 
             @Override
-            public void onFailure(Call<List<UserInfo>> call, Throwable throwable) {
-                if (navigationPresenter!=null)
-                    navigationPresenter.setLoadingState(false);
-                Timber.e(throwable);
+            public void onFailure(Call<ResponsePage<UserInfo>> call, Throwable t) {
+
             }
         });
 
         view.findViewById(R.id.rating_more).setOnClickListener(view1 -> App.getRetrofitService()
-                .getPdaAPI().getRating(ratingAdapter.getItemCount()).enqueue(new Callback<List<UserInfo>>() {
-            @Override
-            public void onResponse(Call<List<UserInfo>> call, Response<List<UserInfo>> response) {
-                List<UserInfo> rating = response.body();
-                if(rating!=null) {
-                    ratingAdapter.addData(rating);
-                }
-            }
+                .getPdaAPI().getRating(++number).enqueue(new Callback<ResponsePage<UserInfo>>() {
+                    @Override
+                    public void onResponse(Call<ResponsePage<UserInfo>> call, Response<ResponsePage<UserInfo>> response) {
+                        ResponsePage<UserInfo> rating = response.body();
+                        if(rating!=null){
+                            ratingAdapter.addData(rating.getData());
+                        }
+                    }
 
-            @Override
-            public void onFailure(Call<List<UserInfo>> call, Throwable throwable) {
+                    @Override
+                    public void onFailure(Call<ResponsePage<UserInfo>> call, Throwable t) {
 
-            }
-        }));
+                    }
+                }));
     }
 
     @Override

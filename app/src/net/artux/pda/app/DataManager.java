@@ -3,11 +3,14 @@ package net.artux.pda.app;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import net.artux.pdalib.LoginUser;
 import net.artux.pdalib.Member;
 
 import java.security.SecureRandom;
+import java.util.Base64;
 
 import at.favre.lib.armadillo.Armadillo;
+import okhttp3.Credentials;
 
 public class DataManager {
 
@@ -29,14 +32,28 @@ public class DataManager {
         editor.commit();
     }
 
+    public void setLoginUser(LoginUser user){
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putString("login", user.getEmailOrLogin());
+        editor.putString("pass", user.getPassword());
+        editor.commit();
+    }
+
+    public boolean isAuthenticated(){
+        return mSharedPreferences.contains("login") && mSharedPreferences.contains("pass");
+    }
+
     public void setAuthToken(String authToken) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString("token", authToken);
         editor.apply();
     }
 
+
     public String getAuthToken() {
-        return mSharedPreferences.getString("token", "");
+        if (isAuthenticated())
+            return Credentials.basic(mSharedPreferences.getString("login", ""), mSharedPreferences.getString("pass", ""));
+        else return "";
     }
 
     public void setMember(Member member){
@@ -50,7 +67,7 @@ public class DataManager {
     public void removeAllData(){
         member = null;
 
-        mSharedPreferences.edit().clear().apply();
+        mSharedPreferences.edit().clear().commit();
     }
 
 }
