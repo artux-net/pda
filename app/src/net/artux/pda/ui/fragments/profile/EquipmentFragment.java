@@ -61,7 +61,7 @@ public class EquipmentFragment extends BaseFragment {
 
         Glide.with(title.getContext())
                 .asGif()
-                .load("https://"+ BuildConfig.URL_API+"/files?file="+item.icon)
+                .load(BuildConfig.PROTOCOL + "://"+ BuildConfig.URL+"base/items/icons/"+item.icon)
                 .apply(options)
                 .into(imageView);
     }

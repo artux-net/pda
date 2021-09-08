@@ -47,14 +47,6 @@ public class Detector extends Item{
         this.weight = weight;
     }
 
-    public int getLibrary_id() {
-        return library_id;
-    }
-
-    public void setLibrary_id(int library_id) {
-        this.library_id = library_id;
-    }
-
     public int getPrice() {
         return price;
     }

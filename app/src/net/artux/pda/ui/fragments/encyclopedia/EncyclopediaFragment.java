@@ -10,6 +10,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -32,14 +33,8 @@ public class EncyclopediaFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        AdditionalFragment additionalFragment = new AdditionalFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt("enc", 1);
-        additionalFragment.setArguments(bundle);
-
         if (navigationPresenter!=null) {
             navigationPresenter.setTitle(getString(R.string.enc));
-            navigationPresenter.addAdditionalFragment(additionalFragment);
         }
 
         webView = view.findViewById(R.id.webview);
@@ -53,11 +48,15 @@ public class EncyclopediaFragment extends BaseFragment {
             }
         });
 
+
+        webView.clearView();
         if(getArguments()!=null){
             int id = getArguments().getInt("id");
-            webView.loadUrl("https://" + BuildConfig.URL_API + "enc/" + id);
+            int type = getArguments().getInt("type");
+
+            webView.loadUrl("https://" + BuildConfig.URL_API + "enc/" + type +"/"+id);
         }else{
-            webView.loadUrl("https://" + BuildConfig.URL_API + "enc/" + "pistols");
+            webView.loadUrl("https://" + BuildConfig.URL_API + "enc");
         }
         webView.setWebViewClient(new WebViewClient(){
             @Override
@@ -75,6 +74,17 @@ public class EncyclopediaFragment extends BaseFragment {
             }
         });
         webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                webView.clearView();
+                if (webView.canGoBack())
+                    webView.goBack();
+                if (!webView.canGoBack())
+                    setEnabled(false);
+            }
+        });
     }
 
     @Override
@@ -83,4 +93,6 @@ public class EncyclopediaFragment extends BaseFragment {
         if (data.containsKey("load"))
             webView.loadUrl(data.getString("load"));
     }
+
+
 }

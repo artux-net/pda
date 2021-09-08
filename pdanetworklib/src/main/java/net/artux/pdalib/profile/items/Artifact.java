@@ -1,5 +1,7 @@
 package net.artux.pdalib.profile.items;
 
+import java.util.Objects;
+
 public class Artifact extends Item {
 
     private int anomal_id;
@@ -54,14 +56,6 @@ public class Artifact extends Item {
 
     public void setWeight(float weight) {
         this.weight = weight;
-    }
-
-    public int getLibrary_id() {
-        return library_id;
-    }
-
-    public void setLibrary_id(int library_id) {
-        this.library_id = library_id;
     }
 
     public int getPrice() {
@@ -142,6 +136,11 @@ public class Artifact extends Item {
 
     public void setElectric(int electric) {
         this.electric = electric;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), anomal_id, health, radio, damage, bleeding, thermal, chemical, endurance, electric);
     }
 
     @Override

@@ -61,7 +61,7 @@ public class NotificationService extends Service {
         builder.url("wss://" + BuildConfig.URL_API + "dialogs/*");
 
         EchoWebSocketListener listener = new EchoWebSocketListener();
-        ws = client.newWebSocket(builder.build(), listener);
+        //ws = client.newWebSocket(builder.build(), listener);
 
         client.dispatcher().executorService().shutdown();
 

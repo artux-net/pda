@@ -1,7 +1,5 @@
 package net.artux.pdalib;
 
-import net.artux.pdalib.profile.Achievement;
-
 import java.util.List;
 
 public class Profile {
@@ -24,11 +22,11 @@ public class Profile {
     3 - requested
      */
     private int friends;
-    private int requests;
+    private int subs;
     private List<Integer> relations;
 
     //TODO
-    private List<Achievement> achievements;
+    private int achievements;
 
     public Profile() {
     }
@@ -45,7 +43,7 @@ public class Profile {
         this.location = member.getLocation();
         this.registration = member.getRegistration();
         this.friends = member.getFriends().size();
-        this.requests = member.getFriendRequests().size();
+        this.subs = member.getRequests().size();
         this.relations = member.getRelations();
     }
 
@@ -61,7 +59,7 @@ public class Profile {
         this.location = member.getLocation();
         this.registration = member.getRegistration();
         this.friends = member.getFriends().size();
-        this.requests = member.getFriendRequests().size();
+        this.subs = member.getRequests().size();
         this.relations = member.getRelations();
 
         setFriendStatus(member, by);
@@ -111,8 +109,8 @@ public class Profile {
         return friends;
     }
 
-    public int getRequests() {
-        return requests;
+    public int getSubs() {
+        return subs;
     }
 
     public List<Integer> getRelations() {
@@ -120,9 +118,9 @@ public class Profile {
     }
 
     private void setFriendStatus(Member member, Member by) {
-        if (member.getFriendRequests().contains(by.getPdaId())) {
+        if (member.getRequests().contains(by.getPdaId())) {
             friendStatus = 3;
-        } else if (by.getFriendRequests().contains(pdaId)) {
+        } else if (by.getRequests().contains(pdaId)) {
             friendStatus = 2;
         } else if (member.getFriends().contains(by.getPdaId())) {
             friendStatus = 1;

@@ -2,9 +2,9 @@ package net.artux.pdalib.profile;
 
 public class FriendModel{
 
-    public int id;
+    public int pdaId;
     public int group;
-    public String name;
+    public String login;
     public String avatar;
 
 }

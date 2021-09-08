@@ -8,6 +8,7 @@ import java.util.List;
 
 public class Member {
 
+
     private String login;
     private String password;
     private String email;
@@ -23,9 +24,9 @@ public class Member {
     private int money;
     private String location;
     private Data data;
-    public List<Integer> dialogs;
-    public List<Integer> friends;
-    public List<Integer> friendRequests;
+    public List<String> dialogs;
+    public List<String> friends;
+    public List<String> requests;
     public List<Integer> relations = new ArrayList<>();
     public List<Note> notes = new ArrayList<>();
     public List<Integer> achievements = new ArrayList<>();
@@ -136,28 +137,16 @@ public class Member {
         this.location = location;
     }
 
-    public List<Integer> getDialogs() {
+    public List<String> getDialogs() {
         return dialogs;
     }
 
-    public void setDialogs(List<Integer> dialogs) {
-        this.dialogs = dialogs;
-    }
-
-    public List<Integer> getFriends() {
+    public List<String> getFriends() {
         return friends;
     }
 
-    public void setFriends(List<Integer> friends) {
-        this.friends = friends;
-    }
-
-    public List<Integer> getFriendRequests() {
-        return friendRequests;
-    }
-
-    public void setFriendRequests(List<Integer> friendRequests) {
-        this.friendRequests = friendRequests;
+    public List<String> getRequests() {
+        return requests;
     }
 
     public void setMoney(int money) {

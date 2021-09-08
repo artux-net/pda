@@ -51,17 +51,11 @@ public interface PdaAPI{
     @POST("register")
     Call<Status> registerUser(@Body RegisterUser user);
 
-    @GET("dialogs")
-    Call<List<Dialog>> getDialogs();
-
-    @GET("dialogs")
-    Call<List<Dialog>> getFirstDialogs(@Header("f") String something);
-
     @GET("reset")
     Call<Status> resetPassword(@Query("email") String loginOrEmail);
 
-    @GET("profile")
-    Call<Profile> getProfile(@Query("pdaId") int pdaId);
+    @GET("profile/{pdaId}")
+    Call<Profile> getProfile(@Path("pdaId") int pdaId);
 
     @GET("profile")
     Call<Profile> getMyProfile();
@@ -80,22 +74,15 @@ public interface PdaAPI{
 
     @GET("enc/list")
     Call<LinkedHashMap<String, String>> getCategories(@Query("loc") String locale);
+    
+    @GET("friends/{id}")
+    Call<List<FriendModel>> getFriends(@Path("id") int pdaId);
 
-    /*
-    0 - friends
-    1 - request
-     */
-    @GET("friends")
-    Call<List<FriendModel>> getFriends(@Query("pdaId") int pdaId, @Query("type") int type);
-
-    @POST("friends")
-    Call<Status> reqFriend(@Query("req") int id);
+    @GET("friends/subs/{id}")
+    Call<List<FriendModel>> getSubs(@Path("id") int pdaId);
 
     @POST("friends")
-    Call<Status> addFriend(@Query("add") int id);
-
-    @POST("friends")
-    Call<Status> removeFriend(@Query("remove") int id);
+    Call<Status> requestFriend(@Query("pdaId") int id);
 
     @GET("ratings")
     Call<ResponsePage<UserInfo>> getRating(@Query("number") Integer number);
@@ -103,17 +90,17 @@ public interface PdaAPI{
     @GET("items/{id}")
     Call<Seller> getSeller(@Path("id") int sellerId);
 
-    @POST("items/buy/{type}")
-    Call<Status> buyItem(@Path("type") int type, @Query("seller") int sellerId, @Body String jsonItem);
+    @POST("items/buy")
+    Call<Status> buyItem(@Query("seller") int sellerId, @Query("hash") int hash);
 
-    @POST("items/sell/{type}")
-    Call<Status> sellItem(@Path("type") int type, @Body String jsonItem);
+    @POST("items/sell")
+    Call<Status> sellItem(@Query("hash") int hash);
 
-    @POST("items/set/4")
-    Call<Status> setArmor(@Body Armor item);
+    @POST("items/set")
+    Call<Status> setArmor(@Query("hash") int hash);
 
-    @POST("items/set/{type}")
-    Call<Status> setWeapon(@Path("type") int type, @Body Weapon item);
+    @POST("items/set")
+    Call<Status> setWeapon(@Query("hash") int hash);
 
     @GET("reset/data")
     Call<Status> resetData();

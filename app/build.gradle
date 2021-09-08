@@ -32,8 +32,8 @@ android {
         applicationId "net.artux.pda"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 8
-        versionName "0.04"
+        versionCode 9
+        versionName "0.04.1"
         signingConfig signingConfigs.release
     }
     buildTypes {
@@ -42,7 +42,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
-            buildConfigField("String", "URL_API", "\"api.artux.net/pda/\"")
+            buildConfigField("String", "URL_API", "\"api.artux.net/pdanetwork/\"")
             buildConfigField("String", "URL", "\"api.artux.net/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-4707001480680280/1079779549\"")
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-4707001480680280/2723145658\"")

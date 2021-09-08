@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +36,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     private Profile profile;
     RecyclerView recyclerView;
     GroupsAdapter groupsAdapter = new GroupsAdapter();
+    View mainView;
 
     @Nullable
     @Override
@@ -45,7 +47,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        mainView = view;
         if (navigationPresenter!=null) {
             navigationPresenter.setTitle(getString(R.string.profile));
             navigationPresenter.setLoadingState(true);
@@ -62,14 +64,19 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         }
         if (getArguments()!=null)
             pda = getArguments().getInt("pdaId", App.getDataManager().getMember().getPdaId());
-        App.getRetrofitService().getPdaAPI().getProfile(pda).enqueue(new Callback<Profile>() {
+        update(pda);
+
+    }
+    
+    void update(int pdaId){
+        App.getRetrofitService().getPdaAPI().getProfile(pdaId).enqueue(new Callback<Profile>() {
             @Override
             public void onResponse(Call<Profile> call, Response<Profile> response) {
                 Profile profile = response.body();
                 if (navigationPresenter!=null)
                     navigationPresenter.setLoadingState(false);
                 if (profile != null)
-                        setProfile(profile, view);
+                    setProfile(profile, mainView);
             }
 
             @Override
@@ -78,7 +85,6 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                 Timber.e(throwable);
             }
         });
-
     }
 
     public void setProfile(Profile profile, View mainView) {
@@ -96,7 +102,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         friends.setText(mainView.getContext().getString(R.string.friends, String.valueOf(profile.getFriends())));
         friends.setOnClickListener(this);
         Button requests = mainView.findViewById(R.id.profile_requests);
-        requests.setText(mainView.getContext().getString(R.string.subscribers, String.valueOf(profile.getRequests())));
+        requests.setText(mainView.getContext().getString(R.string.subscribers, String.valueOf(profile.getSubs())));
         requests.setOnClickListener(this);
 
         groupsAdapter.setRelations(profile.getRelations());
@@ -104,6 +110,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         mainView.findViewById(R.id.viewMessage).setVisibility(View.GONE);
 
         Button friendButton = mainView.findViewById(R.id.profile_friend);
+        Button subsButton = mainView.findViewById(R.id.requests);
         Button messageButton = mainView.findViewById(R.id.write_message);
         messageButton.setOnClickListener(this);
         if (App.getDataManager().getMember().getPdaId()!=profile.getPdaId()) {
@@ -116,10 +123,13 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                         pdaAlertDialog.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                App.getRetrofitService().getPdaAPI().reqFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
+                                App.getRetrofitService().getPdaAPI().requestFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
                                     @Override
                                     public void onResponse(Call<Status> call, Response<Status> response) {
-
+                                        Status status = response.body();
+                                        if (status!=null)
+                                            Toast.makeText(getContext(), status.getDescription(), Toast.LENGTH_SHORT).show();
+                                        update(profile.getPdaId());
                                     }
 
                                     @Override
@@ -147,10 +157,13 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                         pdaAlertDialog.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                App.getRetrofitService().getPdaAPI().removeFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
+                                App.getRetrofitService().getPdaAPI().requestFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
                                     @Override
                                     public void onResponse(Call<Status> call, Response<Status> response) {
-
+                                        Status status = response.body();
+                                        if (status!=null)
+                                            Toast.makeText(getContext(), status.getDescription(), Toast.LENGTH_SHORT).show();
+                                        update(profile.getPdaId());
                                     }
 
                                     @Override
@@ -178,10 +191,13 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                         pdaAlertDialog.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                App.getRetrofitService().getPdaAPI().addFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
+                                App.getRetrofitService().getPdaAPI().requestFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
                                     @Override
                                     public void onResponse(Call<Status> call, Response<Status> response) {
-
+                                        Status status = response.body();
+                                        if (status!=null)
+                                            Toast.makeText(getContext(), status.getDescription(), Toast.LENGTH_SHORT).show();
+                                        update(profile.getPdaId());
                                     }
 
                                     @Override
@@ -208,10 +224,13 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                         pdaAlertDialog.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                App.getRetrofitService().getPdaAPI().removeFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
+                                App.getRetrofitService().getPdaAPI().requestFriend(profile.getPdaId()).enqueue(new Callback<Status>() {
                                     @Override
                                     public void onResponse(Call<Status> call, Response<Status> response) {
-
+                                        Status status = response.body();
+                                        if (status!=null)
+                                            Toast.makeText(getContext(), status.getDescription(), Toast.LENGTH_SHORT).show();
+                                        update(profile.getPdaId());
                                     }
 
                                     @Override
@@ -231,10 +250,13 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                     });
                     break;
             }
+            friendButton.setVisibility(View.VISIBLE);
+            messageButton.setVisibility(View.VISIBLE);
+            subsButton.setVisibility(View.GONE);
         }else{
             friendButton.setVisibility(View.GONE);
             messageButton.setVisibility(View.GONE);
-
+            subsButton.setVisibility(View.VISIBLE);
         }
 
     }

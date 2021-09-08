@@ -72,15 +72,15 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    App.getRetrofitService().getPdaAPI().buyItem(item.type, sellerId, sellerAdapter.getItems().get(pos).toString()).enqueue(new Callback<Status>() {
+                    App.getRetrofitService().getPdaAPI().buyItem(sellerId, sellerAdapter.getItems().get(pos).hashCode()).enqueue(new Callback<Status>() {
                         @Override
                         public void onResponse(Call<Status> call, Response<Status> response) {
                             Status status = response.body();
-                            System.out.println(response.headers().toString());
                             if (status != null){
                                 Toast.makeText(SellerActivity.this, status.getDescription(), Toast.LENGTH_LONG).show();
                                 updateMember();
                             }else {
+                                System.out.println(response.toString());
                                 Toast.makeText(SellerActivity.this, "err", Toast.LENGTH_LONG).show();
                             }
                         }
@@ -174,26 +174,21 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
             builder.setTitle("Вы хотите продать " + item.title + " за " + item.priceToSell() + "?");
 
-            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(R.string.yes, (dialogInterface, i) -> App.getRetrofitService().getPdaAPI().sellItem(item.hashCode()).enqueue(new Callback<Status>() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    App.getRetrofitService().getPdaAPI().sellItem(item.type, item.toString()).enqueue(new Callback<Status>() {
-                        @Override
-                        public void onResponse(Call<Status> call, Response<Status> response) {
-                            Status status = response.body();
-                            if (status != null){
-                                Toast.makeText(SellerActivity.this, status.getDescription(), Toast.LENGTH_LONG).show();
-                                updateMember();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<Status> call, Throwable throwable) {
-
-                        }
-                    });
+                public void onResponse(Call<Status> call, Response<Status> response) {
+                    Status status = response.body();
+                    if (status != null){
+                        Toast.makeText(SellerActivity.this, status.getDescription(), Toast.LENGTH_LONG).show();
+                        updateMember();
+                    }
                 }
-            });
+
+                @Override
+                public void onFailure(Call<Status> call, Throwable throwable) {
+
+                }
+            }));
             builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {});
 
             AlertDialog alertDialog = builder.create();

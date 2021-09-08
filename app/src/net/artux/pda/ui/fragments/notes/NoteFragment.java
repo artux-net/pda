@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class NoteFragment extends BaseFragment {
 
@@ -133,20 +134,21 @@ public class NoteFragment extends BaseFragment {
                     while(iterator.hasNext()){
                         Note note1 = iterator.next();
                         if(note1.cid==selectedNote.cid)
-                            member.notes.remove(note1);
+                            iterator.remove();
                     }
-                    member.notes.add(note);
+                    member.notes.add(0, note);
                     App.getDataManager().setMember(member);
                     Bundle bundle = new Bundle();
                     bundle.putInt("updated", 0);
                     navigationPresenter.passData(bundle);
+                    Timber.d("Note updated");
                 }
 
             }
 
             @Override
             public void onFailure(Call<Note> call, Throwable t) {
-
+                Timber.e(t);
             }
         });
     }

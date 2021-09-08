@@ -141,18 +141,20 @@ public class SceneController implements Serializable {
         }
     }
 
+    boolean isLoading = false;
+
     void showAd(int nextId){
         AdRequest adRequest = new AdRequest.Builder().build();
 
+        if (!isLoading) {
+            isLoading = true;
+            InterstitialAd.load(questActivity, BuildConfig.QuestAdId, adRequest, new InterstitialAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                    Timber.d("onAdLoaded");
+                    mInterstitialAd = interstitialAd;
 
-        InterstitialAd.load(questActivity, BuildConfig.QuestAdId, adRequest, new InterstitialAdLoadCallback() {
-            @Override
-            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                Timber.d( "onAdLoaded");
-                mInterstitialAd = interstitialAd;
-
-                if (mInterstitialAd != null) {
-                    mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback(){
+                    mInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                         @Override
                         public void onAdDismissedFullScreenContent() {
                             Timber.d("The ad was dismissed.");
@@ -170,19 +172,19 @@ public class SceneController implements Serializable {
                         }
                     });
                     mInterstitialAd.show(questActivity);
-                } else {
-                    Timber.d("The interstitial ad wasn't ready yet.");
+                    loadStage(nextId);
+                    isLoading = false;
                 }
-                loadStage(nextId);
-            }
 
-            @Override
-            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                Timber.d(loadAdError.getMessage());
-                mInterstitialAd = null;
-                loadStage(nextId);
-            }
-        });
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    Timber.d(loadAdError.getMessage());
+                    mInterstitialAd = null;
+                    isLoading = false;
+                    loadStage(nextId);
+                }
+            });
+        }
     }
 
     void loadStage(int id){

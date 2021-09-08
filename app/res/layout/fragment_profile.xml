@@ -152,6 +152,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/border_background"/>
+        <Button
+            android:id="@+id/requests"
+            android:text="@string/subs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/border_background"/>
 
         <LinearLayout
             android:id="@+id/relations"

@@ -70,7 +70,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
         }
 
         public void bind(FriendModel friendModel){
-            title.setText(friendModel.name + " [PDA #" + friendModel.id+"]");
+            title.setText(friendModel.login + " [PDA #" + friendModel.pdaId +"]");
             desc.setText(ProfileHelper.getGroup(desc.getContext(), friendModel.group));
             avatar.setImageDrawable(ProfileHelper.getAvatar(avatar.getContext(), friendModel.avatar));
             avatar.getRootView().setOnClickListener(new View.OnClickListener() {
@@ -78,7 +78,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
                 public void onClick(View view) {
                     ProfileFragment profileFragment = new ProfileFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putInt("pdaId", friendModel.id);
+                    bundle.putInt("pdaId", friendModel.pdaId);
                     profileFragment.setArguments(bundle);
                     fragmentNavigation.addFragment(profileFragment, true);
                 }

@@ -71,8 +71,27 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         presenter.attachView(this);
         App.getRetrofitService().attachView(this);
 
-        setFragment(new ProfileFragment(), true);
-        setAdditionalFragment(new InfoFragment());
+        Intent intent = getIntent();
+
+        if (intent!=null && intent.getStringExtra("section")!=null) {
+            switch (getIntent().getStringExtra("section")) {
+                case "stories":
+                    setFragment(new StoriesFragment(), false);
+                    break;
+                case "profile":
+                    setFragment(new ProfileFragment(), false);
+                    break;
+                default:
+                    setFragment(new NewsFragment(), false);
+                    break;
+            }
+            setAdditionalFragment(new InfoFragment());
+        }
+        else{
+            setFragment(new NewsFragment(), false);
+            setAdditionalFragment(new InfoFragment());
+        }
+
 
         if(App.getDataManager().getMember()!=null){
             setAdditionalTitle("PDA #" + App.getDataManager().getMember().getPdaId());

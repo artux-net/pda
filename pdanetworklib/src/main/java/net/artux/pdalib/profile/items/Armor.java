@@ -2,6 +2,8 @@
 package net.artux.pdalib.profile.items;
 
 
+import java.util.Objects;
+
 public class Armor extends Item{
 
     public float thermal_pr;
@@ -53,14 +55,6 @@ public class Armor extends Item{
 
     public void setWeight(float weight) {
         this.weight = weight;
-    }
-
-    public int getLibrary_id() {
-        return library_id;
-    }
-
-    public void setLibrary_id(int library_id) {
-        this.library_id = library_id;
     }
 
     public int getPrice() {
@@ -125,6 +119,20 @@ public class Armor extends Item{
 
     public void setCondition(float condition) {
         this.condition = condition;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Armor armor = (Armor) o;
+        return Float.compare(armor.thermal_pr, thermal_pr) == 0 && Float.compare(armor.electric_pr, electric_pr) == 0 && Float.compare(armor.chemical_pr, chemical_pr) == 0 && Float.compare(armor.radio_pr, radio_pr) == 0 && Float.compare(armor.psy_pr, psy_pr) == 0 && Float.compare(armor.damage_pr, damage_pr) == 0 && Float.compare(armor.condition, condition) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), thermal_pr, electric_pr, chemical_pr, radio_pr, psy_pr, damage_pr, condition);
     }
 
     @Override

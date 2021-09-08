@@ -49,20 +49,37 @@ public class FriendsFragment extends BaseFragment {
     }
 
     void updateFriends(int pdaId, int type){
-        App.getRetrofitService().getPdaAPI().getFriends(pdaId, type).enqueue(new Callback<List<FriendModel>>() {
-            @Override
-            public void onResponse(Call<List<FriendModel>> call, Response<List<FriendModel>> response) {
-                List<FriendModel> body = response.body();
-                if (body!=null && body.size()!=0){
-                    recyclerView.setVisibility(View.VISIBLE);
-                    friendsAdapter.setData(body);
+        if (type==0)
+            App.getRetrofitService().getPdaAPI().getFriends(pdaId).enqueue(new Callback<List<FriendModel>>() {
+                @Override
+                public void onResponse(Call<List<FriendModel>> call, Response<List<FriendModel>> response) {
+                    List<FriendModel> body = response.body();
+                    if (body!=null && body.size()!=0){
+                        recyclerView.setVisibility(View.VISIBLE);
+                        friendsAdapter.setData(body);
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<List<FriendModel>> call, Throwable throwable) {
-                throwable.printStackTrace();
-            }
-        });
+                @Override
+                public void onFailure(Call<List<FriendModel>> call, Throwable throwable) {
+                    throwable.printStackTrace();
+                }
+            });
+        else
+            App.getRetrofitService().getPdaAPI().getSubs(pdaId).enqueue(new Callback<List<FriendModel>>() {
+                @Override
+                public void onResponse(Call<List<FriendModel>> call, Response<List<FriendModel>> response) {
+                    List<FriendModel> body = response.body();
+                    if (body!=null && body.size()!=0){
+                        recyclerView.setVisibility(View.VISIBLE);
+                        friendsAdapter.setData(body);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<FriendModel>> call, Throwable t) {
+
+                }
+            });
     }
 }

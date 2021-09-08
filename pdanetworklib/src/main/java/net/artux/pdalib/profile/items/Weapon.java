@@ -1,11 +1,14 @@
 package net.artux.pdalib.profile.items;
 
+import java.util.Objects;
+
 public class Weapon extends Item{
 
     public float precision;
     public float speed;
     public float damage;
     public float condition;
+    public int  bullet_quantity;
     public int bullet_id;
 
     public Weapon() {
@@ -51,13 +54,6 @@ public class Weapon extends Item{
         this.weight = weight;
     }
 
-    public int getLibrary_id() {
-        return library_id;
-    }
-
-    public void setLibrary_id(int library_id) {
-        this.library_id = library_id;
-    }
 
     public int getPrice() {
         return price;
@@ -105,6 +101,11 @@ public class Weapon extends Item{
 
     public void setBullet_id(int bullet_id) {
         this.bullet_id = bullet_id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), precision, speed, damage, condition, bullet_quantity, bullet_id);
     }
 
     @Override

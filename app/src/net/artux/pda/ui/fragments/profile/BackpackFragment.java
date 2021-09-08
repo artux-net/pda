@@ -78,7 +78,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
             public void onClick(DialogInterface dialogInterface, int i) {
                 EncyclopediaFragment encyclopediaFragment = new EncyclopediaFragment();
                 Bundle bundle = new Bundle();
-                bundle.putInt("id", item.library_id);
+                bundle.putInt("id", item.id);
                 bundle.putInt("type", item.type);
 
                 encyclopediaFragment.setArguments(bundle);
@@ -95,7 +95,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (item instanceof Armor) {
-                            App.getRetrofitService().getPdaAPI().setArmor((Armor) item).enqueue(new Callback<Status>() {
+                            App.getRetrofitService().getPdaAPI().setArmor(((Armor) item).hashCode()).enqueue(new Callback<Status>() {
                                 @Override
                                 public void onResponse(Call<Status> call, Response<Status> response) {
                                     Status status = response.body();
@@ -111,7 +111,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
                             });
                      // if (item instanceof Weapon)
                         }else{
-                            App.getRetrofitService().getPdaAPI().setWeapon(item.type, (Weapon) item).enqueue(new Callback<Status>() {
+                            App.getRetrofitService().getPdaAPI().setWeapon(item.hashCode()).enqueue(new Callback<Status>() {
                                 @Override
                                 public void onResponse(Call<Status> call, Response<Status> response) {
                                     Status status = response.body();

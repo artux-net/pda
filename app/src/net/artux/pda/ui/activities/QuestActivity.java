@@ -30,8 +30,10 @@ import net.artux.pdalib.Member;
 import net.artux.pdalib.profile.Story;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -62,6 +64,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         musicImage = findViewById(R.id.musicSetup);
         musicImage.setOnClickListener(this);
         findViewById(R.id.closeButton).setOnClickListener(this);
+        findViewById(R.id.exitButton).setOnClickListener(this);
         findViewById(R.id.log).setOnClickListener(this);
         switcher = findViewById(R.id.switcher);
         switcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
@@ -160,6 +163,28 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             case R.id.closeButton:
                 startActivity(new Intent(this, MainActivity.class));
                 finish();
+                break;
+            case R.id.exitButton:
+                HashMap<String, List<String>> action = new HashMap<>();
+                action.put("reset_current", new ArrayList<>());
+                App.getRetrofitService().getPdaAPI().synchronize(action).enqueue(new Callback<Member>() {
+                    @Override
+                    public void onResponse(Call<Member> call, Response<Member> response) {
+                        Member member = response.body();
+                        if (member!=null) {
+                            App.getDataManager().setMember(member);
+                            Intent intent = new Intent(QuestActivity.this, MainActivity.class);
+                            intent.putExtra("section", "stories");
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Member> call, Throwable t) {
+                        Timber.e(t);
+                    }
+                });
                 break;
             case R.id.log:
                 Stage stage = sceneController.getActualStage();

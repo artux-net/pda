@@ -1,5 +1,7 @@
 package net.artux.pdalib.profile.items;
 
+import java.util.Objects;
+
 public class Item {
 
     public int id;
@@ -7,7 +9,6 @@ public class Item {
     public String icon;
     public String title;
     public float weight;
-    public int library_id;
     public int price;
     public int quantity;
 
@@ -54,14 +55,6 @@ public class Item {
         this.weight = weight;
     }
 
-    public int getLibrary_id() {
-        return library_id;
-    }
-
-    public void setLibrary_id(int library_id) {
-        this.library_id = library_id;
-    }
-
     public int getPrice() {
         return price;
     }
@@ -78,4 +71,19 @@ public class Item {
     public String toString() {
         return GsonProvider.getInstance().toJson(this);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return id == item.id && type == item.type && Float.compare(item.weight, weight) == 0 &&
+                price == item.price && quantity == item.quantity && Objects.equals(icon, item.icon) && Objects.equals(title, item.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, type, icon, title, weight, price, quantity);
+    }
 }
+
