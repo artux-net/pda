@@ -131,6 +131,14 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         ((TextView)findViewById(R.id.sceneTitle)).setText(title);
     }
 
+    public void setLoading(boolean flag){
+        if (flag)
+            findViewById(R.id.loadingProgressBar).setVisibility(View.VISIBLE);
+        else
+            findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
+    }
+
+
     public void setBackground(String backgroundURL){
         if(!background_url.equals(backgroundURL)) {
             if (!backgroundURL.contains("http")){

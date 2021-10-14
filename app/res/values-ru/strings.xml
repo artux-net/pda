@@ -63,7 +63,7 @@
     <string name="requested">Вы отправили заявку в друзья</string>
     <string name="location">Локация:</string>
     <string name="rating">Рейтинг</string>
-    <string name="nickname">Кличка</string>
+    <string name="nickname">Прозвище</string>
     <string name="repeat_password">Повторите пароль</string>
     <string name="agreement">Нажимая кнопку \"РЕГИСТРАЦИЯ\", \nвы принимаете <font color="#f2cd34">условия пользования</font>.</string>
     <string name="member_debug">Member информация</string>
@@ -92,4 +92,6 @@
     <string name="location_p">Локация: %1$s</string>
     <string name="empty">Здесь пусто..</string>
     <string name="note_isnt_selected">Note isn\'t selected.</string>
+    <string name="jobs_p" translatable="false">Заданий: %1$s</string>
+    <string name="subs">Запросы дружбы - %1$s</string>
 </resources>

@@ -12,7 +12,7 @@ import net.artux.pda.map.model.Player;
 
 public class HealthBar extends Actor implements Disposable {
 
-    TextureAtlas skinAtlas;
+    private final TextureAtlas skinAtlas;
     private final NinePatchDrawable loadingBarBackground;
     private final NinePatchDrawable loadingBar;
     private final Player player;
@@ -28,11 +28,14 @@ public class HealthBar extends Actor implements Disposable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        float progress = (float) player.health / 100;
-        if (progress<0 && progress>1) progress = 0;
+        if (player!=null) {
+            float progress = (float) player.health / 100;
+            if (progress < 0 && progress > 1) progress = 0;
 
-        loadingBarBackground.draw(batch, getX(), getY(), getWidth() * getScaleX(), getHeight() * getScaleY());
-        loadingBar.draw(batch, getX(), getY(), progress * getWidth() * getScaleX(), getHeight() * getScaleY());
+            loadingBarBackground.draw(batch, getX(), getY(), getWidth() * getScaleX(), getHeight() * getScaleY());
+            loadingBar.draw(batch, getX(), getY(), progress * getWidth() * getScaleX(), getHeight() * getScaleY());
+        }
+
     }
 
     @Override

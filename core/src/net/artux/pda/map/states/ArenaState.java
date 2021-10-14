@@ -21,7 +21,6 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.google.gson.Gson;
 
-import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.Entity;
 import net.artux.pda.map.model.Hit;
 import net.artux.pda.map.model.ServerPlayer;
@@ -43,9 +42,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static net.artux.pda.map.GdxAdapter.RUSSIAN_CHARACTERS;
-import static net.artux.pda.map.GdxAdapter.RUSSIAN_FONT_NAME;
-
 public class ArenaState extends State {
     public static List<Entity> entities = new ArrayList<>();
 
@@ -57,7 +53,7 @@ public class ArenaState extends State {
     private final Texture background;
     private final OrthographicCamera cam;
 
-    private final BitmapFont font;
+    private BitmapFont font;
 
     Logger logger;
 
@@ -109,7 +105,6 @@ public class ArenaState extends State {
 
 
 
-        font = GdxAdapter.generateFont(RUSSIAN_FONT_NAME, RUSSIAN_CHARACTERS);
 
         assetManager = new AssetManager();
         assetManager.load("dialog.png", Texture.class);

@@ -124,6 +124,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     return false;
                 }
             });
+
             findViewById(R.id.register).setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {

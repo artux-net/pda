@@ -3,11 +3,13 @@ package net.artux.pda.map.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pdalib.Member;
 
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -18,6 +20,16 @@ public class GameStateManager {
     private final Stack<net.artux.pda.map.states.State> states;
     private Member member;
     private final InputMultiplexer multiplexer = new InputMultiplexer();
+
+    BitmapFont russianFont;
+
+    public void setRussianFont(BitmapFont russianFont) {
+        this.russianFont = russianFont;
+    }
+
+    public BitmapFont getRussianFont() {
+        return russianFont;
+    }
 
     public GameStateManager(PlatformInterface platformInterface, Member member){
         states = new Stack<>();
@@ -59,19 +71,23 @@ public class GameStateManager {
         for (State state: states){
             state.dispose();
         }
+        russianFont.dispose();
         member = null;
     }
 
     public void update(float dt){
-        states.peek().update(dt);
+        if (states.size()>0)
+            states.peek().update(dt);
     }
 
     public void resize(int width, int height){
-        states.peek().resize(width, height);
+        if (states.size()>0)
+            states.peek().resize(width, height);
     }
 
     public void render(SpriteBatch sb){
-        states.peek().render(sb);
+        if (states.size()>0)
+            states.peek().render(sb);
     }
 
     public Member getMember() {

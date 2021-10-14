@@ -39,16 +39,15 @@ public class UserInterface extends Group implements Disposable {
     float w = Gdx.graphics.getWidth();
     float h = Gdx.graphics.getHeight();
     Group menu;
+    Texture texture;
+    Pixmap bgPixmap;
     boolean isMenuOpen = false;
 
-    public UserInterface(GameStateManager gsm, Player gamer, AssetManager assetManager, BitmapFont font){
-        this.player = gamer;
+    public UserInterface(final GameStateManager gsm, final Player player, AssetManager assetManager){
+        this.player = player;
         this.gsm = gsm;
 
-
-
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
-
         style.knob = new TextureRegionDrawable(assetManager.get("touchpad/knob.png", Texture.class));
         style.knob.setMinHeight(170);
         style.knob.setMinWidth(170);
@@ -62,7 +61,7 @@ public class UserInterface extends Group implements Disposable {
                 float deltaX = ((Touchpad) actor).getKnobPercentX();
                 float deltaY = ((Touchpad) actor).getKnobPercentY();
 
-                UserInterface.this.player.setVelocity(deltaX, deltaY);
+                player.setVelocity(deltaX, deltaY);
             }
         });
         addActor(touchpad);
@@ -76,13 +75,13 @@ public class UserInterface extends Group implements Disposable {
         runButton.addListener(new ClickListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                UserInterface.this.player.run = true;
+                player.run = true;
                 return super.touchDown(event, x, y, pointer, button);
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                UserInterface.this.player.run = false;
+                player.run = false;
                 super.touchUp(event, x, y, pointer, button);
             }
         });
@@ -99,10 +98,10 @@ public class UserInterface extends Group implements Disposable {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.clicked(event, x, y);
-                System.out.println("touched pause - user interface");
+                Gdx.app.debug("UserInterface","touched pause - user interface");
                 HashMap<String, String> data = new HashMap<>();
                 data.put("openPda", "");
-                UserInterface.this.gsm.getPlatformInterface().send(data);
+                gsm.getPlatformInterface().send(data);
             }
         });
 
@@ -119,33 +118,42 @@ public class UserInterface extends Group implements Disposable {
             }
         });
 
-
         addActor(runButton);
         addActor(pauseButton);
 
         healthBar = new HealthBar(player);
-        healthBar.setHeight(h/10);
+        healthBar.setHeight(h/20);
         healthBar.setWidth(w/4);
         healthBar.setX(w/36);
-        healthBar.setY(7*h/8);
+        healthBar.setY(h-70);
         healthBar.setScale(1);
         addActor(healthBar);
 
+        initMenu(gsm.getRussianFont());
+        addActor(menuButton);
+
+        logger = new Logger(null, player, 3, (int) (7*h/8));
+
+    }
+
+    void initMenu(BitmapFont font){
         menu = new Group();
+
+        bgPixmap = new Pixmap(1,1, Pixmap.Format.RGB888);
+        bgPixmap.setColor(Color.rgb888(26/255,27/255,29/255));
+        bgPixmap.fill();
+        texture = new Texture(bgPixmap);
+        Image image = new Image(texture);
+        image.setSize(w/4, h);
+        menu.addActor(image);
         Text text =new Text("Задания", font);
-        text.setX(w/4);
+        text.setX(w/4-200);
         text.setY(h/1.5f);
         menu.addActor(text);
 
-        Pixmap bgPixmap = new Pixmap(1,1, Pixmap.Format.RGB888);
-        bgPixmap.setColor(Color.rgb888(26/255,27/255,29/255));
-        bgPixmap.fill();
-        Image image = new Image(new Texture(bgPixmap));
-        image.setSize(w/4, h);
-        menu.addActor(image);
-
         Table menuTable = new Table();
 
+        if (gsm.get("map")!=null)
         for (final Point point : ((Map)gsm.get("map")).getPoints()) {
             if (point.type < 2 || point.type > 3)
                 if (gsm.getMember()!=null && Checker.check(point.getCondition(), gsm.getMember())){
@@ -185,9 +193,6 @@ public class UserInterface extends Group implements Disposable {
 
         this.menu.setX(w);
         addActor(menu);
-        addActor(menuButton);
-
-        logger = new Logger(null, player, 3, (int) (6*h/8));
     }
 
     public boolean contains(String name){
@@ -201,7 +206,9 @@ public class UserInterface extends Group implements Disposable {
     @Override
     public void act(float delta) {
         super.act(delta);
-        logger.update();
+        if (logger!=null)
+            logger.update();
+        if (menu !=null)
         if (isMenuOpen && menu.getX()>w*0.75)
             menu.setX(menu.getX()-15);
         else if (!isMenuOpen && menu.getX()<=w+100) menu.setX(menu.getX()+15);
@@ -210,13 +217,20 @@ public class UserInterface extends Group implements Disposable {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        logger.render();
+        if (logger!=null)
+            logger.render();
     }
 
     @Override
     public void dispose() {
-        healthBar.dispose();
-        logger.dispose();
+        if (healthBar!=null)
+            healthBar.dispose();
+        if (logger!=null)
+            logger.dispose();
+        if (texture!=null)
+            texture.dispose();
+        if (bgPixmap!=null)
+            bgPixmap.dispose();
     }
 
 }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.PlayState;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class Spawn {
         return position;
     }
 
-    public void create(AssetManager skin, List<Mob> mobs, Player player){
+    public void create(final PlayState playState, AssetManager skin, List<Mob> mobs, Player player, final GameStateManager gsm){
         getPosition();
 
         final Random random = new Random();
@@ -49,16 +50,16 @@ public class Spawn {
         for(int i=0;i<n;i++) {
             final Bot bot = new Bot(id, getRandomPoint(random), this, skin, mob, player);
             bots.add(bot);
-            PlayState.entities.add(bot);
+            playState.entities.add(bot);
             final Mob finalMob = mob;
             bot.addListener(new ClickListener(){
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
-                    final Text text = new Text(finalMob.name, PlayState.font);
+                    final Text text = new Text(finalMob.name, gsm.getRussianFont());
                     text.setPosition(position.x, position.y);
                     System.out.println("Add text " + text);
-                    PlayState.stage.addActor(text);
+                    playState.stage.addActor(text);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -72,7 +73,7 @@ public class Spawn {
                     }).start();
                 }
             });
-            PlayState.stage.addActor(bot);
+            playState.stage.addActor(bot);
         }
     }
 

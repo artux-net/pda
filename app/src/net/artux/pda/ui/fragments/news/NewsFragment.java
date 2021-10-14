@@ -5,28 +5,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.reflect.TypeToken;
-import com.prof.rssparser.Channel;
-import com.prof.rssparser.OnTaskCompleted;
-import com.prof.rssparser.Parser;
 
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.fragments.chat.Dialog;
-import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
 import net.artux.pdalib.ResponsePage;
 import net.artux.pdalib.news.Article;
 import net.artux.pdalib.profile.items.GsonProvider;
 
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import retrofit2.Call;
@@ -71,10 +63,12 @@ public class NewsFragment extends BaseFragment {
                 ResponsePage<Article> page = response.body();
                 if (page!=null){
                     List<Article> list = page.getData();
-                    binding.list.setVisibility(View.VISIBLE);
-                    binding.viewMessage.setVisibility(View.GONE);
-                    adapter.setNews(list);
-                    App.getDataManager().setString("news", GsonProvider.getInstance().toJson(list));
+                    if (binding!=null) {
+                        binding.list.setVisibility(View.VISIBLE);
+                        binding.viewMessage.setVisibility(View.GONE);
+                        adapter.setNews(list);
+                        App.getDataManager().setString("news", GsonProvider.getInstance().toJson(list));
+                    }
                 }
 
             }
@@ -84,5 +78,12 @@ public class NewsFragment extends BaseFragment {
                 Timber.tag("News").e(t);
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        binding.list.setAdapter(null);
+        binding = null;
+        super.onDestroyView();
     }
 }

@@ -22,8 +22,9 @@ public class Player extends Entity implements Disposable {
     float zoom;
     Member member;
     boolean server = false;
-    public Player(State state, Vector2 playerPosition, Member member, AssetManager skin) {
-        super(playerPosition);
+    public Player(State state, Member member, AssetManager skin) {
+        super();
+
         camera = state.getCamera();
         zoom = camera.zoom;
         this.id = 1;
@@ -79,15 +80,12 @@ public class Player extends Entity implements Disposable {
         }
         if (bounds!=null){
             if (canMoveX(getX()+MOVEMENT*velocity.x, getY())){
-                System.out.println("act player");
                 super.act(delta);
             }
             if (canMoveY(getX(), getY() + MOVEMENT*velocity.y)){
-                System.out.println("act player");
                 super.act(delta);
             }
         }else{
-            System.out.println("act player");
             super.act(delta);
         }
 

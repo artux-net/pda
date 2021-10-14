@@ -8,37 +8,41 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.initialization.AdapterStatus;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.gson.Gson;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
+import net.artux.pda.ui.fragments.profile.UserRepository;
+import net.artux.pda.utils.Cache;
+import net.artux.pdalib.Profile;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Map;
 import java.util.function.BiConsumer;
 
+import dagger.Module;
 import timber.log.Timber;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static androidx.core.app.ActivityCompat.requestPermissions;
 
-
+@Module
 public class App extends Application {
 
     static RetrofitService mRetrofitService = new RetrofitService();
+    static Cache<Profile> profileCache;
+    static UserRepository repository;
     static DataManager sDataManager;
+
+    //ApplicationComponent appComponent = DaggerApplicationComponent.create();
+
     public static int[] avatars = {
             R.drawable.a1,
             R.drawable.a2,
@@ -85,17 +89,24 @@ public class App extends Application {
             R.drawable.g6//9
     };
 
+
     @Override
     public void onCreate() {
         super.onCreate();
+
         sDataManager = new DataManager(getApplicationContext());
         mRetrofitService.initRetrofit(sDataManager);
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
-            createLogFile();
+            //createLogFile();
         } else {
             Timber.plant(new CrashReportingTree());
         }
+
+        profileCache = new Cache<>(Profile.class, getApplicationContext(), new Gson());
+        repository = new UserRepository(mRetrofitService.getPdaAPI(), profileCache);
+
+
         Timber.d("App started.");
         MobileAds.initialize(this, new OnInitializationCompleteListener() {
             @Override
@@ -115,6 +126,11 @@ public class App extends Application {
 
     }
 
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+    }
+
     private void createLogFile(){
         String fullPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/logs";
         try {
@@ -130,6 +146,11 @@ public class App extends Application {
             Log.println(Log.ERROR,"FileLogTree", "Error while create log file: ");
             e.printStackTrace();
         }
+    }
+
+    @NotNull
+    public UserRepository getRepository() {
+        return repository;
     }
 
     /** A tree which logs important information for crash reporting. */
@@ -148,7 +169,7 @@ public class App extends Application {
             }
 
 
-            try
+            /*try
             {
                 String fullPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/logs";
                 File file = new File(fullPath, "pdaLogs.txt");
@@ -160,7 +181,7 @@ public class App extends Application {
                         t.printStackTrace(printStream);
                     printStream.close();
                 }
-            } catch (IOException e){}
+            } catch (IOException e){}*/
         }
     }
 

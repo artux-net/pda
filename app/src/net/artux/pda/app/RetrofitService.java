@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import dagger.Component;
 import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.EventListener;
@@ -28,7 +29,6 @@ public class RetrofitService {
 
     private PdaAPI mPdaAPI;
     private Gson gson;
-    MainContract.View view;
 
     void initRetrofit(final DataManager dataManager){
         OkHttpClient.Builder httpClient =
@@ -45,21 +45,7 @@ public class RetrofitService {
             Request request = requestBuilder.build();
             return chain.proceed(request);
         });
-        httpClient.eventListener(new EventListener() {
-            @Override
-            public void callStart(Call call) {
-                super.callStart(call);
-                if (view!=null)
-                    view.setLoadingState(true);
-            }
 
-            @Override
-            public void callEnd(Call call) {
-                super.callEnd(call);
-                if (view!=null)
-                    view.setLoadingState(false);
-            }
-        });
 
 
         gson = new GsonBuilder()
@@ -75,10 +61,6 @@ public class RetrofitService {
 
         mPdaAPI = mRetrofit.create(PdaAPI.class);
 
-    }
-
-    public void attachView(MainContract.View view){
-        this.view = view;
     }
 
     public PdaAPI getPdaAPI(){

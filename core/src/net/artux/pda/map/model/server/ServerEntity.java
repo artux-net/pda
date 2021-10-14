@@ -19,7 +19,7 @@ public class ServerEntity extends Entity {
     Vector2 velocity = new Vector2();
 
     public ServerEntity(Vector2 position, AssetManager skin) {
-        super(position);
+        super();
         sprite = new Sprite(skin.get("yellow.png", Texture.class));
         sprite.setSize(12, 12);
     }

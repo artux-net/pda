@@ -152,5 +152,11 @@ public class NoteFragment extends BaseFragment {
             }
         });
     }
+
+    @Override
+    public void onDestroyView() {
+        binding = null;
+        super.onDestroyView();
+    }
 }
 

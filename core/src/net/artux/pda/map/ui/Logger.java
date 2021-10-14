@@ -46,7 +46,6 @@ public class Logger implements Disposable{
         font = new BitmapFont();
         batch = new SpriteBatch();
         cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        texts.add("Member null: " + (player.getMember() == null));
     }
 
     public void resize(int screenWidth, int screenHeight) {
@@ -80,8 +79,10 @@ public class Logger implements Disposable{
 
         font.draw(batch, (int)frameRate + " fps", x, y - 3);
 
-        font.draw(batch, "x: " + player.getPosition().x + ", y: " + player.getPosition().y, x, y - 15);
-        font.draw(batch, "Player health: " + player.health, x, y - 30);
+        if (player!=null) {
+            font.draw(batch, "x: " + player.getPosition().x + ", y: " + player.getPosition().y, x, y - 15);
+            font.draw(batch, "Player health: " + player.health, x, y - 30);
+        }
         font.draw(batch, "Native Heap: " + Gdx.app.getNativeHeap(), x, y - 60);
         font.draw(batch, "Screen: " + Gdx.app.getGraphics().getWidth() + ":" + Gdx.app.getGraphics().getHeight(), x, y - 75);
         font.draw(batch, "Density: " + Gdx.app.getGraphics().getDensity(), x, y - 90);

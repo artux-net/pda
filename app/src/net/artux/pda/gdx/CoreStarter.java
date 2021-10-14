@@ -23,8 +23,8 @@ import timber.log.Timber;
 
 public class CoreStarter extends AndroidApplication implements PlatformInterface {
 
-    GdxAdapter gdxAdapter;
     Gson gson = new Gson();
+    GdxAdapter gdxAdapter;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -34,10 +34,10 @@ public class CoreStarter extends AndroidApplication implements PlatformInterface
         Timber.d("Core start, isArena: " + getIntent().getBooleanExtra("arena", false));
         if(getIntent().getBooleanExtra("arena", false)){
             Connection connection = new Connection("192.168.1.104:8080", App.getDataManager().getAuthToken(), "1");
-            gdxAdapter = new GdxAdapter(CoreStarter.this,  App.getDataManager().getMember(), connection);
+            //gdxAdapter = new GdxAdapter(this,  App.getDataManager().getMember(), connection);
         }else{
             Map map = gson.fromJson(getIntent().getStringExtra("map"), Map.class);
-            gdxAdapter = new GdxAdapter(CoreStarter.this,  App.getDataManager().getMember());
+            gdxAdapter = new GdxAdapter(this,  App.getDataManager().getMember());
             gdxAdapter.put("map", map);
             gdxAdapter.put("member", App.getDataManager().getMember());
         }
@@ -87,7 +87,8 @@ public class CoreStarter extends AndroidApplication implements PlatformInterface
 
     @Override
     protected void onDestroy() {
-        System.out.println("Destroyed CoreStarter");
+        Timber.d("Destroyed CoreStarter");
+        gdxAdapter = null;
         super.onDestroy();
     }
 }

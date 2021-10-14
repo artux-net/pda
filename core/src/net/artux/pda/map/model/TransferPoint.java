@@ -12,16 +12,14 @@ import java.util.HashMap;
 public class TransferPoint extends Actor {
 
     private final String title;
-    private final Vector2 position;
     private final Sprite sprite;
     private final HashMap<String, String> data = new HashMap<>();
 
     public TransferPoint(Transfer transfer, AssetManager manager){
         title = transfer.getMessage();
-        position = transfer.getPosition();
+        setPosition(transfer.getPosition().x, transfer.getPosition().y);
         sprite = new Sprite(manager.get("transfer.png", Texture.class));
         sprite.setSize(32,32);
-        sprite.setPosition(position.x, position.y);
         data.put("map", String.valueOf(transfer.getTo()));
         data.put("pos", transfer.getToPosition());
     }
@@ -30,8 +28,8 @@ public class TransferPoint extends Actor {
         return title;
     }
 
-    public Vector2 getPosition() {
-        return position;
+    public Vector2 getPosition(){
+        return new Vector2(getX(), getY());
     }
 
     public HashMap<String, String> getData() {

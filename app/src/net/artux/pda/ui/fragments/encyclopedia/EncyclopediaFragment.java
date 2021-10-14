@@ -75,7 +75,7 @@ public class EncyclopediaFragment extends BaseFragment {
         });
         webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
 
-        requireActivity().getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 webView.clearView();
@@ -85,6 +85,7 @@ public class EncyclopediaFragment extends BaseFragment {
                     setEnabled(false);
             }
         });
+
     }
 
     @Override
@@ -95,4 +96,9 @@ public class EncyclopediaFragment extends BaseFragment {
     }
 
 
+    @Override
+    public void onDestroy() {
+        webView.destroy();
+        super.onDestroy();
+    }
 }

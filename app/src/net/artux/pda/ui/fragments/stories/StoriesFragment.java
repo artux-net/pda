@@ -55,6 +55,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
         if (getActivity()!=null && App.getDataManager().getMember().getData().getTemp().containsKey("currentStory")){
             Intent intent = new Intent(getActivity(), QuestActivity.class);
             getActivity().startActivity(intent);
+            getActivity().finish();
         } else {
             navigationPresenter.setTitle(getResources().getString(R.string.map));
             navigationPresenter.setLoadingState(true);
@@ -62,7 +63,6 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
 
             StoriesAdapter adapter = new StoriesAdapter( StoriesFragment.this);
             binding.list.setAdapter(adapter);
-
 
             Stories stories= GsonProvider.getInstance().fromJson(App.getDataManager().getString("stories"), Stories.class);
             if(stories!=null){
@@ -129,12 +129,12 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             });
             builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             builder.show();
-        }else{
-            Intent intent = new Intent(getActivity(), CoreStarter.class);
-            intent.putExtra("arena", true);
-            if (getActivity() != null)
-                getActivity().startActivity(intent);
-
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

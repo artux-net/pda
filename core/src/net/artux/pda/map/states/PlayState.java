@@ -1,5 +1,7 @@
 package net.artux.pda.map.states;
 
+import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
+
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -9,18 +11,19 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
-import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.Entity;
 import net.artux.pda.map.model.Hit;
 import net.artux.pda.map.model.Map;
@@ -40,20 +43,18 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
-import static net.artux.pda.map.GdxAdapter.RUSSIAN_CHARACTERS;
-import static net.artux.pda.map.GdxAdapter.RUSSIAN_FONT_NAME;
+import javax.swing.event.ChangeEvent;
 
 
 public class PlayState extends State {
 
-    private Player player;
-    public static List<Entity> entities = new ArrayList<>();
+    private final Player player;
+    public List<Entity> entities = new ArrayList<>();
 
-    public static Stage stage;
-    public static Stage uistage;
+    public Stage stage;
+    public Stage uistage;
 
-    private final Texture background;
+    private Texture background;
     private Texture blur;
     private Texture bounds;
 
@@ -62,27 +63,17 @@ public class PlayState extends State {
 
     public static AssetManager assetManager;
 
-    long heapLoss;
+    private Button.ButtonStyle textButtonStyle;
 
-    private final Button.ButtonStyle textButtonStyle;
-    public static BitmapFont font;
+    private UserInterface userInterface;
 
-    private final UserInterface userInterface;
+    private static final String tag = "PlayState";
 
     public PlayState(final GameStateManager gsm, Batch batch) {
         super(gsm);
-        Gdx.app.setLogLevel(Application.LOG_DEBUG);
-        long before = Gdx.app.getNativeHeap();
+        Gdx.app.debug(tag, "Start play state init");
 
-
-        Type REVIEW_TYPE = new TypeToken<List<Mob>>() {
-        }.getType();
-        Gson gson = new Gson();
-        JsonReader reader = new JsonReader(Gdx.files.internal("mobs").reader());
-        List<Mob> data = gson.fromJson(reader, REVIEW_TYPE);
-        System.out.println("Mobs data size: " + data.size());
-        font = GdxAdapter.generateFont(RUSSIAN_FONT_NAME, RUSSIAN_CHARACTERS);
-
+        Gdx.app.debug(tag, "Before loading textures, heap " + Gdx.app.getNativeHeap());
         assetManager = new AssetManager();
         assetManager.load("dialog.png", Texture.class);
         assetManager.load("beg2.png", Texture.class);
@@ -104,20 +95,63 @@ public class PlayState extends State {
         assetManager.load("occupations.png", Texture.class);
         assetManager.finishLoading();
 
-        Map map = (Map) gsm.get("map");
-        background = new Texture(Gdx.files.absolute(map.getTextureUri()));
-        if (map.getBlurTextureUri()!=null)
-            if (Gdx.files.absolute(map.getBlurTextureUri()).exists()) {
-                blur = new Texture(Gdx.files.absolute(map.getBlurTextureUri()));
-                blur.setWrap(Repeat, Repeat);
-                wb = background.getWidth()/2 - blur.getWidth()/2;
-                hb = background.getHeight()/2 - blur.getHeight()/2;
-            }
+        Gdx.app.debug(tag, "After loading textures, heap " + Gdx.app.getNativeHeap());
 
         Viewport viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         stage = new Stage(viewport, batch);
         uistage = new Stage();
+
+        player = initPlayer();
+
+        Map map = (Map) gsm.get("map");
+        if (map!=null) {
+            player.setPosition(map.getPlayerPosition().x, map.getPlayerPosition().y);
+
+            if (Gdx.files.absolute(map.getTextureUri()).exists())
+                background = new Texture(Gdx.files.absolute(map.getTextureUri()));
+
+            if (map.getBlurTextureUri() != null)
+                if (Gdx.files.absolute(map.getBlurTextureUri()).exists()) {
+                    blur = new Texture(Gdx.files.absolute(map.getBlurTextureUri()));
+                    blur.setWrap(Repeat, Repeat);
+                    if (background!=null) {
+                        wb = background.getWidth() / 2 - blur.getWidth() / 2;
+                        hb = background.getHeight() / 2 - blur.getHeight() / 2;
+                    }
+                }
+
+            Type REVIEW_TYPE = new TypeToken<List<Mob>>() {
+            }.getType();
+            Gson gson = new Gson();
+            JsonReader reader = new JsonReader(Gdx.files.internal("mobs").reader());
+            List<Mob> data = gson.fromJson(reader, REVIEW_TYPE);
+
+            /*for (Spawn spawn : map.getSpawns()){
+                spawn.create(this, assetManager, data, player, gsm);
+            }*/
+
+            for(Point point: map.getPoints()) {
+                if (getMember()!=null && Checker.check(point.getCondition(), getMember()))
+                    if (point.getData().containsKey("chapter")){
+                        int storyId = Integer.parseInt(getMember().getData().getTemp().get("currentStory"));
+                        for (Story story : getMember().getData().getStories()) {
+                            if (story.getStoryId() == storyId
+                                    && (Integer.parseInt(point.getData().get("chapter")) == story.getLastChapter()
+                                    || Integer.parseInt(point.getData().get("chapter")) == 0))
+                                addPoint(point);
+                        }
+                    }else addPoint(point);
+
+            }
+
+            Gdx.app.debug(tag, "Number of transfers " + map.getTransfers().size());
+
+            for (Transfer transfer : map.getTransfers()){
+                stage.addActor(new TransferPoint(transfer, assetManager));
+            }
+        }
+        Gdx.app.debug(tag, "After loading map, heap " + Gdx.app.getNativeHeap());
 
         textButtonStyle = new Button.ButtonStyle();
         textButtonStyle.up  =  new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
@@ -127,36 +161,10 @@ public class PlayState extends State {
 
         ((OrthographicCamera)stage.getCamera()).zoom -= 0.5f;
 
-        initPlayer(map);
 
-        userInterface = new UserInterface(gsm, player, assetManager, font);
+
+        userInterface = new UserInterface(gsm, player, assetManager);
         uistage.addActor(userInterface);
-
-
-        for (Spawn spawn : map.getSpawns()){
-            spawn.create(assetManager, data, player);
-        }
-
-        for(final Point point: map.getPoints()) {
-            if (getMember()!=null && Checker.check(point.getCondition(), getMember()))
-                if (point.getData().containsKey("chapter")){
-                    int storyId = Integer.parseInt(getMember().getData().getTemp().get("currentStory"));
-                    for (Story story : getMember().getData().getStories()) {
-                        if (story.getStoryId() == storyId
-                                && (Integer.parseInt(point.getData().get("chapter")) == story.getLastChapter()
-                                || Integer.parseInt(point.getData().get("chapter")) == 0))
-                                addPoint(point);
-                    }
-                 }else addPoint(point);
-
-        }
-        for (Transfer transfer : map.getTransfers()){
-            stage.addActor(new TransferPoint(transfer, assetManager));
-        }
-
-        long after = Gdx.app.getNativeHeap();
-        heapLoss = after-before;
-        System.out.println("Play init " + (after-before));
     }
 
     private void addPoint(Point point){
@@ -165,21 +173,19 @@ public class PlayState extends State {
             player.setDirection(point.getPosition());
     }
 
-    private void initPlayer(Map map){
-        System.out.println("Heap init:" + Gdx.app.getNativeHeap());
-        player = new Player(this, map.getPlayerPosition(), getMember(), assetManager);
-        System.out.println("Heap player:" + Gdx.app.getNativeHeap());
-        bounds = new Texture(Gdx.files.absolute(map.getBoundsTextureUri()));
+    private Player initPlayer(){
+
+        Player player = new Player(this, getMember(), assetManager);
+
+        /*bounds = new Texture(Gdx.files.absolute(map.getBoundsTextureUri()));
         if (Gdx.files.absolute(map.getBoundsTextureUri()).exists())
-            player.setBoundsTexture(bounds);
-        System.out.println("Heap bounds:" + Gdx.app.getNativeHeap());
+            player.setBoundsTexture(bounds);*/
         entities.add(player);
         stage.addActor(player);
-        System.out.println("Heap 2:" + Gdx.app.getNativeHeap());
-
+        return player;
     }
 
-    public static void registerHit(Hit hit){
+    public void registerHit(Hit hit){
         stage.addActor(hit);
     }
 
@@ -237,7 +243,7 @@ public class PlayState extends State {
                                 }
                             });
                             button.setName(name);
-                            Text text =new Text(point.title, font);
+                            Text text =new Text(point.title, gsm.getRussianFont());
                             text.setPosition(point.getPosition().x, point.getPosition().y);
                             text.setName(name);
                             stage.addActor(text);
@@ -274,8 +280,8 @@ public class PlayState extends State {
                             }
                         });
                         button.setName(name);
-                        Text text =new Text(point.getTitle(), font);
-                        text.setPosition(point.getPosition().x, point.getPosition().y);
+                        Text text =new Text(point.getTitle(), gsm.getRussianFont());
+                        text.setPosition(point.getX(), point.getY());
                         text.setName(name);
                         stage.addActor(text);
                         userInterface.addActor(button);
@@ -311,28 +317,19 @@ public class PlayState extends State {
 
     @Override
     public void render(SpriteBatch batch) {
-        Gdx.gl.glClearColor(130, 169, 130, 0.5f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+       stage.getBatch().begin();
 
-        stage.getBatch().begin();
-
-        stage.getViewport().getCamera().position.set(player.getPosition(), 0);
+        if (player!=null)
+            stage.getViewport().getCamera().position.set(player.getPosition(), 0);
         if (blur!=null)
             stage.getBatch().draw(blur,wb, hb);
-        stage.getBatch().draw(background, 0, 0);
+        if (background!=null)
+            stage.getBatch().draw(background, 0, 0);
 
         stage.getBatch().end();
         stage.draw();
 
         uistage.draw();
-    }
-
-    boolean contains(String name, Stage stage){
-        for (Actor actor : stage.getActors()) {
-            if (actor.getName()!=null && actor.getName().equals(name))
-                return true;
-        }
-        return false;
     }
 
     @Override
@@ -344,24 +341,26 @@ public class PlayState extends State {
 
     @Override
     public void dispose() {
-        System.out.println("Dispose PlayState");
-        long before = Gdx.app.getNativeHeap();
-        System.out.println("Before: " );
         stage.dispose();
         uistage.dispose();
-        background.dispose();
+        Gdx.app.debug(tag,"after dispose stages, heap " + Gdx.app.getNativeHeap());
+        if (background!=null)
+            background.dispose();
         if (bounds!=null)
             bounds.dispose();
         if (blur!=null)
             blur.dispose();
-        font.dispose();
+        Gdx.app.debug(tag,"after dispose textures, heap " + Gdx.app.getNativeHeap());
+        Gdx.app.debug(tag,"after dispose font, heap " + Gdx.app.getNativeHeap());
         assetManager.dispose();
-        player.dispose();
-        userInterface.dispose();
+        Gdx.app.debug(tag,"after dispose asset manager and font, heap " + Gdx.app.getNativeHeap());
+        if (player!=null)
+            player.dispose();
+        Gdx.app.debug(tag,"after dispose player, heap " + Gdx.app.getNativeHeap());
+        if (userInterface!=null)
+         userInterface.dispose();
+        Gdx.app.debug(tag,"after dispose ui, heap " + Gdx.app.getNativeHeap());
 
-        long after = Gdx.app.getNativeHeap();
-        System.out.println("Play dispose " + (after-before));
-        System.out.println("Total heap loss " + heapLoss);
     }
 
 }

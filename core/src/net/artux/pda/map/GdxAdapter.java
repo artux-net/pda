@@ -1,5 +1,6 @@
 package net.artux.pda.map;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -21,18 +22,12 @@ public class GdxAdapter extends ApplicationAdapter {
 
 	GameStateManager gsm;
 
-	public static final String SPANISH_FONT_NAME = "fonts/goodfish rg.ttf";
-	public static final String RUSSIAN_FONT_NAME = "fonts/Imperial Web.ttf";
-	public static final String RUSSIAN_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;:,{}\"´`'<>";
+	public final String SPANISH_FONT_NAME = "fonts/goodfish rg.ttf";
+	public final String RUSSIAN_FONT_NAME = "fonts/Imperial Web.ttf";
+	public final String RUSSIAN_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;:,{}\"´`'<>";
 
-	private Connection connection;
     public GdxAdapter(PlatformInterface platformInterface, Member member){
 		gsm = new GameStateManager(platformInterface, member);
-	}
-
-	public GdxAdapter(PlatformInterface platformInterface, Member member, Connection connection){
-		gsm = new GameStateManager(platformInterface, member);
-		this.connection = connection;
 	}
 
 
@@ -42,14 +37,13 @@ public class GdxAdapter extends ApplicationAdapter {
 
 	@Override
 	public void create () {
+		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+		Gdx.app.debug("GDX","Before load, heap " + Gdx.app.getNativeHeap());
+		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		batch = new SpriteBatch();
-		if (connection != null) {
-			try {
-				gsm.push(new ArenaState(gsm, batch, connection));
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-		}else gsm.push(new PlayState(gsm, batch));
+		gsm.setRussianFont(generateFont(RUSSIAN_FONT_NAME, RUSSIAN_CHARACTERS));
+		gsm.push(new PlayState(gsm, batch));
+		Gdx.app.debug("GDX", "Loaded, heap " + Gdx.app.getNativeHeap());
 	}
 
 	@Override
@@ -60,7 +54,9 @@ public class GdxAdapter extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+		Gdx.gl.glClearColor(130, 169, 130, 0.5f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
 		gsm.update(Gdx.graphics.getDeltaTime());
 		gsm.render(batch);
 	}
@@ -70,14 +66,16 @@ public class GdxAdapter extends ApplicationAdapter {
     	super.dispose();
 		gsm.dispose();
 		batch.dispose();
+		Gdx.app.debug("GDX","Disposed, heap " + Gdx.app.getNativeHeap());
 		System.gc();
 	}
+
 
 	public static BitmapFont generateFont(String fontName, String characters) {
 		return generateFont(fontName, characters, 24);
 	}
 
-	public static BitmapFont generateFont(String fontName, String characters, int size) {
+	private static BitmapFont generateFont(String fontName, String characters, int size) {
 		FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
 		parameter.characters = characters;
 		parameter.size = size;

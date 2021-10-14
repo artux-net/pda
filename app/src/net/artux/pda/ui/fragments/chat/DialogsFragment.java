@@ -42,10 +42,11 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
 
     private final Gson mGson = new Gson();
     private DialogsAdapter dialogsAdapter;
-    FragmentListBinding binding;
+    private FragmentListBinding binding;
     private WebSocket ws;
-    Gson gson = new Gson();
-    NotificationService myService;
+    private Gson gson = new Gson();
+
+    EchoWebSocketListener listener;
 
     @Nullable
     @Override
@@ -83,18 +84,18 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
         builder.url(BuildConfig.WS_PROTOCOL +"://" + BuildConfig.URL_API + "dialogs ");
         navigationPresenter.setTitle("Chat");
 
-        EchoWebSocketListener listener = new EchoWebSocketListener();
+        listener = new EchoWebSocketListener();
         ws = client.newWebSocket(builder.build(), listener);
 
         client.dispatcher().executorService().shutdown();
 
-        Intent serviceIntent = new Intent(getActivity(), NotificationService.class);
+       /* Intent serviceIntent = new Intent(getActivity(), NotificationService.class);
         ServiceConnection sConn = new ServiceConnection() {
 
             public void onServiceConnected(ComponentName name, IBinder binder) {
                 Timber.d( "MainActivity onServiceConnected");
-                myService = ((NotificationService.MyBinder) binder).getService();
-                myService.setListener(DialogsFragment.this);
+                *//*myService = ((NotificationService.MyBinder) binder).getService();
+                myService.setListener(DialogsFragment.this);*//*
                 //bound = true;
             }
 
@@ -102,7 +103,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
                 Timber.d( "MainActivity onServiceDisconnected");
                 //bound = false;
             }
-        };
+        };*/
 
     }
 
@@ -110,6 +111,16 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
     public void onDestroy() {
         super.onDestroy();
         ws.close(1000, null);
+
+        binding = null;
+        listener = null;
+        ws.cancel();
+    }
+
+    @Override
+    public void onDestroyView() {
+        binding.list.setAdapter(null);
+        super.onDestroyView();
     }
 
     private void updateAdapter(final String text){
@@ -205,4 +216,5 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
             Timber.e(t);
         }
     }
+
 }

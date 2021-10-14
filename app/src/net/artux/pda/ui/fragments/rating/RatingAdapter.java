@@ -21,11 +21,11 @@ import java.util.List;
 public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder> {
 
     List<UserInfo> list = new ArrayList<>();
-    static ItemsAdapter.OnClickListener clickListener;
-    static int ownerId;
+    ItemsAdapter.OnClickListener clickListener;
+    int ownerId;
 
     RatingAdapter(ItemsAdapter.OnClickListener clickListener){
-        RatingAdapter.clickListener = clickListener;
+        this.clickListener = clickListener;
         if(App.getDataManager().getMember()!=null){
             ownerId = App.getDataManager().getMember().getPdaId();
         }
@@ -52,7 +52,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
         notifyDataSetChanged();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder{
 
         ImageView avatar;
         TextView title;

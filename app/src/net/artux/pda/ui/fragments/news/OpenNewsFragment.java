@@ -41,13 +41,13 @@ public class OpenNewsFragment extends BaseFragment {
 
     Article mArticle;
     WebView content;
+    NativeAd oldAd;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_open_news, container, false);
     }
-    NativeAd oldAd;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -225,5 +225,12 @@ public class OpenNewsFragment extends BaseFragment {
 
     void setArticle(Article article){
         mArticle = article;
+    }
+
+
+    @Override
+    public void onDestroy() {
+        content.destroy();
+        super.onDestroy();
     }
 }

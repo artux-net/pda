@@ -26,14 +26,15 @@ import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.app.NotificationService;
 import net.artux.pda.databinding.ActivityMainBinding;
+import net.artux.pda.gdx.CoreStarter;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.activities.hierarhy.MainContract;
 import net.artux.pda.ui.activities.hierarhy.MainPresenter;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.additional.InfoFragment;
-import net.artux.pda.ui.fragments.chat.ChatFragment;
 import net.artux.pda.ui.fragments.chat.DialogsFragment;
+import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.news.NewsFragment;
 import net.artux.pda.ui.fragments.notes.NoteFragment;
 import net.artux.pda.ui.fragments.notes.NotesFragment;
@@ -69,7 +70,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
         presenter = new MainPresenter();
         presenter.attachView(this);
-        App.getRetrofitService().attachView(this);
+        //App.getRetrofitService().attachView(this);
 
         Intent intent = getIntent();
 
@@ -85,12 +86,11 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
                     setFragment(new NewsFragment(), false);
                     break;
             }
-            setAdditionalFragment(new InfoFragment());
         }
         else{
             setFragment(new NewsFragment(), false);
-            setAdditionalFragment(new InfoFragment());
         }
+        setAdditionalFragment(new InfoFragment());
 
 
         if(App.getDataManager().getMember()!=null){
@@ -99,7 +99,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
             startActivity(new Intent(this, LoadingActivity.class));
 
         setListeners();
-        startService(new Intent(this, NotificationService.class));
+        //startService(new Intent(this, NotificationService.class));
     }
 
     @Override
@@ -218,7 +218,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
             setAdditionalFragment(new InfoFragment());
         } else if (id == R.id.profileButton) {
             updateMember();
-            setFragment(new ProfileFragment(), true);
+            setFragment(new UserProfileFragment(), true);
             setAdditionalFragment(new AdditionalFragment());
         } else if (id == R.id.notesButton) {
             setFragment(new NoteFragment(), true);

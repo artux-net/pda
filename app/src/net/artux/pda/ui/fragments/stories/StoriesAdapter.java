@@ -30,12 +30,6 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoryHolder> {
 
         this.stories.add(item);
 
-        StoryItem item1 = new StoryItem();
-        item1.id = -2;
-        item1.title = "Тестирование арены";
-        item1.desc = "..";
-
-        this.stories.add(item1);
         notifyDataSetChanged();
     }
 

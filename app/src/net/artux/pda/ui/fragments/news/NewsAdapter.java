@@ -77,7 +77,6 @@ public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
         @SuppressLint("SetTextI18n")
         public void bind(View mainView, final Article article){
-            System.out.println(new Gson().toJson(article));
             titleView.setText(Html.fromHtml(article.title));
             contentView.setText(Html.fromHtml(article.description));
 
@@ -86,7 +85,10 @@ public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
             dateView.setText(outputFormat.format(new Date(article.published)));
             mainView.setOnClickListener(v -> ViewHolder.this.onClick(article));
-            Glide.with(imageView.getContext()).load(article.image).placeholder(R.mipmap.ic_launcher).into(imageView);
+            Glide
+                    .with(imageView.getContext())
+                    .load(article.image)
+                    .into(imageView);
         }
 
         @Override

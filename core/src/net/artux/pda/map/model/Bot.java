@@ -1,5 +1,7 @@
 package net.artux.pda.map.model;
 
+import static com.badlogic.gdx.math.MathUtils.random;
+
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -10,27 +12,29 @@ import net.artux.pdalib.profile.items.Weapon;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.badlogic.gdx.math.MathUtils.random;
-import static net.artux.pda.map.states.PlayState.registerHit;
-
 public class Bot extends Entity {
 
     private Vector2 target;
-    private final Spawn spawn;
+    private Spawn spawn;
     float timer;
 
     public Bot(int id, final Vector2 position, final Spawn spawn, AssetManager skin, Mob mob, Player player) {
-        super(position);
+        super();
+
+        setStartPosition(position);
+        setPosition(position.x, position.y);
+
         this.id = id;
         MOVEMENT = 0.2f;
         velocity = new Vector2(0,0);
-
-        if (mob.group < 0 || player.member.relations.get(mob.group)<-2 )
-            sprite = new Sprite(skin.get("red.png", Texture.class));
-        else if (player.member.relations.get(mob.group)>2)
-            sprite = new Sprite(skin.get("green.png", Texture.class));
-        else
-            sprite = new Sprite(skin.get("yellow.png", Texture.class));
+        if (player.member != null) {
+            if (mob.group < 0 || player.member.relations.get(mob.group) < -2)
+                sprite = new Sprite(skin.get("red.png", Texture.class));
+            else if (player.member.relations.get(mob.group) > 2)
+                sprite = new Sprite(skin.get("green.png", Texture.class));
+            else
+                sprite = new Sprite(skin.get("yellow.png", Texture.class));
+        } else sprite = new Sprite(skin.get("yellow.png", Texture.class));
         setSize(8, 8);
         sprite.setOriginCenter();
         Weapon w = new Weapon();
@@ -96,7 +100,7 @@ public class Bot extends Entity {
 
     public void hit(float dt) {
         if (timer>0.1f) {
-            registerHit(new Hit(Bot.this, getWeapon(), target));
+            //registerHit(new Hit(Bot.this, getWeapon(), target));
             timer = 0;
         }else {
             timer += dt;

@@ -1,7 +1,10 @@
 package net.artux.pda.ui.fragments.profile;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+
+import androidx.core.content.res.ResourcesCompat;
 
 import net.artux.pda.R;
 import net.artux.pda.app.App;
@@ -48,16 +51,12 @@ public class ProfileHelper {
     }
 
     public static Drawable getAvatar(Profile profile, Context context) {
-        if (isInteger(profile.getAvatar()))
-            return context.getResources().getDrawable(App.avatars[Integer.parseInt(profile.getAvatar())]);
-        else
-            //TODO: avatar with no id
-            return null;
+        return getAvatar(context, profile.getAvatar());
     }
 
     public static Drawable getAvatar(Context context, String avatar) {
-        if (isInteger(avatar))
-            return context.getResources().getDrawable(App.avatars[Integer.parseInt(avatar)]);
+        if (isInteger(avatar) && context.getResources()!=null)
+            return ResourcesCompat.getDrawable(context.getResources(), App.avatars[Integer.parseInt(avatar)], null);
         else
             //TODO: avatar with no id
             return null;

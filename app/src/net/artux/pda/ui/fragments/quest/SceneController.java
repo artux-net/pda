@@ -60,6 +60,7 @@ public class SceneController implements Serializable {
 
     public SceneController(QuestActivity questActivity, int story, int chapterId, int stageId) {
         this.questActivity = questActivity;
+        questActivity.setLoading(true);
         loadChapter(story, chapterId, stageId);
     }
 
@@ -103,9 +104,10 @@ public class SceneController implements Serializable {
     private void synchronize(Stage stage, int id){
         ArrayList<String> arrayList = new ArrayList<>();
         arrayList.add("story:"+story+":"+ chapterId +":"+id);
-        if(stage.getActions()!=null) {
-            stage.getActions().put("set", arrayList);
-            App.getRetrofitService().getPdaAPI().synchronize(stage.getActions()).enqueue(new Callback<Member>() {
+        HashMap<String, List<String>> actions = stage.getActions();
+        if (actions == null) actions = new HashMap<>();
+        actions.put("set", arrayList);
+        App.getRetrofitService().getPdaAPI().synchronize(actions).enqueue(new Callback<Member>() {
                 @Override
                 public void onResponse(Call<Member> call, Response<Member> response) {
                     Member member = response.body();
@@ -119,26 +121,8 @@ public class SceneController implements Serializable {
                     Timber.d( "Quest: false to set progress");
                     Timber.e(t);
                 }
-            });
-        }else {
-            HashMap<String, List<String>> actions = new HashMap<>();
-            actions.put("set", arrayList);
-            App.getRetrofitService().getPdaAPI().synchronize(actions).enqueue(new Callback<Member>() {
-                @Override
-                public void onResponse(Call<Member> call, Response<Member> response) {
-                    Member member = response.body();
-                    if (member != null) {
-                        App.getDataManager().setMember(member);
-                    }
-                }
+        });
 
-                @Override
-                public void onFailure(Call<Member> call, Throwable t) {
-                    Timber.d( "Quest: false to set progress");
-                    Timber.e(t);
-                }
-            });
-        }
     }
 
     boolean isLoading = false;
@@ -197,11 +181,13 @@ public class SceneController implements Serializable {
                     Quest0Scene quest0Scene = new Quest0Scene();
                     quest0Scene.setStage(actualStage);
                     mFragmentTransaction.replace(R.id.containerView, quest0Scene);
+                    questActivity.setLoading(false);
                     break;
                 case 1:
                     Quest1Scene quest1Scene = new Quest1Scene();
                     quest1Scene.setStage(actualStage);
                     mFragmentTransaction.replace(R.id.containerView, quest1Scene);
+                    questActivity.setLoading(false);
                     break;
                 case 4:
                     if (actualStage.getData().containsKey("map")) {

@@ -7,6 +7,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 
 import timber.log.Timber;
 
@@ -66,4 +68,5 @@ public abstract class BaseFragment extends Fragment implements FragmentNavigatio
     public void receiveData(Bundle data) {
 
     }
+
 }

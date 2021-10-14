@@ -42,8 +42,6 @@ public class Profile {
         this.xp = member.getXp();
         this.location = member.getLocation();
         this.registration = member.getRegistration();
-        this.friends = member.getFriends().size();
-        this.subs = member.getRequests().size();
         this.relations = member.getRelations();
     }
 
@@ -58,11 +56,8 @@ public class Profile {
         this.xp = member.getXp();
         this.location = member.getLocation();
         this.registration = member.getRegistration();
-        this.friends = member.getFriends().size();
-        this.subs = member.getRequests().size();
         this.relations = member.getRelations();
 
-        setFriendStatus(member, by);
     }
 
     public String getLogin() {
@@ -115,18 +110,6 @@ public class Profile {
 
     public List<Integer> getRelations() {
         return relations;
-    }
-
-    private void setFriendStatus(Member member, Member by) {
-        if (member.getRequests().contains(by.getPdaId())) {
-            friendStatus = 3;
-        } else if (by.getRequests().contains(pdaId)) {
-            friendStatus = 2;
-        } else if (member.getFriends().contains(by.getPdaId())) {
-            friendStatus = 1;
-        } else {
-            friendStatus = 0;
-        }
     }
 
     public int getFriendStatus() {

@@ -5,16 +5,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
-import net.artux.pdalib.arena.ServerEntity;
 import net.artux.pdalib.profile.items.Armor;
 import net.artux.pdalib.profile.items.Weapon;
 
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import static com.badlogic.gdx.math.MathUtils.random;
-import static net.artux.pda.map.states.PlayState.registerHit;
 
 public abstract class Entity extends Actor {
 
@@ -39,11 +33,12 @@ public abstract class Entity extends Actor {
     private Weapon weapon2;
     int weapon = 0;
 
-    public Entity(Vector2 position) {
-        startPosition = position;
-        setX(position.x);
-        setY(position.y);
+    public Entity() {
         setSize(32,32);
+    }
+
+    public void setStartPosition(Vector2 startPosition) {
+        this.startPosition = startPosition;
     }
 
     @Override
@@ -62,9 +57,6 @@ public abstract class Entity extends Actor {
 
     @Override
     public void act(float delta) {
-        System.out.println("moved by " + velocity.x * MOVEMENT +" : "+  velocity.y * MOVEMENT);
-        System.out.println("moved by 60 times " + 60 * velocity.x * MOVEMENT +" : "+  60 * velocity.y * MOVEMENT);
-        System.out.println("moved by " + 1/delta + " times " + 1/delta * velocity.x * MOVEMENT +" : "+ 1/delta * velocity.y * MOVEMENT);
         moveBy(velocity.x * MOVEMENT, velocity.y * MOVEMENT);
     }
 

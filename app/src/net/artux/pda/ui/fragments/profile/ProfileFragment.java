@@ -32,11 +32,9 @@ import timber.log.Timber;
 
 public class ProfileFragment extends BaseFragment implements View.OnClickListener {
 
-    ImageView avatar;
     private Profile profile;
     RecyclerView recyclerView;
     GroupsAdapter groupsAdapter = new GroupsAdapter();
-    View mainView;
 
     @Nullable
     @Override
@@ -47,7 +45,6 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mainView = view;
         if (navigationPresenter!=null) {
             navigationPresenter.setTitle(getString(R.string.profile));
             navigationPresenter.setLoadingState(true);
@@ -64,11 +61,11 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         }
         if (getArguments()!=null)
             pda = getArguments().getInt("pdaId", App.getDataManager().getMember().getPdaId());
-        update(pda);
+        update(pda, view);
 
     }
     
-    void update(int pdaId){
+    void update(int pdaId, View view){
         App.getRetrofitService().getPdaAPI().getProfile(pdaId).enqueue(new Callback<Profile>() {
             @Override
             public void onResponse(Call<Profile> call, Response<Profile> response) {
@@ -76,7 +73,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                 if (navigationPresenter!=null)
                     navigationPresenter.setLoadingState(false);
                 if (profile != null)
-                    setProfile(profile, mainView);
+                    setProfile(profile, view);
             }
 
             @Override
@@ -87,38 +84,44 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         });
     }
 
-    public void setProfile(Profile profile, View mainView) {
-        this.profile = profile;
-        avatar = mainView.findViewById(R.id.profile_avatar);
-        avatar.setImageDrawable(ProfileHelper.getAvatar(profile, getContext()));
-        ((TextView)mainView.findViewById(R.id.profile_login)).setText(profile.getLogin());
-        ((TextView)mainView.findViewById(R.id.profile_group)).setText(getString(R.string.group_p, ProfileHelper.getGroup(profile, getContext())));
-        ((TextView)mainView.findViewById(R.id.profile_location)).setText(getString(R.string.location_p, profile.getLocation()));
-        ((TextView)mainView.findViewById(R.id.profile_time)).setText(getString(R.string.in_zone_time_p, ProfileHelper.getDays(profile)));
-        ((TextView)mainView.findViewById(R.id.profile_rang)).setText(getString(R.string.rang_p, ProfileHelper.getRang(profile,mainView.getContext())));
-        ((TextView)mainView.findViewById(R.id.profile_rating)).setText(getString(R.string.rating_p, String.valueOf(profile.getXp())));
+    @Override
+    public void onDestroyView() {
+        recyclerView.setAdapter(null);
+        super.onDestroyView();
+    }
 
-        Button friends = mainView.findViewById(R.id.profile_friends);
-        friends.setText(mainView.getContext().getString(R.string.friends, String.valueOf(profile.getFriends())));
+    public void setProfile(Profile profile, View view1) {
+        this.profile = profile;
+        ImageView avatar = view1.findViewById(R.id.profile_avatar);
+        avatar.setImageDrawable(ProfileHelper.getAvatar(profile, getContext()));
+        ((TextView)view1.findViewById(R.id.profile_login)).setText(profile.getLogin());
+        ((TextView)view1.findViewById(R.id.profile_group)).setText(getString(R.string.group_p, ProfileHelper.getGroup(profile, getContext())));
+        ((TextView)view1.findViewById(R.id.profile_location)).setText(getString(R.string.location_p, profile.getLocation()));
+        ((TextView)view1.findViewById(R.id.profile_time)).setText(getString(R.string.in_zone_time_p, ProfileHelper.getDays(profile)));
+        ((TextView)view1.findViewById(R.id.profile_rang)).setText(getString(R.string.rang_p, ProfileHelper.getRang(profile,view1.getContext())));
+        ((TextView)view1.findViewById(R.id.profile_rating)).setText(getString(R.string.rating_p, String.valueOf(profile.getXp())));
+
+        Button friends = view1.findViewById(R.id.profile_friends);
+        friends.setText(view1.getContext().getString(R.string.friends, String.valueOf(profile.getFriends())));
         friends.setOnClickListener(this);
-        Button requests = mainView.findViewById(R.id.profile_requests);
-        requests.setText(mainView.getContext().getString(R.string.subscribers, String.valueOf(profile.getSubs())));
+        Button requests = view1.findViewById(R.id.profile_requests);
+        requests.setText(view1.getContext().getString(R.string.subscribers, String.valueOf(profile.getSubs())));
         requests.setOnClickListener(this);
 
         groupsAdapter.setRelations(profile.getRelations());
         recyclerView.setVisibility(View.VISIBLE);
-        mainView.findViewById(R.id.viewMessage).setVisibility(View.GONE);
+        view1.findViewById(R.id.viewMessage).setVisibility(View.GONE);
 
-        Button friendButton = mainView.findViewById(R.id.profile_friend);
-        Button subsButton = mainView.findViewById(R.id.requests);
-        Button messageButton = mainView.findViewById(R.id.write_message);
+        Button friendButton = view1.findViewById(R.id.profile_friend);
+        Button subsButton = view1.findViewById(R.id.requests);
+        Button messageButton = view1.findViewById(R.id.write_message);
         messageButton.setOnClickListener(this);
         if (App.getDataManager().getMember().getPdaId()!=profile.getPdaId()) {
             switch (profile.getFriendStatus()) {
                 case 0:
                     friendButton.setText(R.string.add_friend);
                     friendButton.setOnClickListener(view -> {
-                        PdaAlertDialog pdaAlertDialog = new PdaAlertDialog(getContext(), (ViewGroup) mainView, R.style.AlertDialogStyle);
+                        PdaAlertDialog pdaAlertDialog = new PdaAlertDialog(getContext(), (ViewGroup) view1, R.style.AlertDialogStyle);
                         pdaAlertDialog.setTitle(R.string.add_friend_q);
                         pdaAlertDialog.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
                             @Override
@@ -129,7 +132,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                                         Status status = response.body();
                                         if (status!=null)
                                             Toast.makeText(getContext(), status.getDescription(), Toast.LENGTH_SHORT).show();
-                                        update(profile.getPdaId());
+                                        update(profile.getPdaId(), view1);
                                     }
 
                                     @Override
@@ -163,7 +166,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                                         Status status = response.body();
                                         if (status!=null)
                                             Toast.makeText(getContext(), status.getDescription(), Toast.LENGTH_SHORT).show();
-                                        update(profile.getPdaId());
+                                        update(profile.getPdaId(), view1);
                                     }
 
                                     @Override
@@ -197,7 +200,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                                         Status status = response.body();
                                         if (status!=null)
                                             Toast.makeText(getContext(), status.getDescription(), Toast.LENGTH_SHORT).show();
-                                        update(profile.getPdaId());
+                                        update(profile.getPdaId(), view1);
                                     }
 
                                     @Override
@@ -230,7 +233,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                                         Status status = response.body();
                                         if (status!=null)
                                             Toast.makeText(getContext(), status.getDescription(), Toast.LENGTH_SHORT).show();
-                                        update(profile.getPdaId());
+                                        update(profile.getPdaId(), view1);
                                     }
 
                                     @Override
@@ -286,4 +289,5 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                 break;
         }
     }
+
 }

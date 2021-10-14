@@ -78,7 +78,7 @@
     <string name="in_zone_time_p">In zone: %1$s</string>
     <string name="group_p">Group: %1$s</string>
     <string name="rang_p">Rang: %1$s</string>
-    <string name="jobs_p" translatable="false">Заданий: %1$s</string>
+    <string name="jobs_p">Jobs: %1$s</string>
     <string name="rating_p">Rating: %1$s</string>
     <string name="location_p">Location: %1$s</string>
 
@@ -148,5 +148,5 @@
     <string name="quit">Quit</string>
     <string name="empty">Empty here..</string>
     <string name="note_isnt_selected">Note isn\'t selected.</string>
-    <string name="subs">Запросы дружбы -</string>
+    <string name="subs">Friend requests - %1$s</string>
 </resources>

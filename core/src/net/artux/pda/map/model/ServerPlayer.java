@@ -22,7 +22,7 @@ public class ServerPlayer extends Player {
 
 
     public ServerPlayer(State state, Vector2 playerPosition, Member member, AssetManager skin) {
-        super(state, playerPosition, member, skin);
+        super(state, member, skin);
     }
 
     public void setNextPosition(float x, float y) {

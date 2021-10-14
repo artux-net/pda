@@ -6,10 +6,6 @@ import android.content.SharedPreferences;
 import net.artux.pdalib.LoginUser;
 import net.artux.pdalib.Member;
 
-import java.security.SecureRandom;
-import java.util.Base64;
-
-import at.favre.lib.armadillo.Armadillo;
 import okhttp3.Credentials;
 
 public class DataManager {

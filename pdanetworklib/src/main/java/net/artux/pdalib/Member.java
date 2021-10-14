@@ -25,8 +25,6 @@ public class Member {
     private String location;
     private Data data;
     public List<String> dialogs;
-    public List<String> friends;
-    public List<String> requests;
     public List<Integer> relations = new ArrayList<>();
     public List<Note> notes = new ArrayList<>();
     public List<Integer> achievements = new ArrayList<>();
@@ -139,14 +137,6 @@ public class Member {
 
     public List<String> getDialogs() {
         return dialogs;
-    }
-
-    public List<String> getFriends() {
-        return friends;
-    }
-
-    public List<String> getRequests() {
-        return requests;
     }
 
     public void setMoney(int money) {
