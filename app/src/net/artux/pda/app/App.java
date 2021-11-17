@@ -85,8 +85,8 @@ public class App extends Application {
             R.drawable.g4,
             R.drawable.g5,
             R.drawable.g6,
-            R.drawable.g6,//8
-            R.drawable.g6//9
+            R.drawable.g7,
+            R.drawable.g8
     };
 
 

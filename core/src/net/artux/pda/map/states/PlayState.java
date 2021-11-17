@@ -2,22 +2,18 @@ package net.artux.pda.map.states;
 
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.google.gson.Gson;
@@ -41,9 +37,8 @@ import net.artux.pdalib.profile.Story;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import javax.swing.event.ChangeEvent;
 
 
 public class PlayState extends State {
@@ -127,11 +122,11 @@ public class PlayState extends State {
             JsonReader reader = new JsonReader(Gdx.files.internal("mobs").reader());
             List<Mob> data = gson.fromJson(reader, REVIEW_TYPE);
 
-            /*for (Spawn spawn : map.getSpawns()){
+            for (Spawn spawn : map.getSpawns()){
                 spawn.create(this, assetManager, data, player, gsm);
-            }*/
+            }
 
-            for(Point point: map.getPoints()) {
+           for(Point point: map.getPoints()) {
                 if (getMember()!=null && Checker.check(point.getCondition(), getMember()))
                     if (point.getData().containsKey("chapter")){
                         int storyId = Integer.parseInt(getMember().getData().getTemp().get("currentStory"));
@@ -162,7 +157,6 @@ public class PlayState extends State {
         ((OrthographicCamera)stage.getCamera()).zoom -= 0.5f;
 
 
-
         userInterface = new UserInterface(gsm, player, assetManager);
         uistage.addActor(userInterface);
     }
@@ -174,12 +168,12 @@ public class PlayState extends State {
     }
 
     private Player initPlayer(){
-
+        Map map = (Map) gsm.get("map");
         Player player = new Player(this, getMember(), assetManager);
 
-        /*bounds = new Texture(Gdx.files.absolute(map.getBoundsTextureUri()));
+        bounds = new Texture(Gdx.files.absolute(map.getBoundsTextureUri()));
         if (Gdx.files.absolute(map.getBoundsTextureUri()).exists())
-            player.setBoundsTexture(bounds);*/
+            player.setBoundsTexture(bounds);
         entities.add(player);
         stage.addActor(player);
         return player;
@@ -206,6 +200,15 @@ public class PlayState extends State {
         gsm.removeInputProcessor(uistage);
     }
 
+    HashMap<String, String> preferData = null;
+    ChangeListener dataListener = new ChangeListener() {
+        @Override
+        public void changed(ChangeEvent event, Actor actor) {
+            if (preferData !=null)
+                gsm.getPlatformInterface().send(preferData);
+        }
+    };
+
     @Override
     public void update(float dt) {
         uistage.act(dt);
@@ -228,22 +231,18 @@ public class PlayState extends State {
                     }
                 }
             }else if (actor instanceof Quest){
-                final Quest point  = (Quest) actor;
+                Quest point  = (Quest) actor;
                 String name = "q-"+point.hashCode();
+                preferData = point.getData();
                 if (point.getPosition().dst(player.getPosition()) < 35f) {
-                    if (point.type!=1 && point.type!=3) {
+                    if (point.getType()!=1 && point.getType()!=3) {
                         if (!userInterface.contains(name)) {
                             Button button = new Button(textButtonStyle);
                             button.setPosition(w - w / 12, 2.5f * h / 12);
                             button.setSize(h / 10, h / 10);
-                            button.addListener(new ChangeListener() {
-                                @Override
-                                public void changed(ChangeEvent event, Actor actor) {
-                                    gsm.getPlatformInterface().send(point.getData());
-                                }
-                            });
+                            button.addListener(dataListener);
                             button.setName(name);
-                            Text text =new Text(point.title, gsm.getRussianFont());
+                            Text text = new Text(point.getTitle(), gsm.getRussianFont());
                             text.setPosition(point.getPosition().x, point.getPosition().y);
                             text.setName(name);
                             stage.addActor(text);
@@ -253,32 +252,20 @@ public class PlayState extends State {
                         gsm.getPlatformInterface().send(point.getData());
                     }
                 } else {
-                    for(Actor buttons : userInterface.getChildren()){
-                        if(buttons.getName()!=null && buttons.getName().equals(name)) {
-                            buttons.remove();
-                        }
-                    }
-                    for(Actor buttons : stage.getActors()){
-                        if(buttons.getName()!=null && buttons.getName().equals(name)) {
-                            buttons.remove();
-                        }
-                    }
+                    removeActor(stage.getActors(), name);
+                    removeActor(userInterface.getChildren(), name);
                 }
 
             }else if (actor instanceof TransferPoint){
-                final TransferPoint point  = (TransferPoint) actor;
+                TransferPoint point  = (TransferPoint) actor;
                 String name = "t-"+point.hashCode();
+                preferData = point.getData();
                 if (point.getPosition().dst(player.getPosition()) < 35f) {
                     if (!userInterface.contains(name)) {
                         Button button = new Button(textButtonStyle);
                         button.setPosition(w - w/12, 2.5f * h / 12);
                         button.setSize(h/10,h/10);
-                        button.addListener(new ChangeListener() {
-                            @Override
-                            public void changed(ChangeEvent event, Actor actor) {
-                                gsm.getPlatformInterface().send(point.getData());
-                            }
-                        });
+                        button.addListener(dataListener);
                         button.setName(name);
                         Text text =new Text(point.getTitle(), gsm.getRussianFont());
                         text.setPosition(point.getX(), point.getY());
@@ -287,16 +274,8 @@ public class PlayState extends State {
                         userInterface.addActor(button);
                     }
                 } else {
-                    for(Actor buttons : userInterface.getChildren()){
-                        if(buttons.getName()!=null && buttons.getName().equals(name)) {
-                            buttons.remove();
-                        }
-                    }
-                    for(Actor buttons : stage.getActors()){
-                        if(buttons.getName()!=null && buttons.getName().equals(name)) {
-                            buttons.remove();
-                        }
-                    }
+                    removeActor(stage.getActors(), name);
+                    removeActor(userInterface.getChildren(), name);
                 }
             }
         }
@@ -313,6 +292,14 @@ public class PlayState extends State {
                         entity.setEnemy(entities.get(i));
                         entities.set(j, entity);
                     }
+    }
+
+    void removeActor(Array<Actor> actors, String actorName){
+        for(Actor actor : actors){
+            if(actor.getName()!=null && actor.getName().equals(actorName)) {
+                actor.remove();
+            }
+        }
     }
 
     @Override

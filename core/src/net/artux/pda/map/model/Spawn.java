@@ -3,6 +3,7 @@ package net.artux.pda.map.model;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import net.artux.pda.map.states.GameStateManager;
@@ -36,6 +37,28 @@ public class Spawn {
         return position;
     }
 
+    ClickListener listener = new ClickListener(){
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+            super.clicked(event, x, y);
+            /*Text text = new Text(finalMob.name, gsm.getRussianFont());
+            text.setPosition(position.x, position.y);
+            System.out.println("Add text " + text);
+            playState.stage.addActor(text);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(5000);
+                        text.remove();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();*/
+        }
+    };
+
     public void create(final PlayState playState, AssetManager skin, List<Mob> mobs, Player player, final GameStateManager gsm){
         getPosition();
 
@@ -48,31 +71,11 @@ public class Spawn {
             }
         }
         for(int i=0;i<n;i++) {
-            final Bot bot = new Bot(id, getRandomPoint(random), this, skin, mob, player);
+            Bot bot = new Bot(id, getRandomPoint(random), this, skin, mob, player);
             bots.add(bot);
             playState.entities.add(bot);
-            final Mob finalMob = mob;
-            bot.addListener(new ClickListener(){
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    super.clicked(event, x, y);
-                    final Text text = new Text(finalMob.name, gsm.getRussianFont());
-                    text.setPosition(position.x, position.y);
-                    System.out.println("Add text " + text);
-                    playState.stage.addActor(text);
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Thread.sleep(5000);
-                                text.remove();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
-                }
-            });
+            //Mob finalMob = mob;
+            //bot.addListener();
             playState.stage.addActor(bot);
         }
     }

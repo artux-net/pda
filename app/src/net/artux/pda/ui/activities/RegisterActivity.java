@@ -108,7 +108,7 @@ public class RegisterActivity extends AppCompatActivity {
         boolean cancel = false;
         View focusView = null;
 
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
 
@@ -136,6 +136,7 @@ public class RegisterActivity extends AppCompatActivity {
         } else {
             mRegisterUser = new RegisterUser(mLoginView.getText().toString(),
                     mNameView.getText().toString(),
+                    mNicknameView.getText().toString(),
                     mEmailView.getText().toString(),
                     mPasswordView.getText().toString(),
                     avatarsAdapter.getSelected());

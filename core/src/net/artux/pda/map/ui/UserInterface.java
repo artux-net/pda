@@ -12,11 +12,14 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.model.Map;
@@ -121,13 +124,13 @@ public class UserInterface extends Group implements Disposable {
         addActor(runButton);
         addActor(pauseButton);
 
-        healthBar = new HealthBar(player);
+        /*healthBar = new HealthBar(player);
         healthBar.setHeight(h/20);
         healthBar.setWidth(w/4);
         healthBar.setX(w/36);
         healthBar.setY(h-70);
         healthBar.setScale(1);
-        addActor(healthBar);
+        addActor(healthBar);*/
 
         initMenu(gsm.getRussianFont());
         addActor(menuButton);
@@ -138,18 +141,20 @@ public class UserInterface extends Group implements Disposable {
 
     void initMenu(BitmapFont font){
         menu = new Group();
+        Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
 
         bgPixmap = new Pixmap(1,1, Pixmap.Format.RGB888);
         bgPixmap.setColor(Color.rgb888(26/255,27/255,29/255));
         bgPixmap.fill();
         texture = new Texture(bgPixmap);
         Image image = new Image(texture);
-        image.setSize(w/4, h);
+        image.setSize(w/4 + 20, h);
         menu.addActor(image);
-        Text text =new Text("Задания", font);
+        Label text = new Label("Задания", new Label.LabelStyle(font, Color.WHITE));
         text.setX(w/4-200);
-        text.setY(h/1.5f);
+        text.setY(h-100);
         menu.addActor(text);
+
 
         Table menuTable = new Table();
 
@@ -157,26 +162,35 @@ public class UserInterface extends Group implements Disposable {
         for (final Point point : ((Map)gsm.get("map")).getPoints()) {
             if (point.type < 2 || point.type > 3)
                 if (gsm.getMember()!=null && Checker.check(point.getCondition(), gsm.getMember())){
-                    menuTable.row();
                     if (point.getData().containsKey("chapter") && gsm.getMember()!=null) {
                         int storyId = Integer.parseInt(gsm.getMember().getData().getTemp().get("currentStory"));
                         for (Story story : gsm.getMember().getData().getStories()) {
                             if (story.getStoryId() == storyId
                                     && (Integer.parseInt(point.getData().get("chapter")) == story.getLastChapter()
                                     || Integer.parseInt(point.getData().get("chapter")) == 0)) {
-                                Text label = new Text(point.getTitle(), font);
-                                label.addListener(new ClickListener() {
-                                    @Override
-                                    public void clicked(InputEvent event, float x, float y) {
-                                        super.clicked(event, x, y);
-                                        player.setDirection(point.getPosition());
-                                    }
-                                });
-                                menuTable.add(label);
+                                    menuTable.row();
+                                    Label label = new Label(point.getTitle(), labelStyle);
+                                    label.setWrap(true);
+                                    label.setAlignment(Align.center);
+                                    label.addListener(new ClickListener() {
+                                        @Override
+                                        public void clicked(InputEvent event, float x, float y) {
+                                            super.clicked(event, x, y);
+                                            player.setDirection(point.getPosition());
+                                        }
+                                    });
+
+
+                                    Pixmap labelColor = new Pixmap((int)label.getWidth(), (int)label.getHeight(), Pixmap.Format.RGB888);
+                                    labelColor.setColor(Color.DARK_GRAY);
+                                    labelColor.fill();
+                                    label.getStyle().background = new Image(new Texture(labelColor)).getDrawable();
+
+                                    menuTable.add(label).width(w/4 - 20).pad(10);
                             }
                         }
                     } else {
-                        Text label = new Text(point.getTitle(), font);
+                        Label label = new Label(point.getTitle(), labelStyle);
                         label.addListener(new ClickListener() {
                             @Override
                             public void clicked(InputEvent event, float x, float y) {
@@ -184,12 +198,15 @@ public class UserInterface extends Group implements Disposable {
                                 player.setDirection(point.getPosition());
                             }
                         });
-                        menuTable.add(label);
+                        menuTable.add(label).width(w/4);
                     }
                 }
         }
-        menuTable.setSize(w/4, h);
-        menu.addActor(menuTable);
+
+        ScrollPane scrollPane = new ScrollPane(menuTable);
+        scrollPane.setSize(w/4, h - 100);
+        scrollPane.setScrollbarsVisible(true);
+        menu.addActor(scrollPane);
 
         this.menu.setX(w);
         addActor(menu);

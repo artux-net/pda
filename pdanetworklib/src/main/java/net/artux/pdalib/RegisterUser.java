@@ -4,24 +4,18 @@ public class RegisterUser {
 
     private String login;
     private String name;
+    private String nickname;
     private String email;
     private String password;
     private String avatar;
 
-    public RegisterUser(String login, String name, String email, String password, int avatarId) {
+    public RegisterUser(String login, String name, String nickname, String email, String password, int avatarId) {
         this.login = login;
         this.name = name;
+        this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.avatar = String.valueOf(avatarId);
-    }
-
-    public RegisterUser(String login, String name, String email, String password, String avatar) {
-        this.login = login;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.avatar = avatar;
     }
 
 

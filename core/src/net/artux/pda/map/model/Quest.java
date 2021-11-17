@@ -11,11 +11,11 @@ import java.util.HashMap;
 
 public class Quest extends Actor {
 
-    public int type;
-    public String title;
-    Sprite sprite;
-    Vector2 position;
-    public HashMap<String, String> data;
+    private int type;
+    private String title;
+    private Sprite sprite;
+    private Vector2 position;
+    private HashMap<String, String> data;
 
     public Quest(Point point, AssetManager skin){
         type = point.type;
@@ -44,6 +44,13 @@ public class Quest extends Actor {
         data = point.getData();
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public int getType() {
+        return type;
+    }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {

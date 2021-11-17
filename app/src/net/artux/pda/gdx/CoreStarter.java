@@ -54,31 +54,31 @@ public class CoreStarter extends AndroidApplication implements PlatformInterface
     public void send(final HashMap<String, String> data) {
         runOnUiThread(() -> {
             if (data!=null) {
+                Timber.d("Got command: %s", data.toString());
+                Intent intent = null;
                 if(data.containsKey("chapter")){
-                    Intent intent = new Intent(this, QuestActivity.class);
+                    intent = new Intent(this, QuestActivity.class);
                     intent.putExtra("chapter", Integer.parseInt(data.get("chapter")));
                     intent.putExtra("stage", Integer.parseInt(data.get("stage")));
                     Timber.d("Start QuestActivity - %s - %s", data.get("chapter"), data.get("stage"));
-                    startActivity(intent);
-                    finish();
                 }else if (data.containsKey("seller")){
-                    Intent intent = new Intent(this, SellerActivity.class);
+                    intent = new Intent(this, SellerActivity.class);
                     intent.putExtra("seller", Integer.parseInt(data.get("seller")));
                     intent.putExtra("map", Integer.parseInt(data.get("map")));
                     intent.putExtra("pos", data.get("pos"));
                     Timber.d("Start seller activity - %s", data.get("seller"));
-                    startActivity(intent);
-                    finish();
                 }else if (data.containsKey("map")){
-                    Intent intent = new Intent(this, QuestActivity.class);
+                    intent = new Intent(this, QuestActivity.class);
                     intent.putExtra("map", Integer.parseInt(data.get("map")));
                     intent.putExtra("pos", data.get("pos"));
                     Timber.d("Start map - %s, position: %s", data.get("map"), data.get("pos"));
-                    startActivity(intent);
-                    finish();
                 }else if (data.containsKey("openPda")){
                     Timber.d("Start MainActivity");
-                    startActivity(new Intent(this, MainActivity.class));
+                    intent = new Intent(this, MainActivity.class);
+                }
+
+                if (intent != null){
+                    startActivity(intent);
                     finish();
                 }
             }

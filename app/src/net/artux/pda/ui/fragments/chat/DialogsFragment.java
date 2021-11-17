@@ -123,7 +123,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
         super.onDestroyView();
     }
 
-    private void updateAdapter(final String text){
+    private void updateAdapter(String text){
         if (getActivity()!=null)
             getActivity().runOnUiThread(() -> {
                 Type listType = new TypeToken<ArrayList<Dialog>>(){}.getType();

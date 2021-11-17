@@ -137,7 +137,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         fragmentTransaction
                 .replace(R.id.containerView,fragment)
                 .commit();
-        Timber.d("Set fragment:%s", fragment.getClass().getName());
+        Timber.d("Set fragment: %s", fragment.getClass().getSimpleName());
     }
 
     @Override
@@ -148,7 +148,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
                 .beginTransaction()
                 .replace(R.id.rightContainer,fragment)
                 .commit();
-        Timber.d("Set second fragment:%s", fragment.getClass().getName());
+        Timber.d("Set second fragment: %s", fragment.getClass().getSimpleName());
     }
 
 
@@ -185,7 +185,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     }
 
     @Override
-    public void setLoadingState(final boolean loadingState){
+    public void setLoadingState(boolean loadingState){
         runOnUiThread(() -> Glide.with(getApplicationContext())
             .asGif()
             .load(Uri.parse("file:///android_asset/loadCube.gif"))

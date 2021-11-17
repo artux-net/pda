@@ -29,4 +29,5 @@ public class Text extends Actor {
     public String toString() {
         return text;
     }
+
 }

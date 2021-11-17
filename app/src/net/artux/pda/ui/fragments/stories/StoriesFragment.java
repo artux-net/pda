@@ -64,11 +64,11 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             StoriesAdapter adapter = new StoriesAdapter( StoriesFragment.this);
             binding.list.setAdapter(adapter);
 
-            Stories stories= GsonProvider.getInstance().fromJson(App.getDataManager().getString("stories"), Stories.class);
-            if(stories!=null){
+            Stories cacheStories= GsonProvider.getInstance().fromJson(App.getDataManager().getString("stories"), Stories.class);
+            if(cacheStories!=null){
                 binding.list.setVisibility(View.VISIBLE);
                 binding.viewMessage.setVisibility(View.GONE);
-                adapter.setStories(stories.get());
+                adapter.setStories(cacheStories.get());
             }
 
             App.getRetrofitService().getPdaAPI().getStories().enqueue(new Callback<Stories>() {
@@ -77,11 +77,13 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 public void onResponse(Call<Stories> call, Response<Stories> response) {
                     Stories stories = response.body();
                     navigationPresenter.setLoadingState(false);
-                    if (stories != null) {
+                    if (((stories != null && cacheStories != null && stories.hashCode() != cacheStories.hashCode())
+                            || (cacheStories == null && stories!=null))
+                            && binding !=null) {
                         binding.list.setVisibility(View.VISIBLE);
                         binding.viewMessage.setVisibility(View.GONE);
-                        adapter.setStories(stories.get());
                         App.getDataManager().setString("stories", GsonProvider.getInstance().toJson(stories));
+                        adapter.setStories(stories.get());
                     }
                 }
 
@@ -108,7 +110,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Input like that {story}:{chapter}:{stage}.");
 
-            final EditText input = new EditText(getActivity());
+            EditText input = new EditText(getActivity());
             input.setInputType(InputType.TYPE_CLASS_TEXT);
             builder.setView(input);
             builder.setPositiveButton("Load", (dialog, which) -> {
