@@ -72,7 +72,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
         public void bind(FriendModel friendModel){
             title.setText(friendModel.login + " [PDA #" + friendModel.pdaId +"]");
             desc.setText(ProfileHelper.getGroup(desc.getContext(), friendModel.group));
-            avatar.setImageDrawable(ProfileHelper.getAvatar(avatar.getContext(), friendModel.avatar));
+            ProfileHelper.setAvatar(avatar, friendModel.avatar);
             avatar.getRootView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

@@ -112,7 +112,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                 sceneController = new SceneController(this, storyId, map, getIntent().getStringExtra("pos"));
             } else {
                 boolean found = false;
-                for (Story story : App.getDataManager().getMember().getData().getStories()) {
+                for (Story story : member.getData().getStories()) {
                     if (story.getStoryId() == storyId) {
                         found = true;
                         int chapter = getIntent().getIntExtra("chapter", story.getLastChapter());

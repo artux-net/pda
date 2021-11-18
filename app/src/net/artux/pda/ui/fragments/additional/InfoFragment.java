@@ -56,7 +56,7 @@ public class InfoFragment extends AdditionalBaseFragment {
         if (mDataManager.getMember()!=null) {
             Profile profile = new Profile(mDataManager.getMember());
             navigationPresenter.setAdditionalTitle("PDA #" + App.getDataManager().getMember().getPdaId());
-            mAvatarView.setImageDrawable(ProfileHelper.getAvatar(profile, mAvatarView.getContext()));
+            ProfileHelper.setAvatar(mAvatarView, profile.getAvatar());
             mLoginView.setText(profile.getLogin());
             AutofitHelper.create(mLoginView);
 

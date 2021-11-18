@@ -3,8 +3,11 @@ package net.artux.pda.ui.fragments.profile;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
 
 import androidx.core.content.res.ResourcesCompat;
+
+import com.bumptech.glide.Glide;
 
 import net.artux.pda.R;
 import net.artux.pda.app.App;
@@ -50,16 +53,13 @@ public class ProfileHelper {
         return true;
     }
 
-    public static Drawable getAvatar(Profile profile, Context context) {
-        return getAvatar(context, profile.getAvatar());
-    }
-
-    public static Drawable getAvatar(Context context, String avatar) {
+    public static void setAvatar(ImageView imageView, String avatar){
+        Context context = imageView.getContext();
         if (isInteger(avatar) && context.getResources()!=null)
-            return ResourcesCompat.getDrawable(context.getResources(), App.avatars[Integer.parseInt(avatar)], null);
-        else
-            //TODO: avatar with no id
-            return null;
+            imageView.setImageDrawable(ResourcesCompat.getDrawable(context.getResources(), App.avatars[Integer.parseInt(avatar)], null));
+        else {
+            Glide.with(context).asDrawable().load(avatar).into(imageView);
+        }
     }
 
     public static String getRang(Profile profile, Context context) {

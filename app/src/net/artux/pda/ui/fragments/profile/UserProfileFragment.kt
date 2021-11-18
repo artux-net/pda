@@ -50,7 +50,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
         //viewModel.load(requireArguments().getInt("pdaId", App.getDataManager().member.pdaId))
         viewModel.user.observe(viewLifecycleOwner) {
             val binding = this.binding!!
-            binding.profileAvatar.setImageDrawable(ProfileHelper.getAvatar(it, context))
+            ProfileHelper.setAvatar(binding.profileAvatar, it.avatar)
             binding.profileLogin.text = it.login
             binding.profileGroup.text =
                 getString(

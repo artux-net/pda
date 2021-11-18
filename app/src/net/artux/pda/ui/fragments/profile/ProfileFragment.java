@@ -93,7 +93,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     public void setProfile(Profile profile, View view1) {
         this.profile = profile;
         ImageView avatar = view1.findViewById(R.id.profile_avatar);
-        avatar.setImageDrawable(ProfileHelper.getAvatar(profile, getContext()));
+        ProfileHelper.setAvatar(avatar, profile.getAvatar());
         ((TextView)view1.findViewById(R.id.profile_login)).setText(profile.getLogin());
         ((TextView)view1.findViewById(R.id.profile_group)).setText(getString(R.string.group_p, ProfileHelper.getGroup(profile, getContext())));
         ((TextView)view1.findViewById(R.id.profile_location)).setText(getString(R.string.location_p, profile.getLocation()));

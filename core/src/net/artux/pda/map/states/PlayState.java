@@ -171,9 +171,11 @@ public class PlayState extends State {
         Map map = (Map) gsm.get("map");
         Player player = new Player(this, getMember(), assetManager);
 
-        bounds = new Texture(Gdx.files.absolute(map.getBoundsTextureUri()));
-        if (Gdx.files.absolute(map.getBoundsTextureUri()).exists())
+        if (map.getBoundsTextureUri()!= null && !map.getBoundsTextureUri().equals("")
+                && Gdx.files.absolute(map.getBoundsTextureUri()).exists()) {
+            bounds = new Texture(Gdx.files.absolute(map.getBoundsTextureUri()));
             player.setBoundsTexture(bounds);
+        }
         entities.add(player);
         stage.addActor(player);
         return player;
