@@ -12,7 +12,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
@@ -24,26 +26,22 @@ import com.bumptech.glide.request.target.Target;
 
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pda.app.NotificationService;
 import net.artux.pda.databinding.ActivityMainBinding;
-import net.artux.pda.gdx.CoreStarter;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.activities.hierarhy.MainContract;
 import net.artux.pda.ui.activities.hierarhy.MainPresenter;
-import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.additional.InfoFragment;
 import net.artux.pda.ui.fragments.chat.DialogsFragment;
-import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.news.NewsFragment;
 import net.artux.pda.ui.fragments.notes.NoteFragment;
-import net.artux.pda.ui.fragments.notes.NotesFragment;
-import net.artux.pda.ui.fragments.profile.ProfileFragment;
+import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.stories.StoriesFragment;
 import net.artux.pdalib.Member;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -55,8 +53,6 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
     private ActivityMainBinding binding;
 
-    public BaseFragment mainFragment;
-    public AdditionalBaseFragment additionalFragment;
     public MainPresenter presenter;
 
     private BroadcastReceiver timeReceiver;
@@ -80,7 +76,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
                     setFragment(new StoriesFragment(), false);
                     break;
                 case "profile":
-                    setFragment(new ProfileFragment(), false);
+                    setFragment(new UserProfileFragment(), false);
                     break;
                 default:
                     setFragment(new NewsFragment(), false);
@@ -112,11 +108,6 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         binding.rightTitleView.setText(title);
     }
 
-    @Override
-    public void passData(Bundle data) {
-        mainFragment.receiveData(data);
-        additionalFragment.receiveData(data);
-    }
 
     void setListeners(){
         binding.newsButton.setOnClickListener(this);
@@ -128,7 +119,6 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
     @Override
     public void setFragment(BaseFragment fragment, boolean addToBackStack) {
-        mainFragment = fragment;
         fragment.attachPresenter(presenter);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager()
                 .beginTransaction();
@@ -142,7 +132,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
     @Override
     public void setAdditionalFragment(AdditionalBaseFragment fragment) {
-        additionalFragment = fragment;
+
         fragment.attachPresenter(presenter);
         getSupportFragmentManager()
                 .beginTransaction()
@@ -151,15 +141,27 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         Timber.d("Set second fragment: %s", fragment.getClass().getSimpleName());
     }
 
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        BaseFragment fragment = (BaseFragment) getVisibleFragment();
+        if (fragment != null) {
+            presenter.backPressed(fragment);
+        }
+    }
+
+    public Fragment getVisibleFragment(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        for(Fragment fragment : fragments){
+            if(fragment != null && fragment.isVisible() && !(fragment instanceof AdditionalBaseFragment))
+                return fragment;
+        }
+        return null;
     }
 
     @Override
     public void onStart() {
-
         if (App.getDataManager().getMember()==null)
             startActivity(new Intent(this, LoginActivity.class));
         super.onStart();
@@ -211,21 +213,15 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.newsButton) {
-            setFragment(new NewsFragment(), true);
-            setAdditionalFragment(new InfoFragment());
+            presenter.addFragment(new NewsFragment(), true);
         } else if (id == R.id.messagesButton) {
-            setFragment(new DialogsFragment(), true);
-            setAdditionalFragment(new InfoFragment());
+            presenter.addFragment(new DialogsFragment(), true);
         } else if (id == R.id.profileButton) {
-            updateMember();
-            setFragment(new UserProfileFragment(), true);
-            setAdditionalFragment(new AdditionalFragment());
+            presenter.addFragment(new UserProfileFragment(), true);
         } else if (id == R.id.notesButton) {
-            setFragment(new NoteFragment(), true);
-            setAdditionalFragment(new NotesFragment());
+            presenter.addFragment(new NoteFragment(), true);
         } else if (id == R.id.mapButton) {
-            setFragment(new StoriesFragment(), true);
-            setAdditionalFragment(new InfoFragment());
+            presenter.addFragment(new StoriesFragment(), true);
         }
     }
 

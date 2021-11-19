@@ -40,7 +40,6 @@
                     android:layout_height="wrap_content"
                     android:padding="10dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/a2"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/guideline"
                     app:layout_constraintHorizontal_bias="0.0"

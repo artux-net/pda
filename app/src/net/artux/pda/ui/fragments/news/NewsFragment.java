@@ -14,6 +14,7 @@ import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
+import net.artux.pda.ui.fragments.additional.InfoFragment;
 import net.artux.pdalib.ResponsePage;
 import net.artux.pdalib.news.Article;
 import net.artux.pdalib.profile.items.GsonProvider;

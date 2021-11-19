@@ -9,7 +9,7 @@ public class UserMessage implements Serializable {
     public String message;
     public long time;
     public int groupId;
-    public int avatarId;
+    public String avatarId;
     public int pdaId;
 
     @Override

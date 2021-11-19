@@ -46,11 +46,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" />
         <activity
-            android:name=".ui.activities.SettingsActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="sensorLandscape"
-            android:theme="@style/AppTheme" />
-        <activity
             android:name=".ui.activities.LoadingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" />

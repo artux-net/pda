@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
@@ -42,12 +43,6 @@ public class NotesFragment extends AdditionalBaseFragment implements NotesAdapte
         super.receiveData(data);
         if (data.containsKey("updated")){
             notesAdapter.setNotes(App.getDataManager().getMember().notes);
-            if (data.containsKey("deleted")){
-                if (App.getDataManager().getMember().notes.size()!=0) {
-                    NoteFragment noteFragment = new NoteFragment();
-                    navigationPresenter.addFragment(noteFragment, false);
-                }
-            }
         }
     }
 
@@ -63,6 +58,6 @@ public class NotesFragment extends AdditionalBaseFragment implements NotesAdapte
         Bundle bundle = new Bundle();
         bundle.putSerializable("note", note);
         noteFragment.setArguments(bundle);
-        navigationPresenter.addFragment(noteFragment, false);
+        navigationPresenter.passData(bundle);
     }
 }

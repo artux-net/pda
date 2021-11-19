@@ -10,11 +10,14 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 
+import net.artux.pda.ui.fragments.additional.InfoFragment;
+
 import timber.log.Timber;
 
 public abstract class BaseFragment extends Fragment implements FragmentNavigation.View {
 
     protected FragmentNavigation.Presenter navigationPresenter;
+    public Class<? extends AdditionalBaseFragment> defaultAdditionalFragment = InfoFragment.class;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

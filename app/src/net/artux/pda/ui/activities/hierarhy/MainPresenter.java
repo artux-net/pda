@@ -5,10 +5,38 @@ import android.os.Bundle;
 public class MainPresenter implements MainContract.Presenter, FragmentNavigation.Presenter {
 
     private MainContract.View view;
+    public BaseFragment mainFragment;
+    public AdditionalBaseFragment additionalFragment;
 
     @Override
     public void addFragment(BaseFragment fragment, boolean addToBackStack) {
-        view.setFragment(fragment, addToBackStack);
+        if (mainFragment == null || !mainFragment.getClass().isInstance(fragment)){
+            mainFragment = fragment;
+            updateAdditionalFragment(fragment);
+            view.setFragment(fragment, addToBackStack);
+        }
+    }
+
+    void updateAdditionalFragment(BaseFragment baseFragment){
+        if(!baseFragment.defaultAdditionalFragment.isInstance(additionalFragment)){
+            try {
+                additionalFragment = baseFragment.defaultAdditionalFragment.newInstance();
+                addAdditionalFragment(additionalFragment);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            }
+        }else{
+            Bundle bundle = new Bundle();
+            bundle.putString("fragment", baseFragment.getClass().getSimpleName());
+            additionalFragment.receiveData(bundle);
+        }
+    }
+
+    @Override
+    public BaseFragment getCurrentFragment() {
+        return mainFragment;
     }
 
     @Override
@@ -28,7 +56,8 @@ public class MainPresenter implements MainContract.Presenter, FragmentNavigation
 
     @Override
     public void passData(Bundle data) {
-        view.passData(data);
+        mainFragment.receiveData(data);
+        additionalFragment.receiveData(data);
     }
 
     @Override
@@ -39,5 +68,11 @@ public class MainPresenter implements MainContract.Presenter, FragmentNavigation
     @Override
     public void attachView(MainContract.View view) {
         this.view = view;
+    }
+
+    @Override
+    public void backPressed(BaseFragment fragment) {
+        mainFragment = fragment;
+        updateAdditionalFragment(fragment);
     }
 }

@@ -34,6 +34,9 @@ import retrofit2.Response;
 public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnClickListener {
 
     List<Item> items = new ArrayList<>();
+    {
+        defaultAdditionalFragment = AdditionalFragment.class;
+    }
 
     @Nullable
     @Override

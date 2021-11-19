@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
+import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.profile.adapters.FriendsAdapter;
 import net.artux.pdalib.profile.FriendModel;
 
@@ -26,6 +27,10 @@ public class FriendsFragment extends BaseFragment {
 
     RecyclerView recyclerView;
     FriendsAdapter friendsAdapter;
+    {
+        defaultAdditionalFragment = AdditionalFragment.class;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

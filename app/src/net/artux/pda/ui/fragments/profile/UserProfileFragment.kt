@@ -14,6 +14,7 @@ import net.artux.pda.app.App
 import net.artux.pda.databinding.FragmentProfileBinding
 import net.artux.pda.ui.PdaAlertDialog
 import net.artux.pda.ui.activities.hierarhy.BaseFragment
+import net.artux.pda.ui.fragments.additional.AdditionalFragment
 import net.artux.pda.ui.fragments.chat.ChatFragment
 import net.artux.pda.ui.fragments.profile.adapters.GroupsAdapter
 import net.artux.pda.ui.util.getViewModelFactory
@@ -28,6 +29,9 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
     private var binding: FragmentProfileBinding? = null
     private var groupsAdapter = GroupsAdapter()
     private var recyclerView : RecyclerView? = null
+    init{
+        defaultAdditionalFragment = AdditionalFragment::class.java
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,8 +50,11 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             navigationPresenter.setLoadingState(true)
         }
 
+        if (arguments!=null)
+            viewModel.load(requireArguments().getInt("pdaId", App.getDataManager().member.pdaId))
+        else
+            viewModel.load(App.getDataManager().member.pdaId)
 
-        //viewModel.load(requireArguments().getInt("pdaId", App.getDataManager().member.pdaId))
         viewModel.user.observe(viewLifecycleOwner) {
             val binding = this.binding!!
             ProfileHelper.setAvatar(binding.profileAvatar, it.avatar)
@@ -100,7 +107,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                             pdaAlertDialog.setTitle(R.string.add_friend_q)
                             pdaAlertDialog.setPositiveButton(
                                 R.string.okay
-                            ) { _, i ->
+                            ) { _, _ ->
                                 App.getRetrofitService().pdaAPI.requestFriend(it.pdaId)
                                     .enqueue(object : Callback<Status?> {
                                         override fun onResponse(
@@ -125,7 +132,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                             }
                             pdaAlertDialog.setNegativeButton(
                                 "No"
-                            ) { _, i -> }
+                            ) { _, _ -> }
                             pdaAlertDialog.show()
                         }
                     }
@@ -162,7 +169,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                             }
                             pdaAlertDialog.setNegativeButton(
                                 "No"
-                            ) { dialogInterface, i -> }
+                            ) { _, i -> }
                             pdaAlertDialog.show()
                         }
                     }

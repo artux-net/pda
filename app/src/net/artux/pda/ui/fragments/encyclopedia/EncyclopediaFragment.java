@@ -22,6 +22,9 @@ import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 public class EncyclopediaFragment extends BaseFragment {
 
     WebView webView;
+    {
+        defaultAdditionalFragment = AdditionalFragment.class;
+    }
 
     @Nullable
     @Override

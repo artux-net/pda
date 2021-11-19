@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
         android:choiceMode="singleChoice"
         android:entries="@array/profile_buttons"
-        android:listSelector="@color/black_overlay" />
+        android:descendantFocusability="blocksDescendants"
+        android:listSelector="@android:color/transparent" />
 
 </LinearLayout>

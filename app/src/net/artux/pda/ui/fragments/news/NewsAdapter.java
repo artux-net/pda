@@ -98,7 +98,7 @@ public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             if (presenter!=null) {
                 presenter.setTitle(article.title);
                 //presenter.setLoadingState(true);
-                presenter.addFragment(openNewsFragment, false);
+                presenter.addFragment(openNewsFragment, true);
             }
         }
     }

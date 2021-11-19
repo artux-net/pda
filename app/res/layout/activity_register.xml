@@ -56,6 +56,7 @@
                     android:singleLine="true"
                     android:layout_columnWeight="1"
                     android:imeOptions="actionNext"
+                    android:autofillHints="newUsername"
                     android:theme="@style/EditTextStyle"/>
 
 
@@ -63,6 +64,7 @@
                 <AutoCompleteTextView
                     android:id="@+id/name"
                     android:hint="@string/prompt_name"
+                    android:autofillHints="name"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
@@ -83,6 +85,7 @@
                 <AutoCompleteTextView
                     android:id="@+id/email"
                     android:hint="@string/prompt_email"
+                    android:autofillHints="emailAddress"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
@@ -93,6 +96,7 @@
                 <EditText
                     android:id="@+id/password"
                     android:hint="@string/prompt_password"
+                    android:autofillHints="newPassword"
                     android:imeActionId="6"
                     android:imeActionLabel="@string/action_sign_in"
                     android:imeOptions="actionNext"
@@ -105,6 +109,7 @@
                 <AutoCompleteTextView
                     android:id="@+id/repeat_password"
                     android:hint="@string/repeat_password"
+                    android:autofillHints="newPassword"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"

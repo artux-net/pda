@@ -12,14 +12,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
 import net.artux.pda.ui.PdaAlertDialog;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
 import net.artux.pda.ui.fragments.chat.ChatFragment;
-import net.artux.pda.ui.fragments.profile.ProfileFragment;
+import net.artux.pda.ui.fragments.profile.ProfileHelper;
+import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pdalib.LimitedArrayList;
 import net.artux.pdalib.UserMessage;
 
@@ -30,8 +30,6 @@ import org.joda.time.Instant;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import static net.artux.pda.app.App.avatars;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
@@ -105,7 +103,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     presenter.addFragment(chatFragment1, true);
                 });
                 builder.addButton("Посмотреть профиль", view1 -> {
-                    ProfileFragment profileFragment = new ProfileFragment();
+                    UserProfileFragment profileFragment = new UserProfileFragment();
                     Bundle bundle = new Bundle();
                     bundle.putInt("pdaId",userMessage.pdaId);
                     profileFragment.setArguments(bundle);
@@ -119,7 +117,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             avatarView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ProfileFragment profileFragment = new ProfileFragment();
+                    UserProfileFragment profileFragment = new UserProfileFragment();
                     Bundle bundle = new Bundle();
                     bundle.putInt("pdaId",userMessage.pdaId);
                     profileFragment.setArguments(bundle);
@@ -145,7 +143,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                     + mContext.getResources().getStringArray(R.array.groups)[userMessage.groupId]
                     + " - " + outputFormat.format(time.toDate()));
             messageView.setText(Html.fromHtml(userMessage.message));
-            avatarView.setImageDrawable(ContextCompat.getDrawable(mContext, avatars[userMessage.avatarId]));
+            ProfileHelper.setAvatar(avatarView, userMessage.avatarId);
         }
     }
 

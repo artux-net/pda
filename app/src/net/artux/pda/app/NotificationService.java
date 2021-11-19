@@ -116,7 +116,6 @@ public class NotificationService extends Service {
     void sendNotif(UserMessage message) {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(App.avatars[message.avatarId])
                         .setContentTitle(message.senderLogin)
                         .setContentText(message.message);
 

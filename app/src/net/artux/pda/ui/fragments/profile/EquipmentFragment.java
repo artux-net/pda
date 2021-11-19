@@ -17,10 +17,15 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
+import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pdalib.profile.Equipment;
 import net.artux.pdalib.profile.items.Item;
 
 public class EquipmentFragment extends BaseFragment {
+
+    {
+        defaultAdditionalFragment = AdditionalFragment.class;
+    }
 
     @Nullable
     @Override

@@ -10,7 +10,6 @@ public interface MainContract {
 
         void setTitle(String title);
         void setAdditionalTitle(String title);
-        void passData(Bundle data);
 
         void setLoadingState(boolean loadingState);
     }
@@ -25,6 +24,7 @@ public interface MainContract {
 
     interface Presenter {
         void attachView(View view);
+        void backPressed(BaseFragment baseFragment);
     }
 
 }

@@ -235,10 +235,10 @@ public class PlayState extends State {
             }else if (actor instanceof Quest){
                 Quest point  = (Quest) actor;
                 String name = "q-"+point.hashCode();
-                preferData = point.getData();
                 if (point.getPosition().dst(player.getPosition()) < 35f) {
                     if (point.getType()!=1 && point.getType()!=3) {
                         if (!userInterface.contains(name)) {
+                            preferData = point.getData();
                             Button button = new Button(textButtonStyle);
                             button.setPosition(w - w / 12, 2.5f * h / 12);
                             button.setSize(h / 10, h / 10);
@@ -261,9 +261,9 @@ public class PlayState extends State {
             }else if (actor instanceof TransferPoint){
                 TransferPoint point  = (TransferPoint) actor;
                 String name = "t-"+point.hashCode();
-                preferData = point.getData();
                 if (point.getPosition().dst(player.getPosition()) < 35f) {
                     if (!userInterface.contains(name)) {
+                        preferData = point.getData();
                         Button button = new Button(textButtonStyle);
                         button.setPosition(w - w/12, 2.5f * h / 12);
                         button.setSize(h/10,h/10);

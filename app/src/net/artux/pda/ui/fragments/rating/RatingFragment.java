@@ -14,7 +14,7 @@ import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
-import net.artux.pda.ui.fragments.profile.ProfileFragment;
+import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
 import net.artux.pdalib.ResponsePage;
 
@@ -23,11 +23,13 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import timber.log.Timber;
 
 public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClickListener {
 
     private int number = 1;
+    {
+        defaultAdditionalFragment = AdditionalFragment.class;
+    }
 
     @Nullable
     @Override
@@ -88,13 +90,12 @@ public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClick
 
     @Override
     public void onClick(int pos) {
-        ProfileFragment profileFragment = new ProfileFragment();
+        UserProfileFragment profileFragment = new UserProfileFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("pdaId", pos);
         profileFragment.setArguments(bundle);
         if (navigationPresenter!=null) {
-            navigationPresenter.addFragment(profileFragment, false);
-            navigationPresenter.addAdditionalFragment(new AdditionalFragment());
+            navigationPresenter.addFragment(profileFragment, true);
         }
     }
 }

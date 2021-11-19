@@ -57,8 +57,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        navigationPresenter.addAdditionalFragment(new InfoFragment());
-
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.create();
         mRecyclerView = view.findViewById(R.id.recycleView);
@@ -127,7 +125,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         }
     }
 
-    private void updateAdapter(final String text){
+    private void updateAdapter(String text){
         if (getActivity()!=null)
             getActivity().runOnUiThread(() -> {
                 Type listType = new TypeToken<LimitedArrayList<UserMessage>>(){}.getType();

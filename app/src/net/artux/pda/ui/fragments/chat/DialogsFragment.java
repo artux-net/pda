@@ -24,6 +24,7 @@ import net.artux.pda.app.NotificationService;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
+import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
 import net.artux.pdalib.Status;
 import net.artux.pdalib.UserMessage;
@@ -47,6 +48,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
     private Gson gson = new Gson();
 
     EchoWebSocketListener listener;
+
 
     @Nullable
     @Override
@@ -212,8 +214,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
                             navigationPresenter.setLoadingState(false);
                     }
                 });
-
-            Timber.e(t);
+            Timber.d("WS - closing because throwable: %s", t.getMessage());
         }
     }
 

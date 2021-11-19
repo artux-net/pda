@@ -1,8 +1,6 @@
 package net.artux.pda.ui.fragments.profile;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import androidx.core.content.res.ResourcesCompat;
@@ -13,11 +11,7 @@ import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pdalib.Profile;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class ProfileHelper {
 

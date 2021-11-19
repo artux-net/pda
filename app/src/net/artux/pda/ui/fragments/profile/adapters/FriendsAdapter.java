@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
-import net.artux.pda.ui.fragments.profile.ProfileFragment;
 import net.artux.pda.ui.fragments.profile.ProfileHelper;
+import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pdalib.profile.FriendModel;
 
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
             avatar.getRootView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ProfileFragment profileFragment = new ProfileFragment();
+                    UserProfileFragment profileFragment = new UserProfileFragment();
                     Bundle bundle = new Bundle();
                     bundle.putInt("pdaId", friendModel.pdaId);
                     profileFragment.setArguments(bundle);
