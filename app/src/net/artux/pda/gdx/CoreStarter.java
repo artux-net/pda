@@ -37,11 +37,23 @@ public class CoreStarter extends AndroidApplication implements PlatformInterface
             //gdxAdapter = new GdxAdapter(this,  App.getDataManager().getMember(), connection);
         }else{
             Map map = gson.fromJson(getIntent().getStringExtra("map"), Map.class);
-            gdxAdapter = new GdxAdapter(this,  App.getDataManager().getMember());
+            gdxAdapter = new GdxAdapter(this);
             gdxAdapter.put("map", map);
             gdxAdapter.put("member", App.getDataManager().getMember());
+            if (map == null || App.getDataManager().getMember()==null){
+
+                Timber.wtf("Nulls");
+
+            }
         }
         initialize(gdxAdapter, config);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 
     @Override

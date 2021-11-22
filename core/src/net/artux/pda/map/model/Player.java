@@ -28,7 +28,7 @@ public class Player extends Entity implements Disposable {
         camera = state.getCamera();
         zoom = camera.zoom;
         this.id = 1;
-        MOVEMENT = 3f;
+        MOVEMENT = 9f;
         velocity = new Vector2(0,0);
         sprite = new Sprite(skin.get("gg1.png", Texture.class));
         directionSprite = new Sprite(skin.get("direction.png", Texture.class));
@@ -72,11 +72,11 @@ public class Player extends Entity implements Disposable {
     public void act(float delta) {
 
         if(run) {
-            MOVEMENT = 0.8f;
+            MOVEMENT = 2f;
             if (camera.zoom > 0.7*zoom) camera.zoom -= 0.007;
         } else {
             if (camera.zoom < zoom) camera.zoom += 0.005;
-            MOVEMENT = 0.4f;
+            MOVEMENT = 1f;
         }
         if (bounds!=null){
             if (canMoveX(getX()+MOVEMENT*velocity.x, getY())){

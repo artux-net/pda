@@ -14,6 +14,10 @@ public class MainPresenter implements MainContract.Presenter, FragmentNavigation
             mainFragment = fragment;
             updateAdditionalFragment(fragment);
             view.setFragment(fragment, addToBackStack);
+        }else if (mainFragment != null && mainFragment.getClass().isInstance(fragment)){
+            Bundle bundle = new Bundle();
+            bundle.putInt("reset", 0);
+            mainFragment.receiveData(bundle);
         }
     }
 

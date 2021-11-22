@@ -18,7 +18,6 @@ public class GameStateManager {
     private final PlatformInterface platformInterface;
     HashMap<String, Object> bundle = new HashMap<>();
     private final Stack<net.artux.pda.map.states.State> states;
-    private Member member;
     private final InputMultiplexer multiplexer = new InputMultiplexer();
 
     BitmapFont russianFont;
@@ -31,10 +30,9 @@ public class GameStateManager {
         return russianFont;
     }
 
-    public GameStateManager(PlatformInterface platformInterface, Member member){
+    public GameStateManager(PlatformInterface platformInterface){
         states = new Stack<>();
         this.platformInterface = platformInterface;
-        this.member = member;
     }
 
     public void put(String key, Object o){
@@ -72,7 +70,6 @@ public class GameStateManager {
             state.dispose();
         }
         russianFont.dispose();
-        member = null;
     }
 
     public void update(float dt){
@@ -91,7 +88,7 @@ public class GameStateManager {
     }
 
     public Member getMember() {
-        return member;
+        return (Member) bundle.get("member");
     }
 
     public void addInputProcessor(InputProcessor inputProcessor){

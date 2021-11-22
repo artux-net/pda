@@ -32,12 +32,10 @@ public class Cache<T> {
         });
     }
 
-    public MutableLiveData<T> get(String id){
+    public T get(String id){
         if(!mSharedPreferences.contains(id))
             return null;
-        MutableLiveData<T> data = new MutableLiveData<T>();
-        data.setValue(gson.fromJson(mSharedPreferences.getString(id, ""), typeParameterClass));
-        return data;
+        return gson.fromJson(mSharedPreferences.getString(id, ""), typeParameterClass);
     }
 
 }

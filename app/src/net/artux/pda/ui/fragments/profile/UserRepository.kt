@@ -18,12 +18,13 @@ class UserRepository @Inject constructor(
     // Простой кэш в памяти. Детали опущены для краткости.
     private val userCache: Cache<Profile>
 ) {
-    fun getProfile(userId: Int): LiveData<Profile> {
+    fun getProfile(userId: Int): MutableLiveData<Profile> {
+        val data: MutableLiveData<Profile> = MutableLiveData<Profile>();
         val cached = userCache.get(userId.toString())
         if (cached != null) {
-            return cached
+            data.value = cached
+            return data
         }
-        val data = MutableLiveData<Profile>()
         userCache.put(userId.toString(), data)
         // Эта реализация все еще неоптимальная, но лучше, чем раньше.
         // Полная реализация также обрабатывает случаи ошибок.
@@ -39,4 +40,25 @@ class UserRepository @Inject constructor(
         })
         return data
     }
+
+    fun getProfile(userId: Int, data: MutableLiveData<Profile>) {
+        val cached = userCache.get(userId.toString())
+        if (cached != null) {
+            data.value = cached
+        }
+        userCache.put(userId.toString(), data)
+        // Эта реализация все еще неоптимальная, но лучше, чем раньше.
+        // Полная реализация также обрабатывает случаи ошибок.
+        webservice.getProfile(userId).enqueue(object : Callback<Profile> {
+            override fun onResponse(call: Call<Profile>, response: Response<Profile>) {
+                data.postValue(response.body())
+            }
+
+            // Случай ошибки опущен для краткости.
+            override fun onFailure(call: Call<Profile>, t: Throwable) {
+                TODO()
+            }
+        })
+    }
+
 }

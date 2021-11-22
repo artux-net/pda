@@ -55,7 +55,8 @@
             android:screenOrientation="sensorLandscape" />
         <activity
             android:name=".gdx.CoreStarter"
-            android:screenOrientation="sensorLandscape">
+            android:screenOrientation="sensorLandscape"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

@@ -86,6 +86,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             groupsAdapter.setRelations(it.relations)
             recyclerView = view.findViewById(R.id.list)
             recyclerView!!.adapter = groupsAdapter
+
             recyclerView!!.visibility = View.VISIBLE
             view.findViewById<View>(R.id.viewMessage).visibility = View.GONE
 
@@ -284,6 +285,12 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
         }
     }
 
+    override fun receiveData(data: Bundle?) {
+        super.receiveData(data)
+        if (data?.containsKey("reset") == true){
+            viewModel.load(App.getDataManager().member.pdaId)
+        }
+    }
 
     override fun onDestroyView() {
         recyclerView!!.adapter = null

@@ -34,9 +34,6 @@ public abstract class State {
     }
 
     public Member getMember(){
-        if (gsm.getMember()==null)
-            return (Member) gsm.get("member");
-        else
-            return gsm.getMember();
+        return (Member) gsm.get("member");
     }
 }

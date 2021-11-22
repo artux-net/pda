@@ -26,8 +26,8 @@ public class GdxAdapter extends ApplicationAdapter {
 	public final String RUSSIAN_FONT_NAME = "fonts/Imperial Web.ttf";
 	public final String RUSSIAN_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;:,{}\"´`'<>";
 
-    public GdxAdapter(PlatformInterface platformInterface, Member member){
-		gsm = new GameStateManager(platformInterface, member);
+    public GdxAdapter(PlatformInterface platformInterface){
+		gsm = new GameStateManager(platformInterface);
 	}
 
 
