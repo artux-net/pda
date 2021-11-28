@@ -92,13 +92,13 @@ public class NotificationService extends Service {
         Type listType = new TypeToken<ArrayList<Dialog>>(){}.getType();
 
         try {
-            UserMessage userMessage = App.getRetrofitService().getGson().fromJson(text,UserMessage.class);
+           /* UserMessage userMessage = App.getRetrofitService().getGson().fromJson(text,UserMessage.class);
             if (userMessage.cid == -1) throw new JsonSyntaxException("");
             if (listener!=null) listener.newMessage(userMessage);
             updateDialog(userMessage);
             if (!userMessage.senderLogin.equals(App.getDataManager().getMember().getLogin()))
                 sendNotif(userMessage);
-            Timber.d("Dialogs, new message: " + userMessage.toString());
+            Timber.d("Dialogs, new message: " + userMessage.toString());*/
         }catch (JsonSyntaxException e){
             try {
                 ArrayList<Dialog> list = gson.fromJson(text, listType);

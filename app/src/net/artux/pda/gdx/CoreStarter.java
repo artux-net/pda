@@ -1,52 +1,88 @@
 package net.artux.pda.gdx;
 
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
+
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LifecycleRegistry;
+import androidx.savedstate.SavedStateRegistry;
+import androidx.savedstate.SavedStateRegistryController;
+import androidx.savedstate.SavedStateRegistryOwner;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.gson.Gson;
 
-import net.artux.pda.BuildConfig;
-import net.artux.pda.app.App;
 import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.Map;
 import net.artux.pda.map.platform.PlatformInterface;
+import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.QuestActivity;
+import net.artux.pda.viewmodels.ProfileViewModel;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
-import net.artux.pdalib.arena.Connection;
+import net.artux.pdalib.Member;
 
 import java.util.HashMap;
 
 import timber.log.Timber;
 
-public class CoreStarter extends AndroidApplication implements PlatformInterface {
+public class CoreStarter extends AndroidApplication implements PlatformInterface, LifecycleOwner, SavedStateRegistryOwner {
 
-    Gson gson = new Gson();
-    GdxAdapter gdxAdapter;
+    private Gson gson = new Gson();
+    private GdxAdapter gdxAdapter;
+    private ProfileViewModel viewModel;
+    private LifecycleRegistry lifecycleRegistry;
+    private final SavedStateRegistryController mSavedStateRegistryController = SavedStateRegistryController.create(this);
 
     @Override
-    protected void onCreate (Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 
-        Timber.d("Core start, isArena: " + getIntent().getBooleanExtra("arena", false));
-        if(getIntent().getBooleanExtra("arena", false)){
-            Connection connection = new Connection("192.168.1.104:8080", App.getDataManager().getAuthToken(), "1");
-            //gdxAdapter = new GdxAdapter(this,  App.getDataManager().getMember(), connection);
-        }else{
+
+        lifecycleRegistry = new LifecycleRegistry(this);
+        mSavedStateRegistryController.performRestore(savedInstanceState);
+
+        if(viewModel == null)
+            viewModel = getViewModelFactory(this).create(ProfileViewModel.class);
+
+        Result<Member> member = viewModel.getUserRepository().getCachedMember();
+        if (member instanceof Result.Success){
             Map map = gson.fromJson(getIntent().getStringExtra("map"), Map.class);
-            gdxAdapter = new GdxAdapter(this);
+            gdxAdapter = new GdxAdapter(CoreStarter.this);
             gdxAdapter.put("map", map);
-            gdxAdapter.put("member", App.getDataManager().getMember());
-            if (map == null || App.getDataManager().getMember()==null){
-
-                Timber.wtf("Nulls");
-
-            }
+            gdxAdapter.put("member", ((Result.Success<Member>) member).getData());
+            initialize(gdxAdapter, config);
         }
-        initialize(gdxAdapter, config);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        lifecycleRegistry.markState(Lifecycle.State.STARTED);
+    }
+
+    @NonNull
+    public Lifecycle getLifecycle() {
+        return lifecycleRegistry;
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mSavedStateRegistryController.performSave(outState);
+    }
+
+    @NonNull
+    @Override
+    public final SavedStateRegistry getSavedStateRegistry() {
+        return mSavedStateRegistryController.getSavedStateRegistry();
     }
 
     @Override
@@ -54,12 +90,6 @@ public class CoreStarter extends AndroidApplication implements PlatformInterface
         super.onBackPressed();
         startActivity(new Intent(this, MainActivity.class));
         finish();
-    }
-
-    @Override
-    protected void onResume() {
-        System.out.println("Resume");
-        super.onResume();
     }
 
     @Override
@@ -103,4 +133,5 @@ public class CoreStarter extends AndroidApplication implements PlatformInterface
         gdxAdapter = null;
         super.onDestroy();
     }
+
 }

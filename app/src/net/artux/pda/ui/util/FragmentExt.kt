@@ -19,10 +19,36 @@ package net.artux.pda.ui.util
  * Extension functions for Fragment.
  */
 
+import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import com.badlogic.gdx.backends.android.AndroidApplication
 import net.artux.pda.app.App
+import net.artux.pda.gdx.CoreStarter
+import androidx.lifecycle.SavedStateViewModelFactory
+import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryOwner
+
 
 fun Fragment.getViewModelFactory(): ViewModelFactory {
-    val repository = (requireContext().applicationContext as App).repository;
+    val repository = (requireContext().applicationContext as App).repository
     return ViewModelFactory(repository, this)
 }
+
+fun AppCompatActivity.getViewModelFactory(): ViewModelFactory {
+    val repository = (applicationContext as App).repository
+    return ViewModelFactory(repository, this)
+}
+
+fun FragmentActivity.getViewModelFactory(): ViewModelFactory {
+    val repository = (applicationContext as App).repository
+    return ViewModelFactory(repository, this)
+}
+
+
+fun CoreStarter.getViewModelFactory(): ViewModelFactory {
+    val repository = (applicationContext as App).repository
+    return ViewModelFactory(repository, this)
+}
+

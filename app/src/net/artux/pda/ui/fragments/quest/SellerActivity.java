@@ -1,7 +1,8 @@
 package net.artux.pda.ui.fragments.quest;
 
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
+
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -9,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,39 +19,40 @@ import com.bumptech.glide.Glide;
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pda.ui.activities.LoginActivity;
+import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
+import net.artux.pda.viewmodels.MemberViewModel;
 import net.artux.pdalib.Member;
 import net.artux.pdalib.Status;
 import net.artux.pdalib.profile.Data;
 import net.artux.pdalib.profile.Seller;
 import net.artux.pdalib.profile.items.Item;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.internal.EverythingIsNonNull;
 import timber.log.Timber;
 
 public class SellerActivity extends AppCompatActivity implements View.OnClickListener {
 
-    List<Item> buyerList = new ArrayList<>();
+    private ItemsAdapter sellerAdapter;
+    private RecyclerView buyerView;
+    private ImageView background;
 
-    int sellerId = 0;
+    private MemberViewModel viewModel;
 
-    ItemsAdapter sellerAdapter;
-
-    RecyclerView buyerView;
-    ImageView background;
+    private int sellerId = 0;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_quest3);
-
+        if (viewModel == null)
+            viewModel = getViewModelFactory(this).create(MemberViewModel.class);
 
         sellerId = getIntent().getIntExtra("seller", 0);
 
@@ -61,7 +62,11 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
         background = findViewById(R.id.sellerBackground);
         findViewById(R.id.map).setOnClickListener(this);
 
-        updateMember();
+        viewModel.getMember().observe(this, memberResult -> {
+            if (memberResult instanceof Result.Success)
+                updateList(((Result.Success<Member>) memberResult).getData());
+            else viewModel.updateMember();
+        });
 
         sellerAdapter = new ItemsAdapter();
         sellerAdapter.setOnClickListener(pos -> {
@@ -69,29 +74,26 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
             builder.setTitle("Вы хотите купить " + item.title + " за " + item.price + "?");
 
-            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(R.string.yes, (dialogInterface, i) -> App.getRetrofitService().getPdaAPI().buyItem(sellerId, sellerAdapter.getItems().get(pos).hashCode()).enqueue(new Callback<Status>() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    App.getRetrofitService().getPdaAPI().buyItem(sellerId, sellerAdapter.getItems().get(pos).hashCode()).enqueue(new Callback<Status>() {
-                        @Override
-                        public void onResponse(Call<Status> call, Response<Status> response) {
-                            Status status = response.body();
-                            if (status != null){
-                                Toast.makeText(SellerActivity.this, status.getDescription(), Toast.LENGTH_LONG).show();
-                                updateMember();
-                            }else {
-                                System.out.println(response.toString());
-                                Toast.makeText(SellerActivity.this, "err", Toast.LENGTH_LONG).show();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<Status> call, Throwable throwable) {
-                            Toast.makeText(SellerActivity.this, throwable.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    });
+                @EverythingIsNonNull
+                public void onResponse(Call<Status> call, Response<Status> response) {
+                    Status status = response.body();
+                    if (status != null){
+                        Toast.makeText(SellerActivity.this, status.getDescription(), Toast.LENGTH_LONG).show();
+                        viewModel.updateMember();
+                    }else {
+                        System.out.println(response.toString());
+                        Toast.makeText(SellerActivity.this, "err", Toast.LENGTH_LONG).show();
+                    }
                 }
-            });
+
+                @Override
+                @EverythingIsNonNull
+                public void onFailure(Call<Status> call, Throwable throwable) {
+                    Toast.makeText(SellerActivity.this, throwable.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }));
             builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {});
 
             AlertDialog alertDialog = builder.create();
@@ -100,6 +102,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
 
         App.getRetrofitService().getPdaAPI().getSeller(sellerId).enqueue(new Callback<Seller>() {
             @Override
+            @EverythingIsNonNull
             public void onResponse(Call<Seller> call, Response<Seller> response) {
                 Seller seller = response.body();
                 if (seller!=null){
@@ -124,6 +127,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             }
 
             @Override
+            @EverythingIsNonNull
             public void onFailure(Call<Seller> call, Throwable throwable) {
                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -133,40 +137,11 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
         sellerView.setAdapter(sellerAdapter);
     }
 
-    void updateMember(){
-        App.getRetrofitService().getPdaAPI()
-                .loginUser().enqueue(new Callback<Member>() {
-            @Override
-            public void onResponse(@NonNull Call<Member> call, @NonNull Response<Member> response) {
-                Member member = response.body();
-                if (response.code()==502)
-                    Toast.makeText(getApplicationContext(), R.string.unable_connect, Toast.LENGTH_SHORT).show();
-                else if (member!=null) {
-                    System.out.println("Member updated");
-                    App.getDataManager().setMember(member);
-                    if (member.getData().getAllItems().size()!=buyerList.size())
-                        updateList();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Member error, try to login again", Toast.LENGTH_SHORT).show();
-                    App.getDataManager().removeAllData();
-                    startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                    SellerActivity.this.finish();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Member> call, Throwable t) {
-                t.printStackTrace();
-                Toast.makeText(getApplicationContext(), R.string.error_server_connection, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    void updateList(){
-        Data data = App.getDataManager().getMember().getData();
-        ((TextView)findViewById(R.id.playerName)).setText(App.getDataManager().getMember().getName());
-        ((TextView)findViewById(R.id.playerMoney)).setText(getString(R.string.money, String.valueOf(App.getDataManager().getMember().getMoney())));
-        buyerList = data.getAllItems();
+    void updateList(Member member){
+        Data data = member.getData();
+        ((TextView)findViewById(R.id.playerName)).setText(member.getName());
+        ((TextView)findViewById(R.id.playerMoney)).setText(getString(R.string.money, String.valueOf(member.getMoney())));
+        List<Item> buyerList = data.getAllItems();
         ItemsAdapter buyerAdapter = new ItemsAdapter();
         buyerAdapter.setOnClickListener(pos -> {
             Item item = buyerAdapter.getItems().get(pos);
@@ -176,15 +151,17 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
 
             builder.setPositiveButton(R.string.yes, (dialogInterface, i) -> App.getRetrofitService().getPdaAPI().sellItem(item.hashCode()).enqueue(new Callback<Status>() {
                 @Override
+                @EverythingIsNonNull
                 public void onResponse(Call<Status> call, Response<Status> response) {
                     Status status = response.body();
                     if (status != null){
                         Toast.makeText(SellerActivity.this, status.getDescription(), Toast.LENGTH_LONG).show();
-                        updateMember();
+                        viewModel.updateMember();
                     }
                 }
 
                 @Override
+                @EverythingIsNonNull
                 public void onFailure(Call<Status> call, Throwable throwable) {
 
                 }
@@ -202,15 +179,13 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.map:
-                if (getIntent().getExtras()!=null) {
-                    Intent intent = new Intent(this, QuestActivity.class);
-                    intent.putExtras(getIntent().getExtras());
-                    startActivity(intent);
-                    finish();
-                    break;
-                }
+        if (view.getId() == R.id.map) {
+            if (getIntent().getExtras() != null) {
+                Intent intent = new Intent(this, QuestActivity.class);
+                intent.putExtras(getIntent().getExtras());
+                startActivity(intent);
+                finish();
+            }
         }
     }
 }

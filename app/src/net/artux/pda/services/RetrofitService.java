@@ -1,26 +1,19 @@
-package net.artux.pda.app;
+package net.artux.pda.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import net.artux.pda.BuildConfig;
-import net.artux.pda.PdaAPI;
-import net.artux.pda.ui.activities.hierarhy.MainContract;
+import net.artux.pda.app.App;
+import net.artux.pda.app.DataManager;
+import net.artux.pda.app.GsonInstantAdapter;
 
 import org.joda.time.Instant;
 
-import java.io.IOException;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
-import dagger.Component;
-import okhttp3.Authenticator;
-import okhttp3.Call;
-import okhttp3.EventListener;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.Route;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import timber.log.Timber;
@@ -30,7 +23,7 @@ public class RetrofitService {
     private PdaAPI mPdaAPI;
     private Gson gson;
 
-    void initRetrofit(final DataManager dataManager){
+    public void initRetrofit(final DataManager dataManager){
         OkHttpClient.Builder httpClient =
                 new OkHttpClient.Builder();
 

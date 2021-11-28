@@ -1,5 +1,7 @@
 package net.artux.pda.ui.activities;
 
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,9 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -25,18 +25,18 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import net.artux.pda.R;
-import net.artux.pda.app.App;
 import net.artux.pda.databinding.ActivityMainBinding;
+import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.activities.hierarhy.MainContract;
 import net.artux.pda.ui.activities.hierarhy.MainPresenter;
-import net.artux.pda.ui.fragments.additional.InfoFragment;
 import net.artux.pda.ui.fragments.chat.DialogsFragment;
 import net.artux.pda.ui.fragments.news.NewsFragment;
 import net.artux.pda.ui.fragments.notes.NoteFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.stories.StoriesFragment;
+import net.artux.pda.viewmodels.MemberViewModel;
 import net.artux.pdalib.Member;
 
 import java.text.SimpleDateFormat;
@@ -44,55 +44,53 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import timber.log.Timber;
 
 public class MainActivity extends FragmentActivity implements MainContract.View, View.OnClickListener {
 
     private ActivityMainBinding binding;
-
-    public MainPresenter presenter;
-
+    private MainPresenter presenter;
     private BroadcastReceiver timeReceiver;
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm dd/MM/yy", Locale.US);
+    private MemberViewModel viewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (viewModel == null)
+            viewModel = getViewModelFactory(this).create(MemberViewModel.class);
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         presenter = new MainPresenter();
         presenter.attachView(this);
-        //App.getRetrofitService().attachView(this);
 
         Intent intent = getIntent();
 
         if (intent!=null && intent.getStringExtra("section")!=null) {
             switch (getIntent().getStringExtra("section")) {
                 case "stories":
-                    setFragment(new StoriesFragment(), false);
+                    presenter.addFragment(new StoriesFragment(), false);
                     break;
                 case "profile":
-                    setFragment(new UserProfileFragment(), false);
+                    presenter.addFragment(new UserProfileFragment(), false);
                     break;
                 default:
-                    setFragment(new NewsFragment(), false);
+                    presenter.addFragment(new NewsFragment(), false);
                     break;
             }
         }
         else{
-            setFragment(new NewsFragment(), false);
+            presenter.addFragment(new NewsFragment(), false);
         }
-        setAdditionalFragment(new InfoFragment());
 
-
-        if(App.getDataManager().getMember()!=null){
-            setAdditionalTitle("PDA #" + App.getDataManager().getMember().getPdaId());
-        }else
-            startActivity(new Intent(this, LoadingActivity.class));
+        viewModel.getMember().observe(this, memberResult -> {
+            if (memberResult instanceof Result.Success) {
+                Member member = ((Result.Success<Member>) memberResult).getData();
+                presenter.setAdditionalTitle("PDA #" + member.getPdaId());
+            }
+        });
 
         setListeners();
         //startService(new Intent(this, NotificationService.class));
@@ -162,8 +160,6 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
     @Override
     public void onStart() {
-        if (App.getDataManager().getMember()==null)
-            startActivity(new Intent(this, LoginActivity.class));
         super.onStart();
         binding.timeView.setText(timeFormat.format(new Date()));
         timeReceiver = new BroadcastReceiver() {
@@ -225,37 +221,5 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        updateMember();
-    }
-
-    private void updateMember(){
-        App.getRetrofitService().getPdaAPI()
-                .loginUser().enqueue(new Callback<Member>() {
-            @Override
-            public void onResponse(@NonNull Call<Member> call, @NonNull Response<Member> response) {
-                Member member = response.body();
-                if (response.code()==502)
-                    Toast.makeText(MainActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
-                else if (member!=null) {
-                    Timber.d("Member updated");
-                    App.getDataManager().setMember(member);
-                } else {
-                    Toast.makeText(MainActivity.this, "Member error, try to login again", Toast.LENGTH_SHORT).show();
-                    App.getDataManager().removeAllData();
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                    MainActivity.this.finish();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Member> call, Throwable t) {
-                Timber.e(t);
-                Toast.makeText(MainActivity.this, R.string.error_server_connection, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 }
 

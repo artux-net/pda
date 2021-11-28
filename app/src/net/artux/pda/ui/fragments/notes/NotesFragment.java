@@ -7,11 +7,13 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 
-import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
+import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
+import net.artux.pdalib.Member;
 import net.artux.pdalib.profile.Note;
 
 public class NotesFragment extends AdditionalBaseFragment implements NotesAdapter.OnNoteClickListener {
@@ -35,29 +37,26 @@ public class NotesFragment extends AdditionalBaseFragment implements NotesAdapte
         notesAdapter = new NotesAdapter(this, navigationPresenter);
         binding.list.setAdapter(notesAdapter);
 
-        notesAdapter.setNotes(App.getDataManager().getMember().notes);
+        viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
+            if (memberResult instanceof Result.Success){
+                notesAdapter.setNotes(((Result.Success<Member>) memberResult).getData().notes);
+            }else viewModel.updateMember();
+        });
+
     }
 
     @Override
     public void receiveData(Bundle data) {
         super.receiveData(data);
         if (data.containsKey("updated")){
-            notesAdapter.setNotes(App.getDataManager().getMember().notes);
+            viewModel.updateMember();
         }
     }
 
     @Override
-    public void onClick(int cid) {
-        Note note = new Note();
-        for (Note note1: App.getDataManager().getMember().notes){
-            if (cid == note1.cid){
-                note = note1;
-            }
-        }
-        NoteFragment noteFragment = new NoteFragment();
+    public void onClick(Note note) {
         Bundle bundle = new Bundle();
         bundle.putSerializable("note", note);
-        noteFragment.setArguments(bundle);
         navigationPresenter.passData(bundle);
     }
 }

@@ -2,7 +2,6 @@ package net.artux.pda.ui.fragments.stories;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -15,22 +14,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.gson.reflect.TypeToken;
-
-import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.gdx.CoreStarter;
+import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.fragments.chat.Dialog;
 import net.artux.pda.ui.fragments.quest.models.Stories;
-import net.artux.pda.ui.fragments.quest.models.StoryItem;
+import net.artux.pdalib.Member;
 import net.artux.pdalib.profile.items.GsonProvider;
-
-import java.lang.reflect.Type;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,49 +44,56 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (getActivity()!=null && App.getDataManager().getMember().getData().getTemp().containsKey("currentStory")){
-            Intent intent = new Intent(getActivity(), QuestActivity.class);
-            getActivity().startActivity(intent);
-            getActivity().finish();
-        } else {
-            navigationPresenter.setTitle(getResources().getString(R.string.map));
-            navigationPresenter.setLoadingState(true);
-            binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
+        viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
+            if (memberResult instanceof Result.Success){
+                Member member = ((Result.Success<Member>) memberResult).getData();
+                if (member.getData().getTemp().containsKey("currentStory")) {
+                    Intent intent = new Intent(getActivity(), QuestActivity.class);
+                    requireActivity().startActivity(intent);
+                    requireActivity().finish();
+                }else loadStories();
+            }else viewModel.updateMember();
+        });
+    }
 
-            StoriesAdapter adapter = new StoriesAdapter( StoriesFragment.this);
-            binding.list.setAdapter(adapter);
+    private void loadStories() {
+        navigationPresenter.setTitle(getResources().getString(R.string.map));
+        navigationPresenter.setLoadingState(true);
+        binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
 
-            Stories cacheStories= GsonProvider.getInstance().fromJson(App.getDataManager().getString("stories"), Stories.class);
-            if(cacheStories!=null){
-                binding.list.setVisibility(View.VISIBLE);
-                binding.viewMessage.setVisibility(View.GONE);
-                adapter.setStories(cacheStories.get());
+        StoriesAdapter adapter = new StoriesAdapter( StoriesFragment.this);
+        binding.list.setAdapter(adapter);
+
+        Stories cacheStories= GsonProvider.getInstance().fromJson(App.getDataManager().getString("stories"), Stories.class);
+        if(cacheStories!=null){
+            binding.list.setVisibility(View.VISIBLE);
+            binding.viewMessage.setVisibility(View.GONE);
+            adapter.setStories(cacheStories.get());
+        }
+
+        App.getRetrofitService().getPdaAPI().getStories().enqueue(new Callback<Stories>() {
+            @Override
+            @EverythingIsNonNull
+            public void onResponse(Call<Stories> call, Response<Stories> response) {
+                Stories stories = response.body();
+                navigationPresenter.setLoadingState(false);
+                if (((stories != null && cacheStories != null && stories.hashCode() != cacheStories.hashCode())
+                        || (cacheStories == null && stories!=null))
+                        && binding !=null) {
+                    binding.list.setVisibility(View.VISIBLE);
+                    binding.viewMessage.setVisibility(View.GONE);
+                    App.getDataManager().setString("stories", GsonProvider.getInstance().toJson(stories));
+                    adapter.setStories(stories.get());
+                }
             }
 
-            App.getRetrofitService().getPdaAPI().getStories().enqueue(new Callback<Stories>() {
-                @Override
-                @EverythingIsNonNull
-                public void onResponse(Call<Stories> call, Response<Stories> response) {
-                    Stories stories = response.body();
-                    navigationPresenter.setLoadingState(false);
-                    if (((stories != null && cacheStories != null && stories.hashCode() != cacheStories.hashCode())
-                            || (cacheStories == null && stories!=null))
-                            && binding !=null) {
-                        binding.list.setVisibility(View.VISIBLE);
-                        binding.viewMessage.setVisibility(View.GONE);
-                        App.getDataManager().setString("stories", GsonProvider.getInstance().toJson(stories));
-                        adapter.setStories(stories.get());
-                    }
-                }
-
-                @Override
-                @EverythingIsNonNull
-                public void onFailure(Call<Stories> call, Throwable throwable) {
-                    navigationPresenter.setLoadingState(false);
-                    Timber.e(throwable);
-                }
-            });
-        }
+            @Override
+            @EverythingIsNonNull
+            public void onFailure(Call<Stories> call, Throwable throwable) {
+                navigationPresenter.setLoadingState(false);
+                Timber.e(throwable);
+            }
+        });
     }
 
     @Override

@@ -1,5 +1,7 @@
 package net.artux.pda.ui.activities;
 
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,11 +12,11 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -23,7 +25,9 @@ import com.google.gson.GsonBuilder;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.repositories.Result;
+import net.artux.pda.viewmodels.MemberViewModel;
+import net.artux.pda.viewmodels.ProfileViewModel;
 import net.artux.pda.ui.fragments.quest.SceneController;
 import net.artux.pda.ui.fragments.quest.models.Stage;
 import net.artux.pdalib.Member;
@@ -35,11 +39,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timber.log.Timber;
 
 
 public class QuestActivity extends AppCompatActivity implements View.OnClickListener {
@@ -55,10 +54,15 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     private BroadcastReceiver _broadcastReceiver;
     private final SimpleDateFormat _sdfWatchTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
+    private MemberViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quest);
+
+        if (viewModel == null)
+            viewModel = getViewModelFactory(this).create(MemberViewModel.class);
 
         tvTime = findViewById(R.id.sceneTime);
         musicImage = findViewById(R.id.musicSetup);
@@ -70,25 +74,24 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         switcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
         switcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
 
-        App.getRetrofitService().getPdaAPI().loginUser().enqueue(new Callback<Member>() {
+        viewModel.getMember().observe(this, new Observer<Result<Member>>() {
             @Override
-            public void onResponse(Call<Member> call, Response<Member> response) {
-                Member member = response.body();
-                if (member!= null){
-                    startLoading(member);
-                }else{
-                    Toast.makeText(getApplicationContext(), "Null member, try again", Toast.LENGTH_LONG).show();
-                    finish();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Member> call, Throwable t) {
-                Timber.e(t);
-                Toast.makeText(getApplicationContext(), t.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                finish();
+            public void onChanged(Result<Member> memberResult) {
+                if (memberResult instanceof Result.Success){
+                    startLoading(((Result.Success<Member>) memberResult).getData());
+                    viewModel.getMember().removeObserver(this);
+                }else viewModel.updateMember();
             }
         });
+    }
+
+    public void sync(Stage stage, int id){
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add("story:"+sceneController.getStory()+":"+ sceneController.getChapterId() +":"+id);
+        HashMap<String, List<String>> actions = stage.getActions();
+        if (actions == null) actions = new HashMap<>();
+        actions.put("set", arrayList);
+        viewModel.syncMember(actions);
     }
 
     private void startLoading(Member member){
@@ -103,7 +106,12 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                 String currentStory = temp.get("currentStory");
                 if (currentStory != null)
                     storyId = Integer.parseInt(currentStory);
-                else storyId = 0;
+                else {
+                    Intent intent = new Intent(QuestActivity.this, MainActivity.class);
+                    intent.putExtra("section", "stories");
+                    startActivity(intent);
+                    finish();
+                }
             }
 
             int map = getIntent().getIntExtra("map", -1);
@@ -154,6 +162,8 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    boolean isFirst = true;
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -175,23 +185,16 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             case R.id.exitButton:
                 HashMap<String, List<String>> action = new HashMap<>();
                 action.put("reset_current", new ArrayList<>());
-                App.getRetrofitService().getPdaAPI().synchronize(action).enqueue(new Callback<Member>() {
-                    @Override
-                    public void onResponse(Call<Member> call, Response<Member> response) {
-                        Member member = response.body();
-                        if (member!=null) {
-                            App.getDataManager().setMember(member);
-                            Intent intent = new Intent(QuestActivity.this, MainActivity.class);
-                            intent.putExtra("section", "stories");
-                            startActivity(intent);
-                            finish();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<Member> call, Throwable t) {
-                        Timber.e(t);
-                    }
+                viewModel.syncMember(action);
+                viewModel.getMember().observe(this, memberResult -> {
+                    if (isFirst)
+                        isFirst = false;
+                    else if (memberResult instanceof Result.Success){
+                        Intent intent = new Intent(QuestActivity.this, MainActivity.class);
+                        intent.putExtra("section", "stories");
+                        startActivity(intent);
+                        finish();
+                    }else viewModel.syncMember(action);
                 });
                 break;
             case R.id.log:

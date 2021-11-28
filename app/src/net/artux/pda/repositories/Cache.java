@@ -1,13 +1,8 @@
-package net.artux.pda.utils;
+package net.artux.pda.repositories;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.google.gson.Gson;
 
@@ -23,13 +18,9 @@ public class Cache<T> {
         mSharedPreferences = context.getSharedPreferences(typeParameterClass.getName(), Context.MODE_PRIVATE);
     }
 
-    public void put(String id, MutableLiveData<T> object){
-        object.observeForever(new Observer<T>() {
-            @Override
-            public void onChanged(T t) {
-                mSharedPreferences.edit().putString(id, gson.toJson(t)).apply();
-            }
-        });
+    @SuppressLint("ApplySharedPref")
+    public void put(String id, T object){
+        mSharedPreferences.edit().putString(id, gson.toJson(object)).commit();
     }
 
     public T get(String id){
@@ -38,4 +29,8 @@ public class Cache<T> {
         return gson.fromJson(mSharedPreferences.getString(id, ""), typeParameterClass);
     }
 
+    @SuppressLint("ApplySharedPref")
+    public void clear(){
+        mSharedPreferences.edit().clear().commit();
+    }
 }

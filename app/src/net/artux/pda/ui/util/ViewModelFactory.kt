@@ -20,9 +20,9 @@ import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
-import net.artux.pda.app.App
-import net.artux.pda.ui.fragments.profile.UserProfileViewModel
-import net.artux.pda.ui.fragments.profile.UserRepository
+import net.artux.pda.viewmodels.ProfileViewModel
+import net.artux.pda.repositories.UserRepository
+import net.artux.pda.viewmodels.MemberViewModel
 
 /**
  * Factory for all ViewModels.
@@ -39,11 +39,12 @@ class ViewModelFactory constructor(
         modelClass: Class<T>,
         handle: SavedStateHandle
     ) = with(modelClass) {
-        handle.set("uid", App.getDataManager().member.pdaId)
         when {
             //todo another view models
-            isAssignableFrom(UserProfileViewModel::class.java) ->
-                UserProfileViewModel(handle, usersRepository)
+            isAssignableFrom(ProfileViewModel::class.java) ->
+                ProfileViewModel(usersRepository)
+            isAssignableFrom(MemberViewModel::class.java) ->
+                MemberViewModel(usersRepository)
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

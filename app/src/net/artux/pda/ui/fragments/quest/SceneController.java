@@ -77,6 +77,21 @@ public class SceneController implements Serializable {
                     if (multiExoPlayer!=null)
                         multiExoPlayer.release();
                     multiExoPlayer = new MultiExoPlayer(questActivity, chapter.getMusics());
+                    for (Stage stage : chapter.getStages()){
+                        if(stage.getBackgroundUrl() != null && !stage.getBackgroundUrl().equals("")) {
+                            String background_url;
+                            if (!stage.getBackgroundUrl().contains("http")){
+                                background_url = "https://" + BuildConfig.URL + "/" + stage.getBackgroundUrl();
+                            }else
+                                background_url = stage.getBackgroundUrl();
+
+                            Glide.with(questActivity)
+                                    .downloadOnly()
+                                    .load(background_url)
+                                    .submit();
+                        }
+                    }
+
                     localChapter = chapter;
                     stages = chapter.getStages();
                     loadStage(stageId);
@@ -102,27 +117,7 @@ public class SceneController implements Serializable {
     }
 
     private void synchronize(Stage stage, int id){
-        ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("story:"+story+":"+ chapterId +":"+id);
-        HashMap<String, List<String>> actions = stage.getActions();
-        if (actions == null) actions = new HashMap<>();
-        actions.put("set", arrayList);
-        App.getRetrofitService().getPdaAPI().synchronize(actions).enqueue(new Callback<Member>() {
-                @Override
-                public void onResponse(Call<Member> call, Response<Member> response) {
-                    Member member = response.body();
-                    if (member != null) {
-                        App.getDataManager().setMember(member);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<Member> call, Throwable t) {
-                    Timber.d( "Quest: false to set progress");
-                    Timber.e(t);
-                }
-        });
-
+        questActivity.sync(stage, id);
     }
 
     boolean isLoading = false;

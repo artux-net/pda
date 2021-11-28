@@ -32,6 +32,7 @@ import java.util.TimeZone;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.internal.EverythingIsNonNull;
 import timber.log.Timber;
 
 
@@ -58,44 +59,39 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
        if (position==0){
             holder.binding.noteTitle.setText("Добавить заметку");
             holder.binding.getRoot().setBackgroundColor(Color.rgb(5, 20, 13));
-            holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Context context = holder.binding.getRoot().getContext();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle("Создание заметки..");
+            holder.binding.getRoot().setOnClickListener(view -> {
+                Context context = holder.binding.getRoot().getContext();
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Создание заметки..");
 
-                    final EditText input = new EditText(context);
-                    input.setInputType(InputType.TYPE_CLASS_TEXT);
-                    input.setHint("Введите заголовок..");
-                    builder.setView(input);
-                    builder.setPositiveButton("Создать", (dialog, which) -> {
-                                String title = input.getText().toString();
-                                App.getRetrofitService().getPdaAPI().createNote(title).enqueue(new Callback<Note>() {
-                                    @Override
-                                    public void onResponse(Call<Note> call, Response<Note> response) {
-                                        Note note = response.body();
-                                        if (note != null) {
-                                            Member member = App.getDataManager().getMember();
-                                            member.notes.add(note);
-                                            App.getDataManager().setMember(member);
-                                            Bundle bundle = new Bundle();
-                                            bundle.putInt("updated", 0);
-                                            presenter.passData(bundle);
-                                            Timber.d("Tried to create note " + member.notes.size());
-                                        }
+                final EditText input = new EditText(context);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setHint("Введите заголовок..");
+                builder.setView(input);
+                builder.setPositiveButton("Создать", (dialog, which) -> {
+                            String title = input.getText().toString();
+                            App.getRetrofitService().getPdaAPI().createNote(title).enqueue(new Callback<Note>() {
+                                @Override
+                                @EverythingIsNonNull
+                                public void onResponse(Call<Note> call, Response<Note> response) {
+                                    Note note = response.body();
+                                    if (note != null) {
+                                        Bundle bundle = new Bundle();
+                                        bundle.putInt("updated", 0);
+                                        presenter.passData(bundle);
                                     }
+                                }
 
-                                    @Override
-                                    public void onFailure(Call<Note> call, Throwable t) {
+                                @Override
+                                @EverythingIsNonNull
+                                public void onFailure(Call<Note> call, Throwable t) {
 
-                                    }
-                                });
+                                }
                             });
-                    builder.setNegativeButton("Отмена", (dialog, which) -> dialog.cancel());
-                    builder.show();
-                    App.getRetrofitService().getPdaAPI().createNote("");
-                }
+                        });
+                builder.setNegativeButton("Отмена", (dialog, which) -> dialog.cancel());
+                builder.show();
+                App.getRetrofitService().getPdaAPI().createNote("");
             });
         }else
             holder.bind(notes.get(position-1));
@@ -139,11 +135,11 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
         @Override
         public void onClick(View view) {
-            listener.onClick(note.cid);
+            listener.onClick(note);
         }
     }
 
     public interface OnNoteClickListener{
-        void onClick(int cid);
+        void onClick(Note note);
     }
 }

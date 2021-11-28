@@ -1,18 +1,19 @@
 package net.artux.pda.app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import net.artux.pdalib.LoginUser;
 import net.artux.pdalib.Member;
+
+import org.jetbrains.annotations.NotNull;
 
 import okhttp3.Credentials;
 
 public class DataManager {
 
     private SharedPreferences mSharedPreferences;
-
-    private static Member member;
 
     public DataManager(Context context) {
         mSharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
@@ -39,30 +40,13 @@ public class DataManager {
         return mSharedPreferences.contains("login") && mSharedPreferences.contains("pass");
     }
 
-    public void setAuthToken(String authToken) {
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString("token", authToken);
-        editor.apply();
-    }
-
-
     public String getAuthToken() {
         if (isAuthenticated())
             return Credentials.basic(mSharedPreferences.getString("login", ""), mSharedPreferences.getString("pass", ""));
         else return "";
     }
 
-    public void setMember(Member member){
-        DataManager.member = member;
-    }
-
-    public Member getMember(){
-        return member;
-    }
-
     public void removeAllData(){
-        member = null;
-
         mSharedPreferences.edit().clear().commit();
     }
 

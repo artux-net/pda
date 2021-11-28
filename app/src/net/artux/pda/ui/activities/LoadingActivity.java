@@ -1,5 +1,7 @@
 package net.artux.pda.ui.activities;
 
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
+
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -7,7 +9,6 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
@@ -22,23 +23,22 @@ import com.bumptech.glide.request.target.Target;
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pdalib.Member;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timber.log.Timber;
+import net.artux.pda.repositories.Result;
+import net.artux.pda.viewmodels.MemberViewModel;
 
 public class LoadingActivity extends AppCompatActivity {
 
-    String TAG = "LoadingActivity";
 
-    boolean loaded, gifEnd;
+    private boolean loaded, gifEnd, afterClearCache = false;
+    private MemberViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
+
+        if (viewModel == null)
+            viewModel = getViewModelFactory(this).create(MemberViewModel.class);
 
         Glide.with(this)
                 .asGif()
@@ -65,34 +65,20 @@ public class LoadingActivity extends AppCompatActivity {
                 })
                 .into((ImageView) findViewById(R.id.imageGif));
 
-        App.getRetrofitService().getPdaAPI()
-                .loginUser().enqueue(new Callback<Member>() {
-            @Override
-            public void onResponse(@NonNull Call<Member> call, @NonNull Response<Member> response) {
-                Member member = response.body();
-                if (response.code()==502) {
-                    Toast.makeText(getApplicationContext(), R.string.unable_connect, Toast.LENGTH_SHORT).show();
-                    LoadingActivity.this.finish();
-                }
-                else if (member!=null) {
-                    Timber.d("Good token, set member.");
 
-                    App.getDataManager().setMember(member);
+        viewModel.getMember().observe(this, memberResult -> {
+            if(memberResult instanceof Result.Success){
+                if (afterClearCache){
                     loaded = true;
                     start();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Member error, try to login again", Toast.LENGTH_SHORT).show();
-                    App.getDataManager().removeAllData();
-                    startActivity(new Intent(LoadingActivity.this, LoginActivity.class));
-                    LoadingActivity.this.finish();
+                }else {
+                    afterClearCache = true;
+                    viewModel.updateMemberWithReset();
                 }
-
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<Member> call, Throwable t) {
-                t.printStackTrace();
-                Toast.makeText(getApplicationContext(), R.string.error_server_connection, Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(getApplicationContext(), "Member error, try to login again", Toast.LENGTH_SHORT).show();
+                App.getDataManager().removeAllData();
+                startActivity(new Intent(LoadingActivity.this, LoginActivity.class));
                 LoadingActivity.this.finish();
             }
         });

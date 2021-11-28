@@ -15,9 +15,10 @@ import com.bumptech.glide.request.RequestOptions;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
+import net.artux.pdalib.Member;
 import net.artux.pdalib.profile.Equipment;
 import net.artux.pdalib.profile.items.Item;
 
@@ -38,19 +39,24 @@ public class EquipmentFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         if (navigationPresenter!=null)
             navigationPresenter.setTitle("Снаряжение");
-        Equipment equipment = App.getDataManager()
-                .getMember()
-                .getData()
-                .getEquipment();
 
-        if (equipment.getArmor()!=null)
-            defineSlot(view, R.id.mainSlot, equipment.getArmor());
+        viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
+            if(memberResult instanceof Result.Success){
+                Member member = ((Result.Success<Member>) memberResult).getData();
+                Equipment equipment = member
+                        .getData()
+                        .getEquipment();
+
+                if (equipment.getArmor()!=null)
+                    defineSlot(view, R.id.mainSlot, equipment.getArmor());
+                if (equipment.getFirstWeapon()!=null)
+                    defineSlot(view, R.id.slot2, equipment.getFirstWeapon());
+                if (equipment.getSecondWeapon()!=null)
+                    defineSlot(view, R.id.slot1, equipment.getSecondWeapon());
+            }else viewModel.updateMember();
+        });
 
 
-        if (equipment.getFirstWeapon()!=null)
-            defineSlot(view, R.id.slot2, equipment.getFirstWeapon());
-        if (equipment.getSecondWeapon()!=null)
-            defineSlot(view, R.id.slot1, equipment.getSecondWeapon());
     }
 
     private void defineSlot(View view, int slotId, Item item){

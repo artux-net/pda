@@ -1,5 +1,7 @@
 package net.artux.pda.ui.fragments.quest;
 
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
+
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -10,9 +12,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentNotificationBinding;
 import net.artux.pda.ui.fragments.profile.ProfileHelper;
+import net.artux.pda.viewmodels.ProfileViewModel;
 import net.artux.pda.ui.fragments.quest.models.Stage;
 import net.artux.pda.ui.fragments.quest.models.Text;
 import net.artux.pda.ui.fragments.quest.models.Transfer;
@@ -25,11 +27,14 @@ import java.util.List;
 
 public abstract class SceneFragment extends Fragment implements StageNavigation.View{
 
-    private Stage stage;
+    protected Stage stage;
+    protected ProfileViewModel viewModel;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (viewModel == null)
+            viewModel = getViewModelFactory(this).create(ProfileViewModel.class);
         showMessage();
     }
 
@@ -57,10 +62,6 @@ public abstract class SceneFragment extends Fragment implements StageNavigation.
 
     }
 
-    int[] getMusics(){
-        return stage.getMusics();
-    }
-
     void showMessage(){
         if (stage!=null && !stage.getMessage().trim().equals("")) {
 
@@ -68,7 +69,7 @@ public abstract class SceneFragment extends Fragment implements StageNavigation.
             binding.notificationTitle.setText("Уведомление");
             binding.notificationContent.setText(stage.getMessage());
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
             builder.setView(binding.getRoot());
             AlertDialog dialog = builder.create();
             Window window = dialog.getWindow();
@@ -78,21 +79,21 @@ public abstract class SceneFragment extends Fragment implements StageNavigation.
         }
     }
 
-    List<Text> getTexts(){
+    List<Text> getTexts(Stage stage, Member member){
         List<Text> texts = new ArrayList<>();
         for (final Text text : stage.getText())
-            if(Checker.check(text.condition, App.getDataManager().getMember())) {
-                text.text = formatText(text.text, App.getDataManager().getMember());
+            if(Checker.check(text.condition, member)) {
+                text.text = formatText(text.text, member);
                 texts.add(text);
             }
         return texts;
     }
 
-    List<Transfer> getTransfers(){
+    List<Transfer> getTransfers(Stage stage, Member member){
         List<Transfer> transfers = new ArrayList<>();
         for (final Transfer transfer : stage.getTransfers())
-            if(Checker.check(transfer.condition, App.getDataManager().getMember())) {
-                transfer.text = formatText(transfer.text, App.getDataManager().getMember());
+            if(Checker.check(transfer.condition, member)) {
+                transfer.text = formatText(transfer.text, member);
                 transfers.add(transfer);
             }
         return transfers;
@@ -106,7 +107,7 @@ public abstract class SceneFragment extends Fragment implements StageNavigation.
                 .replaceAll("@xp", String.valueOf(member.getXp()))
                 .replaceAll("@login", member.getLogin())
                 .replaceAll("@location", member.getLocation())
-                .replaceAll("@group", ProfileHelper.getGroup(getContext(), member.getGroup())
+                .replaceAll("@group", ProfileHelper.getGroup(requireContext(), member.getGroup())
                 .replaceAll("@pdaId", String.valueOf(member.getPdaId())));
     }
 }

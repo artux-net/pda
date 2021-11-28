@@ -11,7 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.artux.pda.R;
+import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.QuestActivity;
+import net.artux.pda.ui.fragments.quest.models.Transfer;
+import net.artux.pdalib.Member;
+
+import java.util.List;
 
 public class Quest1Scene extends SceneFragment {
 
@@ -28,24 +33,27 @@ public class Quest1Scene extends SceneFragment {
         TextView title = view.findViewById(R.id.sceneTitle);
         Button button = view.findViewById(R.id.okButton);
 
-        mainText.setText(getTexts().get(0).text);
-        title.setText(getTitle());
+        Result<Member> memberResult = viewModel.getUserRepository().getCachedMember();
+        if (memberResult instanceof Result.Success){
+            Member member = ((Result.Success<Member>) memberResult).getData();
+            mainText.setText(getTexts(stage, member).get(0).text);
+            title.setText(getTitle());
 
-        if (getActivity()!=null) {
-            if (!getBackground().equals(""))
-                ((QuestActivity) getActivity()).setBackground(getBackground());
+            if (getActivity() != null) {
+                if (!getBackground().equals(""))
+                    ((QuestActivity) getActivity()).setBackground(getBackground());
 
-            if (getTransfers().get(0).text!=null && !getTransfers().get(0).text.equals(""))
-                button.setText(getTransfers().get(0).text);
-            else
-                button.setText(getActivity().getString(R.string.okay));
+                List<Transfer> transfers = getTransfers(stage, member);
 
-            button.setOnClickListener(v -> {
-                        ((QuestActivity) getActivity()).getSceneController().showAd((getTransfers().get(0).stage_id));
-            });
+                if (transfers.get(0).text != null && !transfers.get(0).text.equals(""))
+                    button.setText(getTransfers(stage, member).get(0).text);
+                else
+                    button.setText(getActivity().getString(R.string.okay));
+
+                button.setOnClickListener(v -> ((QuestActivity) getActivity()).getSceneController().showAd((transfers.get(0).stage_id)));
+            }
         }
 
-        //if (stage.getMessage()!=null && !stage.getMessage().equals(""))
     }
 
 

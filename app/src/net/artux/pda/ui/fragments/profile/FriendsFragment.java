@@ -22,11 +22,12 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.internal.EverythingIsNonNull;
 
 public class FriendsFragment extends BaseFragment {
 
-    RecyclerView recyclerView;
-    FriendsAdapter friendsAdapter;
+    private RecyclerView recyclerView;
+    private FriendsAdapter friendsAdapter;
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
@@ -46,17 +47,19 @@ public class FriendsFragment extends BaseFragment {
         friendsAdapter = new FriendsAdapter(navigationPresenter);
         recyclerView.setAdapter(friendsAdapter);
 
-        if(getArguments()!=null){
-            int pdaId = getArguments().getInt("pdaId", App.getDataManager().getMember().getPdaId());
+
+        if (getArguments() != null) {
+            int pdaId = getArguments().getInt("pdaId", viewModel.getId());
             int type = getArguments().getInt("type", 0);
             updateFriends(pdaId, type);
-        } else updateFriends(App.getDataManager().getMember().getPdaId(), 0);
+        } else updateFriends(viewModel.getId(), 0);
     }
 
     void updateFriends(int pdaId, int type){
         if (type==0)
             App.getRetrofitService().getPdaAPI().getFriends(pdaId).enqueue(new Callback<List<FriendModel>>() {
                 @Override
+                @EverythingIsNonNull
                 public void onResponse(Call<List<FriendModel>> call, Response<List<FriendModel>> response) {
                     List<FriendModel> body = response.body();
                     if (body!=null && body.size()!=0){
@@ -66,6 +69,7 @@ public class FriendsFragment extends BaseFragment {
                 }
 
                 @Override
+                @EverythingIsNonNull
                 public void onFailure(Call<List<FriendModel>> call, Throwable throwable) {
                     throwable.printStackTrace();
                 }
@@ -73,6 +77,7 @@ public class FriendsFragment extends BaseFragment {
         else
             App.getRetrofitService().getPdaAPI().getSubs(pdaId).enqueue(new Callback<List<FriendModel>>() {
                 @Override
+                @EverythingIsNonNull
                 public void onResponse(Call<List<FriendModel>> call, Response<List<FriendModel>> response) {
                     List<FriendModel> body = response.body();
                     if (body!=null && body.size()!=0){
@@ -82,6 +87,7 @@ public class FriendsFragment extends BaseFragment {
                 }
 
                 @Override
+                @EverythingIsNonNull
                 public void onFailure(Call<List<FriendModel>> call, Throwable t) {
 
                 }

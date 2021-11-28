@@ -16,17 +16,16 @@ import com.google.gson.Gson;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.ui.fragments.profile.UserRepository;
-import net.artux.pda.utils.Cache;
+import net.artux.pda.repositories.UserRepository;
+import net.artux.pda.services.RetrofitService;
+import net.artux.pda.repositories.Cache;
+import net.artux.pdalib.Member;
 import net.artux.pdalib.Profile;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Date;
 import java.util.function.BiConsumer;
 
 import dagger.Module;
@@ -38,6 +37,7 @@ public class App extends Application {
 
     static RetrofitService mRetrofitService = new RetrofitService();
     static Cache<Profile> profileCache;
+    static Cache<Member> memberCache;
     static UserRepository repository;
     static DataManager sDataManager;
 
@@ -104,7 +104,8 @@ public class App extends Application {
         }
 
         profileCache = new Cache<>(Profile.class, getApplicationContext(), new Gson());
-        repository = new UserRepository(mRetrofitService.getPdaAPI(), profileCache);
+        memberCache = new Cache<>(Member.class, getApplicationContext(), new Gson());
+        repository = new UserRepository(mRetrofitService.getPdaAPI(), profileCache, memberCache);
 
 
         Timber.d("App started.");

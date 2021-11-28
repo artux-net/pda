@@ -14,12 +14,13 @@ import androidx.annotation.Nullable;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.app.DataManager;
+import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.fragments.profile.ProfileHelper;
+import net.artux.pdalib.Member;
 import net.artux.pdalib.Profile;
 
 import me.grantland.widget.AutofitHelper;
-import timber.log.Timber;
 
 public class InfoFragment extends AdditionalBaseFragment {
 
@@ -53,22 +54,22 @@ public class InfoFragment extends AdditionalBaseFragment {
         mAchievementsView = view.findViewById(R.id.achievementsInfo);
         mLocationInfo = view.findViewById(R.id.locationInfo);
 
-        if (mDataManager.getMember()!=null) {
-            Profile profile = new Profile(mDataManager.getMember());
-            navigationPresenter.setAdditionalTitle("PDA #" + App.getDataManager().getMember().getPdaId());
-            ProfileHelper.setAvatar(mAvatarView, profile.getAvatar());
-            mLoginView.setText(profile.getLogin());
-            AutofitHelper.create(mLoginView);
+        viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
+            if(memberResult instanceof Result.Success){
+                Member member = ((Result.Success<Member>) memberResult).getData();
+                Profile profile = new Profile(member);
+                navigationPresenter.setAdditionalTitle("PDA #" + member.getPdaId());
+                ProfileHelper.setAvatar(mAvatarView, profile.getAvatar());
+                mLoginView.setText(profile.getLogin());
+                AutofitHelper.create(mLoginView);
 
-            mDaysView.setText(ProfileHelper.getDays(profile));
-            mGroupView.setText(ProfileHelper.getGroup(profile, mGroupView.getContext()));
-            mRangView.setText(ProfileHelper.getRang(profile, mRangView.getContext()));
-            mAchievementsView.setText("");
-            mLocationInfo.setText(profile.getLocation());
-        }else if (navigationPresenter!=null)
-            navigationPresenter.setAdditionalTitle("Unable to get member");
-        else
-            Timber.d("Member is null");
+                mDaysView.setText(ProfileHelper.getDays(profile));
+                mGroupView.setText(ProfileHelper.getGroup(profile, mGroupView.getContext()));
+                mRangView.setText(ProfileHelper.getRang(profile, mRangView.getContext()));
+                mAchievementsView.setText("");
+                mLocationInfo.setText(profile.getLocation());
+            }else viewModel.updateMember();
+        });
 
     }
 }

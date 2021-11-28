@@ -1,5 +1,7 @@
 package net.artux.pda.ui.fragments.rating;
 
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +50,7 @@ public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClick
         RecyclerView recyclerView = view.findViewById(R.id.list);
         View v = view.findViewById(R.id.viewMessage);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        RatingAdapter ratingAdapter = new RatingAdapter(this);
+        RatingAdapter ratingAdapter = new RatingAdapter(this, viewModel.getId());
         recyclerView.setAdapter(ratingAdapter);
 
         App.getRetrofitService().getPdaAPI().getRating(number).enqueue(new Callback<ResponsePage<UserInfo>>() {

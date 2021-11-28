@@ -1,6 +1,7 @@
-package net.artux.pda;
+package net.artux.pda.services;
 
 
+import net.artux.pda.BuildConfig;
 import net.artux.pda.map.model.Map;
 import net.artux.pda.ui.fragments.chat.Dialog;
 import net.artux.pda.ui.fragments.quest.models.Chapter;
@@ -104,7 +105,7 @@ public interface PdaAPI{
     Call<Status> setWeapon(@Query("hash") int hash);
 
     @GET("reset/data")
-    Call<Status> resetData();
+    Call<Member> resetData();
 
     @PUT("notes")
     Call<Note> updateNote(@Body Note note);

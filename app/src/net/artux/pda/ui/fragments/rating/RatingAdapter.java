@@ -24,11 +24,9 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
     ItemsAdapter.OnClickListener clickListener;
     int ownerId;
 
-    RatingAdapter(ItemsAdapter.OnClickListener clickListener){
+    RatingAdapter(ItemsAdapter.OnClickListener clickListener, int ownerId){
         this.clickListener = clickListener;
-        if(App.getDataManager().getMember()!=null){
-            ownerId = App.getDataManager().getMember().getPdaId();
-        }
+        this.ownerId = ownerId;
     }
 
     @NonNull

@@ -21,10 +21,22 @@ import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 
 public class EncyclopediaFragment extends BaseFragment {
 
-    WebView webView;
+    private String lastUrl;
+    private WebView webView;
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
+
+    OnBackPressedCallback callback = new OnBackPressedCallback(false) {
+        @Override
+        public void handleOnBackPressed() {
+            webView.loadUrl("about:blank");
+            if (webView.canGoBack())
+                webView.goBack();
+            if (!webView.canGoBack())
+                setEnabled(false);
+        }
+    };
 
     @Nullable
     @Override
@@ -52,14 +64,16 @@ public class EncyclopediaFragment extends BaseFragment {
         });
 
 
-        webView.clearView();
+        webView.loadUrl("about:blank");
         if(getArguments()!=null){
             int id = getArguments().getInt("id");
             int type = getArguments().getInt("type");
 
             webView.loadUrl("https://" + BuildConfig.URL_API + "enc/" + type +"/"+id);
+            lastUrl = "https://" + BuildConfig.URL_API + "enc/" + type +"/"+id;
         }else{
             webView.loadUrl("https://" + BuildConfig.URL_API + "enc");
+            lastUrl = "https://" + BuildConfig.URL_API + "enc";
         }
         webView.setWebViewClient(new WebViewClient(){
             @Override
@@ -74,20 +88,14 @@ public class EncyclopediaFragment extends BaseFragment {
                 super.onPageFinished(view, url);
                 if (navigationPresenter!=null)
                     navigationPresenter.setLoadingState(false);
+                if (!lastUrl.equals(url))
+                    callback.setEnabled(true);
             }
+
         });
         webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
 
-        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                webView.clearView();
-                if (webView.canGoBack())
-                    webView.goBack();
-                if (!webView.canGoBack())
-                    setEnabled(false);
-            }
-        });
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
 
     }
 

@@ -1,16 +1,17 @@
 package net.artux.pda.ui.fragments;
 
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -20,6 +21,7 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.ActivitySettingsBinding;
+import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.LoginActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
@@ -33,11 +35,11 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import timber.log.Timber;
 
 public class SettingsFragment extends BaseFragment implements View.OnClickListener {
 
-    ActivitySettingsBinding binding;
+
+    private ActivitySettingsBinding binding;
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
@@ -60,8 +62,14 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         binding.build.setText(getResources().getString(R.string.build, String.valueOf(BuildConfig.VERSION_CODE)));
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(App.getDataManager().getMember());
-        binding.debugMember.setText(json);
+        viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
+            if (memberResult instanceof Result.Success){
+                Member member = ((Result.Success<Member>) memberResult).getData();
+                String json = gson.toJson(member);
+                binding.debugMember.setText(json);
+            }
+        });
+
     }
 
     void setOnClickListener(ViewGroup view){
@@ -95,41 +103,12 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                     binding.debugMember.setVisibility(View.VISIBLE);
                 break;
             case R.id.resetData:
-                App.getRetrofitService().getPdaAPI().resetData().enqueue(new Callback<Status>() {
-                    @Override
-                    public void onResponse(Call<Status> call, Response<Status> response) {
-                        Status status = response.body();
-                        if (status!=null){
-                            Toast.makeText(getContext(), status.getDescription(), Toast.LENGTH_LONG).show();
-                        }else {
-                            Toast.makeText(getContext(), getString(R.string.error_server_connection), Toast.LENGTH_LONG).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<Status> call, Throwable throwable) {
-                        Toast.makeText(getContext(), getString(R.string.error_server_connection), Toast.LENGTH_LONG).show();
-                        throwable.printStackTrace();
-                    }
-                });
+                viewModel.resetData();
                 break;
             case R.id.resetStory:
                 HashMap<String, List<String>> action = new HashMap<>();
                 action.put("reset_current", new ArrayList<>());
-                App.getRetrofitService().getPdaAPI().synchronize(action).enqueue(new Callback<Member>() {
-                    @Override
-                    public void onResponse(Call<Member> call, Response<Member> response) {
-                        Member member = response.body();
-                        if (member!=null) {
-                            App.getDataManager().setMember(member);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<Member> call, Throwable t) {
-                        Timber.e(t);
-                    }
-                });
+                viewModel.syncMember(action);
                 break;
         }
     }

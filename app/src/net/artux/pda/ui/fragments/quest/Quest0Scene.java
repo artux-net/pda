@@ -15,8 +15,12 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import net.artux.pda.R;
+import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.quest.models.Transfer;
+import net.artux.pdalib.Member;
+
+import java.util.List;
 
 public class Quest0Scene extends SceneFragment{
 
@@ -35,10 +39,18 @@ public class Quest0Scene extends SceneFragment{
         TextView mainText = view.findViewById(R.id.sceneText);
         sceneResponses = view.findViewById(R.id.sceneResponses);
 
-        mainText.setText(getTexts().get(0).text);
+
 
         colorStateList = mainText.getTextColors();
-        setSceneResponses();
+
+
+        Result<Member> memberResult = viewModel.getUserRepository().getCachedMember();
+        if (memberResult instanceof Result.Success){
+            Member member = ((Result.Success<Member>) memberResult).getData();
+            mainText.setText(getTexts(stage, member).get(0).text);
+            setSceneResponses(member);
+        }
+
 
         if (getActivity()!=null) {
             ((QuestActivity) getActivity()).setTitle(getTitle());
@@ -47,9 +59,9 @@ public class Quest0Scene extends SceneFragment{
         }
     }
 
-    private void setSceneResponses(){
+    private void setSceneResponses(Member member){
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        for (final Transfer transfer : getTransfers()) {
+        for (final Transfer transfer : getTransfers(stage, member)) {
             Button button = new Button(getContext());
             button.setLayoutParams(layoutParams);
             button.setPadding(10, 10, 10, 10);
