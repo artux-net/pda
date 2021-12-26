@@ -48,7 +48,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/login"
                     android:hint="@string/prompt_login"
                     android:inputType="textEmailAddress"
@@ -60,7 +60,7 @@
 
 
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/name"
                     android:hint="@string/prompt_name"
                     android:inputType="textEmailAddress"
@@ -70,7 +70,7 @@
                     android:imeOptions="actionNext"
                     android:theme="@style/EditTextStyle"/>
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nickname"
                     android:hint="@string/nickname"
                     android:inputType="textEmailAddress"
@@ -80,7 +80,7 @@
                     android:imeOptions="actionNext"
                     android:theme="@style/EditTextStyle"/>
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/email"
                     android:hint="@string/prompt_email"
                     android:inputType="textEmailAddress"
@@ -90,7 +90,7 @@
                     android:imeOptions="actionNext"
                     android:theme="@style/EditTextStyle"/>
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password"
                     android:hint="@string/prompt_password"
                     android:imeOptions="actionNext"
@@ -100,7 +100,7 @@
                     android:layout_columnWeight="1"
                     android:theme="@style/EditTextStyle"/>
 
-                <AutoCompleteTextView
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/repeat_password"
                     android:hint="@string/repeat_password"
                     android:inputType="textEmailAddress"

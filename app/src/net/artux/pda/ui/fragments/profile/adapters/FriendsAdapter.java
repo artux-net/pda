@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
-import net.artux.pda.ui.fragments.profile.ProfileHelper;
+import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pdalib.profile.FriendModel;
 

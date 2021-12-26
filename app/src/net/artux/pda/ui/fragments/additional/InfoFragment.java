@@ -16,7 +16,7 @@ import net.artux.pda.app.App;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
-import net.artux.pda.ui.fragments.profile.ProfileHelper;
+import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 import net.artux.pdalib.Member;
 import net.artux.pdalib.Profile;
 

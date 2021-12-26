@@ -34,6 +34,21 @@ public class Checker {
 
                                     }
                                 break;
+                            case "money>=":
+                                if (conditions.get(condition)!=null)
+                                    for (String money : conditions.get(condition)){
+                                        if (member.getMoney() < Integer.parseInt(money))
+                                            return false;
+                                    }
+                                break;
+                            case "money<":
+                                if (conditions.get(condition)!=null)
+                                    for (String money : conditions.get(condition)){
+                                        if (member.getMoney() >= Integer.parseInt(money))
+                                            return false;
+                                    }
+                                break;
+
                         }
                     } else return false;
             }

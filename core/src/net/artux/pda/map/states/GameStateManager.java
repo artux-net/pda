@@ -3,13 +3,13 @@ package net.artux.pda.map.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pdalib.Member;
 
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -54,12 +54,6 @@ public class GameStateManager {
         states.peek().handleInput();
     }
 
-    public void pop(){
-        states.peek().stop();
-        states.pop();
-        states.peek().handleInput();
-    }
-
     public void set(State state){
         states.pop().dispose();
         states.push(state);
@@ -68,6 +62,10 @@ public class GameStateManager {
     public void dispose(){
         for (State state: states){
             state.dispose();
+        }
+        for (Object obj : bundle.values()) {
+            if (obj instanceof Texture)
+                ((Texture) obj).dispose();
         }
         russianFont.dispose();
     }

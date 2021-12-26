@@ -9,27 +9,20 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 import net.artux.pda.map.platform.PlatformInterface;
-import net.artux.pda.map.states.ArenaState;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.PlayState;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.arena.Connection;
-
-import java.net.URISyntaxException;
 
 public class GdxAdapter extends ApplicationAdapter {
 	SpriteBatch batch;
 
 	GameStateManager gsm;
 
-	public final String SPANISH_FONT_NAME = "fonts/goodfish rg.ttf";
 	public final String RUSSIAN_FONT_NAME = "fonts/Imperial Web.ttf";
 	public final String RUSSIAN_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;:,{}\"´`'<>";
 
     public GdxAdapter(PlatformInterface platformInterface){
 		gsm = new GameStateManager(platformInterface);
 	}
-
 
 	public void put(String key, Object o){
     	gsm.put(key, o);

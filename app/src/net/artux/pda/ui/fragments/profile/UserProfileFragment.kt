@@ -17,6 +17,7 @@ import net.artux.pda.ui.activities.hierarhy.BaseFragment
 import net.artux.pda.ui.fragments.additional.AdditionalFragment
 import net.artux.pda.ui.fragments.chat.ChatFragment
 import net.artux.pda.ui.fragments.profile.adapters.GroupsAdapter
+import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper
 import net.artux.pda.ui.util.getViewModelFactory
 import net.artux.pda.viewmodels.ProfileViewModel
 import net.artux.pdalib.Status

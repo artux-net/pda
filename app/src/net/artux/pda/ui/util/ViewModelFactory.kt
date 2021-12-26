@@ -20,9 +20,13 @@ import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
+import net.artux.pda.repositories.QuestRepository
+import net.artux.pda.repositories.SummaryRepository
 import net.artux.pda.viewmodels.ProfileViewModel
 import net.artux.pda.repositories.UserRepository
 import net.artux.pda.viewmodels.MemberViewModel
+import net.artux.pda.viewmodels.QuestViewModel
+import net.artux.pda.viewmodels.SummaryViewModel
 
 /**
  * Factory for all ViewModels.
@@ -30,6 +34,8 @@ import net.artux.pda.viewmodels.MemberViewModel
 @Suppress("UNCHECKED_CAST")
 class ViewModelFactory constructor(
     private val usersRepository: UserRepository,
+    private val questRepository: QuestRepository,
+    private val summaryRepository: SummaryRepository,
     owner: SavedStateRegistryOwner,
     defaultArgs: Bundle? = null
 ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
@@ -45,6 +51,10 @@ class ViewModelFactory constructor(
                 ProfileViewModel(usersRepository)
             isAssignableFrom(MemberViewModel::class.java) ->
                 MemberViewModel(usersRepository)
+            isAssignableFrom(QuestViewModel::class.java) ->
+                QuestViewModel(questRepository)
+            isAssignableFrom(SummaryViewModel::class.java) ->
+                SummaryViewModel(summaryRepository)
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

@@ -20,6 +20,7 @@ import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.encyclopedia.EncyclopediaFragment;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
+import net.artux.pda.ui.fragments.profile.helpers.ItemsHelper;
 import net.artux.pdalib.Member;
 import net.artux.pdalib.Status;
 import net.artux.pdalib.profile.Data;
@@ -27,7 +28,6 @@ import net.artux.pdalib.profile.items.Armor;
 import net.artux.pdalib.profile.items.Item;
 import net.artux.pdalib.profile.items.Weapon;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 

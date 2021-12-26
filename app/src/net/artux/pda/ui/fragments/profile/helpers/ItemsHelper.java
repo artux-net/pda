@@ -1,4 +1,4 @@
-package net.artux.pda.ui.fragments.profile;
+package net.artux.pda.ui.fragments.profile.helpers;
 
 import android.content.Context;
 

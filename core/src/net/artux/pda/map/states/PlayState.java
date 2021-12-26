@@ -58,9 +58,8 @@ public class PlayState extends State {
 
     public static AssetManager assetManager;
 
-    private Button.ButtonStyle textButtonStyle;
-
-    private UserInterface userInterface;
+    private final Button.ButtonStyle textButtonStyle;
+    private final UserInterface userInterface;
 
     private static final String tag = "PlayState";
 
@@ -103,14 +102,13 @@ public class PlayState extends State {
         if (map!=null) {
             player.setPosition(map.getPlayerPosition().x, map.getPlayerPosition().y);
 
-            if (Gdx.files.absolute(map.getTextureUri()).exists())
-                background = new Texture(Gdx.files.absolute(map.getTextureUri()));
+            background = (Texture) gsm.get("texture");
 
             if (map.getBlurTextureUri() != null)
-                if (Gdx.files.absolute(map.getBlurTextureUri()).exists()) {
-                    blur = new Texture(Gdx.files.absolute(map.getBlurTextureUri()));
+                if (gsm.get("blur")!=null) {
+                    blur = (Texture) gsm.get("blur");
                     blur.setWrap(Repeat, Repeat);
-                    if (background!=null) {
+                    if (background != null) {
                         wb = background.getWidth() / 2 - blur.getWidth() / 2;
                         hb = background.getHeight() / 2 - blur.getHeight() / 2;
                     }
@@ -171,9 +169,8 @@ public class PlayState extends State {
         Map map = (Map) gsm.get("map");
         Player player = new Player(this, getMember(), assetManager);
 
-        if (map.getBoundsTextureUri()!= null && !map.getBoundsTextureUri().equals("")
-                && Gdx.files.absolute(map.getBoundsTextureUri()).exists()) {
-            bounds = new Texture(Gdx.files.absolute(map.getBoundsTextureUri()));
+        if (gsm.get("bounds")!=null) {
+            bounds = (Texture) gsm.get("bounds");
             player.setBoundsTexture(bounds);
         }
         entities.add(player);
@@ -314,6 +311,9 @@ public class PlayState extends State {
             stage.getBatch().draw(blur,wb, hb);
         if (background!=null)
             stage.getBatch().draw(background, 0, 0);
+        else if (gsm.get("texture")!=null){
+            background = (Texture) gsm.get("texture");
+        }
 
         stage.getBatch().end();
         stage.draw();

@@ -13,7 +13,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import net.artux.pda.databinding.FragmentNotificationBinding;
-import net.artux.pda.ui.fragments.profile.ProfileHelper;
+import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 import net.artux.pda.viewmodels.ProfileViewModel;
 import net.artux.pda.ui.fragments.quest.models.Stage;
 import net.artux.pda.ui.fragments.quest.models.Text;
@@ -28,6 +28,7 @@ import java.util.List;
 public abstract class SceneFragment extends Fragment implements StageNavigation.View{
 
     protected Stage stage;
+    protected QuestController controller;
     protected ProfileViewModel viewModel;
 
     @Override
@@ -41,6 +42,11 @@ public abstract class SceneFragment extends Fragment implements StageNavigation.
     @Override
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    @Override
+    public void setController(QuestController controller) {
+        this.controller = controller;
     }
 
     @Override

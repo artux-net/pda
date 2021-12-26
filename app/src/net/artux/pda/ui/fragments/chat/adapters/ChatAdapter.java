@@ -1,26 +1,18 @@
 package net.artux.pda.ui.fragments.chat.adapters;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.ui.PdaAlertDialog;
-import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
-import net.artux.pda.ui.fragments.chat.ChatFragment;
-import net.artux.pda.ui.fragments.profile.ProfileHelper;
-import net.artux.pda.ui.fragments.profile.UserProfileFragment;
-import net.artux.pdalib.LimitedArrayList;
+import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 import net.artux.pdalib.UserMessage;
 
 import org.joda.time.DateTime;
@@ -28,33 +20,36 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
-    private final LimitedArrayList<UserMessage> mMessageList = new LimitedArrayList<>();
+    private ArrayList<UserMessage> messages;
+    private MessageClickListener listener;
 
-    private final Context mContext;
-    private final FragmentNavigation.Presenter presenter;
-
-    public ChatAdapter(Context context, FragmentNavigation.Presenter presenter){
-        mContext = context;
-        this.presenter = presenter;
+    public ChatAdapter(MessageClickListener listener){
+        this.listener = listener;
+        messages = new ArrayList<>();
     }
 
-    public void setItems(LimitedArrayList<UserMessage> messages) {
-        mMessageList.addAll(messages);
+    @SuppressLint("NotifyDataSetChanged")
+    public void setItems(List<UserMessage> messages) {
+        this.messages.addAll(messages);
         notifyDataSetChanged();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void clearItems() {
-        mMessageList.clear();
+        messages.clear();
         notifyDataSetChanged();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void addMessage(UserMessage userMessage){
-        mMessageList.add(userMessage);
+        messages.add(userMessage);
         notifyDataSetChanged();
     }
 
@@ -68,12 +63,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bind(mMessageList.get(position), presenter);
+        holder.bind(messages.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mMessageList.size();
+        return messages.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
@@ -92,59 +87,38 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
 
         @SuppressLint("SetTextI18n")
-        void bind(UserMessage userMessage, FragmentNavigation.Presenter presenter){
+        void bind(UserMessage userMessage){
             itemView.setOnLongClickListener(view -> {
-                PdaAlertDialog builder = new PdaAlertDialog(mContext, (LinearLayout) itemView);
-                builder.addButton("Перейти к диалогу", view12 -> {
-                    ChatFragment chatFragment1 = new ChatFragment();
-                    Bundle bundle1 = new Bundle();
-                    bundle1.putInt("to", userMessage.pdaId);
-                    chatFragment1.setArguments(bundle1);
-                    presenter.addFragment(chatFragment1, true);
-                });
-                builder.addButton("Посмотреть профиль", view1 -> {
-                    UserProfileFragment profileFragment = new UserProfileFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("pdaId",userMessage.pdaId);
-                    profileFragment.setArguments(bundle);
-                    if (presenter!=null)
-                        presenter.addFragment(profileFragment, true);
-                });
-                builder.show();
-
+                listener.onLongClick(userMessage);
                 return false;
             });
-            avatarView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    UserProfileFragment profileFragment = new UserProfileFragment();
-                    Bundle bundle = new Bundle();
-                    bundle.putInt("pdaId",userMessage.pdaId);
-                    profileFragment.setArguments(bundle);
-                    if (presenter!=null)
-                        presenter.addFragment(profileFragment, true);
-                }
-            });
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-                }
-            });
+            itemView.setOnClickListener(view -> listener.onClick(userMessage));
             SimpleDateFormat outputFormat =
                     new SimpleDateFormat("HH:mm", Locale.getDefault());
             outputFormat.setTimeZone(TimeZone.getDefault());
             Instant instant = new Instant(userMessage.time);
             DateTime time = instant.toDateTime().toDateTime(DateTimeZone.getDefault());
 
-
             nicknameView.setText(userMessage.senderLogin);
-            infoView.setText(" [PDA #" + userMessage.pdaId+"] "
-                    + mContext.getResources().getStringArray(R.array.groups)[userMessage.groupId]
-                    + " - " + outputFormat.format(time.toDate()));
             messageView.setText(Html.fromHtml(userMessage.message));
+
+            if (userMessage.pdaId < 0 || userMessage.groupId < 0){
+                infoView.setText(" [PDA ###]"
+                        + " - " + outputFormat.format(time.toDate()));
+            }else {
+                infoView.setText(" [PDA #" + userMessage.pdaId + "] "
+                        + infoView.getContext().getResources().getStringArray(R.array.groups)[userMessage.groupId] // группировка
+                        + " - " + outputFormat.format(time.toDate()));
+            }
             ProfileHelper.setAvatar(avatarView, userMessage.avatarId);
         }
+    }
+
+    public interface MessageClickListener{
+
+        void onClick(UserMessage message);
+        void onLongClick(UserMessage message);
+
     }
 
 }

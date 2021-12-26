@@ -1,4 +1,4 @@
-package net.artux.pda.ui.fragments.profile;
+package net.artux.pda.ui.fragments.profile.helpers;
 
 import android.content.Context;
 import android.widget.ImageView;
@@ -7,6 +7,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import com.bumptech.glide.Glide;
 
+import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pdalib.Profile;
@@ -52,6 +53,10 @@ public class ProfileHelper {
         if (isInteger(avatar) && context.getResources()!=null)
             imageView.setImageDrawable(ResourcesCompat.getDrawable(context.getResources(), App.avatars[Integer.parseInt(avatar)], null));
         else {
+            if (!avatar.contains("http")) {
+                avatar = "https://" + BuildConfig.URL + "/" + avatar;
+            }
+
             Glide.with(context).asDrawable().load(avatar).into(imageView);
         }
     }

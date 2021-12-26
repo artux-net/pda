@@ -29,6 +29,10 @@ public class Cache<T> {
         return gson.fromJson(mSharedPreferences.getString(id, ""), typeParameterClass);
     }
 
+    public String[] getIds(){
+        return mSharedPreferences.getAll().keySet().toArray(new String[0]);
+    }
+
     @SuppressLint("ApplySharedPref")
     public void clear(){
         mSharedPreferences.edit().clear().commit();

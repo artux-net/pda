@@ -19,36 +19,35 @@ package net.artux.pda.ui.util
  * Extension functions for Fragment.
  */
 
-import android.app.Activity
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.badlogic.gdx.backends.android.AndroidApplication
-import net.artux.pda.app.App
-import net.artux.pda.gdx.CoreStarter
-import androidx.lifecycle.SavedStateViewModelFactory
-import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
+import net.artux.pda.app.App
+import net.artux.pda.gdx.MapEngine
 
+
+fun getViewModelFactory(context: Context, owner: SavedStateRegistryOwner): ViewModelFactory{
+    val userRepository = (context as App).userRepository
+    val questRepository = context.questRepository
+    val summaryRepository = context.summaryRepository
+    return ViewModelFactory(userRepository, questRepository, summaryRepository, owner)
+}
 
 fun Fragment.getViewModelFactory(): ViewModelFactory {
-    val repository = (requireContext().applicationContext as App).repository
-    return ViewModelFactory(repository, this)
+   return getViewModelFactory(requireContext().applicationContext, this)
 }
 
 fun AppCompatActivity.getViewModelFactory(): ViewModelFactory {
-    val repository = (applicationContext as App).repository
-    return ViewModelFactory(repository, this)
+    return getViewModelFactory(applicationContext, this)
 }
 
 fun FragmentActivity.getViewModelFactory(): ViewModelFactory {
-    val repository = (applicationContext as App).repository
-    return ViewModelFactory(repository, this)
+    return getViewModelFactory(applicationContext, this)
 }
 
-
-fun CoreStarter.getViewModelFactory(): ViewModelFactory {
-    val repository = (applicationContext as App).repository
-    return ViewModelFactory(repository, this)
+fun MapEngine.getViewModelFactory(): ViewModelFactory {
+    return getViewModelFactory(applicationContext, this)
 }
 

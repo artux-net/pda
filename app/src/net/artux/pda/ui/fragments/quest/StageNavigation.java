@@ -8,6 +8,7 @@ public interface StageNavigation {
 
     interface View{
         void setStage(Stage stage);
+        void setController(QuestController controller);
         HashMap<String, String> getData();
     }
 

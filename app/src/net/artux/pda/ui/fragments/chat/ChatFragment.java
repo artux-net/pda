@@ -1,6 +1,5 @@
 package net.artux.pda.ui.fragments.chat;
 
-import android.os.Binder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,13 +21,15 @@ import com.google.gson.reflect.TypeToken;
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
+import net.artux.pda.databinding.FragmentChatBinding;
+import net.artux.pda.ui.PdaAlertDialog;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.fragments.additional.InfoFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
-import net.artux.pdalib.LimitedArrayList;
+import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pdalib.UserMessage;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -37,7 +38,7 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import timber.log.Timber;
 
-public class ChatFragment extends BaseFragment implements View.OnClickListener {
+public class ChatFragment extends BaseFragment implements View.OnClickListener, ChatAdapter.MessageClickListener {
 
     private RecyclerView mRecyclerView;
     private ChatAdapter mChatAdapter;
@@ -47,10 +48,13 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     private WebSocket ws;
     private Gson gson = new Gson();
 
+    private FragmentChatBinding binding;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_chat, container, false);
+        binding = FragmentChatBinding.inflate(inflater);
+        return binding.getRoot();
     }
 
     @Override
@@ -63,7 +67,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(manager);
-        mChatAdapter = new ChatAdapter(getActivity(), navigationPresenter);
+        mChatAdapter = new ChatAdapter(this);
         mRecyclerView.setAdapter(mChatAdapter);
 
         mInputEditText = view.findViewById(R.id.inputMessage);
@@ -128,7 +132,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
     private void updateAdapter(String text){
         if (getActivity()!=null)
             getActivity().runOnUiThread(() -> {
-                Type listType = new TypeToken<LimitedArrayList<UserMessage>>(){}.getType();
+                Type listType = new TypeToken<ArrayList<UserMessage>>(){}.getType();
 
                 try {
                     UserMessage userMessage = App.getRetrofitService().getGson().fromJson(text,UserMessage.class);
@@ -136,7 +140,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
                     mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount()-1);
                 }catch (JsonSyntaxException e){
                     mChatAdapter.clearItems();
-                    LimitedArrayList<UserMessage> list = gson.fromJson(text, listType);
+                    ArrayList<UserMessage> list = gson.fromJson(text, listType);
                     mChatAdapter.setItems(list);
                 }
             });
@@ -147,6 +151,37 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener {
         super.onDestroy();
         mRecyclerView.setAdapter(null);
         ws.close(1000, "Closed by user");
+    }
+
+    @Override
+    public void onClick(UserMessage message) {
+        UserProfileFragment profileFragment = new UserProfileFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("pdaId", message.pdaId);
+        profileFragment.setArguments(bundle);
+        if (navigationPresenter!=null)
+            navigationPresenter.addFragment(profileFragment, true);
+    }
+
+    @Override
+    public void onLongClick(UserMessage message) {
+        PdaAlertDialog builder = new PdaAlertDialog(requireContext(), binding.getRoot());
+        builder.addButton("Перейти к диалогу", view12 -> {
+            ChatFragment chatFragment1 = new ChatFragment();
+            Bundle bundle1 = new Bundle();
+            bundle1.putInt("to", message.pdaId);
+            chatFragment1.setArguments(bundle1);
+            navigationPresenter.addFragment(chatFragment1, true);
+        });
+        builder.addButton("Посмотреть профиль", view1 -> {
+            UserProfileFragment profileFragment = new UserProfileFragment();
+            Bundle bundle = new Bundle();
+            bundle.putInt("pdaId", message.pdaId);
+            profileFragment.setArguments(bundle);
+            if (navigationPresenter!=null)
+                navigationPresenter.addFragment(profileFragment, true);
+        });
+        builder.show();
     }
 
     private final class EchoWebSocketListener extends WebSocketListener {

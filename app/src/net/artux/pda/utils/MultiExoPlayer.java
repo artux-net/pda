@@ -20,7 +20,6 @@ public class MultiExoPlayer {
     private final Context context;
     private final List<Sound> sounds;
     private final HashMap<Sound, SimpleExoPlayer> player = new HashMap<>();
-    private MyDownloadService myDownloadService;
     boolean muted;
 
     public MultiExoPlayer(Context context, List<Sound> soundList){

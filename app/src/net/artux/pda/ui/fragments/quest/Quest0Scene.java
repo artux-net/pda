@@ -20,8 +20,6 @@ import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.quest.models.Transfer;
 import net.artux.pdalib.Member;
 
-import java.util.List;
-
 public class Quest0Scene extends SceneFragment{
 
     private LinearLayout sceneResponses;
@@ -39,10 +37,7 @@ public class Quest0Scene extends SceneFragment{
         TextView mainText = view.findViewById(R.id.sceneText);
         sceneResponses = view.findViewById(R.id.sceneResponses);
 
-
-
         colorStateList = mainText.getTextColors();
-
 
         Result<Member> memberResult = viewModel.getUserRepository().getCachedMember();
         if (memberResult instanceof Result.Success){
@@ -72,7 +67,7 @@ public class Quest0Scene extends SceneFragment{
             if (getActivity()!=null) {
                 button.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.black_overlay));
                 button.setOnClickListener(v ->
-                        ((QuestActivity) getActivity()).getSceneController().loadStage(transfer.stage_id));
+                        controller.chooseTransfer(transfer));
             }
             sceneResponses.addView(button);
         }
