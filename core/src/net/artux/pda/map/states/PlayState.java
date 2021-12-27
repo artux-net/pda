@@ -58,8 +58,8 @@ public class PlayState extends State {
 
     public static AssetManager assetManager;
 
-    private final Button.ButtonStyle textButtonStyle;
-    private final UserInterface userInterface;
+    private Button.ButtonStyle textButtonStyle;
+    private UserInterface userInterface;
 
     private static final String tag = "PlayState";
 
@@ -307,12 +307,22 @@ public class PlayState extends State {
 
         if (player!=null)
             stage.getViewport().getCamera().position.set(player.getPosition(), 0);
+
         if (blur!=null)
             stage.getBatch().draw(blur,wb, hb);
+        else if (gsm.get("blur")!=null){
+            blur = (Texture) gsm.get("blur");
+        }
         if (background!=null)
             stage.getBatch().draw(background, 0, 0);
         else if (gsm.get("texture")!=null){
             background = (Texture) gsm.get("texture");
+        }
+        if (bounds==null){
+            bounds = (Texture) gsm.get("bounds");
+            if (bounds != null && player!=null) {
+                player.setBoundsTexture(bounds);
+            }
         }
 
         stage.getBatch().end();

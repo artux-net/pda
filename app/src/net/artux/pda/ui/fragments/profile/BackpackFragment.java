@@ -28,6 +28,7 @@ import net.artux.pdalib.profile.items.Armor;
 import net.artux.pdalib.profile.items.Item;
 import net.artux.pdalib.profile.items.Weapon;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
 
 
     private ItemsAdapter itemsAdapter = new ItemsAdapter( this);
+    private DecimalFormat formater = new DecimalFormat("##.##");
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
@@ -73,7 +75,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
                     for (Item item: items)
                         weight += item.weight;
 
-                    navigationPresenter.setTitle("Денег: " + member.getMoney() + ", вес рюкзака: " + String.format("%s", weight) + " кг");
+                    navigationPresenter.setTitle("Денег: " + member.getMoney() + ", вес рюкзака: " + formater.format(weight) + " кг");
                 }else viewModel.updateMember();
             }
         });

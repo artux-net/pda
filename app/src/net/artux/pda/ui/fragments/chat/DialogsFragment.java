@@ -1,10 +1,7 @@
 package net.artux.pda.ui.fragments.chat;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,10 +21,10 @@ import net.artux.pda.app.NotificationService;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
 import net.artux.pdalib.Status;
 import net.artux.pdalib.UserMessage;
+import net.artux.pdalib.profile.items.GsonProvider;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -41,18 +38,14 @@ import timber.log.Timber;
 
 public class DialogsFragment extends BaseFragment implements MessageListener {
 
-    private final Gson mGson = new Gson();
     private DialogsAdapter dialogsAdapter;
     private FragmentListBinding binding;
     private WebSocket ws;
-    private Gson gson = new Gson();
+    private Gson gson = GsonProvider.getInstance();
+    private EchoWebSocketListener listener;
 
-    EchoWebSocketListener listener;
-
-
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentListBinding.inflate(inflater);
         return binding.getRoot();
     }
@@ -65,7 +58,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
 
         dialogsAdapter = new DialogsAdapter((MainActivity) getActivity(), navigationPresenter);
         Type listType = new TypeToken<List<Dialog>>(){}.getType();
-        List<Dialog> dialogs = mGson.fromJson(App.getDataManager().getString("dialogs"), listType);
+        List<Dialog> dialogs = gson.fromJson(App.getDataManager().getString("dialogs"), listType);
         if(dialogs!=null){
             binding.list.setVisibility(View.VISIBLE);
             binding.viewMessage.setVisibility(View.GONE);
@@ -74,8 +67,8 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
 
         binding.list.setAdapter(dialogsAdapter);
 
-        Intent intent = new Intent(getActivity(), NotificationService.class).putExtra("t", App.getDataManager().getAuthToken());
-        getActivity().startService(intent);
+        /*Intent intent = new Intent(getActivity(), NotificationService.class).putExtra("t", App.getDataManager().getAuthToken());
+        getActivity().startService(intent);*/
 
         OkHttpClient client = new OkHttpClient();
 

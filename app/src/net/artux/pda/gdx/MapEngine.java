@@ -43,7 +43,7 @@ import timber.log.Timber;
 
 public class MapEngine extends AndroidApplication implements PlatformInterface, LifecycleOwner, SavedStateRegistryOwner {
 
-    private final Gson gson = new Gson();
+    private Gson gson = new Gson();
     private GdxAdapter gdxAdapter;
     private ProfileViewModel viewModel;
     private LifecycleRegistry lifecycleRegistry;
