@@ -50,8 +50,8 @@ public class ArenaState extends State {
     private Touchpad shootTouchpad;
     public static Stage stage;
     public static Stage uistage;
-    private Texture background;
-    private OrthographicCamera cam;
+    private final Texture background;
+    private final OrthographicCamera cam;
 
     private BitmapFont font;
 

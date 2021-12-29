@@ -12,6 +12,10 @@ class SummaryRepository @Inject constructor(
         summaryCache.clear()
     }
 
+    fun remove(id:String) {
+        summaryCache.remove(id)
+    }
+
     fun getCachedSummary(id: String): Result<Summary> {
         val cache = summaryCache.get(id)
         return if (cache != null)
@@ -24,7 +28,7 @@ class SummaryRepository @Inject constructor(
     }
 
     fun getAllDates(): Array<String> {
-        return summaryCache.ids;
+        return summaryCache.ids
     }
 
 }

@@ -41,7 +41,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
     private DialogsAdapter dialogsAdapter;
     private FragmentListBinding binding;
     private WebSocket ws;
-    private Gson gson = GsonProvider.getInstance();
+    private final Gson gson = GsonProvider.getInstance();
     private EchoWebSocketListener listener;
 
     @Override

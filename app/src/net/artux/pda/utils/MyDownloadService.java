@@ -4,23 +4,35 @@ import android.app.Notification;
 
 import androidx.annotation.Nullable;
 
-import com.google.android.exoplayer2.database.DatabaseProvider;
-import com.google.android.exoplayer2.database.ExoDatabaseProvider;
 import com.google.android.exoplayer2.offline.Download;
 import com.google.android.exoplayer2.offline.DownloadManager;
 import com.google.android.exoplayer2.offline.DownloadService;
 import com.google.android.exoplayer2.scheduler.Scheduler;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
-import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor;
-import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 
-import java.io.File;
 import java.util.List;
-import java.util.concurrent.Executor;
 
 public class MyDownloadService extends DownloadService {
+    protected MyDownloadService(int foregroundNotificationId) {
+        super(foregroundNotificationId);
+    }
 
-    private DownloadManager downloadManager;
+    @Override
+    protected DownloadManager getDownloadManager() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    protected Scheduler getScheduler() {
+        return null;
+    }
+
+    @Override
+    protected Notification getForegroundNotification(List<Download> downloads, int notMetRequirements) {
+        return null;
+    }
+
+  /*  private DownloadManager downloadManager;
     private SimpleCache downloadCache;
     private DefaultHttpDataSourceFactory dataSourceFactory;
 
@@ -91,5 +103,5 @@ public class MyDownloadService extends DownloadService {
 
     public DefaultHttpDataSourceFactory getDataSourceFactory() {
         return dataSourceFactory;
-    }
+    }*/
 }

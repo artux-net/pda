@@ -105,7 +105,7 @@ public class OpenNewsFragment extends BaseFragment {
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                         super.onAdFailedToLoad(loadAdError);
-                        Timber.e(String.valueOf("Ad failed " + loadAdError.getMessage()), loadAdError);
+                        Timber.e("Ad failed %s", loadAdError.getMessage());
                     }
 
                     @Override

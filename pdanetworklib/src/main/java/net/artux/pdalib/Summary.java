@@ -8,8 +8,8 @@ import java.util.List;
 
 public class Summary {
 
-    private String title;
-    private List<UserMessage> messages;
+    private final String title;
+    private final List<UserMessage> messages;
 
     public Summary() {
         this.title = getCurrentId();

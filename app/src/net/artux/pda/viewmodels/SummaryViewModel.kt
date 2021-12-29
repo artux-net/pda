@@ -19,6 +19,10 @@ class SummaryViewModel @Inject constructor(
         return summary
     }
 
+    fun removeSummary(id: String) {
+        repository.remove(id)
+    }
+
     fun getAllIds() : Array<String> {
         return repository.getAllDates()
     }

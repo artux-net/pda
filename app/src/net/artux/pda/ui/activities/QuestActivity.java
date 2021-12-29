@@ -2,6 +2,7 @@ package net.artux.pda.ui.activities;
 
 import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -66,7 +67,6 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     private QuestController sceneController;
 
     private TextView tvTime;
-    private ImageView musicImage;
     private ImageSwitcher switcher;
 
     private String background_url = "";
@@ -97,7 +97,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             summaryViewModel = getViewModelFactory(this).create(SummaryViewModel.class);
 
         tvTime = findViewById(R.id.sceneTime);
-        musicImage = findViewById(R.id.musicSetup);
+        ImageView musicImage = findViewById(R.id.musicSetup);
         musicImage.setOnClickListener(this);
         findViewById(R.id.closeButton).setOnClickListener(this);
         findViewById(R.id.exitButton).setOnClickListener(this);
@@ -220,10 +220,8 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void processTransfer(Transfer transfer) {
-        switch(sceneController.getActualStage().getTypeStage()){
-            case 7:
-                summary.addMessage(new UserMessage(member, transfer.text));
-                break;
+        if (sceneController.getActualStage().getTypeStage() == 7) {
+            summary.addMessage(new UserMessage(member, transfer.text));
         }
     }
 
@@ -434,6 +432,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         super.onDestroy();
     }
 
+    @SuppressLint("MissingSuperCall")
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
 

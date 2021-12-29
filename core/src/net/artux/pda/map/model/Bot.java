@@ -15,7 +15,7 @@ import java.util.TimerTask;
 public class Bot extends Entity {
 
     private Vector2 target;
-    private Spawn spawn;
+    private final Spawn spawn;
     float timer;
 
     public Bot(int id, final Vector2 position, final Spawn spawn, AssetManager skin, Mob mob, Player player) {
@@ -25,7 +25,7 @@ public class Bot extends Entity {
         setPosition(position.x, position.y);
 
         this.id = id;
-        MOVEMENT = 0.2f;
+        MOVEMENT = 20f;
         velocity = new Vector2(0,0);
         if (player.member != null) {
             if (mob.group < 0 || player.member.relations.get(mob.group) < -2)

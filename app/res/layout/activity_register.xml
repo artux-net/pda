@@ -51,9 +51,9 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/login"
                     android:hint="@string/prompt_login"
-                    android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
+                    android:inputType="text"
                     android:layout_columnWeight="1"
                     android:imeOptions="actionNext"
                     android:theme="@style/EditTextStyle"/>
@@ -63,9 +63,9 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/name"
                     android:hint="@string/prompt_name"
-                    android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
+                    android:inputType="textPersonName"
                     android:layout_columnWeight="1"
                     android:imeOptions="actionNext"
                     android:theme="@style/EditTextStyle"/>
@@ -73,9 +73,9 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nickname"
                     android:hint="@string/nickname"
-                    android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
+                    android:inputType="text"
                     android:layout_columnWeight="1"
                     android:imeOptions="actionNext"
                     android:theme="@style/EditTextStyle"/>
@@ -83,8 +83,8 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/email"
                     android:hint="@string/prompt_email"
-                    android:inputType="textEmailAddress"
                     android:maxLines="1"
+                    android:inputType="textEmailAddress"
                     android:singleLine="true"
                     android:layout_columnWeight="1"
                     android:imeOptions="actionNext"
@@ -103,7 +103,7 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/repeat_password"
                     android:hint="@string/repeat_password"
-                    android:inputType="textEmailAddress"
+                    android:inputType="textPassword"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:layout_columnWeight="1"

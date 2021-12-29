@@ -27,8 +27,8 @@ import java.util.TimeZone;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
-    private ArrayList<UserMessage> messages;
-    private MessageClickListener listener;
+    private List<UserMessage> messages;
+    private final MessageClickListener listener;
 
     public ChatAdapter(MessageClickListener listener){
         this.listener = listener;
@@ -37,7 +37,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @SuppressLint("NotifyDataSetChanged")
     public void setItems(List<UserMessage> messages) {
-        this.messages.addAll(messages);
+        this.messages = messages;
         notifyDataSetChanged();
     }
 

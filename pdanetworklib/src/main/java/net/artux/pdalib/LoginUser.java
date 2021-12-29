@@ -2,8 +2,8 @@ package net.artux.pdalib;
 
 public class LoginUser {
 
-    private String emailOrLogin;
-    private String password;
+    private final String emailOrLogin;
+    private final String password;
 
     public LoginUser(String emailOrLogin, String password) {
         this.emailOrLogin = emailOrLogin;

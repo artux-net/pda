@@ -1,5 +1,8 @@
 package net.artux.pda.ui.activities;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -7,7 +10,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -17,22 +19,18 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pdalib.LoginStatus;
 import net.artux.pdalib.LoginUser;
 import net.artux.pdalib.Member;
 import net.artux.pdalib.Status;
@@ -45,10 +43,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static androidx.core.app.ActivityCompat.requestPermissions;
-
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     LoginUser loginUser;
@@ -57,7 +51,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    private View mResetPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +63,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             finish();
         }else {
             setContentView(R.layout.activity_login);
-            mResetPassword = findViewById(R.id.forgotPassword);
+            View mResetPassword = findViewById(R.id.forgotPassword);
             mResetPassword.setOnClickListener(v -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                 builder.setTitle(R.string.action_input_login_or_email);
@@ -80,24 +73,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                 builder.setView(input);
 
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("OK", (dialog, which) -> App.getRetrofitService().getPdaAPI().resetPassword(input.getText().toString()).enqueue(new Callback<Status>() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        App.getRetrofitService().getPdaAPI().resetPassword(input.getText().toString()).enqueue(new Callback<Status>() {
-                            @Override
-                            public void onResponse(Call<Status> call, Response<Status> response) {
-                                Status status = response.body();
-                                if (status != null)
-                                    Toast.makeText(LoginActivity.this, status.getDescription(), Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onFailure(Call<Status> call, Throwable t) {
-
-                            }
-                        });
+                    public void onResponse(Call<Status> call, Response<Status> response) {
+                        Status status = response.body();
+                        if (status != null)
+                            Toast.makeText(LoginActivity.this, status.getDescription(), Toast.LENGTH_SHORT).show();
                     }
-                });
+
+                    @Override
+                    public void onFailure(Call<Status> call, Throwable t) {
+
+                    }
+                }));
                 builder.setNegativeButton(R.string.action_cancel, (dialog, which) -> dialog.cancel());
 
                 builder.show();
@@ -105,24 +93,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mEmailView = findViewById(R.id.email);
 
             mPasswordView = findViewById(R.id.password);
-            mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                    if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                        hideKeyboard(LoginActivity.this);
-                        attemptLogin();
-                        return true;
-                    }
-                    return false;
+            mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
+                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                    hideKeyboard(LoginActivity.this);
+                    attemptLogin();
+                    return true;
                 }
+                return false;
             });
 
-            findViewById(R.id.register).setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-                }
-            });
+            findViewById(R.id.register).setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
 
             View mEmailSignInButton = findViewById(R.id.email_sign_in_button);
             mEmailSignInButton.setOnClickListener(view -> attemptLogin());
@@ -173,19 +153,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 public void onResponse(Call<Member> call, Response<Member> response) {
                         showProgress(false);
                         Member member = response.body();
-                        Timber.d("Member auth " + App.getDataManager().getAuthToken());
+                        Timber.d("Member auth %s", App.getDataManager().getAuthToken());
                         if (response.code() == 502)
                             Toast.makeText(LoginActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
+                        else if (response.code() == 401){
+                            Toast.makeText(LoginActivity.this, "Неправильный логин или пароль", Toast.LENGTH_SHORT).show();
+                        }
                         else if (member != null) {
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                 finish();
                             }
                         else {
-                            if (response.message()!=null && !response.message().equals(""))
+                            if (!response.message().equals(""))
                                 Toast.makeText(getApplicationContext(), response.code() + ":" + response.message(), Toast.LENGTH_LONG).show();
                             else
                                 Toast.makeText(getApplicationContext(), response.code() + ":" + getString(R.string.unable_connect), Toast.LENGTH_LONG).show();
-                            Timber.e("Login error - " + response.toString());
+                            Timber.e("Login error - %s", response.toString());
                         }
 
                     }

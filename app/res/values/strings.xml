@@ -149,5 +149,6 @@
     <string name="empty">Empty here..</string>
     <string name="note_isnt_selected">Note isn\'t selected.</string>
     <string name="subs">Friend requests - %1$s</string>
-    <string name="settings">Настройки</string>
+    <string name="settings">Settings</string>
+    <string name="exitStory">Выйти из истории</string>
 </resources>

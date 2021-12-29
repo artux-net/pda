@@ -2,7 +2,11 @@ package net.artux.pda.ui.fragments;
 
 import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
 
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,18 +32,22 @@ import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pdalib.Member;
 import net.artux.pdalib.Status;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class SettingsFragment extends BaseFragment implements View.OnClickListener {
 
 
     private ActivitySettingsBinding binding;
+    private File cacheDirectory;
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
@@ -70,6 +78,43 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
             }
         });
 
+        // path to /data/data/yourapp/app_data/imageDir
+
+        PackageManager m = requireActivity().getPackageManager();
+        String s = requireActivity().getPackageName();
+        PackageInfo p = null;
+        try {
+            p = m.getPackageInfo(s, 0);
+            s = p.applicationInfo.dataDir;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+        cacheDirectory = new File(s + "/cache");
+        Timber.d(Arrays.toString(cacheDirectory.list()));
+
+        binding.mapCache.setText("Сохраненные карты: " + ((float)(dirSize(cacheDirectory) / (1024*1024))) + " мб");
+    }
+
+    private static long dirSize(File dir) {
+        Timber.d(dir.getAbsolutePath());
+        Timber.d(String.valueOf(dir.getParentFile().listFiles()));
+        if (dir.exists()) {
+            long result = 0;
+            File[] fileList = dir.listFiles();
+            if (fileList != null) {
+                for (File file : fileList) {
+                    if (file.isDirectory()) {
+                        result += dirSize(file);
+                    } else {
+                        result += file.length();
+                    }
+                }
+            }
+            return result;
+        }
+        return 0;
     }
 
     void setOnClickListener(ViewGroup view){
@@ -89,7 +134,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 getActivity().finish();
                 break;
-            case R.id.clearImages:
+            case R.id.imagesResetButton:
                 new Thread(() -> {
                     if (getContext()!=null) {
                         Glide.get(getContext()).clearDiskCache();
@@ -105,10 +150,10 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
             case R.id.resetData:
                 viewModel.resetData();
                 break;
-            case R.id.resetStory:
-                HashMap<String, List<String>> action = new HashMap<>();
-                action.put("reset_current", new ArrayList<>());
-                viewModel.syncMember(action);
+            case R.id.mapCacheResetButton:
+                if(cacheDirectory.delete()){
+                    binding.mapCache.setText("Сохраненные карты: " + (dirSize(cacheDirectory) / (1024*1024)) + " мб");
+                }
                 break;
         }
     }

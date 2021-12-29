@@ -39,8 +39,8 @@ import retrofit2.Response;
 public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnClickListener {
 
 
-    private ItemsAdapter itemsAdapter = new ItemsAdapter( this);
-    private DecimalFormat formater = new DecimalFormat("##.##");
+    private final ItemsAdapter itemsAdapter = new ItemsAdapter( this);
+    private final DecimalFormat formater = new DecimalFormat("##.##");
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }

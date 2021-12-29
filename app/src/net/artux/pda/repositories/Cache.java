@@ -29,6 +29,13 @@ public class Cache<T> {
         return gson.fromJson(mSharedPreferences.getString(id, ""), typeParameterClass);
     }
 
+    public boolean remove(String id){
+        if(!mSharedPreferences.contains(id))
+            return false;
+
+        return mSharedPreferences.edit().remove(id).commit();
+    }
+
     public String[] getIds(){
         return mSharedPreferences.getAll().keySet().toArray(new String[0]);
     }

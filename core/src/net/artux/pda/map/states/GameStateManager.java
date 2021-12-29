@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pdalib.Member;
@@ -54,9 +55,14 @@ public class GameStateManager {
         states.peek().handleInput();
     }
 
+    public State peek(){
+        return states.peek();
+    }
+
     public void set(State state){
         states.pop().dispose();
         states.push(state);
+        states.peek().handleInput();
     }
 
     public void dispose(){
@@ -64,7 +70,7 @@ public class GameStateManager {
             state.dispose();
         }
         for (Object obj : bundle.values()) {
-            if (obj instanceof Texture)
+            if (obj instanceof Disposable)
                 ((Texture) obj).dispose();
         }
         russianFont.dispose();

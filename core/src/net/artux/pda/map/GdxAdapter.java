@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.PlayState;
+import net.artux.pda.map.states.PreloadState;
 
 public class GdxAdapter extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -35,7 +36,9 @@ public class GdxAdapter extends ApplicationAdapter {
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		batch = new SpriteBatch();
 		gsm.setRussianFont(generateFont(RUSSIAN_FONT_NAME, RUSSIAN_CHARACTERS));
-		gsm.push(new PlayState(gsm, batch));
+		PreloadState preloadState = new PreloadState(gsm);
+		gsm.push(preloadState);
+		preloadState.startLoad(batch);
 		Gdx.app.debug("GDX", "Loaded, heap " + Gdx.app.getNativeHeap());
 	}
 
@@ -47,7 +50,7 @@ public class GdxAdapter extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		Gdx.gl.glClearColor(130, 169, 130, 0.5f);
+		Gdx.gl.glClearColor(0, 0, 0, 0.5f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		gsm.update(Gdx.graphics.getDeltaTime());

@@ -38,7 +38,6 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        navigationPresenter.setTitle("Сводка");
 
         if (summaryViewModel==null)
             summaryViewModel = getViewModelFactory(this).create(SummaryViewModel.class);
@@ -52,6 +51,7 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
         view.findViewById(R.id.viewMessage).setVisibility(View.GONE);
         mChatAdapter = new ChatAdapter(this);
         recyclerView.setAdapter(mChatAdapter);
+        reset();
 
         summaryViewModel.getSummary().observe(getViewLifecycleOwner(), summary -> {
             if (summary!=null){
@@ -72,11 +72,19 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
 
     }
 
+    void reset(){
+        navigationPresenter.setTitle("Выберете сводку в меню справа..");
+        mChatAdapter.clearItems();
+    }
+
     @Override
     public void receiveData(Bundle data) {
         super.receiveData(data);
         if (data.containsKey("loadSummary")){
             summaryViewModel.getCachedSummary(data.getString("loadSummary"));
+        }
+        if (data.containsKey("reset")){
+            reset();
         }
     }
 }

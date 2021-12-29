@@ -12,7 +12,7 @@ android {
             keyPassword 'pass'
         }
     }
-    buildToolsVersion "30.0.2"
+    buildToolsVersion "32.0.0"
     compileSdkVersion 31
     sourceSets {
         main {
@@ -33,8 +33,8 @@ android {
         applicationId "net.artux.pda"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 16
-        versionName "0.04.7"
+        versionCode 17
+        versionName "0.04.8"
         signingConfig signingConfigs.release
     }
     buildTypes {
@@ -70,23 +70,25 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
-    implementation 'com.google.android.exoplayer:exoplayer:2.12.0'
-    implementation 'com.google.firebase:firebase-ads:20.2.0'
+
+    implementation 'com.google.android.exoplayer:exoplayer:2.16.1'
+    implementation 'com.google.firebase:firebase-ads:20.5.0'
+
     implementation 'androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'me.grantland:autofittextview:0.2.1'
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.annotation:annotation:1.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'org.aviran.cookiebar2:cookiebar2:1.1.4'
-    implementation 'com.google.android.material:material:1.2.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
     implementation 'joda-time:joda-time:2.10.8'
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
@@ -95,8 +97,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics'
 
-    implementation "androidx.core:core-ktx:+"
-    implementation("androidx.fragment:fragment-ktx:1.3.6")
+    implementation "androidx.core:core-ktx:1.7.0"
+    implementation("androidx.fragment:fragment-ktx:1.4.0")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     //dagger2
@@ -104,6 +106,11 @@ dependencies {
     implementation 'com.google.dagger:dagger-android-support:2.35.1' // if you use the support libraries
     annotationProcessor 'com.google.dagger:dagger-android-processor:2.35.1'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.35.1'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
 }

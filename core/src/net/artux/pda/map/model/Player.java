@@ -72,13 +72,14 @@ public class Player extends Entity implements Disposable {
     public void act(float delta) {
 
         if(run) {
-            MOVEMENT = 2f;
+            MOVEMENT = 40f;
             if (camera.zoom > 0.7*zoom) camera.zoom -= 0.007;
         } else {
             if (camera.zoom < zoom) camera.zoom += 0.005;
-            MOVEMENT = 1f;
+            MOVEMENT = 20f;
         }
-        if (bounds!=null){
+
+        if (bounds!=null && !velocity.isZero()){
             if (canMoveX(getX()+MOVEMENT*velocity.x, getY())){
                 super.act(delta);
             }
@@ -123,17 +124,13 @@ public class Player extends Entity implements Disposable {
 
     public boolean canMoveX(float x, float y){
         Color color = new Color(pixmap.getPixel(Math.round(x), bounds.getHeight() -Math.round(y)));
-        /*System.out.println("X: "+color.toString());
-        System.out.println(" R:" + color.r +  " G:" + color.g + " B:"+ color.b);*/
-        return color.r != 1.0;
+        return color.r != 1.0 || (color.g == 1 && color.r == 1 && color.b == 1);
     }
 
     public boolean canMoveY(float x, float y){
 
         Color color = new Color(pixmap.getPixel(Math.round(x), bounds.getHeight() - Math.round(y)));
-        /*System.out.println("Y: "+color.toString());
-        System.out.println(" R:" + color.r +  " G:" + color.g + " B:"+ color.b);*/
-        return color.r != 1.0;
+        return color.r != 1.0 || (color.g == 1 && color.r == 1 && color.b == 1);
     }
 
     public void update(float dt){

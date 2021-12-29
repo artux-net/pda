@@ -2,13 +2,9 @@ package net.artux.pda.gdx;
 
 import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.opengl.GLES20;
-import android.opengl.GLUtils;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
@@ -18,11 +14,8 @@ import androidx.savedstate.SavedStateRegistry;
 import androidx.savedstate.SavedStateRegistryController;
 import androidx.savedstate.SavedStateRegistryOwner;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.google.gson.Gson;
 
 import net.artux.pda.map.GdxAdapter;
@@ -36,21 +29,17 @@ import net.artux.pda.viewmodels.ProfileViewModel;
 import net.artux.pda.viewmodels.QuestViewModel;
 import net.artux.pdalib.Member;
 
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import timber.log.Timber;
 
 public class MapEngine extends AndroidApplication implements PlatformInterface, LifecycleOwner, SavedStateRegistryOwner {
 
-    private Gson gson = new Gson();
+    private final Gson gson = new Gson();
     private GdxAdapter gdxAdapter;
     private ProfileViewModel viewModel;
     private LifecycleRegistry lifecycleRegistry;
     private final SavedStateRegistryController mSavedStateRegistryController = SavedStateRegistryController.create(this);
-    public Bitmap texture;
-    public Bitmap bounds;
-    public Bitmap blur;
 
     private QuestViewModel questViewModel;
 
@@ -72,7 +61,6 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
         Result<Member> member = viewModel.getUserRepository().getCachedMember();
         if (member instanceof Result.Success ) {
             Map map = gson.fromJson(getIntent().getStringExtra("map"),Map.class);
-            loadTextures(map);
 
             gdxAdapter = new GdxAdapter(MapEngine.this);
 
@@ -80,40 +68,9 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
             gdxAdapter.put("map", gson.fromJson(getIntent().getStringExtra("map"), Map.class));
             gdxAdapter.put("member", ((Result.Success<Member>) member).getData());
             initialize(gdxAdapter, config);
-            Gdx.app.postRunnable(() -> {
-                gdxAdapter.put("texture", fromBitmap(texture));
-                gdxAdapter.put("bounds", fromBitmap(bounds));
-                gdxAdapter.put("blur", fromBitmap(blur));
-            });
         }
     }
 
-    void loadTextures(Map map){
-        try {
-            texture = loadBitmap(map.getTextureUri(), this);
-            bounds = loadBitmap(map.getBoundsTextureUri(), this);
-            blur = loadBitmap(map.getBlurTextureUri(), this);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static Bitmap loadBitmap(String filename, Context context) throws FileNotFoundException {
-        return BitmapFactory.decodeStream(context
-                .openFileInput(filename.replaceAll("/","")));
-    }
-
-    Texture fromBitmap(Bitmap bitmap) {
-        if (bitmap != null) {
-            Texture tex = new Texture(bitmap.getWidth(), bitmap.getHeight(), Pixmap.Format.RGBA8888);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tex.getTextureObjectHandle());
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
-            bitmap.recycle();
-            return tex;
-        }
-        return null;
-    }
 
     @Override
     public void onStart() {
@@ -198,6 +155,20 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
                 }
             }
         });
+    }
+
+    @Override
+    public void debug(String msg) {
+        Timber.d(msg);
+    }
+
+    @Override
+    public void error(String msg, Throwable t) {
+        Timber.e(t, msg);
+        Toast.makeText(this, "Critical error with map, try again later", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override

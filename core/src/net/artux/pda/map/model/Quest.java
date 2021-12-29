@@ -11,11 +11,11 @@ import java.util.HashMap;
 
 public class Quest extends Actor {
 
-    private int type;
-    private String title;
+    private final int type;
+    private final String title;
     private Sprite sprite;
-    private Vector2 position;
-    private HashMap<String, String> data;
+    private final Vector2 position;
+    private final HashMap<String, String> data;
 
     public Quest(Point point, AssetManager skin){
         type = point.type;

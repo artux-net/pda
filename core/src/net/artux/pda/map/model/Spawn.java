@@ -73,7 +73,7 @@ public class Spawn {
         for(int i=0;i<n;i++) {
             Bot bot = new Bot(id, getRandomPoint(random), this, skin, mob, player);
             bots.add(bot);
-            playState.entities.add(bot);
+//            playState.entities.add(bot);
             //Mob finalMob = mob;
             //bot.addListener();
             playState.stage.addActor(bot);

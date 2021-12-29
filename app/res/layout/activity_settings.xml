@@ -16,12 +16,58 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/clearImages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="Кеш"
+                android:textStyle="bold"
+                android:textSize="20sp" />
+
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:textSize="20sp"
-                android:text="@string/action_clear_saved_images"/>
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_alignParentStart="true"
+                    android:id="@+id/mapCache"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:text="Сохраненные карты: "
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/mapCacheResetButton"
+                    android:layout_alignParentEnd="true"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Сброс"/>
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/imagesResetButton"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Сброс кеша изображений"/>
+
+
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="Пользователь"
+                android:textStyle="bold"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/showDebug"
@@ -45,12 +91,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/resetData"/>
 
-            <Button
-                android:id="@+id/resetStory"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Выйти из истории"/>
 
             <Button
                 android:id="@+id/signOut"
@@ -58,6 +98,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/action_sign_out"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
 
             <TextView
                 android:id="@+id/version"

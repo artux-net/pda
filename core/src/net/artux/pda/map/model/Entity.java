@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public abstract class Entity extends Actor {
 
-    protected float MOVEMENT = 0.4f;
+    protected float MOVEMENT = 20f;
     public boolean run = false;
 
     public int id;
@@ -57,7 +57,7 @@ public abstract class Entity extends Actor {
 
     @Override
     public void act(float delta) {
-        moveBy(velocity.x * MOVEMENT, velocity.y * MOVEMENT);
+        moveBy(delta*velocity.x * MOVEMENT, delta*velocity.y * MOVEMENT);
     }
 
     @Override

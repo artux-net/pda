@@ -30,7 +30,7 @@ public class Logger implements Disposable{
     private final Player player;
     private final int x;
     private final int y;
-    private State state;
+    private final State state;
 
     List<String> texts =  new ArrayList<>();
 
@@ -88,7 +88,7 @@ public class Logger implements Disposable{
         font.draw(batch, "Density: " + Gdx.app.getGraphics().getDensity(), x, y - 90);
         font.draw(batch, "Version: " + Gdx.app.getVersion(), x, y - 105);
         if (state!=null && state instanceof ArenaState) {
-            font.draw(batch, "Ping: " + ((ArenaState) state).getPing() + "ms", x, y - 120);
+            font.draw(batch, "Ping: " + ArenaState.getPing() + "ms", x, y - 120);
             font.draw(batch, "Server render time: " + ((ArenaState) state).getServerRenderTime() + "ms", x, y - 135);
         }
         for (int i = 0; i<texts.size(); i++){

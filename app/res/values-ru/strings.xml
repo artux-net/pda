@@ -94,4 +94,5 @@
     <string name="note_isnt_selected">Note isn\'t selected.</string>
     <string name="jobs_p" translatable="false">Заданий: %1$s</string>
     <string name="subs">Запросы дружбы - %1$s</string>
+    <string name="settings">Настройки</string>
 </resources>

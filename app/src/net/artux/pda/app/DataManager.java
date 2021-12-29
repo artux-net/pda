@@ -13,7 +13,7 @@ import okhttp3.Credentials;
 
 public class DataManager {
 
-    private SharedPreferences mSharedPreferences;
+    private final SharedPreferences mSharedPreferences;
 
     public DataManager(Context context) {
         mSharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
