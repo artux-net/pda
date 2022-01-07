@@ -273,11 +273,13 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
         when (p0!!.id) {
             R.id.profile_friends -> {
                 bundle.putInt("type", 0)
+                bundle.putInt("pdaId", profile!!.pdaId)
                 friendsFragment.arguments = bundle
                 navigationPresenter.addFragment(friendsFragment, true)
             }
             R.id.profile_requests -> {
                 bundle.putInt("type", 1)
+                bundle.putInt("pdaId", profile!!.pdaId)
                 friendsFragment.arguments = bundle
                 navigationPresenter.addFragment(friendsFragment, true)
             }

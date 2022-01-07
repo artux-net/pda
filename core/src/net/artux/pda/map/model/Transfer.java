@@ -2,11 +2,15 @@ package net.artux.pda.map.model;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.HashMap;
+import java.util.List;
+
 public class Transfer {
     public String pos;
     private String toPos;
     private String message;
     private int to;
+    public HashMap<String, List<String>> condition;
 
     public Vector2 getPosition() {
         if (pos!=null) {

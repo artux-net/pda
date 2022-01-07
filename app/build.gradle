@@ -13,7 +13,7 @@ android {
         }
     }
     buildToolsVersion "32.0.0"
-    compileSdkVersion 31
+    compileSdkVersion 32
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -32,9 +32,9 @@ android {
     defaultConfig {
         applicationId "net.artux.pda"
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 17
-        versionName "0.04.8"
+        targetSdkVersion 32
+        versionCode 19
+        versionName "0.04.9"
         signingConfig signingConfigs.release
     }
     buildTypes {
@@ -43,7 +43,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
-            buildConfigField("String", "URL_API", "\"api.artux.net/pdanetwork/\"")
+            buildConfigField("String", "URL_API", "\"app.artux.net/pdanetwork/\"")
             buildConfigField("String", "URL", "\"api.artux.net/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-4707001480680280/1079779549\"")
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-4707001480680280/2723145658\"")
@@ -52,7 +52,7 @@ android {
             debuggable true
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
-            buildConfigField("String", "URL_API", "\"api.artux.net/pdanetwork/\"")
+            buildConfigField("String", "URL_API", "\"app.artux.net/pdanetwork/\"")
             buildConfigField("String", "URL", "\"api.artux.net/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-3940256099942544/1033173712\"")
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-3940256099942544/2247696110\"")

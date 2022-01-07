@@ -140,7 +140,8 @@ public class PlayState extends State {
             Gdx.app.debug(tag, "Number of transfers " + map.getTransfers().size());
 
             for (Transfer transfer : map.getTransfers()) {
-                stage.addActor(new TransferPoint(transfer, assetManager));
+                if (getMember()!=null && Checker.check(transfer.condition, getMember()))
+                    stage.addActor(new TransferPoint(transfer, assetManager));
             }
         }
         Gdx.app.debug(tag, "After loading map, heap " + Gdx.app.getNativeHeap());
@@ -150,9 +151,6 @@ public class PlayState extends State {
         textButtonStyle.down = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
         textButtonStyle.checked = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
         textButtonStyle.over = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
-
-
-
 
         userInterface = new UserInterface(gsm, player, assetManager);
         uistage.addActor(userInterface);
