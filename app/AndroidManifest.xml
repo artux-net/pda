@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="net.artux.pda" >
+    package="net.artux.pda">
 
     <uses-permission android:name="android.permission.INTERNET" /> <!-- Adding the permission -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -15,16 +15,23 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ui.activities.FinishRegistrationActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:label="@string/title_activity_finish_registration"
+            android:theme="@style/AppTheme.Fullscreen" />
         <activity
             android:name=".ui.activities.LogActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.LoginActivity"
+            android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="sensorLandscape"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="true">
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
@@ -57,9 +64,9 @@
             android:screenOrientation="sensorLandscape" />
         <activity
             android:name=".gdx.MapEngine"
+            android:exported="true"
             android:launchMode="singleInstance"
-            android:screenOrientation="sensorLandscape"
-            android:exported="true">
+            android:screenOrientation="sensorLandscape">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -76,7 +83,7 @@
         <service
             android:name=".utils.MyDownloadService"
             android:exported="false"
-            tools:ignore="Instantiatable" >
+            tools:ignore="Instantiatable">
 
             <!-- This is needed for Scheduler -->
             <intent-filter>
@@ -90,7 +97,7 @@
         <receiver
             android:name=".app.BootReceiver"
             android:enabled="true"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

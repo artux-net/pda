@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.LoginActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
+import net.artux.pda.viewmodels.QuestViewModel;
 import net.artux.pdalib.Member;
 import net.artux.pdalib.Status;
 
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,6 +54,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
+    private QuestViewModel questViewModel;
 
     @Nullable
     @Override
@@ -63,6 +67,9 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setOnClickListener(binding.getRoot());
+        if (questViewModel == null){
+            questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
+        }
         if (navigationPresenter!=null) {
             navigationPresenter.setTitle(getString(R.string.settings));
         }
@@ -78,11 +85,9 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
             }
         });
 
-        // path to /data/data/yourapp/app_data/imageDir
-
         PackageManager m = requireActivity().getPackageManager();
         String s = requireActivity().getPackageName();
-        PackageInfo p = null;
+        PackageInfo p;
         try {
             p = m.getPackageInfo(s, 0);
             s = p.applicationInfo.dataDir;
@@ -99,7 +104,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     private static long dirSize(File dir) {
         Timber.d(dir.getAbsolutePath());
-        Timber.d(String.valueOf(dir.getParentFile().listFiles()));
+        Timber.d(Arrays.toString(Objects.requireNonNull(dir.getParentFile()).listFiles()));
         if (dir.exists()) {
             long result = 0;
             File[] fileList = dir.listFiles();
@@ -134,10 +139,15 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 getActivity().finish();
                 break;
+            case R.id.questResetButton:
+                questViewModel.clear();
+                Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
             case R.id.imagesResetButton:
                 new Thread(() -> {
                     if (getContext()!=null) {
                         Glide.get(getContext()).clearDiskCache();
+                        Looper.prepare();
+                        Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
                     }
                 }).start();
                 break;
@@ -149,10 +159,12 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 break;
             case R.id.resetData:
                 viewModel.resetData();
+                Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.mapCacheResetButton:
                 if(cacheDirectory.delete()){
                     binding.mapCache.setText("Сохраненные карты: " + (dirSize(cacheDirectory) / (1024*1024)) + " мб");
+                    Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }

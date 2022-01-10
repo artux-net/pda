@@ -47,6 +47,14 @@
             </RelativeLayout>
 
             <Button
+                android:id="@+id/questResetButton"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Сброс кеша историй"/>
+
+            <Button
                 android:id="@+id/imagesResetButton"
                 android:layout_alignParentEnd="true"
                 android:layout_gravity="center"

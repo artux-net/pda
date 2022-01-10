@@ -26,6 +26,9 @@ import net.artux.pda.ui.activities.adapters.AvatarsAdapter;
 import net.artux.pdalib.RegisterUser;
 import net.artux.pdalib.Status;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -46,6 +49,12 @@ public class RegisterActivity extends AppCompatActivity {
 
     AvatarsAdapter avatarsAdapter = new AvatarsAdapter();
 
+    private static final String EMAIL_VALIDATION_REGEX = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+    private static final String LOGIN_VALIDATION_REGEX = "^[a-zA-Z0-9-_.]+$";
+    private static final String NAME_VALIDATION_REGEX = "^[A-Za-z\u0400-\u052F']*$";
+    private static final String PASSWORD_VALIDATION_REGEX = "^[A-Za-z\\d!@#$%^&*()_+№\";:?><\\[\\]{}]*$";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,7 +68,7 @@ public class RegisterActivity extends AppCompatActivity {
         findViewById(R.id.agreement).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String url = "http://www.artux.net/privacy";
+                String url = "https://www.artux.net/privacy";
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
                 startActivity(i);
@@ -96,38 +105,70 @@ public class RegisterActivity extends AppCompatActivity {
         mProgressView = findViewById(R.id.register_progress);
     }
 
+    boolean isViewWithIncorrectData(EditText editText, String regex){
+        String value = editText.getText().toString();
+        if (TextUtils.isEmpty(value)) {
+            editText.setError(getString(R.string.error_field_required));
+            return true;
+        }else if(!value.matches(regex)){
+            editText.setError(getString(R.string.error_invalid_value,
+                    join(", ", checkStringSymbolsByRegexp(value, regex))));
+            return true;
+        }
+        return false;
+    }
+
+    private String join(String delimiter, Collection<String> collection){
+        StringBuilder joinBuilder = new StringBuilder();
+        String[] strings = collection.toArray(new String[0]);
+        int lastIndex = strings.length - 1;
+        for (int i = 0; i < lastIndex; i++) {
+            joinBuilder.append(strings[i]).append(delimiter);
+        }
+        joinBuilder.append(strings[lastIndex]);
+        return joinBuilder.toString();
+    }
+
     private void attemptRegister() {
         // Reset errors.
+        mLoginView.setError(null);
+        mNameView.setError(null);
+        mNicknameView.setError(null);
         mEmailView.setError(null);
         mPasswordView.setError(null);
         mRepeatPasswordView.setError(null);
 
-        String email = mEmailView.getText().toString().replace(" ", "");
-        String password = mPasswordView.getText().toString().replace(" ", "");
-
         boolean cancel = false;
         View focusView = null;
 
-        if (TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
+        if (isViewWithIncorrectData(mEmailView, EMAIL_VALIDATION_REGEX)) {
+            focusView = mEmailView;
+            cancel = true;
+        }
 
+        if (isViewWithIncorrectData(mLoginView, LOGIN_VALIDATION_REGEX)) {
+            focusView = mLoginView;
+            cancel = true;
+        }
+
+        if (isViewWithIncorrectData(mNameView, NAME_VALIDATION_REGEX)) {
+            focusView = mNameView;
+            cancel = true;
+        }
+
+        if (isViewWithIncorrectData(mNicknameView, NAME_VALIDATION_REGEX)) {
+            focusView = mNicknameView;
+            cancel = true;
+        }
+
+        if (isViewWithIncorrectData(mPasswordView, PASSWORD_VALIDATION_REGEX)) {
+            focusView = mPasswordView;
             cancel = true;
         }
 
         if (!mPasswordView.getText().toString().equals(mRepeatPasswordView.getText().toString())){
-            mRepeatPasswordView.setError("Passwords are not equal.");
+            mRepeatPasswordView.setError(getString(R.string.notEqualPasswords));
             focusView = mRepeatPasswordView;
-            cancel = true;
-        }
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
             cancel = true;
         }
 
@@ -140,45 +181,52 @@ public class RegisterActivity extends AppCompatActivity {
                     mEmailView.getText().toString(),
                     mPasswordView.getText().toString(),
                     avatarsAdapter.getSelected());
+
             showProgress(true);
             App.getRetrofitService().getPdaAPI().registerUser(mRegisterUser).enqueue(new Callback<Status>() {
                 @Override
                 public void onResponse(Call<Status> call, Response<Status> response) {
                     showProgress(false);
                     Status status = response.body();
-                    if (status!=null){
-                        Toast.makeText(RegisterActivity.this, status.getDescription(), Toast.LENGTH_LONG)
-                                .show();
+                    if (status!=null)
                         if (status.isSuccess()) {
+                            Intent intent = new Intent(RegisterActivity.this, FinishRegistrationActivity.class);
+                            intent.putExtra("email", mRegisterUser.getEmail());
+                            startActivity(intent);
                             finish();
+                        } else {
+                            Toast.makeText(RegisterActivity.this, status.getDescription(), Toast.LENGTH_LONG)
+                                    .show();
                         }
+                    else{
+                        Toast.makeText(RegisterActivity.this,"Wrong response from server, please update the app", Toast.LENGTH_LONG)
+                                .show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Status> call, Throwable throwable) {
                     showProgress(false);
+                    Toast.makeText(RegisterActivity.this, "Error: " + throwable.getMessage(), Toast.LENGTH_LONG)
+                            .show();
                 }
             });
         }
     }
 
-    private boolean isEmailValid(String email) {
-        return email.contains("@") & email.contains(".");
+    private Collection<String> checkStringSymbolsByRegexp(String str, String regexp) {
+        Collection<String> result = new ArrayList<>();
+        for (char chr : str.toCharArray()) {
+            String chrOfStr = Character.toString(chr);
+            if (!chrOfStr.matches(regexp)) {
+                result.add(chrOfStr);
+            }
+        }
+        return result;
     }
 
-    private boolean isPasswordValid(String password) {
-        return password.length() >= 8;
-    }
-
-    /**
-     * Shows the progress UI and hides the login form.
-     */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -200,8 +248,6 @@ public class RegisterActivity extends AppCompatActivity {
                 }
             });
         } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }

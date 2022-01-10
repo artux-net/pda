@@ -58,4 +58,7 @@ class QuestViewModel @Inject constructor(
         return map
     }
 
+    fun clear(){
+        repository.clearCache()
+    }
 }
