@@ -51,6 +51,8 @@ android {
         debug {
             debuggable true
             buildConfigField("String", "PROTOCOL", "\"https\"")
+            //buildConfigField("String", "WS_PROTOCOL", "\"ws\"")
+            //buildConfigField("String", "URL_API", "\"192.168.1.104:8080/pdanetwork/\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
             buildConfigField("String", "URL_API", "\"app.artux.net/pdanetwork/\"")
             buildConfigField("String", "URL", "\"api.artux.net/\"")

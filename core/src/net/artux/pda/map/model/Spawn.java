@@ -21,10 +21,10 @@ public class Spawn {
     private int r;
     private int n;
     private String pos;
+    private boolean angry;
+    private boolean ignorePlayer;
     private Vector2 position = null;
     private HashMap<String, String> data;
-    List<Bot> bots = new ArrayList<>();
-    Entity enemy;
     public HashMap<String, String> getData() {
         return data;
     }
@@ -37,67 +37,27 @@ public class Spawn {
         return position;
     }
 
-    ClickListener listener = new ClickListener(){
-        @Override
-        public void clicked(InputEvent event, float x, float y) {
-            super.clicked(event, x, y);
-            /*Text text = new Text(finalMob.name, gsm.getRussianFont());
-            text.setPosition(position.x, position.y);
-            System.out.println("Add text " + text);
-            playState.stage.addActor(text);
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(5000);
-                        text.remove();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();*/
-        }
-    };
-
-    public void create(final PlayState playState, AssetManager skin, List<Mob> mobs, Player player, final GameStateManager gsm){
-        getPosition();
-
-        final Random random = new Random();
-        Mob mob = new Mob();
-        for (Mob m:mobs){
-            if (id==m.id){
-                mob = m;
-                System.out.println("Mob found "+ id +" " + mob.name);
-            }
-        }
-        for(int i=0;i<n;i++) {
-            Bot bot = new Bot(id, getRandomPoint(random), this, skin, mob, player);
-            bots.add(bot);
-//            playState.entities.add(bot);
-            //Mob finalMob = mob;
-            //bot.addListener();
-            playState.stage.addActor(bot);
-        }
+    public boolean isAngry() {
+        return angry;
     }
 
-    Vector2 getRandomPoint(Random random){
-        float x = (random.nextFloat() % 1)*r*2-r;
-        int n = random.nextInt(2+1)-1;
-        float y = n*(float) Math.sqrt(r*r - x*x);
-        return new Vector2(position.x+x,position.y+y);
+    public boolean isIgnorePlayer() {
+        return ignorePlayer;
     }
 
-    public void setEnemy(Spawn spawn) {
-        setEnemy(spawn, 0,0);
+    public int getN() {
+        return n;
     }
 
-    void setEnemy(Spawn spawn, int i, int j) {
-        bots.get(i).setEnemy(spawn.bots.get(j));
-        if (i < bots.size() && j < spawn.bots.size())
-            setEnemy(spawn, ++i, ++j);
-        else if (i < bots.size())
-            setEnemy(spawn, ++i, --j);
-        else if (j < spawn.bots.size())
-            setEnemy(spawn, --i, ++j);
+    public int getR() {
+        return r;
+    }
+
+    public Vector2 getPos() {
+        return position;
+    }
+
+    public int getId() {
+        return id;
     }
 }

@@ -3,9 +3,11 @@ package net.artux.pda.map.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.platform.PlatformInterface;
@@ -21,14 +23,18 @@ public class GameStateManager {
     private final Stack<net.artux.pda.map.states.State> states;
     private final InputMultiplexer multiplexer = new InputMultiplexer();
 
-    BitmapFont russianFont;
+    static BitmapFont russianFont;
 
     public void setRussianFont(BitmapFont russianFont) {
-        this.russianFont = russianFont;
+        GameStateManager.russianFont = russianFont;
     }
 
-    public BitmapFont getRussianFont() {
+    public static BitmapFont getRussianFont() {
         return russianFont;
+    }
+
+    public static Label.LabelStyle getLabelStyle() {
+        return  new Label.LabelStyle(getRussianFont(), Color.WHITE);
     }
 
     public GameStateManager(PlatformInterface platformInterface){

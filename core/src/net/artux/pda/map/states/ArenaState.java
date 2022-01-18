@@ -24,7 +24,6 @@ import com.google.gson.Gson;
 import net.artux.pda.map.model.Entity;
 import net.artux.pda.map.model.Hit;
 import net.artux.pda.map.model.ServerPlayer;
-import net.artux.pda.map.model.server.ServerEntity;
 import net.artux.pda.map.ui.HealthBar;
 import net.artux.pda.map.ui.Logger;
 import net.artux.pdalib.arena.Action;
@@ -33,10 +32,6 @@ import net.artux.pdalib.arena.Position;
 import net.artux.pdalib.arena.ServerState;
 import net.artux.pdalib.profile.items.GsonProvider;
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
-
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,7 +60,6 @@ public class ArenaState extends State {
 
     ServerState lastServerState;
 
-    final WebSocketClient socketClient;
     float lastJoyX;
     float lastJoyY;
     long lastUpdate;
@@ -125,7 +119,7 @@ public class ArenaState extends State {
         assetManager.load("touchpad/back.png", Texture.class);
         assetManager.finishLoading();
 
-        socketClient = new WebSocketClient(new URI("ws://"+connection.ip+"/pda/arena/"+connection.token + "/" +connection.session)) {
+        /*socketClient = new WebSocketClient(new URI("ws://"+connection.ip+"/pda/arena/"+connection.token + "/" +connection.session)) {
 
             @Override
             public void onOpen(ServerHandshake handshakedata) {
@@ -177,7 +171,7 @@ public class ArenaState extends State {
         };
         System.out.println("Arena connecting to " + "ws://"+connection.ip+"/pda/arena/"+connection.token + "/" +connection.session);
 
-
+*/
         long before = Gdx.app.getNativeHeap();
 
         Viewport viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -190,7 +184,7 @@ public class ArenaState extends State {
         textButtonStyle.up  =  new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
 
         initPlayer();
-        socketClient.connect();
+        //socketClient.connect();
         Button.ButtonStyle runButtonStyle = new Button.ButtonStyle();
         runButtonStyle.up  = new TextureRegionDrawable(assetManager.get("beg2.png", Texture.class));
         runButtonStyle.down  = new TextureRegionDrawable(assetManager.get("beg1.png", Texture.class));
@@ -247,7 +241,7 @@ public class ArenaState extends State {
 
     private void initPlayer(){
         player = new ServerPlayer(this, new Vector2(), getMember(), assetManager);
-        player.setServer(true);
+    //    player.setServer(true);
         entities.add(player);
         stage.addActor(player);
         healthBar = new HealthBar(player);
@@ -289,17 +283,17 @@ public class ArenaState extends State {
                     float deltaX = moveTouchpad.getKnobPercentX();
                     float deltaY = moveTouchpad.getKnobPercentY();
                     Action action = new Action("move", gson.toJson(new Position(deltaX, deltaY)));
-                    if (socketClient.isOpen() && (deltaX!= lastJoyX || deltaY!= lastJoyY)) {
+                   /* if (socketClient.isOpen() && (deltaX!= lastJoyX || deltaY!= lastJoyY)) {
                         lastJoyX = deltaX;
                         lastJoyY = deltaY;
                         socketClient.send(gson.toJson(action));
-                    }
+                    }*/
                 }
             }
         };
         thread.start();
 
-        Thread thread1 = new Thread(){
+        /*Thread thread1 = new Thread(){
 
             @Override
             public void run() {
@@ -318,8 +312,8 @@ public class ArenaState extends State {
                     }
                 }
             }
-        };
-        thread1.start();
+        };*/
+        //thread1.start();
 
         uistage.addActor(moveTouchpad);
         uistage.addActor(shootTouchpad);
@@ -384,7 +378,7 @@ public class ArenaState extends State {
 
     @Override
     public void dispose() {
-        socketClient.close();
+       //socketClient.close();
         System.out.println("Dispose PlayState");
         long before = Gdx.app.getNativeHeap();
         System.out.println("Before: " );

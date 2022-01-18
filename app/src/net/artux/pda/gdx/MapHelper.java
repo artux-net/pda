@@ -1,5 +1,8 @@
 package net.artux.pda.gdx;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.app.Activity;
 import android.content.Intent;
 
@@ -41,8 +44,9 @@ public class MapHelper {
 
     static void startMap(Activity context, Map map) {
         Intent intent = new Intent(context, MapEngine.class);
+        intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra("map", new Gson().toJson(map));
-        context.startActivity(intent);
+        context.startActivityForResult(intent, 2);
         context.finish();
     }
 

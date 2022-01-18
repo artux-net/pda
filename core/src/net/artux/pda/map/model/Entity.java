@@ -1,26 +1,31 @@
 package net.artux.pda.map.model;
 
+import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
+import com.badlogic.gdx.ai.fsm.State;
+import com.badlogic.gdx.ai.fsm.StateMachine;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import net.artux.pda.map.BotStates;
 import net.artux.pdalib.profile.items.Armor;
 import net.artux.pdalib.profile.items.Weapon;
 
 import java.util.Objects;
 
-public abstract class Entity extends Actor {
+public abstract class Entity<T extends State<? extends Entity<T>>> extends Actor {
 
+    public int id;
+
+    Vector2 velocity = new Vector2();
     protected float MOVEMENT = 20f;
     public boolean run = false;
 
-    public int id;
-    Vector2 velocity = new Vector2();
+
     public Sprite sprite;
 
     public double health = 100;
-
 
     boolean waiting;
     boolean timerStarted;
@@ -32,9 +37,12 @@ public abstract class Entity extends Actor {
     private Weapon weapon1;
     private Weapon weapon2;
     int weapon = 0;
+    private DefaultStateMachine stateMachine;
 
-    public Entity() {
+    public Entity(T initialState) {
         setSize(32,32);
+        stateMachine = new DefaultStateMachine(this, initialState);
+        stateMachine.getCurrentState().enter(this);
     }
 
     public void setStartPosition(Vector2 startPosition) {
@@ -51,12 +59,12 @@ public abstract class Entity extends Actor {
 
     @Override
     public int hashCode() {
-        boolean shot = false;
-        return Objects.hash(run, id, velocity, sprite, health, waiting, timerStarted, startPosition, enemy, armor, weapon1, weapon2, weapon, shot);
+        return Objects.hash(run, id, velocity, sprite, health, waiting, timerStarted, startPosition, enemy, armor, weapon1, weapon2, weapon);
     }
 
     @Override
     public void act(float delta) {
+        stateMachine.update();
         moveBy(delta*velocity.x * MOVEMENT, delta*velocity.y * MOVEMENT);
     }
 
@@ -67,6 +75,9 @@ public abstract class Entity extends Actor {
         batch.draw(sprite, getX(), getY(), sprite.getOriginX(), sprite.getOriginY(), getWidth(), getHeight(), getScaleX(), getScaleY(), getRotation());
     }
 
+    public DefaultStateMachine getStateMachine() {
+        return stateMachine;
+    }
 
     public Vector2 getPosition() {
         return new Vector2(getX(), getY());
@@ -90,14 +101,6 @@ public abstract class Entity extends Actor {
 
     public Vector2 getVelocity() {
         return velocity;
-    }
-
-
-
-    public Vector2 getTarget(){
-        if (this instanceof Bot){
-         return this.getTarget();
-        }else return startPosition;
     }
 
     public Armor getArmor() {

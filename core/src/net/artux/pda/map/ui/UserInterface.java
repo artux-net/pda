@@ -26,14 +26,18 @@ import net.artux.pda.map.model.Map;
 import net.artux.pda.map.model.Player;
 import net.artux.pda.map.model.Point;
 import net.artux.pda.map.model.Text;
+import net.artux.pda.map.model.components.InteractiveComponent;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pdalib.Checker;
 import net.artux.pdalib.profile.Story;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class UserInterface extends Group implements Disposable {
 
+    private final Button.ButtonStyle textButtonStyle;
     Player player;
     GameStateManager gsm;
 
@@ -46,8 +50,12 @@ public class UserInterface extends Group implements Disposable {
     Pixmap bgPixmap;
     boolean isMenuOpen = false;
 
-    public UserInterface(final GameStateManager gsm, final Player player, AssetManager assetManager){
-        this.player = player;
+    public static float joyDeltaX;
+    public static float joyDeltaY;
+    public static boolean running;
+
+
+    public UserInterface(final GameStateManager gsm, AssetManager assetManager){
         this.gsm = gsm;
 
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
@@ -61,10 +69,8 @@ public class UserInterface extends Group implements Disposable {
         touchpad.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                float deltaX = ((Touchpad) actor).getKnobPercentX();
-                float deltaY = ((Touchpad) actor).getKnobPercentY();
-
-                player.setVelocity(deltaX, deltaY);
+                joyDeltaX = ((Touchpad) actor).getKnobPercentX();
+                joyDeltaY = ((Touchpad) actor).getKnobPercentY();
             }
         });
         addActor(touchpad);
@@ -72,19 +78,19 @@ public class UserInterface extends Group implements Disposable {
         Button.ButtonStyle runButtonStyle = new Button.ButtonStyle();
         runButtonStyle.up  = new TextureRegionDrawable(assetManager.get("beg2.png", Texture.class));
         runButtonStyle.down  = new TextureRegionDrawable(assetManager.get("beg1.png", Texture.class));
-        Button runButton = new Button(runButtonStyle);
+        final Button runButton = new Button(runButtonStyle);
         runButton.setPosition(11*Gdx.graphics.getWidth()/12,Gdx.graphics.getHeight()/12);
         runButton.setSize(Gdx.graphics.getHeight()/10,Gdx.graphics.getHeight()/10);
         runButton.addListener(new ClickListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                player.run = true;
+                running = true;
                 return super.touchDown(event, x, y, pointer, button);
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                player.run = false;
+                running = false;
                 super.touchUp(event, x, y, pointer, button);
             }
         });
@@ -121,6 +127,13 @@ public class UserInterface extends Group implements Disposable {
             }
         });
 
+        textButtonStyle = new Button.ButtonStyle();
+        textButtonStyle.up = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
+        textButtonStyle.down = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
+        textButtonStyle.checked = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
+        textButtonStyle.over = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
+
+
         addActor(runButton);
         addActor(pauseButton);
 
@@ -137,6 +150,21 @@ public class UserInterface extends Group implements Disposable {
 
         logger = new Logger(null, player, 3, (int) (7*h/8));
 
+    }
+
+    public void addInteractButton(String id, final InteractiveComponent.InteractListener listener){
+        Button button = new Button(textButtonStyle);
+        button.setPosition(w - w / 12, 2.5f * h / 12);
+        button.setSize(h / 10, h / 10);
+        button.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                listener.interact();
+            }
+        });
+
+        button.setName(id);
+        this.addActor(button);
     }
 
     void initMenu(BitmapFont font){
@@ -176,7 +204,7 @@ public class UserInterface extends Group implements Disposable {
                                         @Override
                                         public void clicked(InputEvent event, float x, float y) {
                                             super.clicked(event, x, y);
-                                            player.setDirection(point.getPosition());
+                                            //player.setDirection(point.getPosition());
                                         }
                                     });
 
@@ -195,7 +223,7 @@ public class UserInterface extends Group implements Disposable {
                             @Override
                             public void clicked(InputEvent event, float x, float y) {
                                 super.clicked(event, x, y);
-                                player.setDirection(point.getPosition());
+                                //player.setDirection(point.getPosition());
                             }
                         });
                         menuTable.add(label).width(w/4);

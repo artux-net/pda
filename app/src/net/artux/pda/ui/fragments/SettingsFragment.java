@@ -136,8 +136,9 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         switch (v.getId()){
             case R.id.signOut:
                 App.getDataManager().removeAllData();
+                viewModel.clearCache();
                 startActivity(new Intent(getActivity(), LoginActivity.class));
-                getActivity().finish();
+                requireActivity().finish();
                 break;
             case R.id.questResetButton:
                 questViewModel.clear();

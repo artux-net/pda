@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
+import net.artux.pda.map.PlayerStates;
 import net.artux.pda.map.model.Entity;
 import net.artux.pdalib.arena.Position;
 
@@ -19,7 +20,7 @@ public class ServerEntity extends Entity {
     Vector2 velocity = new Vector2();
 
     public ServerEntity(Vector2 position, AssetManager skin) {
-        super();
+        super(PlayerStates.STANDING);
         sprite = new Sprite(skin.get("yellow.png", Texture.class));
         sprite.setSize(12, 12);
     }

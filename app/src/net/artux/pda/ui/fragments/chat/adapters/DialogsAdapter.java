@@ -21,6 +21,7 @@ import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
 import net.artux.pda.ui.fragments.chat.ChatFragment;
 import net.artux.pda.ui.fragments.chat.Dialog;
+import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 import net.artux.pdalib.UserMessage;
 
 import java.util.ArrayList;
@@ -112,12 +113,8 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             mainView = itemView;
         }
 
-        void bind(final Dialog dialog) {
-            if (dialog.type == 0) {
-                avatarView.setImageDrawable(ContextCompat
-                        .getDrawable(avatarView.getContext(), App.avatars[dialog.getAvatarId()]));
-
-            }
+        void bind(Dialog dialog) {
+            ProfileHelper.setAvatar(avatarView, dialog.avatar);
             lastMessage.setText(dialog.lastMessage);
             titleView.setText(dialog.title);
             mainView.setOnClickListener(view -> ViewHolder.this.onClick(dialog));

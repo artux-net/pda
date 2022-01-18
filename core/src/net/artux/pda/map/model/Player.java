@@ -10,20 +10,21 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.PlayerStates;
 import net.artux.pda.map.states.PlayState;
 import net.artux.pda.map.states.State;
 import net.artux.pdalib.Member;
 
-public class Player extends Entity implements Disposable {
+public class Player extends Entity<PlayerStates> implements Disposable {
 
     Vector2 direction;
     Sprite directionSprite;
     OrthographicCamera camera;
     float zoom;
     Member member;
-    boolean server = false;
+
     public Player(State state, Member member, AssetManager skin) {
-        super();
+        super(PlayerStates.STANDING);
 
         camera = state.getCamera();
         zoom = camera.zoom;
@@ -41,10 +42,6 @@ public class Player extends Entity implements Disposable {
             setWeapon(member.getData().getEquipment().getFirstWeapon(), 0);
             setWeapon(member.getData().getEquipment().getSecondWeapon(), 1);
         }
-    }
-
-    public void setServer(boolean server) {
-        this.server = server;
     }
 
     public Member getMember() {

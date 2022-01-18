@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -68,7 +69,7 @@ public class GdxAdapter extends ApplicationAdapter {
 
 
 	public static BitmapFont generateFont(String fontName, String characters) {
-		return generateFont(fontName, characters, 24);
+		return generateFont(fontName, characters, 28);
 	}
 
 	private static BitmapFont generateFont(String fontName, String characters, int size) {
@@ -78,7 +79,7 @@ public class GdxAdapter extends ApplicationAdapter {
 
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(fontName) );
 		BitmapFont font = generator.generateFont(parameter);
-
+		font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 		generator.dispose();
 		return font;
 	}

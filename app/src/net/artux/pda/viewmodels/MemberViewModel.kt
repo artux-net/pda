@@ -42,4 +42,10 @@ class MemberViewModel @Inject constructor(
         return (userRepository.getCachedMember() as Result.Success).data.pdaId
     }
 
+    fun clearCache(){
+        GlobalScope.launch {
+            userRepository.clearMemberCache()
+        }
+    }
+
 }

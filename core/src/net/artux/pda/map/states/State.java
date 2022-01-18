@@ -11,7 +11,7 @@ public abstract class State {
 
     protected OrthographicCamera camera;
     protected Vector3 mouse;
-    protected GameStateManager gsm;
+    public static GameStateManager gsm;
 
     protected float w = Gdx.graphics.getWidth();
     protected float h = Gdx.graphics.getHeight();

@@ -14,7 +14,7 @@ buildscript {
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.8.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'org.projectlombok:lombok:1.18.0'
-
+        classpath "com.badlogicgames.gdx:gdx-ai:1.8.1"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -87,11 +87,12 @@ project(":core") {
 
     dependencies {
         implementation project(":pdanetworklib")
-        implementation "org.java-websocket:Java-WebSocket:1.5.1"
         implementation 'com.google.code.gson:gson:2.8.9'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
 
+        implementation "com.badlogicgames.ashley:ashley:1.7.3"
+        implementation "com.badlogicgames.gdx:gdx-ai:1.8.1"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
     }

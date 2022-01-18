@@ -34,6 +34,13 @@ public class Logger implements Disposable{
 
     List<String> texts =  new ArrayList<>();
 
+    public abstract static class LogData{
+        public static float posX;
+        public static float posY;
+        public static float health;
+    }
+
+
     public Logger(State state, Player player, int x, int y) {
         this.state = state;
         this.player = player;
@@ -78,15 +85,14 @@ public class Logger implements Disposable{
         batch.begin();
 
         font.draw(batch, (int)frameRate + " fps", x, y - 3);
-
-        if (player!=null) {
-            font.draw(batch, "x: " + player.getPosition().x + ", y: " + player.getPosition().y, x, y - 15);
-            font.draw(batch, "Player health: " + player.health, x, y - 30);
-        }
+        font.draw(batch, "x: " + LogData.posX + ", y: " + LogData.posY, x, y - 15);
+        font.draw(batch, "Player health: " + LogData.health, x, y - 30);
         font.draw(batch, "Native Heap: " + Gdx.app.getNativeHeap(), x, y - 60);
+        font.draw(batch, "Java Heap: " + Gdx.app.getJavaHeap(), x + 200, y - 60);
         font.draw(batch, "Screen: " + Gdx.app.getGraphics().getWidth() + ":" + Gdx.app.getGraphics().getHeight(), x, y - 75);
         font.draw(batch, "Density: " + Gdx.app.getGraphics().getDensity(), x, y - 90);
         font.draw(batch, "Version: " + Gdx.app.getVersion(), x, y - 105);
+
         if (state!=null && state instanceof ArenaState) {
             font.draw(batch, "Ping: " + ArenaState.getPing() + "ms", x, y - 120);
             font.draw(batch, "Server render time: " + ((ArenaState) state).getServerRenderTime() + "ms", x, y - 135);
