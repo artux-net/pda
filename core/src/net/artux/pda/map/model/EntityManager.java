@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
@@ -35,6 +36,7 @@ import net.artux.pda.map.model.components.states.BotStatesAshley;
 import net.artux.pda.map.model.systems.BattleSystem;
 import net.artux.pda.map.model.systems.CameraSystem;
 import net.artux.pda.map.model.systems.ClicksSystem;
+import net.artux.pda.map.model.systems.DeadCheckerSystem;
 import net.artux.pda.map.model.systems.InteractionSystem;
 import net.artux.pda.map.model.systems.LogSystem;
 import net.artux.pda.map.model.systems.MoodSystem;
@@ -43,6 +45,7 @@ import net.artux.pda.map.model.systems.RenderSystem;
 import net.artux.pda.map.model.systems.SoundsSystem;
 import net.artux.pda.map.model.systems.StatesSystem;
 import net.artux.pda.map.model.systems.TargetingSystem;
+import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.State;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pdalib.Checker;
@@ -68,7 +71,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
     CameraSystem cameraSystem;
     SoundsSystem soundsSystem;
 
-    public EntityManager(Engine engine, AssetManager assetManager, Stage stage, Map map, Member member, UserInterface userInterface) {
+    public EntityManager(Engine engine, AssetManager assetManager, Stage stage, Map map, Member member, UserInterface userInterface, GameStateManager gameStateManager) {
         this.engine = engine;
         this.stage = stage;
         this.assetManager = assetManager;
@@ -95,7 +98,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
 
         soundsSystem = new SoundsSystem(assetManager);
         renderSystem = new RenderSystem(stage.getBatch());
-        battleSystem = new BattleSystem(stage.getBatch(), soundsSystem);
+        battleSystem = new BattleSystem(assetManager, stage.getBatch(), soundsSystem);
         cameraSystem = new CameraSystem();
         engine.addSystem(renderSystem);
         engine.addSystem(clicksSystem);
@@ -106,6 +109,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         engine.addSystem(new TargetingSystem());
         engine.addSystem(new MoodSystem());
         engine.addSystem(new MovingSystem());
+        engine.addSystem(new DeadCheckerSystem(userInterface, gameStateManager));
         engine.addSystem(cameraSystem);
         engine.addSystem(soundsSystem);
 
@@ -129,6 +133,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
                         @Override
                         public void clicked() {
                             final Label text = new Label(finalMob.name, getLabelStyle());
+                            text.setOrigin(Align.center);
                             text.setPosition(spawn.getPosition().x, spawn.getPosition().y);
                             stage.addActor(text);
                             new Thread(new Runnable() {
@@ -270,6 +275,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
                     @Override
                     public void clicked() {
                         final Label text = new Label("Локация " + point.getMessage(), getLabelStyle());
+                        text.setOrigin(Align.center);
                         text.setPosition(point.getPosition().x, point.getPosition().y);
                         stage.addActor(text);
                         new Thread(new Runnable() {

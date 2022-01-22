@@ -103,7 +103,7 @@ public class PlayState extends State {
         userInterface = new UserInterface(gsm, assetManager);
         uistage.addActor(userInterface);
 
-        entityManager = new EntityManager(engine, assetManager, stage, map, getMember(), userInterface);
+        entityManager = new EntityManager(engine, assetManager, stage, map, getMember(), userInterface, gsm);
         stage.addCaptureListener(new InputListener());
 
         Gdx.app.debug(tag, "State loaded, heap: " + Gdx.app.getNativeHeap());

@@ -29,6 +29,15 @@ public class SpriteComponent implements Component {
         this.userVelocityInput = userVelocityInput;
     }
 
+    public void setTexture(Texture texture) {
+        sprite.setTexture(texture);
+        sprite.setOriginCenter();
+    }
+
+    public void setSize(float width, float height){
+        sprite.setSize(width, height);
+    }
+
     public float getRotation(){
         if (userVelocityInput != null){
             Vector2 velocity = userVelocityInput.getVelocity();

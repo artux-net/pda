@@ -22,8 +22,6 @@ public class RenderSystem extends EntitySystem{
 
     private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
-    private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
     public RenderSystem(Batch batch) {
         this.batch = batch;

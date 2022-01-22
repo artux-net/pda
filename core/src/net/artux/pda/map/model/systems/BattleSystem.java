@@ -1,11 +1,13 @@
 package net.artux.pda.map.model.systems;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -19,7 +21,11 @@ import net.artux.pda.map.model.components.MoodComponent;
 import net.artux.pda.map.model.components.PositionComponent;
 import net.artux.pda.map.model.components.SpriteComponent;
 import net.artux.pda.map.model.components.WeaponComponent;
+import net.artux.pda.map.model.components.player.PlayerComponent;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 public class BattleSystem extends EntitySystem implements Disposable {
@@ -27,6 +33,7 @@ public class BattleSystem extends EntitySystem implements Disposable {
     private Array<Entity> entities;
     private Batch batch;
     private SoundsSystem soundsSystem;
+    private AssetManager assetManager;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
@@ -36,8 +43,9 @@ public class BattleSystem extends EntitySystem implements Disposable {
     private ShapeRenderer sr = new ShapeRenderer();
     private Random random = new Random();
 
-    public BattleSystem(Batch batch, SoundsSystem soundsSystem) {
+    public BattleSystem(AssetManager assetManager, Batch batch, SoundsSystem soundsSystem) {
         this.batch = batch;
+        this.assetManager = assetManager;
         this.soundsSystem = soundsSystem;
     }
 
@@ -57,7 +65,6 @@ public class BattleSystem extends EntitySystem implements Disposable {
                 entities.removeValue(entity, true);
             }
         });
-
     }
 
     @Override
@@ -71,7 +78,7 @@ public class BattleSystem extends EntitySystem implements Disposable {
             if (healthComponent.isDead()){
                 Entity deadEntity = new Entity();
                 deadEntity.add(new PositionComponent(positionComponent.getPosition()))
-                        .add(new SpriteComponent(new Texture("gray.png"), 4,4));//TODO
+                        .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4,4));//TODO
 
                 getEngine().removeEntity(entity);
                 getEngine().addEntity(deadEntity);

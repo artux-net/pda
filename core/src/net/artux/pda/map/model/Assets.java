@@ -25,6 +25,7 @@ public class Assets implements Disposable {
         assetManager.load("red.png", Texture.class);
         assetManager.load("green.png", Texture.class);
         assetManager.load("yellow.png", Texture.class);
+        assetManager.load("gray.png", Texture.class);
         assetManager.load("direction.png", Texture.class);
         assetManager.load("touchpad/knob.png", Texture.class);
         assetManager.load("touchpad/back.png", Texture.class);

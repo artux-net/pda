@@ -172,6 +172,12 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
     }
 
     @Override
+    public void restart() {
+        startActivity(getIntent());
+        finish();
+    }
+
+    @Override
     protected void onDestroy() {
         Timber.d("Destroyed CoreStarter");
         gdxAdapter = null;
