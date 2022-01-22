@@ -8,10 +8,9 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.model.components.UserVelocityInput;
+import net.artux.pda.map.model.components.player.UserVelocityInput;
 import net.artux.pda.map.model.components.PositionComponent;
 import net.artux.pda.map.model.components.VelocityComponent;
-import net.artux.pda.map.ui.UserInterface;
 
 public class MovingSystem extends EntitySystem {
 

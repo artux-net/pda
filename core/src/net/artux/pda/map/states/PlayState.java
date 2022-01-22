@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -80,7 +82,7 @@ public class PlayState extends State {
         uistage = new Stage();
 
         camera = ((OrthographicCamera) stage.getCamera());
-        camera.zoom -= 0.5f;
+        camera.zoom = 0.5f;
 
         Map map = (Map) gsm.get("map");
 
@@ -103,7 +105,6 @@ public class PlayState extends State {
 
         entityManager = new EntityManager(engine, assetManager, stage, map, getMember(), userInterface);
         stage.addCaptureListener(new InputListener());
-        stage.addListener(entityManager);
 
         Gdx.app.debug(tag, "State loaded, heap: " + Gdx.app.getNativeHeap());
     }
@@ -118,6 +119,7 @@ public class PlayState extends State {
     protected void handleInput() {
         gsm.addInputProcessor(uistage);
         gsm.addInputProcessor(stage);
+        gsm.addInputProcessor(new GestureDetector(entityManager));
     }
 
     @Override
@@ -163,7 +165,6 @@ public class PlayState extends State {
     @Override
     public void dispose() {
         stage.dispose();
-        uistage.dispose();
         Gdx.app.debug(tag, "after dispose stages, heap " + Gdx.app.getNativeHeap());
         if (background != null)
             background.dispose();

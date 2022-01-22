@@ -1,49 +1,36 @@
 package net.artux.pda.map.ui;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.model.Player;
-import net.artux.pda.map.states.ArenaState;
-import net.artux.pda.map.states.State;
+import net.artux.pdalib.Member;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-/**
- * A nicer class for showing framerate that doesn't spam the console
- * like Logger.log()
- *
- * @author William Hartman
- */
-public class Logger implements Disposable{
+public class Logger implements Disposable {
     long lastTimeCounted;
     private float sinceChange;
     private float frameRate;
     private final BitmapFont font;
     private final SpriteBatch batch;
-    private OrthographicCamera cam;
-    private final Player player;
     private final int x;
     private final int y;
-    private final State state;
 
-    List<String> texts =  new ArrayList<>();
+    public static List<String> dataCollection = new ArrayList<>();
 
-    public abstract static class LogData{
+    public abstract static class LogData {
         public static float posX;
         public static float posY;
         public static float health;
+        public static Member member;
     }
 
-
-    public Logger(State state, Player player, int x, int y) {
-        this.state = state;
-        this.player = player;
+    public Logger(int x, int y) {
         this.x = x;
         this.y = y;
 
@@ -52,22 +39,6 @@ public class Logger implements Disposable{
         frameRate = Gdx.graphics.getFramesPerSecond();
         font = new BitmapFont();
         batch = new SpriteBatch();
-        cam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    }
-
-    public void resize(int screenWidth, int screenHeight) {
-        cam = new OrthographicCamera(screenWidth, screenHeight);
-        cam.translate(screenWidth / 2, screenHeight / 2);
-        cam.update();
-        batch.setProjectionMatrix(cam.combined);
-    }
-
-    public void addText(String text){
-        texts.add(text);
-    }
-
-    public void removeText(String text){
-        texts.remove(text);
     }
 
     public void update() {
@@ -75,7 +46,7 @@ public class Logger implements Disposable{
         lastTimeCounted = TimeUtils.millis();
 
         sinceChange += delta;
-        if(sinceChange >= 1000) {
+        if (sinceChange >= 1000) {
             sinceChange = 0;
             frameRate = Gdx.graphics.getFramesPerSecond();
         }
@@ -84,22 +55,24 @@ public class Logger implements Disposable{
     public void render() {
         batch.begin();
 
-        font.draw(batch, (int)frameRate + " fps", x, y - 3);
-        font.draw(batch, "x: " + LogData.posX + ", y: " + LogData.posY, x, y - 15);
-        font.draw(batch, "Player health: " + LogData.health, x, y - 30);
-        font.draw(batch, "Native Heap: " + Gdx.app.getNativeHeap(), x, y - 60);
-        font.draw(batch, "Java Heap: " + Gdx.app.getJavaHeap(), x + 200, y - 60);
-        font.draw(batch, "Screen: " + Gdx.app.getGraphics().getWidth() + ":" + Gdx.app.getGraphics().getHeight(), x, y - 75);
-        font.draw(batch, "Density: " + Gdx.app.getGraphics().getDensity(), x, y - 90);
-        font.draw(batch, "Version: " + Gdx.app.getVersion(), x, y - 105);
+        dataCollection.add("Player position, x: " + LogData.posX + ", y: " + LogData.posY);
+        dataCollection.add("Player health: " + LogData.health);
+        dataCollection.add("Money: " + LogData.member.getMoney());
+        dataCollection.add("Player keys: " + Arrays.toString(LogData.member.getData().parameters.keys.toArray(new String[0])));
+        dataCollection.add("Player values: " + LogData.member.getData().parameters.values.toString());
+        dataCollection.add("");
+        dataCollection.add((int) frameRate + " FPS");
+        dataCollection.add("Native Heap: " + Gdx.app.getNativeHeap() + " Java Heap: " + Gdx.app.getJavaHeap());
+        dataCollection.add("Screen: " + Gdx.app.getGraphics().getWidth() + ":" + Gdx.app.getGraphics().getHeight());
+        dataCollection.add("Density: " + Gdx.app.getGraphics().getDensity());
 
-        if (state!=null && state instanceof ArenaState) {
-            font.draw(batch, "Ping: " + ArenaState.getPing() + "ms", x, y - 120);
-            font.draw(batch, "Server render time: " + ((ArenaState) state).getServerRenderTime() + "ms", x, y - 135);
+        float step = 25;
+
+        for (int i = 0; i < dataCollection.size(); i++) {
+            font.draw(batch, dataCollection.get(i), x, y - i * step);
         }
-        for (int i = 0; i<texts.size(); i++){
-            font.draw(batch, texts.get(i), x, y - 150 - i*15);
-        }
+
+        dataCollection.clear();
 
         batch.end();
     }

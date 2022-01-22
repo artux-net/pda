@@ -25,6 +25,12 @@ public class GameStateManager {
 
     static BitmapFont russianFont;
 
+    public static class GlobalData{
+        public static int mapWidth;
+        public static int mapHeight;
+
+    }
+
     public void setRussianFont(BitmapFont russianFont) {
         GameStateManager.russianFont = russianFont;
     }

@@ -1,4 +1,4 @@
-package net.artux.pda.map.model.components;
+package net.artux.pda.map.model.components.player;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.Camera;

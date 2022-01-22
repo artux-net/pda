@@ -13,10 +13,8 @@ public class HealthComponent implements Component {
         value = 100;
     }
 
-
-
     public boolean isDead(){
-        return value<0;
+        return value<1;
     }
 
 }

@@ -9,6 +9,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -20,9 +21,9 @@ import com.google.gson.stream.JsonReader;
 
 import net.artux.pda.map.model.components.HealthComponent;
 import net.artux.pda.map.model.components.InteractiveComponent;
-import net.artux.pda.map.model.components.PlayerComponent;
+import net.artux.pda.map.model.components.player.PlayerComponent;
 import net.artux.pda.map.model.components.ClickComponent;
-import net.artux.pda.map.model.components.UserVelocityInput;
+import net.artux.pda.map.model.components.player.UserVelocityInput;
 import net.artux.pda.map.model.components.MoodComponent;
 import net.artux.pda.map.model.components.PositionComponent;
 import net.artux.pda.map.model.components.SpriteComponent;
@@ -32,13 +33,14 @@ import net.artux.pda.map.model.components.VelocityComponent;
 import net.artux.pda.map.model.components.WeaponComponent;
 import net.artux.pda.map.model.components.states.BotStatesAshley;
 import net.artux.pda.map.model.systems.BattleSystem;
-import net.artux.pda.map.model.systems.CameraFollowingSystem;
+import net.artux.pda.map.model.systems.CameraSystem;
 import net.artux.pda.map.model.systems.ClicksSystem;
 import net.artux.pda.map.model.systems.InteractionSystem;
 import net.artux.pda.map.model.systems.LogSystem;
 import net.artux.pda.map.model.systems.MoodSystem;
 import net.artux.pda.map.model.systems.MovingSystem;
 import net.artux.pda.map.model.systems.RenderSystem;
+import net.artux.pda.map.model.systems.SoundsSystem;
 import net.artux.pda.map.model.systems.StatesSystem;
 import net.artux.pda.map.model.systems.TargetingSystem;
 import net.artux.pda.map.states.State;
@@ -51,7 +53,7 @@ import net.artux.pdalib.profile.items.Weapon;
 
 import java.util.HashMap;
 
-public class EntityManager extends InputListener implements Disposable {
+public class EntityManager extends InputListener implements Disposable, GestureDetector.GestureListener {
 
     Stage stage;
     AssetManager assetManager;
@@ -63,6 +65,8 @@ public class EntityManager extends InputListener implements Disposable {
     RenderSystem renderSystem;
     BattleSystem battleSystem;
     ClicksSystem clicksSystem;
+    CameraSystem cameraSystem;
+    SoundsSystem soundsSystem;
 
     public EntityManager(Engine engine, AssetManager assetManager, Stage stage, Map map, Member member, UserInterface userInterface) {
         this.engine = engine;
@@ -89,18 +93,23 @@ public class EntityManager extends InputListener implements Disposable {
         createControlPointsEntities();
         createQuestPointsEntities();
 
+        soundsSystem = new SoundsSystem(assetManager);
         renderSystem = new RenderSystem(stage.getBatch());
-        battleSystem = new BattleSystem(stage.getBatch());
+        battleSystem = new BattleSystem(stage.getBatch(), soundsSystem);
+        cameraSystem = new CameraSystem();
         engine.addSystem(renderSystem);
         engine.addSystem(clicksSystem);
         engine.addSystem(battleSystem);
         engine.addSystem(new LogSystem(userInterface));
-        engine.addSystem(new InteractionSystem(stage, userInterface));
+        engine.addSystem(new InteractionSystem(stage, userInterface, soundsSystem));
         engine.addSystem(new StatesSystem());
         engine.addSystem(new TargetingSystem());
         engine.addSystem(new MoodSystem());
         engine.addSystem(new MovingSystem());
-        engine.addSystem(new CameraFollowingSystem());
+        engine.addSystem(cameraSystem);
+        engine.addSystem(soundsSystem);
+
+        stage.addListener(this);
     }
 
     private void createControlPointsEntities(){
@@ -127,7 +136,8 @@ public class EntityManager extends InputListener implements Disposable {
                                 public void run() {
                                     try {
                                         Thread.sleep(5000);
-                                        text.remove();
+                                        if (stage.getActors().contains(text, true))
+                                            text.remove();
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
@@ -255,6 +265,25 @@ public class EntityManager extends InputListener implements Disposable {
                         data.put("pos", point.getToPosition());
                         State.gsm.getPlatformInterface().send(data);
                     }
+                }))
+                .add(new ClickComponent(new ClickComponent.ClickListener() {
+                    @Override
+                    public void clicked() {
+                        final Label text = new Label("Локация " + point.getMessage(), getLabelStyle());
+                        text.setPosition(point.getPosition().x, point.getPosition().y);
+                        stage.addActor(text);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(5000);
+                                    text.remove();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
                 }));
 
         entity.add(new SpriteComponent(assetManager.get("transfer.png", Texture.class), 32, 32));
@@ -272,12 +301,68 @@ public class EntityManager extends InputListener implements Disposable {
     }
 
     @Override
-    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-        return clicksSystem.clicked(x, y);
+    public void dispose() {
+        battleSystem.dispose();
     }
 
     @Override
-    public void dispose() {
-        battleSystem.dispose();
+    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+        clicksSystem.clicked(x, y);
+        return false;
+    }
+
+    @Override
+    public boolean pan(float x, float y, float deltaX, float deltaY) {
+        cameraSystem.setDetached(true);
+        cameraSystem.moveBy(-deltaX, deltaY);
+        return true;
+    }
+
+    @Override
+    public boolean panStop(float x, float y, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean zoom(float initialDistance, float distance) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(float x, float y, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean tap(float x, float y, int count, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean longPress(float x, float y) {
+        return false;
+    }
+
+    @Override
+    public boolean fling(float velocityX, float velocityY, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+        cameraSystem.setZooming(true);
+        float panAmount = pointer1.dst(pointer2);
+        float initAmount = initialPointer1.dst(initialPointer2);
+
+        float newZoom = (initAmount / panAmount) * cameraSystem.getCurrentZoom();
+
+        cameraSystem.setZoom(newZoom);
+
+        return false;
+    }
+
+    @Override
+    public void pinchStop() {
+        cameraSystem.setZooming(false);
     }
 }

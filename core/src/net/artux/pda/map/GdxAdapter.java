@@ -22,6 +22,8 @@ public class GdxAdapter extends ApplicationAdapter {
 	public final String RUSSIAN_FONT_NAME = "fonts/Imperial Web.ttf";
 	public final String RUSSIAN_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;:,{}\"´`'<>";
 
+
+
     public GdxAdapter(PlatformInterface platformInterface){
 		gsm = new GameStateManager(platformInterface);
 	}
@@ -58,13 +60,19 @@ public class GdxAdapter extends ApplicationAdapter {
 		gsm.render(batch);
 	}
 
+	private boolean disposed;
+
 	@Override
 	public void dispose () {
+		Gdx.app.debug("GDX","Disposing started, heap " + Gdx.app.getNativeHeap());
     	super.dispose();
-		gsm.dispose();
-		batch.dispose();
+    	if (!disposed) {
+			gsm.dispose();
+			batch.dispose();
+			System.gc();
+			disposed = true;
+		}
 		Gdx.app.debug("GDX","Disposed, heap " + Gdx.app.getNativeHeap());
-		System.gc();
 	}
 
 

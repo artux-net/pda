@@ -148,8 +148,8 @@ public class UserInterface extends Group implements Disposable {
         initMenu(gsm.getRussianFont());
         addActor(menuButton);
 
-        logger = new Logger(null, player, 3, (int) (7*h/8));
-
+        logger = new Logger(5, (int) (h - 10));
+        Logger.LogData.member = gsm.getMember();
     }
 
     public void addInteractButton(String id, final InteractiveComponent.InteractListener listener){

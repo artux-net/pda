@@ -91,6 +91,8 @@ public class App extends Application {
             R.drawable.g8
     };
 
+    public static StringBuilder logBuilder = new StringBuilder();
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -153,9 +155,10 @@ public class App extends Application {
             }
             if (tag!=null)
                 message = tag + " : " + message;
+            logBuilder.append(message).append("\n");
             FirebaseCrashlytics.getInstance().log(message);
-            System.out.println(message);
             if (t != null) {
+                logBuilder.append(t.toString()).append("\n");
                 FirebaseCrashlytics.getInstance().recordException(t);
                 t.printStackTrace();
             }

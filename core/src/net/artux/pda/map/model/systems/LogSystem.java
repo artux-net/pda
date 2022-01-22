@@ -6,16 +6,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.utils.Array;
 
 import net.artux.pda.map.model.components.HealthComponent;
 import net.artux.pda.map.model.components.InteractiveComponent;
-import net.artux.pda.map.model.components.PlayerComponent;
+import net.artux.pda.map.model.components.player.PlayerComponent;
 import net.artux.pda.map.model.components.PositionComponent;
-import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
 

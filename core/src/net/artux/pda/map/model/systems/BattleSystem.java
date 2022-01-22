@@ -26,17 +26,19 @@ public class BattleSystem extends EntitySystem implements Disposable {
 
     private Array<Entity> entities;
     private Batch batch;
+    private SoundsSystem soundsSystem;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
     private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
-    ShapeRenderer sr = new ShapeRenderer();
-    Random random = new Random();
+    private ShapeRenderer sr = new ShapeRenderer();
+    private Random random = new Random();
 
-    public BattleSystem(Batch batch) {
+    public BattleSystem(Batch batch, SoundsSystem soundsSystem) {
         this.batch = batch;
+        this.soundsSystem = soundsSystem;
     }
 
     @Override
@@ -100,6 +102,7 @@ public class BattleSystem extends EntitySystem implements Disposable {
                             getPointNear(positionComponent1, weaponComponent.getWeapon().precision), 1);
                     sr.end();
                     healthComponent1.value -= weaponComponent.getWeapon().damage;
+                    soundsSystem.playShoot(positionComponent.getPosition());
                     if (healthComponent1.isDead())
                         moodComponent.setEnemy(null);
                 }
