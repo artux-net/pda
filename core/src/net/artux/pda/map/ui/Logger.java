@@ -3,6 +3,7 @@ package net.artux.pda.map.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -18,8 +19,8 @@ public class Logger implements Disposable {
     private float frameRate;
     private final BitmapFont font;
     private final SpriteBatch batch;
-    private final int x;
-    private final int y;
+    private final float x;
+    private final float y;
 
     public static List<String> dataCollection = new ArrayList<>();
 
@@ -28,16 +29,17 @@ public class Logger implements Disposable {
         public static float posY;
         public static float health;
         public static Member member;
+        public static Vector2 logPoint;
     }
 
-    public Logger(int x, int y) {
+    public Logger(float x, float y) {
         this.x = x;
         this.y = y;
 
         lastTimeCounted = TimeUtils.millis();
         sinceChange = 0;
         frameRate = Gdx.graphics.getFramesPerSecond();
-        font = new BitmapFont();
+        font = Fonts.generateFont(Fonts.Language.RUSSIAN, Fonts.ARIAL_FONT, 16);
         batch = new SpriteBatch();
     }
 
@@ -50,6 +52,10 @@ public class Logger implements Disposable {
             sinceChange = 0;
             frameRate = Gdx.graphics.getFramesPerSecond();
         }
+    }
+
+    public void addRow(String row){
+        dataCollection.add(row);
     }
 
     public void render() {
@@ -71,10 +77,9 @@ public class Logger implements Disposable {
         for (int i = 0; i < dataCollection.size(); i++) {
             font.draw(batch, dataCollection.get(i), x, y - i * step);
         }
+        batch.end();
 
         dataCollection.clear();
-
-        batch.end();
     }
 
     public void dispose() {

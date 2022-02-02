@@ -23,26 +23,22 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.model.Map;
-import net.artux.pda.map.model.Player;
 import net.artux.pda.map.model.Point;
-import net.artux.pda.map.model.Text;
-import net.artux.pda.map.model.components.InteractiveComponent;
+import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pdalib.Checker;
+import net.artux.pdalib.Member;
 import net.artux.pdalib.profile.Story;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class UserInterface extends Group implements Disposable {
 
     private final Button.ButtonStyle textButtonStyle;
-    Player player;
     GameStateManager gsm;
 
     HealthBar healthBar;
-    public Logger logger;
+    public static Logger logger;
     float w = Gdx.graphics.getWidth();
     float h = Gdx.graphics.getHeight();
     Group menu;
@@ -54,6 +50,9 @@ public class UserInterface extends Group implements Disposable {
     public static float joyDeltaY;
     public static boolean running;
 
+    private BitmapFont font;
+
+    float leftMargin = 5;
 
     public UserInterface(final GameStateManager gsm, AssetManager assetManager){
         this.gsm = gsm;
@@ -134,22 +133,41 @@ public class UserInterface extends Group implements Disposable {
         textButtonStyle.over = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
 
 
+        Table table = new Table();
+        table.setPosition(leftMargin*getDensity(), h/2);
+        table.setHeight(h/2);
+        table.setWidth(w/3);
+        table.align(Align.left | Align.top);
+        addActor(table);
+
         addActor(runButton);
         addActor(pauseButton);
 
-        /*healthBar = new HealthBar(player);
-        healthBar.setHeight(h/20);
-        healthBar.setWidth(w/4);
-        healthBar.setX(w/36);
-        healthBar.setY(h-70);
-        healthBar.setScale(1);
-        addActor(healthBar);*/
 
-        initMenu(gsm.getRussianFont());
+        font = Fonts.generateFont(Fonts.Language.RUSSIAN, 24);
+        initMenu(font);
         addActor(menuButton);
 
-        logger = new Logger(5, (int) (h - 10));
+        logger = new Logger(leftMargin*getDensity(), (int) (h - 210));
         Logger.LogData.member = gsm.getMember();
+
+
+        healthBar = new HealthBar(this);
+        /*healthBar.setX(leftMargin*getDensity());
+        healthBar.setY(h-leftMargin-healthBar.getHeight());*/
+
+        table.padTop(leftMargin*getDensity()).row().width(400).height(100);
+        table.add(healthBar);
+
+
+    }
+
+    public Member getMember(){
+        return gsm.getMember();
+    }
+
+    public static Logger getLogger(){
+        return logger;
     }
 
     public void addInteractButton(String id, final InteractiveComponent.InteractListener listener){
@@ -179,7 +197,7 @@ public class UserInterface extends Group implements Disposable {
         image.setSize(w/4 + 20, h);
         menu.addActor(image);
         Label text = new Label("Задания", new Label.LabelStyle(font, Color.WHITE));
-        text.setX(w/4-200);
+        text.setX(w/8-text.getWidth()/2);
         text.setY(h-100);
         menu.addActor(text);
 
@@ -197,36 +215,11 @@ public class UserInterface extends Group implements Disposable {
                                     && (Integer.parseInt(point.getData().get("chapter")) == story.getLastChapter()
                                     || Integer.parseInt(point.getData().get("chapter")) == 0)) {
                                     menuTable.row();
-                                    Label label = new Label(point.getTitle(), labelStyle);
-                                    label.setWrap(true);
-                                    label.setAlignment(Align.center);
-                                    label.addListener(new ClickListener() {
-                                        @Override
-                                        public void clicked(InputEvent event, float x, float y) {
-                                            super.clicked(event, x, y);
-                                            //player.setDirection(point.getPosition());
-                                        }
-                                    });
-
-
-                                    Pixmap labelColor = new Pixmap((int)label.getWidth(), (int)label.getHeight(), Pixmap.Format.RGB888);
-                                    labelColor.setColor(Color.DARK_GRAY);
-                                    labelColor.fill();
-                                    label.getStyle().background = new Image(new Texture(labelColor)).getDrawable();
-
-                                    menuTable.add(label).width(w/4 - 20).pad(10);
+                                    menuTable.add(getLabel(point.getTitle(),labelStyle)).width(w/4 - 20).pad(10);
                             }
                         }
                     } else {
-                        Label label = new Label(point.getTitle(), labelStyle);
-                        label.addListener(new ClickListener() {
-                            @Override
-                            public void clicked(InputEvent event, float x, float y) {
-                                super.clicked(event, x, y);
-                                //player.setDirection(point.getPosition());
-                            }
-                        });
-                        menuTable.add(label).width(w/4);
+                        menuTable.add(getLabel(point.getTitle(),labelStyle)).width(w/4 - 20).pad(10);
                     }
                 }
         }
@@ -238,6 +231,30 @@ public class UserInterface extends Group implements Disposable {
 
         this.menu.setX(w);
         addActor(menu);
+    }
+
+    Label getLabel(String title, Label.LabelStyle labelStyle){
+        Label label = new Label(title, labelStyle);
+        label.setWrap(true);
+        label.setAlignment(Align.center);
+        label.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                //player.setDirection(point.getPosition());
+            }
+        });
+
+
+        Pixmap labelColor = new Pixmap((int)label.getWidth(), (int)label.getHeight(), Pixmap.Format.RGB888);
+        labelColor.setColor(Color.DARK_GRAY);
+        labelColor.fill();
+        label.getStyle().background = new Image(new Texture(labelColor)).getDrawable();
+        return label;
+    }
+
+    public float getDensity(){
+        return Gdx.graphics.getDensity();
     }
 
     public boolean contains(String name){
@@ -266,6 +283,10 @@ public class UserInterface extends Group implements Disposable {
             logger.render();
     }
 
+    public Label.LabelStyle getLabelStyle() {
+        return new Label.LabelStyle(font, Color.WHITE);
+    }
+
     @Override
     public void dispose() {
         if (healthBar!=null)
@@ -276,6 +297,8 @@ public class UserInterface extends Group implements Disposable {
             texture.dispose();
         if (bgPixmap!=null)
             bgPixmap.dispose();
+        if (font!=null)
+            font.dispose();
     }
 
 }

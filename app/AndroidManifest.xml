@@ -19,7 +19,7 @@
             android:name=".ui.activities.FinishRegistrationActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
-            android:label="@string/title_activity_finish_registration"
+            android:screenOrientation="sensorLandscape"
             android:theme="@style/AppTheme.Fullscreen" />
         <activity
             android:name=".ui.activities.LogActivity"

@@ -73,6 +73,7 @@ public class PreloadState extends State {
         Map map = (Map) gsm.get("map");
         if (map != null) {
             FileHandle file = Gdx.files.local(cachePath+map.getTextureUri());
+
             if (!file.exists())
                 return;
             String path = map.getBlurTextureUri();

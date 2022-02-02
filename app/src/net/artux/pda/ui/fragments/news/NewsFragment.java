@@ -52,7 +52,7 @@ public class NewsFragment extends BaseFragment {
 
         Type listType = new TypeToken<List<Article>>(){}.getType();
         List<Article> news = GsonProvider.getInstance().fromJson(App.getDataManager().getString("news"), listType);
-        if(news!=null){
+        if(news!=null && !news.isEmpty()){
             binding.list.setVisibility(View.VISIBLE);
             binding.viewMessage.setVisibility(View.GONE);
             adapter.setNews(news);
@@ -64,7 +64,7 @@ public class NewsFragment extends BaseFragment {
                 ResponsePage<Article> page = response.body();
                 if (page!=null){
                     List<Article> list = page.getData();
-                    if (binding!=null) {
+                    if (binding!=null && !list.isEmpty()) {
                         binding.list.setVisibility(View.VISIBLE);
                         binding.viewMessage.setVisibility(View.GONE);
                         adapter.setNews(list);

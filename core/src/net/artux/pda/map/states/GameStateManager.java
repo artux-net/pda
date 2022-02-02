@@ -3,11 +3,8 @@ package net.artux.pda.map.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.platform.PlatformInterface;
@@ -22,26 +19,6 @@ public class GameStateManager {
     HashMap<String, Object> bundle = new HashMap<>();
     private final Stack<net.artux.pda.map.states.State> states;
     private final InputMultiplexer multiplexer = new InputMultiplexer();
-
-    static BitmapFont russianFont;
-
-    public static class GlobalData{
-        public static int mapWidth;
-        public static int mapHeight;
-
-    }
-
-    public void setRussianFont(BitmapFont russianFont) {
-        GameStateManager.russianFont = russianFont;
-    }
-
-    public static BitmapFont getRussianFont() {
-        return russianFont;
-    }
-
-    public static Label.LabelStyle getLabelStyle() {
-        return  new Label.LabelStyle(getRussianFont(), Color.WHITE);
-    }
 
     public GameStateManager(PlatformInterface platformInterface){
         states = new Stack<>();
@@ -85,7 +62,6 @@ public class GameStateManager {
             if (obj instanceof Disposable)
                 ((Texture) obj).dispose();
         }
-        russianFont.dispose();
     }
 
     public void update(float dt){

@@ -199,7 +199,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     .show();
                         }
                     else{
-                        Toast.makeText(RegisterActivity.this,"Wrong response from server, please update the app", Toast.LENGTH_LONG)
+                        Toast.makeText(RegisterActivity.this, getString(R.string.wrong_response), Toast.LENGTH_LONG)
                                 .show();
                     }
                 }

@@ -10,7 +10,7 @@ public class LevelBackground implements Disposable {
     private final Texture texture;
     private final Camera camera;
 
-    int w,h;
+    private final int w, h;
 
     public LevelBackground(Texture texture, Camera camera) {
         this.texture = texture;

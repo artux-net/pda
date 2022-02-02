@@ -12,15 +12,19 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.signature.ObjectKey;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
+import net.artux.pda.ui.fragments.profile.helpers.GlideUtil;
 import net.artux.pdalib.Member;
 import net.artux.pdalib.profile.Equipment;
 import net.artux.pdalib.profile.items.Item;
+
+import java.nio.charset.StandardCharsets;
 
 public class EquipmentFragment extends BaseFragment {
 
@@ -70,10 +74,15 @@ public class EquipmentFragment extends BaseFragment {
                 .placeholder(R.mipmap.ic_launcher)
                 .error(R.mipmap.ic_launcher);
 
+        String link = BuildConfig.PROTOCOL + "://"+ BuildConfig.URL+"base/items/icons/"+item.icon;
+
+        //String cached = GlideUtil.sha256BytesToHex(link.getBytes(StandardCharsets.UTF_8));
+
         Glide.with(title.getContext())
                 .asGif()
-                .load(BuildConfig.PROTOCOL + "://"+ BuildConfig.URL+"base/items/icons/"+item.icon)
+                .load(link)
                 .apply(options)
+                .signature(new ObjectKey(link))
                 .into(imageView);
     }
 }

@@ -7,48 +7,20 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
 
-import net.artux.pda.map.model.Assets;
-import net.artux.pda.map.model.Entity;
-import net.artux.pda.map.model.EntityManager;
-import net.artux.pda.map.model.Hit;
+import net.artux.pda.map.engine.Assets;
+import net.artux.pda.map.engine.EntityManager;
+import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.model.LevelBackground;
 import net.artux.pda.map.model.Map;
-import net.artux.pda.map.model.Mob;
-import net.artux.pda.map.model.Player;
-import net.artux.pda.map.model.Point;
-import net.artux.pda.map.model.Quest;
-import net.artux.pda.map.model.Spawn;
-import net.artux.pda.map.model.Text;
-import net.artux.pda.map.model.Transfer;
-import net.artux.pda.map.model.TransferPoint;
-import net.artux.pda.map.model.components.SpriteComponent;
 import net.artux.pda.map.ui.UserInterface;
-import net.artux.pdalib.Checker;
-import net.artux.pdalib.profile.Story;
-
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.List;
 
 
 public class PlayState extends State {
@@ -84,13 +56,17 @@ public class PlayState extends State {
         camera = ((OrthographicCamera) stage.getCamera());
         camera.zoom = 0.5f;
 
-        Map map = (Map) gsm.get("map");
+        userInterface = new UserInterface(gsm, assetManager);
+        uistage.addActor(userInterface);
 
+        Map map = (Map) gsm.get("map");
         if (map != null) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             System.out.println(gson.toJson(map));
 
             background = new Texture(Gdx.files.local(cachePath + map.getTextureUri()));
+            GlobalData.mapWidth = background.getWidth();
+            GlobalData.mapHeight = background.getHeight();
 
             if (map.getBlurTextureUri() != null) {
                 FileHandle fileHandle = Gdx.files.local(cachePath + map.getBlurTextureUri());
@@ -98,21 +74,11 @@ public class PlayState extends State {
                     levelBackground = new LevelBackground(new Texture(fileHandle), camera);
                 }
             }
+
+            entityManager = new EntityManager(engine, assetManager, stage, map, getMember(), userInterface, gsm);
         }
 
-        userInterface = new UserInterface(gsm, assetManager);
-        uistage.addActor(userInterface);
-
-        entityManager = new EntityManager(engine, assetManager, stage, map, getMember(), userInterface, gsm);
-        stage.addCaptureListener(new InputListener());
-
         Gdx.app.debug(tag, "State loaded, heap: " + Gdx.app.getNativeHeap());
-    }
-
-    private void addPoint(Point point) {
-        stage.addActor(new Quest(point, assetManager));
-        /*if (point.type < 2 || point.type > 3)//TODO
-            player.setDirection(point.getPosition());*/
     }
 
     @Override
@@ -139,21 +105,18 @@ public class PlayState extends State {
         float dt = Gdx.app.getGraphics().getDeltaTime();
 
         stage.getBatch().begin();
-
         if (levelBackground != null)
             levelBackground.render(batch);
 
         if (background != null)
             stage.getBatch().draw(background, 0, 0);
 
-        entityManager.update(dt);
-
+        entityManager.update(dt); // TODO make it draw
         stage.getBatch().end();
+
         stage.draw();
-
-        uistage.draw();
-
         entityManager.draw(dt);
+        uistage.draw();
     }
 
     @Override
@@ -179,7 +142,6 @@ public class PlayState extends State {
         if (userInterface != null)
             userInterface.dispose();
         Gdx.app.debug(tag, "after dispose ui, heap " + Gdx.app.getNativeHeap());
-
     }
 
 }

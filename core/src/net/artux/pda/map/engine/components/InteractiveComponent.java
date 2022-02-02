@@ -1,0 +1,20 @@
+package net.artux.pda.map.engine.components;
+
+import com.badlogic.ashley.core.Component;
+
+public class InteractiveComponent implements Component {
+
+    public String title;
+    public int type;
+    public InteractListener listener;
+
+    public InteractiveComponent(String title, int type, InteractListener listener) {
+        this.title = title;
+        this.type = type;
+        this.listener = listener;
+    }
+
+    public interface InteractListener{
+        void interact();
+    }
+}

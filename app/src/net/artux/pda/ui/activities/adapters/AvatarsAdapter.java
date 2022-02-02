@@ -1,16 +1,20 @@
 package net.artux.pda.ui.activities.adapters;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+
 import net.artux.pda.R;
-import net.artux.pda.app.App;
 
 import java.util.HashMap;
 
@@ -19,6 +23,7 @@ public class AvatarsAdapter extends RecyclerView.Adapter<AvatarsAdapter.ViewHold
     int selected = 0;
     HashMap<Integer, ViewHolder> holders = new HashMap<>();
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
@@ -35,7 +40,7 @@ public class AvatarsAdapter extends RecyclerView.Adapter<AvatarsAdapter.ViewHold
 
     @Override
     public int getItemCount() {
-        return App.avatars.length-1;
+        return 30;
     }
 
     public void uncheck(Integer pos){
@@ -61,7 +66,13 @@ public class AvatarsAdapter extends RecyclerView.Adapter<AvatarsAdapter.ViewHold
         }
 
         void bind(int id){
-            avatar.setImageDrawable(avatar.getContext().getResources().getDrawable(App.avatars[id]));
+            id++;
+            Glide.with(avatar)
+                    .asDrawable()
+                    .apply(new RequestOptions().override(122, 88))
+                    .load(Uri.parse("file:///android_asset/avatars/a"+id+".png"))
+                    .into(avatar);
+
             if(selected==id)
                 check();
             else
@@ -69,7 +80,7 @@ public class AvatarsAdapter extends RecyclerView.Adapter<AvatarsAdapter.ViewHold
         }
 
         void check(){
-            checked.setImageDrawable(checked.getContext().getResources().getDrawable(R.drawable.ic_check));
+            checked.setImageDrawable(ResourcesCompat.getDrawable(avatar.getResources(), R.drawable.ic_check, null));
         }
 
         public void uncheck(){
@@ -78,7 +89,7 @@ public class AvatarsAdapter extends RecyclerView.Adapter<AvatarsAdapter.ViewHold
 
         @Override
         public void onClick(View view) {
-            int position = getPosition();
+            int position = getAbsoluteAdapterPosition();
             if(position != RecyclerView.NO_POSITION) {
                 AvatarsAdapter.this.uncheck(selected);
                 selected = position;

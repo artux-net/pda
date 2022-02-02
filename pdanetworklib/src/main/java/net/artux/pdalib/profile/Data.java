@@ -107,6 +107,14 @@ public class Data {
         return items;
     }
 
+    public Item getItemById(int id){
+        for (Item item: getItems()) {
+            if (item.id == id)
+                return item;
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return "Data{" +

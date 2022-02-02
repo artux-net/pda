@@ -6,6 +6,7 @@ import net.artux.pda.ui.fragments.quest.models.Transfer;
 public interface QuestController {
 
     void beginWithStage(int stageId);
+    void beginWithStage(int stageId, boolean sync);
     void chooseTransfer(Transfer transfer);
     Stage getActualStage();
     int getStoryId();

@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
+import androidx.lifecycle.ViewModelStore;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.savedstate.SavedStateRegistry;
 import androidx.savedstate.SavedStateRegistryController;
 import androidx.savedstate.SavedStateRegistryOwner;
@@ -33,7 +35,7 @@ import java.util.HashMap;
 
 import timber.log.Timber;
 
-public class MapEngine extends AndroidApplication implements PlatformInterface, LifecycleOwner, SavedStateRegistryOwner {
+public class MapEngine extends AndroidApplication implements PlatformInterface, LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner {
 
     private final Gson gson = new Gson();
     private GdxAdapter gdxAdapter;
@@ -42,6 +44,8 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
     private final SavedStateRegistryController mSavedStateRegistryController = SavedStateRegistryController.create(this);
 
     private QuestViewModel questViewModel;
+
+    ViewModelStore viewModelStore = new ViewModelStore();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,4 +188,9 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
         super.onDestroy();
     }
 
+    @NonNull
+    @Override
+    public ViewModelStore getViewModelStore() {
+        return viewModelStore;
+    }
 }

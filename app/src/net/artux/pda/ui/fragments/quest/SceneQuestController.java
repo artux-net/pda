@@ -24,6 +24,11 @@ public class SceneQuestController implements Serializable, QuestController {
         listener.setLoading(true);
     }
 
+    public void beginWithStage(int stageId, boolean sync){
+        listener.setTitle("Глава " + chapterId);
+        loadStage(stageId, sync);
+    }
+
     public void beginWithStage(int stageId){
         listener.setTitle("Глава " + chapterId);
         loadStage(stageId, false);

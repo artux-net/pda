@@ -90,9 +90,13 @@
     <string name="group_p">Группировка: %1$s</string>
     <string name="in_zone_time_p">В зоне: %1$s</string>
     <string name="location_p">Локация: %1$s</string>
-    <string name="empty">Здесь пусто..</string>
+    <string name="empty">Записи отсутствуют.</string>
     <string name="note_isnt_selected">Note isn\'t selected.</string>
     <string name="jobs_p" translatable="false">Заданий: %1$s</string>
     <string name="subs">Запросы дружбы - %1$s</string>
     <string name="settings">Настройки</string>
+    <string name="exitStory">Выйти из истории</string>
+    <string name="registrationEndDesc">На указанную почту %1$s было отправлено письмо с ссылкой для подтверждения регистрации в сталкерской сети, перейдеите по ней для завершения.</string>
+    <string name="registrationEndConfirm">Я подтвердил аккаунт</string>
+    <string name="notEqualPasswords">Пароли не совпадают.</string>
 </resources>

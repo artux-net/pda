@@ -144,6 +144,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             int storyId = getIntent().getIntExtra("story", -1);
 
             if (storyId < 0) {
+                // если нет номера истории в намерении
                 String currentStory = temp.get("currentStory");
                 if (currentStory != null)
                     storyId = Integer.parseInt(currentStory);
@@ -161,24 +162,24 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                     found = true;
                     int chapter = getIntent().getIntExtra("chapter", story.getLastChapter());
                     int stage = getIntent().getIntExtra("stage", story.getLastStage());
-
-                    loadChapter(story.getStoryId(), chapter, stage);
+                    // загрузка последней стадии или намеренной
+                    loadChapter(story.getStoryId(), chapter, stage, getIntent().hasExtra("chapter") && getIntent().hasExtra("stage"));
                 }
             }
             if (!found)
-                loadChapter(storyId, 1, 0);
+                loadChapter(storyId, 1, 0, true);// первое открытие
 
         } else
-            loadChapter(keys[0], keys[1], keys[2]);
+            loadChapter(keys[0], keys[1], keys[2], true);
     }
 
-    void loadChapter(int storyId, int chapterId, int stageId) {
+    void loadChapter(int storyId, int chapterId, int stageId, boolean sync) {
         questViewModel.getChapter(storyId, chapterId).observe(this, new Observer<Chapter>() {
             @Override
             public void onChanged(Chapter chapter) {
                 if (chapter != null) {
                     sceneController = new SceneQuestController(QuestActivity.this, storyId, chapterId, chapter);
-                    sceneController.beginWithStage(stageId);
+                    sceneController.beginWithStage(stageId, sync);
 
                     questViewModel.getChapter().removeObserver(this);
                     multiExoPlayer = new MultiExoPlayer(QuestActivity.this, chapter.getMusics());
@@ -302,7 +303,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                     if (stage.getData().containsKey("chapter")) {
                         int chapter = Integer.parseInt(stage.getData().get("chapter"));
                         int stageId = Integer.parseInt(stage.getData().get("stage"));
-                        loadChapter(sceneController.getStoryId(), chapter, stageId);
+                        loadChapter(sceneController.getStoryId(), chapter, stageId, true);
                     }
                     break;
                 case 6:
