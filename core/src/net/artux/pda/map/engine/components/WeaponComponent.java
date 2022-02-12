@@ -34,12 +34,14 @@ public class WeaponComponent implements Component {
         if (getSelected()!=null)
             setResource(member.getData().getItemById(getSelected().bullet_id));
         player = true;
+        reload();
     }
 
     public WeaponComponent(Armor armor, Weapon weapon1, Weapon weapon2) {
         this.armor = armor;
         this.weapon1 = weapon1;
         this.weapon2 = weapon2;
+        reload();
     }
 
     public Armor getArmor() {
@@ -126,19 +128,8 @@ public class WeaponComponent implements Component {
             } else if (magazine == 0) {
                 reloading = true;
 
-                int take = weapon.bullet_quantity;
-                if (player) {
-                    take = resource.quantity;
-                    if (weapon.bullet_quantity < take) {
-                        take = weapon.bullet_quantity;
-                    }
-                }
+                reload();
                 timeout += 20 / weapon.speed; // перезарядка
-                stack = 0;
-                if (selected == 0)
-                    bullets_2 = take;
-                else
-                    bullets_1 = take;
                 return false;
             } else {
                 stack = 0;
@@ -148,4 +139,22 @@ public class WeaponComponent implements Component {
         }else return false;
     }
 
+
+    void reload(){
+        Weapon weapon = getSelected();
+        if (weapon!=null) {
+            int take = weapon.bullet_quantity;
+            if (player) {
+                take = resource.quantity;
+                if (weapon.bullet_quantity < take) {
+                    take = weapon.bullet_quantity;
+                }
+            }
+            stack = 0;
+            if (selected == 0)
+                bullets_2 = take;
+            else
+                bullets_1 = take;
+        }
+    }
 }

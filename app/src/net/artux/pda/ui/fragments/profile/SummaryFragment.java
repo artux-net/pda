@@ -47,8 +47,7 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setVisibility(View.VISIBLE);
-        view.findViewById(R.id.viewMessage).setVisibility(View.GONE);
+
         mChatAdapter = new ChatAdapter(this);
         recyclerView.setAdapter(mChatAdapter);
         reset();
@@ -57,6 +56,13 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
             if (summary!=null){
                 navigationPresenter.setTitle("Сводка от " + summary.getTitle());
                 mChatAdapter.setItems(summary.getMessages());
+                if (summary.getMessages().size()>0) {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    view.findViewById(R.id.viewMessage).setVisibility(View.GONE);
+                }else{
+                    recyclerView.setVisibility(View.GONE);
+                    view.findViewById(R.id.viewMessage).setVisibility(View.VISIBLE);
+                }
             }
         });
 

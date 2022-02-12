@@ -31,9 +31,9 @@ android {
     }
     defaultConfig {
         applicationId "net.artux.pda"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 32
-        versionCode 22
+        versionCode 23
         versionName "0.05.2"
         signingConfig signingConfigs.release
     }

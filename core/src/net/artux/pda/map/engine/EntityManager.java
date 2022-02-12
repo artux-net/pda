@@ -390,7 +390,6 @@ public class EntityManager extends InputListener implements Disposable, GestureD
             Vector2 cameraPosition = cameraSystem.getPosition();
             Vector2 cameraShift = new Vector2(centerPoint.x - cameraPosition.x, cameraPosition.y - centerPoint.y);
             Vector2 cameraShiftValue = cameraShift.cpy().scl(lastZoom - newZoom);
-            UserInterface.getLogger().addRow(cameraShiftValue.toString());
 
             if (cameraSystem.setZoom(newZoom))
                 cameraSystem.moveBy(cameraShiftValue.x, cameraShiftValue.y);

@@ -68,9 +68,8 @@ public class AvatarsAdapter extends RecyclerView.Adapter<AvatarsAdapter.ViewHold
         void bind(int id){
             id++;
             Glide.with(avatar)
-                    .asDrawable()
-                    .apply(new RequestOptions().override(122, 88))
                     .load(Uri.parse("file:///android_asset/avatars/a"+id+".png"))
+                    .centerInside()
                     .into(avatar);
 
             if(selected==id)

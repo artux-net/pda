@@ -84,8 +84,12 @@ public class PreloadState extends State {
             file = Gdx.files.local(cachePath+path);
             if (!file.exists() && path != null && !path.equals(""))
                 return;
-            if (!(gsm.peek() instanceof PlayState))
-                gsm.set(new PlayState(gsm, batch));
+            try {
+                if (!(gsm.peek() instanceof PlayState))
+                    gsm.set(new PlayState(gsm, batch));
+            }catch (Throwable e){
+                Gdx.app.error("Preload", "Can not start PlayState", e);
+            }
         }
     }
 

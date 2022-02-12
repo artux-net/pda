@@ -1,20 +1,26 @@
-package net.artux.pda.map.ui;
+package net.artux.pda.map.ui.bars;
+
+import static net.artux.pdalib.Checker.isInteger;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Widget;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 
-import org.graalvm.compiler.lir.LIRInstruction;
-
-import javax.swing.UIDefaults;
+import net.artux.pda.map.ui.Fonts;
+import net.artux.pda.map.ui.Logger;
+import net.artux.pda.map.ui.TextureActor;
+import net.artux.pda.map.ui.UserInterface;
 
 public class HealthBar extends Group implements Disposable {
 
@@ -27,8 +33,10 @@ public class HealthBar extends Group implements Disposable {
     private int padding = 10;
 
     UserInterface userInterface;
+    Texture image;
+    public HealthBar(UserInterface userInterface, AssetManager assetManager) {
+        super();
 
-    public HealthBar(UserInterface userInterface) {
         this.userInterface = userInterface;
 
         skinAtlas = new TextureAtlas(Gdx.files.internal("data/uiskin.atlas"));
@@ -37,23 +45,50 @@ public class HealthBar extends Group implements Disposable {
         barBackground = new NinePatchDrawable(new NinePatch(skinAtlas.findRegion("default-scroll"), 4, 5, 4, 5));
         font = Fonts.generateFont(Fonts.Language.RUSSIAN, 32);
 
-        Label label = new Label(userInterface.getMember().getName() + " " + userInterface.getMember().getNickname()
-                + " [PDA #"+ userInterface.getMember().getPdaId()+"]", userInterface.getLabelStyle());
-        addActor(label);
+
+        HorizontalGroup table = new HorizontalGroup();
+        table.align(Align.left | Align.center);
+        table.space(20);
+        table.setFillParent(true);
+
+        if(isInteger(userInterface.getMember().getAvatar()))
+            image = assetManager
+                    .get("avatars/a"+(Integer.parseInt(userInterface.getMember().getAvatar())+1)+".png", Texture.class);
+        else
+            image = assetManager
+                    .get("avatars/a0.jpg", Texture.class);
+
+        table.addActor(new TextureActor(image));
+        VerticalGroup table1 = new VerticalGroup();
+        table1.align(Align.left|Align.top);
+        table1.fill();
+        Label.LabelStyle style = userInterface.getLabelStyle();
+
+        table1.addActor(new Label(userInterface.getMember().getName() + " " + userInterface.getMember().getNickname()
+                + " [PDA #"+ userInterface.getMember().getPdaId()+"]", style));
+
+        Label label =new Label("Денег: " + userInterface.getMember().getMoney(), style);
+        label.setAlignment(Align.left);
+
+        table1.addActor(label);
+
+        table.addActor(table1);
+
+        table.fill();
+        addActor(table);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
         float progress = Logger.LogData.health / 100;
 
         float w = getWidth() * getScaleX();
         float h = getHeight() * getScaleY();
 
         barBackground.draw(batch, getX() - padding, getY() - padding, w + padding*2, h + padding*2);
-
         healthBarBackground.draw(batch, getX(), getY(), w, 0.1f * h);
         healthBar.draw(batch, getX(), getY(), progress * w , 0.1f * h);
+        super.draw(batch, parentAlpha);
     }
 
     @Override

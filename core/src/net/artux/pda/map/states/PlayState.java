@@ -10,16 +10,18 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import net.artux.pda.map.engine.Assets;
+import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EntityManager;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.model.LevelBackground;
 import net.artux.pda.map.model.Map;
+import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
 
 
@@ -31,6 +33,8 @@ public class PlayState extends State {
     private Texture background;
     private LevelBackground levelBackground;
     private Texture bounds;
+
+    Logger logger;
 
     public AssetManager assetManager;
 
@@ -49,7 +53,7 @@ public class PlayState extends State {
 
         Viewport viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        assetManager = Assets.get();
+        assetManager = new AssetsFinder().get();
         stage = new Stage(viewport, batch);
         uistage = new Stage();
 
@@ -76,6 +80,12 @@ public class PlayState extends State {
             }
 
             entityManager = new EntityManager(engine, assetManager, stage, map, getMember(), userInterface, gsm);
+
+            logger = new Logger(engine);
+
+            userInterface.getHudTable().row().padTop(40);
+            userInterface.getHudTable().add(logger);
+            //userInterface.setDebug(true, true);
         }
 
         Gdx.app.debug(tag, "State loaded, heap: " + Gdx.app.getNativeHeap());
@@ -135,6 +145,8 @@ public class PlayState extends State {
             bounds.dispose();
         if (levelBackground != null)
             levelBackground.dispose();
+        if (logger!=null)
+            logger.dispose();
         Gdx.app.debug(tag, "after dispose textures, heap " + Gdx.app.getNativeHeap());
         Gdx.app.debug(tag, "after dispose font, heap " + Gdx.app.getNativeHeap());
         assetManager.dispose();

@@ -1,22 +1,22 @@
 package net.artux.pda.map.engine;
 
-import com.badlogic.gdx.Files;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.TextureLoader;
-import com.badlogic.gdx.assets.loaders.resolvers.AbsoluteFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Disposable;
 
-public class Assets implements Disposable {
+public class AssetsFinder implements Disposable {
 
-    private static AssetManager assetManager;
+    private AssetManager assetManager;
 
-    public static AssetManager get() {
+    public AssetManager get() {
         assetManager = new AssetManager();
+
+        assetManager.load("avatars/a0.jpg", Texture.class);
+        for (int i = 1; i < 31; i++) {
+            assetManager.load("avatars/a"+i+".png", Texture.class);
+        }
+
         assetManager.load("dialog.png", Texture.class);
         assetManager.load("beg2.png", Texture.class);
         assetManager.load("beg1.png", Texture.class);
@@ -38,23 +38,12 @@ public class Assets implements Disposable {
         assetManager.load("occupations.png", Texture.class);
         assetManager.load("controlPoint.png", Texture.class);
 
-
-
         assetManager.load("contact_0.ogg", Music.class);
         assetManager.load("contact_1.ogg", Music.class);
         assetManager.load("ak74_shoot_0.ogg", Music.class);
         assetManager.load("ak74_shoot_1.ogg", Music.class);
 
         assetManager.finishLoading();
-
-        assetManager.setLoader(Texture.class, new TextureLoader(new AbsoluteFileHandleResolver()));
-        for (FileHandle fileHandle: Gdx.files.absolute("/data/data/net.artux.pda/cache/image_manager_disk_cache").list()) {
-            if (fileHandle.name().contains(".") && fileHandle.exists()) {
-                assetManager.load(new AssetDescriptor(fileHandle, Texture.class));
-            }
-        }
-        assetManager.finishLoading();
-
 
         return assetManager;
     }

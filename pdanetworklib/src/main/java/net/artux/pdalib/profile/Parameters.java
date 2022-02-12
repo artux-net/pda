@@ -11,9 +11,7 @@ public class Parameters {
 
     @Override
     public String toString() {
-        return "Parameters{" +
-                "keys=" + keys +
-                ", values=" + values +
-                '}';
+        return "keys=" + keys +
+                ", values=" + values;
     }
 }

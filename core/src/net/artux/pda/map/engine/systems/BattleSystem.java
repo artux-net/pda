@@ -21,6 +21,7 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
+import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.ui.UserInterface;
 
 import java.util.Random;
@@ -92,12 +93,13 @@ public class BattleSystem extends EntitySystem implements Disposable {
             WeaponComponent weaponComponent = wm.get(entity);
             weaponComponent.update(delta);
             if (pcm.has(entity) && weaponComponent.getSelected()!=null){
-                UserInterface.getLogger().addRow("Main weapon " + weaponComponent.getSelected().title);
-                UserInterface.getLogger().addRow("Reloading: " + weaponComponent.reloading);
-                if (weaponComponent.resource!=null)
-                    UserInterface.getLogger().addRow("Bullet: " + weaponComponent.resource.title +", " + weaponComponent.getMagazine() + "/" + weaponComponent.resource.quantity);
-                else
-                    UserInterface.getLogger().addRow("Bullet: " + "отсутствует");
+                PlayerData.selectedWeapon = weaponComponent.getSelected().title;
+                if (weaponComponent.resource!=null) {
+                    PlayerData.bullet = weaponComponent.resource.title;
+                    PlayerData.resource = weaponComponent.resource.quantity;
+                    PlayerData.magazine = weaponComponent.getMagazine();
+                }
+                //UserInterface.getLogger().put("Reloading", weaponComponent.reloading, "toString");
             }
 
             MoodComponent moodComponent = mm.get(entity);

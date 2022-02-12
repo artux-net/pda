@@ -22,10 +22,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.model.Map;
 import net.artux.pda.map.model.Point;
-import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.states.GameStateManager;
+import net.artux.pda.map.ui.bars.HealthBar;
+import net.artux.pda.map.ui.bars.WeaponBar;
 import net.artux.pdalib.Checker;
 import net.artux.pdalib.Member;
 import net.artux.pdalib.profile.Story;
@@ -35,24 +37,23 @@ import java.util.HashMap;
 public class UserInterface extends Group implements Disposable {
 
     private final Button.ButtonStyle textButtonStyle;
-    GameStateManager gsm;
+    private GameStateManager gsm;
 
-    HealthBar healthBar;
-    public static Logger logger;
-    float w = Gdx.graphics.getWidth();
-    float h = Gdx.graphics.getHeight();
-    Group menu;
-    Texture texture;
-    Pixmap bgPixmap;
-    boolean isMenuOpen = false;
+    private HealthBar healthBar;
+    private float w = Gdx.graphics.getWidth();
+    private float h = Gdx.graphics.getHeight();
+    private Group menu;
+    private Texture texture;
+    private Pixmap bgPixmap;
+    private boolean isMenuOpen = false;
 
     public static float joyDeltaX;
     public static float joyDeltaY;
     public static boolean running;
 
     private BitmapFont font;
-
-    float leftMargin = 5;
+    private float leftMargin = 5;
+    private Table hudTable;
 
     public UserInterface(final GameStateManager gsm, AssetManager assetManager){
         this.gsm = gsm;
@@ -133,42 +134,45 @@ public class UserInterface extends Group implements Disposable {
         textButtonStyle.over = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
 
 
-        Table table = new Table();
-        table.setPosition(leftMargin*getDensity(), h/2);
-        table.setHeight(h/2);
-        table.setWidth(w/3);
-        table.align(Align.left | Align.top);
-        addActor(table);
+        hudTable = new Table();
+        hudTable.setPosition(leftMargin*getDensity(), h/2);
+        hudTable.setHeight(h/2);
+        hudTable.setWidth(w/3);
+        hudTable.align(Align.left | Align.top);
+        addActor(hudTable);
 
         addActor(runButton);
         addActor(pauseButton);
-
 
         font = Fonts.generateFont(Fonts.Language.RUSSIAN, 24);
         initMenu(font);
         addActor(menuButton);
 
-        logger = new Logger(leftMargin*getDensity(), (int) (h - 210));
-        Logger.LogData.member = gsm.getMember();
+        healthBar = new HealthBar(this, assetManager);
+        WeaponBar weaponBar = new WeaponBar(this);
 
+        hudTable.pad(leftMargin*getDensity())
+                .row()
+                .width(w/4)
+                .height(120);
+        hudTable.add().setActor(healthBar);
 
-        healthBar = new HealthBar(this);
-        /*healthBar.setX(leftMargin*getDensity());
-        healthBar.setY(h-leftMargin-healthBar.getHeight());*/
+        hudTable
+                .row()
+                .padTop(40)
+                .width(w/4)
+                .height(120);
+        hudTable.add().setActor(weaponBar);
+    }
 
-        table.padTop(leftMargin*getDensity()).row().width(400).height(100);
-        table.add(healthBar);
-
-
+    public Table getHudTable() {
+        return hudTable;
     }
 
     public Member getMember(){
         return gsm.getMember();
     }
 
-    public static Logger getLogger(){
-        return logger;
-    }
 
     public void addInteractButton(String id, final InteractiveComponent.InteractListener listener){
         Button button = new Button(textButtonStyle);
@@ -203,7 +207,8 @@ public class UserInterface extends Group implements Disposable {
 
 
         Table menuTable = new Table();
-
+        menuTable.setFillParent(true);
+        menuTable.align(Align.top);
         if (gsm.get("map")!=null)
         for (final Point point : ((Map)gsm.get("map")).getPoints()) {
             if (point.type < 2 || point.type > 3)
@@ -268,8 +273,6 @@ public class UserInterface extends Group implements Disposable {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (logger!=null)
-            logger.update();
         if (menu !=null)
         if (isMenuOpen && menu.getX()>w*0.75)
             menu.setX(menu.getX()-15);
@@ -279,8 +282,6 @@ public class UserInterface extends Group implements Disposable {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
-        if (logger!=null)
-            logger.render();
     }
 
     public Label.LabelStyle getLabelStyle() {
@@ -291,8 +292,6 @@ public class UserInterface extends Group implements Disposable {
     public void dispose() {
         if (healthBar!=null)
             healthBar.dispose();
-        if (logger!=null)
-            logger.dispose();
         if (texture!=null)
             texture.dispose();
         if (bgPixmap!=null)
