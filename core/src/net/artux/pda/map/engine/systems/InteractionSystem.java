@@ -22,11 +22,11 @@ public class InteractionSystem extends EntitySystem {
     private Stage stage;
     private UserInterface userInterface;
     private SoundsSystem soundsSystem;
+    private CameraSystem cameraSystem;
 
-    public InteractionSystem(Stage stage, UserInterface userInterface, SoundsSystem soundsSystem) {
+    public InteractionSystem(Stage stage, UserInterface userInterface) {
         this.stage = stage;
         this.userInterface = userInterface;
-        this.soundsSystem = soundsSystem;
     }
 
     private ImmutableArray<Entity> points;
@@ -43,6 +43,8 @@ public class InteractionSystem extends EntitySystem {
         points = engine.getEntitiesFor(Family.all(InteractiveComponent.class, PositionComponent.class).get());
         mobs = engine.getEntitiesFor(Family.all(MoodComponent.class, PositionComponent.class).get());
         players = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get());
+        soundsSystem = engine.getSystem(SoundsSystem.class);
+        cameraSystem = engine.getSystem(CameraSystem.class);
     }
 
     @Override
@@ -81,7 +83,7 @@ public class InteractionSystem extends EntitySystem {
                 PlayerComponent playerComponent = pcm.get(players.get(j));
 
                 if (playerComponent.camera.frustum.pointInFrustum(positionComponent.getX(), positionComponent.getY(), 0)) {
-                    if (!positionComponent.isCameraVisible()) {
+                    if (!positionComponent.isCameraVisible() && !cameraSystem.detached) {
                         soundsSystem.playStalkerDetection();
                         positionComponent.setCameraVisible(true);
                     }

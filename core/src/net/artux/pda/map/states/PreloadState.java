@@ -88,7 +88,7 @@ public class PreloadState extends State {
                 if (!(gsm.peek() instanceof PlayState))
                     gsm.set(new PlayState(gsm, batch));
             }catch (Throwable e){
-                Gdx.app.error("Preload", "Can not start PlayState", e);
+                gsm.getPlatformInterface().error("Can not start PlayState", e);
             }
         }
     }

@@ -1,5 +1,6 @@
 package net.artux.pda.map.ui;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
@@ -133,6 +134,11 @@ public class UserInterface extends Group implements Disposable {
         textButtonStyle.checked = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
         textButtonStyle.over = new TextureRegionDrawable(assetManager.get("dialog.png", Texture.class));
 
+        font = Fonts.generateFont(Fonts.Language.RUSSIAN, 24);
+        addActor(runButton);
+        addActor(pauseButton);
+        initMenu(font);
+        addActor(menuButton);
 
         hudTable = new Table();
         hudTable.setPosition(leftMargin*getDensity(), h/2);
@@ -141,28 +147,22 @@ public class UserInterface extends Group implements Disposable {
         hudTable.align(Align.left | Align.top);
         addActor(hudTable);
 
-        addActor(runButton);
-        addActor(pauseButton);
-
-        font = Fonts.generateFont(Fonts.Language.RUSSIAN, 24);
-        initMenu(font);
-        addActor(menuButton);
-
         healthBar = new HealthBar(this, assetManager);
         WeaponBar weaponBar = new WeaponBar(this);
 
         hudTable.pad(leftMargin*getDensity())
                 .row()
-                .width(w/4)
-                .height(120);
+                .height(120)
+                .fill();
         hudTable.add().setActor(healthBar);
 
-        hudTable
-                .row()
-                .padTop(40)
-                .width(w/4)
-                .height(120);
+        hudTable.row()
+                .padTop(30)
+                .height(70)
+                .fill();
         hudTable.add().setActor(weaponBar);
+        /*if (Gdx.app.getLogLevel() == Application.LOG_DEBUG)
+            setDebug(true, true);*/
     }
 
     public Table getHudTable() {
@@ -200,7 +200,7 @@ public class UserInterface extends Group implements Disposable {
         Image image = new Image(texture);
         image.setSize(w/4 + 20, h);
         menu.addActor(image);
-        Label text = new Label("Задания", new Label.LabelStyle(font, Color.WHITE));
+        Label text = new Label("Метки", new Label.LabelStyle(font, Color.WHITE));
         text.setX(w/8-text.getWidth()/2);
         text.setY(h-100);
         menu.addActor(text);

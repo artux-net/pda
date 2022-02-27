@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Mobs {
+public class MobsTypes {
 
-    List<Mob> mobs = new ArrayList<>();
+    List<MobType> mobs = new ArrayList<>();
     HashMap<Integer, ArrayList<Integer>> relations = new HashMap<>();
 
-    public Mob getMob(int id) {
-        for (Mob mob:mobs){
-            if (id==mob.id){
-                return mob;
+    public MobType getMobType(int id) {
+        for (MobType mobType : mobs){
+            if (id== mobType.id){
+                return mobType;
             }
         }
         return null;

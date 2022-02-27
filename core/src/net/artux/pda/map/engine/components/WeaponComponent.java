@@ -142,7 +142,7 @@ public class WeaponComponent implements Component {
 
     void reload(){
         Weapon weapon = getSelected();
-        if (weapon!=null) {
+        if (weapon!=null && (!player || (resource!=null && resource.quantity>0))) {
             int take = weapon.bullet_quantity;
             if (player) {
                 take = resource.quantity;

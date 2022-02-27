@@ -77,11 +77,11 @@ public class App extends Application {
         questRepository = new QuestRepository(mRetrofitService.getPdaAPI(), chapterCache, mapCache);
         summaryRepository = new SummaryRepository(summaryCache);
 
-        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG)
             Timber.plant(new Timber.DebugTree());
-        } else {
+        else
             Timber.plant(new CrashReportingTree());
-        }
+
         Timber.d("App started.");
         MobileAds.initialize(this, initializationStatus -> {
             Timber.d("Ads initialization");
@@ -113,13 +113,16 @@ public class App extends Application {
         return summaryRepository;
     }
 
-    /** A tree which logs important information for crash reporting. */
+    /**
+     * A tree which logs important information for crash reporting.
+     */
     private static class CrashReportingTree extends Timber.Tree {
-        @Override protected void log(int priority, String tag, @NonNull String message, Throwable t) {
+        @Override
+        protected void log(int priority, String tag, @NonNull String message, Throwable t) {
             if (priority == Log.VERBOSE || priority == Log.DEBUG) {
-               return;
+                return;
             }
-            if (tag!=null)
+            if (tag != null)
                 message = tag + " : " + message;
             logBuilder.append(message).append("\n");
             FirebaseCrashlytics.getInstance().log(message);
@@ -135,7 +138,7 @@ public class App extends Application {
         return sDataManager;
     }
 
-    public static RetrofitService getRetrofitService(){
+    public static RetrofitService getRetrofitService() {
         return mRetrofitService;
     }
 }

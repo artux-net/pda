@@ -26,12 +26,14 @@ import net.artux.pda.ui.activities.adapters.AvatarsAdapter;
 import net.artux.pdalib.RegisterUser;
 import net.artux.pdalib.Status;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -199,14 +201,28 @@ public class RegisterActivity extends AppCompatActivity {
                                     .show();
                         }
                     else{
-                        Toast.makeText(RegisterActivity.this, getString(R.string.wrong_response), Toast.LENGTH_LONG)
-                                .show();
+                        if (response.isSuccessful()){
+                            Toast.makeText(RegisterActivity.this, getString(R.string.wrong_response), Toast.LENGTH_LONG)
+                                    .show();
+                        } else {
+                            try {
+                                if (response.errorBody() != null) {
+                                    String s =  response.errorBody().string();
+                                    Toast.makeText(RegisterActivity.this, s, Toast.LENGTH_LONG).show();
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Toast.makeText(RegisterActivity.this, getString(R.string.error_server_connection), Toast.LENGTH_LONG)
+                                        .show();
+                            }
+                        }
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Status> call, Throwable throwable) {
                     showProgress(false);
+                    Timber.e(throwable);
                     Toast.makeText(RegisterActivity.this, "Error: " + throwable.getMessage(), Toast.LENGTH_LONG)
                             .show();
                 }

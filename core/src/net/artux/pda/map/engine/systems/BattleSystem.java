@@ -42,10 +42,9 @@ public class BattleSystem extends EntitySystem implements Disposable {
     private ShapeRenderer sr = new ShapeRenderer();
     private Random random = new Random();
 
-    public BattleSystem(AssetManager assetManager, Batch batch, SoundsSystem soundsSystem) {
+    public BattleSystem(AssetManager assetManager, Batch batch) {
         this.batch = batch;
         this.assetManager = assetManager;
-        this.soundsSystem = soundsSystem;
     }
 
     @Override
@@ -64,6 +63,8 @@ public class BattleSystem extends EntitySystem implements Disposable {
                 entities.removeValue(entity, true);
             }
         });
+
+        soundsSystem = engine.getSystem(SoundsSystem.class);
     }
 
     @Override

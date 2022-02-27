@@ -47,7 +47,6 @@ public class WeaponBar extends Group implements Disposable {
 
         VerticalGroup table = new VerticalGroup();
         table.align(Align.left | Align.center);
-        table.space(20);
         table.setFillParent(true);
 
         selected = new Label("", userInterface.getLabelStyle());
@@ -62,7 +61,10 @@ public class WeaponBar extends Group implements Disposable {
     public void act(float delta) {
         super.act(delta);
         selected.setText(PlayerData.selectedWeapon);
-        resource.setText(PlayerData.bullet + ": " + PlayerData.magazine+"/" + PlayerData.resource);
+        if (PlayerData.bullet != null)
+            resource.setText(PlayerData.bullet + ": " + PlayerData.magazine+"/" + PlayerData.resource);
+        else
+            resource.setText("Патроны отсутствуют");
     }
 
     @Override

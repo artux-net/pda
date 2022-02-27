@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
+import net.artux.pda.map.engine.components.ControlPointComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
@@ -46,8 +47,8 @@ import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.engine.systems.StatesSystem;
 import net.artux.pda.map.engine.systems.TargetingSystem;
 import net.artux.pda.map.model.Map;
-import net.artux.pda.map.model.Mob;
-import net.artux.pda.map.model.Mobs;
+import net.artux.pda.map.model.MobType;
+import net.artux.pda.map.model.MobsTypes;
 import net.artux.pda.map.model.Point;
 import net.artux.pda.map.model.Spawn;
 import net.artux.pda.map.model.Transfer;
@@ -63,6 +64,8 @@ import net.artux.pdalib.profile.items.Armor;
 import net.artux.pdalib.profile.items.Weapon;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class EntityManager extends InputListener implements Disposable, GestureDetector.GestureListener {
 
@@ -73,11 +76,9 @@ public class EntityManager extends InputListener implements Disposable, GestureD
 
     Engine engine;
 
-    RenderSystem renderSystem;
     BattleSystem battleSystem;
     ClicksSystem clicksSystem;
     CameraSystem cameraSystem;
-    SoundsSystem soundsSystem;
 
     BitmapFont font;
     Label.LabelStyle labelStyle;
@@ -88,8 +89,6 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         this.assetManager = assetManager;
         this.map = map;
         this.member = member;
-
-        clicksSystem = new ClicksSystem();
 
         //player
         Entity player = new Entity();
@@ -107,46 +106,100 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         createControlPointsEntities();
         createQuestPointsEntities();
 
-        soundsSystem = new SoundsSystem(assetManager);
-        renderSystem = new RenderSystem(stage.getBatch());
-        battleSystem = new BattleSystem(assetManager, stage.getBatch(), soundsSystem);
-        cameraSystem = new CameraSystem();
-        engine.addSystem(renderSystem);
-        engine.addSystem(clicksSystem);
-        engine.addSystem(battleSystem);
-        engine.addSystem(new LogSystem(userInterface));
-        engine.addSystem(new InteractionSystem(stage, userInterface, soundsSystem));
+        engine.addSystem(new RenderSystem(stage.getBatch()));
+        engine.addSystem(new SoundsSystem(assetManager));
+        engine.addSystem(new ClicksSystem());
+        engine.addSystem(new BattleSystem(assetManager, stage.getBatch()));
+        engine.addSystem(new CameraSystem());
+        engine.addSystem(new LogSystem());
+        engine.addSystem(new InteractionSystem(stage, userInterface));
         engine.addSystem(new StatesSystem());
         engine.addSystem(new TargetingSystem());
         engine.addSystem(new MoodSystem());
         engine.addSystem(new MovingSystem());
         engine.addSystem(new DeadCheckerSystem(userInterface, gameStateManager));
-        engine.addSystem(cameraSystem);
-        engine.addSystem(soundsSystem);
+
+        clicksSystem = engine.getSystem(ClicksSystem.class);
+        battleSystem = engine.getSystem(BattleSystem.class);
+        cameraSystem = engine.getSystem(CameraSystem.class);
 
         stage.addListener(this);
 
-        font = Fonts.generateFont(Fonts.Language.RUSSIAN, 24);
+        font = Fonts.generateFont(Fonts.Language.RUSSIAN, 16);
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
     }
 
-    private void createControlPointsEntities(){
+    private void createControlPointsEntities() {
         JsonReader reader = new JsonReader(Gdx.files.internal("mobs.json").reader());
-        Mobs mobs = new Gson().fromJson(reader, Mobs.class);
+        MobsTypes mobsTypes = new Gson().fromJson(reader, MobsTypes.class);
 
         for (final Spawn spawn : map.getSpawns()) {
-            Mob mob = mobs.getMob(spawn.getId());
+            MobType mobType = mobsTypes.getMobType(spawn.getId());
 
             Entity controlPoint = new Entity();
             float size = spawn.getR() * 2 * 0.9f;
-            final Mob finalMob = mob;
+
+            TargetMovingComponent.Targeting targeting = new TargetMovingComponent.Targeting() {
+                @Override
+                public Vector2 getTarget() {
+                    double r = (double) spawn.getR() / 2 + random.nextInt(spawn.getR());
+
+                    double angle = random.nextInt(360);
+
+                    Vector2 basePosition = spawn.getPosition();
+                    float x = (float) (Math.cos(angle) * r);
+                    float y = (float) (Math.sin(angle) * r);
+                    return new Vector2(basePosition.x + x, basePosition.y + y);
+                }
+            };
+
+            List<Entity> pointEntities = new LinkedList<>();
+            for (int i = 0; i < spawn.getN(); i++) {
+                Entity entity = new Entity();
+
+                Armor armor = new Armor();
+                Weapon w = new Weapon();
+                w.speed = 14;
+                w.damage = 2;
+                w.precision = 1;
+                w.bullet_quantity = 30;
+
+                MoodComponent moodComponent = new MoodComponent(mobType.group, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]), spawn.isAngry());
+                moodComponent.ignorePlayer = spawn.isIgnorePlayer();
+
+                entity.add(new PositionComponent(targeting.getTarget()))
+                        .add(new VelocityComponent())
+                        .add(new HealthComponent())
+                        .add(moodComponent)
+                        .add(new WeaponComponent(armor, w, w))
+                        .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
+                        .add(new TargetMovingComponent(targeting));
+
+
+                Texture texture;
+                if (member != null) {
+                    if (mobType.group < 0 || member.relations.get(mobType.group) < -2)
+                        texture = assetManager.get("red.png", Texture.class);
+                    else if (member.relations.get(mobType.group) > 2)
+                        texture = assetManager.get("green.png", Texture.class);
+                    else
+                        texture = assetManager.get("yellow.png", Texture.class);
+                } else texture = assetManager.get("yellow.png", Texture.class);
+
+                entity.add(new SpriteComponent(texture, 8, 8));
+                engine.addEntity(entity);
+                pointEntities.add(entity);
+            }
+
+            final ControlPointComponent controlPointComponent = new ControlPointComponent("Контрольная точка", mobType, pointEntities);
 
             controlPoint.add(new PositionComponent(spawn.getPosition()))
-                    .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class),size, size))
+                    .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size))
+                    .add(controlPointComponent)
                     .add(new ClickComponent(new ClickComponent.ClickListener() {
                         @Override
                         public void clicked() {
-                            final Label text = new Label(finalMob.name, labelStyle);
+                            final Label text = new Label(controlPointComponent.desc(), labelStyle);
                             text.setOrigin(Align.center);
                             text.setPosition(spawn.getPosition().x, spawn.getPosition().y);
                             stage.addActor(text);
@@ -166,61 +219,10 @@ public class EntityManager extends InputListener implements Disposable, GestureD
                     }));
             engine.addEntity(controlPoint);
 
-
-            TargetMovingComponent.Targeting targeting = new TargetMovingComponent.Targeting() {
-                @Override
-                public Vector2 getTarget() {
-                    double r = (double) spawn.getR()/2 + random.nextInt(spawn.getR());
-
-                    double angle = random.nextInt(360);
-
-                    Vector2 basePosition = spawn.getPosition();
-                    float x = (float) (Math.cos(angle) * r);
-                    float y = (float) (Math.sin(angle) * r);
-                    return new Vector2(basePosition.x+x,basePosition.y+y);
-                }
-            };
-
-            for (int i = 0; i < spawn.getN(); i++) {
-                Entity entity = new Entity();
-
-                Armor armor = new Armor();
-
-                Weapon w = new Weapon();
-                w.speed=14;
-                w.damage=2;
-                w.precision=1;
-                w.bullet_quantity = 30;
-
-                MoodComponent moodComponent = new MoodComponent(mob.group, mobs.getRelations(mob.group).toArray(new Integer[0]), spawn.isAngry());
-                moodComponent.ignorePlayer = spawn.isIgnorePlayer();
-
-                entity.add(new PositionComponent(targeting.getTarget()))
-                        .add(new VelocityComponent())
-                        .add(new HealthComponent())
-                        .add(moodComponent)
-                        .add(new WeaponComponent(armor, w, w))
-                        .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
-                        .add(new TargetMovingComponent(targeting));
-
-
-                Texture texture;
-                if (member != null) {
-                    if (mob.group < 0 || member.relations.get(mob.group) < -2)
-                        texture = assetManager.get("red.png", Texture.class);
-                    else if (member.relations.get(mob.group) > 2)
-                        texture = assetManager.get("green.png", Texture.class);
-                    else
-                        texture = assetManager.get("yellow.png", Texture.class);
-                } else texture = assetManager.get("yellow.png", Texture.class);
-
-                entity.add(new SpriteComponent(texture,8,8));
-                engine.addEntity(entity);
-            }
         }
     }
 
-    private void createQuestPointsEntities(){
+    private void createQuestPointsEntities() {
         for (Point point : map.getPoints()) {
             if (member != null && Checker.check(point.getCondition(), member))
                 if (point.getData().containsKey("chapter")) {
@@ -236,7 +238,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         }
 
         for (Transfer transfer : map.getTransfers()) {
-            if (member!=null && Checker.check(transfer.condition, member))
+            if (member != null && Checker.check(transfer.condition, member))
                 addTransferPoint(transfer);
         }
 
@@ -253,7 +255,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
                 }));
 
         Texture texture = null;
-        switch (point.type){
+        switch (point.type) {
             case 0:
             case 1:
                 texture = assetManager.get("quest.png", Texture.class);
@@ -268,7 +270,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
                 texture = assetManager.get("quest1.png", Texture.class);
                 break;
         }
-        if (texture!=null)
+        if (texture != null)
             entity.add(new SpriteComponent(texture));
 
         engine.addEntity(entity);
@@ -313,11 +315,11 @@ public class EntityManager extends InputListener implements Disposable, GestureD
     }
 
 
-    public void update(float dt){
+    public void update(float dt) {
         engine.update(dt);
     }
 
-    public void draw(float dt){
+    public void draw(float dt) {
         battleSystem.drawObjects(dt);
     }
 
@@ -386,7 +388,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
 
         Logger.LogData.logPoint = cameraSystem.getPosition();
 
-        if (lastPointer!=null){
+        if (lastPointer != null) {
             Vector2 cameraPosition = cameraSystem.getPosition();
             Vector2 cameraShift = new Vector2(centerPoint.x - cameraPosition.x, cameraPosition.y - centerPoint.y);
             Vector2 cameraShiftValue = cameraShift.cpy().scl(lastZoom - newZoom);

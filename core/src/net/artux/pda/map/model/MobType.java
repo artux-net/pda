@@ -3,7 +3,7 @@ package net.artux.pda.map.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mob {
+public class MobType {
 
     public int id;
     public String name;
@@ -13,7 +13,7 @@ public class Mob {
     public List<String> items = new ArrayList<>();
     public int travel;
 
-    Mob(){
+    MobType(){
         id = -1;
         name = "Undefined";
         group = 0;

@@ -36,7 +36,6 @@ public class HealthBar extends Group implements Disposable {
     Texture image;
     public HealthBar(UserInterface userInterface, AssetManager assetManager) {
         super();
-
         this.userInterface = userInterface;
 
         skinAtlas = new TextureAtlas(Gdx.files.internal("data/uiskin.atlas"));
@@ -45,11 +44,10 @@ public class HealthBar extends Group implements Disposable {
         barBackground = new NinePatchDrawable(new NinePatch(skinAtlas.findRegion("default-scroll"), 4, 5, 4, 5));
         font = Fonts.generateFont(Fonts.Language.RUSSIAN, 32);
 
-
-        HorizontalGroup table = new HorizontalGroup();
-        table.align(Align.left | Align.center);
-        table.space(20);
-        table.setFillParent(true);
+        HorizontalGroup horizontalGroup = new HorizontalGroup();
+        horizontalGroup.align(Align.left | Align.center);
+        horizontalGroup.space(20);
+        horizontalGroup.setFillParent(true);
 
         if(isInteger(userInterface.getMember().getAvatar()))
             image = assetManager
@@ -58,24 +56,21 @@ public class HealthBar extends Group implements Disposable {
             image = assetManager
                     .get("avatars/a0.jpg", Texture.class);
 
-        table.addActor(new TextureActor(image));
-        VerticalGroup table1 = new VerticalGroup();
-        table1.align(Align.left|Align.top);
-        table1.fill();
+        horizontalGroup.addActor(new TextureActor(image));
+
+        VerticalGroup labelsTable = new VerticalGroup();
+        labelsTable.align(Align.left|Align.top);
+        labelsTable.fill();
         Label.LabelStyle style = userInterface.getLabelStyle();
 
-        table1.addActor(new Label(userInterface.getMember().getName() + " " + userInterface.getMember().getNickname()
+        labelsTable.addActor(new Label(userInterface.getMember().getName() + " " + userInterface.getMember().getNickname()
                 + " [PDA #"+ userInterface.getMember().getPdaId()+"]", style));
+        labelsTable.addActor(new Label("Денег: " + userInterface.getMember().getMoney(), style));
 
-        Label label =new Label("Денег: " + userInterface.getMember().getMoney(), style);
-        label.setAlignment(Align.left);
+        horizontalGroup.addActor(labelsTable);
 
-        table1.addActor(label);
-
-        table.addActor(table1);
-
-        table.fill();
-        addActor(table);
+        horizontalGroup.fill();
+        addActor(horizontalGroup);
     }
 
     @Override

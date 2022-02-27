@@ -67,7 +67,6 @@ public class SoundsSystem extends EntitySystem implements Disposable {
     }
 
     public void playShoot(Vector2 position){
-
         for (int i = 0; i < players.size(); i++) {
             PositionComponent positionComponent = pm.get(players.get(i));
 
@@ -75,8 +74,6 @@ public class SoundsSystem extends EntitySystem implements Disposable {
                 m.setVolume(0.01f + (1/position.dst(positionComponent.getPosition())));
             }
         }
-
-
 
         int i = random.nextInt(weapons.size());
         if (weapons.get(i).isPlaying())

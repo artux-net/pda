@@ -83,7 +83,7 @@ public class PlayState extends State {
 
             logger = new Logger(engine);
 
-            userInterface.getHudTable().row().padTop(40);
+            userInterface.getHudTable().row();
             userInterface.getHudTable().add(logger);
             //userInterface.setDebug(true, true);
         }

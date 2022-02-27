@@ -18,12 +18,6 @@ import net.artux.pdalib.Member;
 
 public class LogSystem extends EntitySystem {
 
-    private UserInterface userInterface;
-
-    public LogSystem(UserInterface userInterface) {
-        this.userInterface = userInterface;
-    }
-
     private ImmutableArray<Entity> players;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
