@@ -40,5 +40,12 @@ public class Story {
         this.lastStage = lastStage;
     }
 
-
+    @Override
+    public String toString() {
+        return "Story{" +
+                "Id=" + storyId +
+                ", lastChapter=" + lastChapter +
+                ", lastStage=" + lastStage +
+                '}';
+    }
 }

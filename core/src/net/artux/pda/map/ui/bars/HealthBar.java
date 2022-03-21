@@ -22,7 +22,7 @@ import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.TextureActor;
 import net.artux.pda.map.ui.UserInterface;
 
-public class HealthBar extends Group implements Disposable {
+public class HealthBar extends VerticalGroup implements Disposable {
 
     private final TextureAtlas skinAtlas;
     private final NinePatchDrawable barBackground;
@@ -43,7 +43,7 @@ public class HealthBar extends Group implements Disposable {
         healthBarBackground = new NinePatchDrawable(new NinePatch(skinAtlas.findRegion("default-round"), 5, 5, 4, 4));
         barBackground = new NinePatchDrawable(new NinePatch(skinAtlas.findRegion("default-scroll"), 4, 5, 4, 5));
         font = Fonts.generateFont(Fonts.Language.RUSSIAN, 32);
-
+        padTop(20);
         HorizontalGroup horizontalGroup = new HorizontalGroup();
         horizontalGroup.align(Align.left | Align.center);
         horizontalGroup.space(20);
@@ -71,6 +71,7 @@ public class HealthBar extends Group implements Disposable {
 
         horizontalGroup.fill();
         addActor(horizontalGroup);
+        fill();
     }
 
     @Override

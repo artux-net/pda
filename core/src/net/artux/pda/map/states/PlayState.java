@@ -42,7 +42,7 @@ public class PlayState extends State {
 
     private static final String tag = "PlayState";
 
-    String cachePath = "cache/";
+    public static final String cachePath = "cache/";
     EntityManager entityManager;
 
     public PlayState(final GameStateManager gsm, Batch batch) {

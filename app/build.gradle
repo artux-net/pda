@@ -33,8 +33,8 @@ android {
         applicationId "net.artux.pda"
         minSdkVersion 24
         targetSdkVersion 32
-        versionCode 25
-        versionName "0.05.3"
+        versionCode 26
+        versionName "0.05.4"
         signingConfig signingConfigs.release
     }
     buildTypes {

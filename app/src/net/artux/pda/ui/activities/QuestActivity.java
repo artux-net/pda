@@ -324,7 +324,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             Toast.makeText(this,"Can not load stage, error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
-        if (processSummary && stage.getTypeStage() == 7)
+        if (processSummary && stage.getTypeStage() == 7 && stage.getText() != null)
             summary.addMessage(new UserMessage(stage.getTitle(), stage.getText().get(0).text, stage.getBackgroundUrl()));
 
         mFragmentTransaction.commitAllowingStateLoss();

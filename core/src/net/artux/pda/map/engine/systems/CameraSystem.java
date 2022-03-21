@@ -23,8 +23,10 @@ public class CameraSystem extends EntitySystem {
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 
-    private static float maxZoom = 1.4f;
-    private static float minZoom = 0.4f;
+    private static float maxZoom = 2f;
+    private static float minZoom = 0.1f;
+    private static float maxLimit = 1.4f;
+    private static float minLimit = 0.4f;
     private static float zoomingSpeed = 2f;
 
     @Override
@@ -64,14 +66,14 @@ public class CameraSystem extends EntitySystem {
                 detached = false;
 
             if (!zooming){
-                if (camera.zoom<minZoom){
-                    float delta = minZoom - camera.zoom;
+                if (camera.zoom<minLimit){
+                    float delta = minLimit - camera.zoom;
 
                     camera.zoom += delta*deltaTime*zoomingSpeed;
                 }
 
-                if (camera.zoom>maxZoom){
-                    float delta = camera.zoom - maxZoom;
+                if (camera.zoom>maxLimit){
+                    float delta = camera.zoom - maxLimit;
                     camera.zoom -= delta*deltaTime*zoomingSpeed;
                 }
             }

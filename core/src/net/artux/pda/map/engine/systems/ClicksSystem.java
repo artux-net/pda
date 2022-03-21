@@ -23,7 +23,6 @@ public class ClicksSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         entities = engine.getEntitiesFor(Family.all(ClickComponent.class, PositionComponent.class).get());
-
     }
 
     @Override

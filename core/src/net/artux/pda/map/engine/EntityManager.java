@@ -34,12 +34,16 @@ import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.states.BotStatesAshley;
+import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
+import net.artux.pda.map.engine.pathfinding.MapBorder;
 import net.artux.pda.map.engine.systems.BattleSystem;
 import net.artux.pda.map.engine.systems.CameraSystem;
 import net.artux.pda.map.engine.systems.ClicksSystem;
 import net.artux.pda.map.engine.systems.DeadCheckerSystem;
 import net.artux.pda.map.engine.systems.InteractionSystem;
 import net.artux.pda.map.engine.systems.LogSystem;
+import net.artux.pda.map.engine.systems.MapLoggerSystem;
+import net.artux.pda.map.engine.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.systems.MoodSystem;
 import net.artux.pda.map.engine.systems.MovingSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
@@ -53,6 +57,7 @@ import net.artux.pda.map.model.Point;
 import net.artux.pda.map.model.Spawn;
 import net.artux.pda.map.model.Transfer;
 import net.artux.pda.map.states.GameStateManager;
+import net.artux.pda.map.states.PlayState;
 import net.artux.pda.map.states.State;
 import net.artux.pda.map.ui.Fonts;
 import net.artux.pda.map.ui.Logger;
@@ -77,11 +82,15 @@ public class EntityManager extends InputListener implements Disposable, GestureD
     Engine engine;
 
     BattleSystem battleSystem;
+    MapLoggerSystem mapLoggerSystem;
     ClicksSystem clicksSystem;
     CameraSystem cameraSystem;
 
     BitmapFont font;
     Label.LabelStyle labelStyle;
+
+    private boolean controlPoints = true;
+    private boolean questPoints = true;
 
     public EntityManager(Engine engine, AssetManager assetManager, Stage stage, Map map, Member member, UserInterface userInterface, GameStateManager gameStateManager) {
         this.engine = engine;
@@ -102,13 +111,18 @@ public class EntityManager extends InputListener implements Disposable, GestureD
                 .add(velocityComponent)
                 .add(new PlayerComponent(stage.getViewport().getCamera(), member));
         engine.addEntity(player);
+        if (controlPoints)
+            createControlPointsEntities();
+        if (questPoints)
+            createQuestPointsEntities();
 
-        createControlPointsEntities();
-        createQuestPointsEntities();
+        MapBorder mapBorder = new MapBorder(assetManager.<Texture>get("test.png"), new Texture( Gdx.files.local(PlayState.cachePath + map.getBoundsTextureUri())));
+        engine.addSystem(new MapOrientationSystem(mapBorder));
 
         engine.addSystem(new RenderSystem(stage.getBatch()));
         engine.addSystem(new SoundsSystem(assetManager));
         engine.addSystem(new ClicksSystem());
+        engine.addSystem(new MapLoggerSystem(stage.getBatch()));
         engine.addSystem(new BattleSystem(assetManager, stage.getBatch()));
         engine.addSystem(new CameraSystem());
         engine.addSystem(new LogSystem());
@@ -122,6 +136,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         clicksSystem = engine.getSystem(ClicksSystem.class);
         battleSystem = engine.getSystem(BattleSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);
+        mapLoggerSystem = engine.getSystem(MapLoggerSystem.class);
 
         stage.addListener(this);
 
@@ -132,7 +147,6 @@ public class EntityManager extends InputListener implements Disposable, GestureD
     private void createControlPointsEntities() {
         JsonReader reader = new JsonReader(Gdx.files.internal("mobs.json").reader());
         MobsTypes mobsTypes = new Gson().fromJson(reader, MobsTypes.class);
-
         for (final Spawn spawn : map.getSpawns()) {
             MobType mobType = mobsTypes.getMobType(spawn.getId());
 
@@ -220,6 +234,19 @@ public class EntityManager extends InputListener implements Disposable, GestureD
             engine.addEntity(controlPoint);
 
         }
+
+
+
+        Entity entity = new Entity();
+        entity.add(new VelocityComponent()).add(new TargetMovingComponent(new TargetMovingComponent.Targeting() {
+            @Override
+            public Vector2 getTarget() {
+                return Logger.LogData.position;
+            }
+        }))
+        .add(new PositionComponent(668, 770));
+        engine.addEntity(entity);
+
     }
 
     private void createQuestPointsEntities() {
@@ -252,6 +279,27 @@ public class EntityManager extends InputListener implements Disposable, GestureD
                     public void interact() {
                         State.gsm.getPlatformInterface().send(point.getData());
                     }
+                }))
+                .add(new ClickComponent(new ClickComponent.ClickListener() {
+                    @Override
+                    public void clicked() {
+                        final Label text = new Label("Метка: " + point.getTitle(), labelStyle);
+                        text.setOrigin(Align.center);
+                        text.setPosition(point.getPosition().x, point.getPosition().y);
+                        stage.addActor(text);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(5000);
+                                    if (stage.getActors().contains(text, true))
+                                        text.remove();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
                 }));
 
         Texture texture = null;
@@ -268,6 +316,9 @@ public class EntityManager extends InputListener implements Disposable, GestureD
                 break;
             case 6:
                 texture = assetManager.get("quest1.png", Texture.class);
+                break;
+            case 7:
+                texture = assetManager.get("transfer.png", Texture.class);
                 break;
         }
         if (texture != null)
@@ -321,12 +372,14 @@ public class EntityManager extends InputListener implements Disposable, GestureD
 
     public void draw(float dt) {
         battleSystem.drawObjects(dt);
+        mapLoggerSystem.drawObjects(dt);
     }
 
     @Override
     public void dispose() {
         font.dispose();
         battleSystem.dispose();
+        mapLoggerSystem.dispose();
     }
 
     @Override

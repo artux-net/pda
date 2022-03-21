@@ -59,9 +59,11 @@ public enum BotStatesAshley implements State<Entity> {
         public void update(Entity entity) {
             TargetMovingComponent targetMovingComponent = tmm.get(entity);
             PositionComponent positionComponent = pm.get(entity);
-            if (positionComponent.getPosition().dst(targetMovingComponent.movementTarget)<3f){
-                sm.get(entity).stateMachine.changeState(STANDING);
-            }
+            if (targetMovingComponent.movementTarget!=null) {
+                if (positionComponent.getPosition().dst(targetMovingComponent.movementTarget) < 3f) {
+                    sm.get(entity).stateMachine.changeState(STANDING);
+                }
+            }else sm.get(entity).stateMachine.changeState(STANDING);
         }
     },
 

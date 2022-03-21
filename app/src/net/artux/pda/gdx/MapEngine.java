@@ -4,6 +4,7 @@ import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,8 @@ import androidx.savedstate.SavedStateRegistryOwner;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
 import net.artux.pda.map.GdxAdapter;
@@ -169,7 +172,9 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
     @Override
     public void error(String msg, Throwable t) {
         Timber.e(t, msg);
-        Toast.makeText(this, "Critical error with map, try again later", Toast.LENGTH_SHORT).show();
+        if (Looper.myLooper()==null)
+            Looper.prepare();
+        Toast.makeText(getApplicationContext(), "Critical error with map, try again later", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();

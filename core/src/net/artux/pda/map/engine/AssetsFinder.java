@@ -18,6 +18,7 @@ public class AssetsFinder implements Disposable {
         }
 
         assetManager.load("dialog.png", Texture.class);
+        assetManager.load("test.png", Texture.class);
         assetManager.load("beg2.png", Texture.class);
         assetManager.load("beg1.png", Texture.class);
         assetManager.load("pause.png", Texture.class);

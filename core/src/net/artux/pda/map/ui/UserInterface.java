@@ -141,9 +141,7 @@ public class UserInterface extends Group implements Disposable {
         addActor(menuButton);
 
         hudTable = new Table();
-        hudTable.setPosition(leftMargin*getDensity(), h/2);
-        hudTable.setHeight(h/2);
-        hudTable.setWidth(w/3);
+        hudTable.setPosition(leftMargin*getDensity(), h);
         hudTable.align(Align.left | Align.top);
         addActor(hudTable);
 
@@ -152,15 +150,16 @@ public class UserInterface extends Group implements Disposable {
 
         hudTable.pad(leftMargin*getDensity())
                 .row()
-                .height(120)
-                .fill();
+                .height(120);
         hudTable.add().setActor(healthBar);
 
         hudTable.row()
-                .padTop(30)
-                .height(70)
-                .fill();
+                .padTop(20)
+                .height(70);
         hudTable.add().setActor(weaponBar);
+
+
+
         /*if (Gdx.app.getLogLevel() == Application.LOG_DEBUG)
             setDebug(true, true);*/
     }
