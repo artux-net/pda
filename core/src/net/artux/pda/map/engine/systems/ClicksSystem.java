@@ -22,13 +22,12 @@ public class ClicksSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        entities = engine.getEntitiesFor(Family.all(ClickComponent.class, PositionComponent.class).get());
+        entities = engine.getEntitiesFor(Family.all(ClickComponent.class, PositionComponent.class, SpriteComponent.class).get());
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-
     }
 
     public boolean clicked(float x, float y){

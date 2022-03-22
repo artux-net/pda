@@ -9,7 +9,6 @@ import net.artux.pdalib.Member;
 
 public abstract class State {
 
-    protected OrthographicCamera camera;
     protected Vector3 mouse;
     public static GameStateManager gsm;
 
@@ -18,7 +17,6 @@ public abstract class State {
 
     public State(GameStateManager gsm){
         this.gsm = gsm;
-        camera = new OrthographicCamera();
         mouse = new Vector3();
     }
 
@@ -28,10 +26,6 @@ public abstract class State {
     public abstract void render(SpriteBatch sb);
     public abstract void resize(int width, int height);
     public abstract void dispose();
-
-    public OrthographicCamera getCamera() {
-        return camera;
-    }
 
     public Member getMember(){
         return (Member) gsm.get("member");

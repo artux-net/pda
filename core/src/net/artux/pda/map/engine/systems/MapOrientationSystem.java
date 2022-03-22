@@ -5,26 +5,28 @@ import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
-import net.artux.pda.map.engine.pathfinding.MapBorder;
+import net.artux.pda.map.engine.pathfinding.MapBorders;
 import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 import net.artux.pda.map.engine.pathfinding.TiledRaycastCollisionDetector;
+import net.artux.pda.map.model.Map;
 
-public class MapOrientationSystem extends EntitySystem {
+public class MapOrientationSystem extends EntitySystem{
 
     private FlatTiledGraph worldGraph;
-    private final MapBorder mapBorder;
+    private final MapBorders mapBorders;
 
     TiledManhattanDistance<FlatTiledNode> heuristic;
     IndexedAStarPathFinder<FlatTiledNode> pathFinder;
     PathSmoother<FlatTiledNode, Vector2> pathSmoother;
     TiledRaycastCollisionDetector<FlatTiledNode> collisionDetector;
 
-    public MapOrientationSystem(MapBorder mapBorder) {
-        this.mapBorder = mapBorder;
-        if (mapBorder.isMobTilesActive()) {
-            this.worldGraph = new FlatTiledGraph(mapBorder);
+    public MapOrientationSystem(AssetsFinder assetsFinder, Map map) {
+        this.mapBorders = new MapBorders(assetsFinder.getLocal(map.getTilesTexture()), assetsFinder.getLocal(map.getBoundsTextureUri()));
+        if (mapBorders.isMobTilesActive()) {
+            this.worldGraph = new FlatTiledGraph(mapBorders);
             heuristic = new TiledManhattanDistance<>();
             pathFinder = new IndexedAStarPathFinder<>(worldGraph, true);
             collisionDetector = new TiledRaycastCollisionDetector<>(worldGraph);
@@ -44,11 +46,12 @@ public class MapOrientationSystem extends EntitySystem {
         return worldGraph;
     }
 
-    public MapBorder getMapBorder() {
-        return mapBorder;
+    public MapBorders getMapBorder() {
+        return mapBorders;
     }
 
     public boolean isGraphActive(){
         return worldGraph != null;
     }
+
 }

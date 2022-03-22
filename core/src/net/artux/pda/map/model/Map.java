@@ -9,6 +9,7 @@ public class Map {
     private int id;
     private String title;
     private String texture;
+    private String tilesTexture;
     private String boundsTexture;
     private String blurTexture;
     private String defPos;
@@ -46,6 +47,10 @@ public class Map {
 
     public void setPlayerPos(String pos) {
         this.defPos = pos;
+    }
+
+    public String getTilesTexture() {
+        return tilesTexture;
     }
 
     public Vector2 getPlayerPosition() {

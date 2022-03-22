@@ -23,7 +23,7 @@ import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.TextureActor;
 import net.artux.pda.map.ui.UserInterface;
 
-public class WeaponBar extends Group implements Disposable {
+public class WeaponBar extends VerticalGroup implements Disposable {
 
     private final Label selected;
     private final Label resource;
@@ -45,16 +45,13 @@ public class WeaponBar extends Group implements Disposable {
         font = Fonts.generateFont(Fonts.Language.RUSSIAN, 32);
 
 
-        VerticalGroup table = new VerticalGroup();
-        table.align(Align.left | Align.center);
-        table.setFillParent(true);
+        align(Align.left | Align.center);
 
         selected = new Label("", userInterface.getLabelStyle());
         resource = new Label("", userInterface.getLabelStyle());
-        table.addActor(selected);
-        table.addActor(resource);
-        table.fill();
-        addActor(table);
+        addActor(selected);
+        addActor(resource);
+        fill();
     }
 
     @Override

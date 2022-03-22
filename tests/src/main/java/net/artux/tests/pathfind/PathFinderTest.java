@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -20,7 +19,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
-import net.artux.pda.map.engine.pathfinding.MapBorder;
+import net.artux.pda.map.engine.pathfinding.MapBorders;
 import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 import net.artux.pda.map.engine.pathfinding.TiledRaycastCollisionDetector;
 import net.artux.pda.map.engine.pathfinding.TiledSmoothableGraphPath;
@@ -64,10 +63,10 @@ public class PathFinderTest extends PathFinderTestBase {
     public void create () {
         Texture texture =  new Texture(Gdx.files.local(cachePath + map.getTextureUri()));;
         Texture bounds =  new Texture(Gdx.files.local(cachePath + map.getBoundsTextureUri()));;
-        MapBorder mapBorder = new MapBorder(bounds, null);
+        MapBorders mapBorders = new MapBorders(bounds, null);
         // Create the map
-        worldMap = new FlatTiledGraph(mapBorder);
-        width = Gdx.graphics.getWidth()/(mapBorder.getHeight()/16f);
+        worldMap = new FlatTiledGraph(mapBorders);
+        width = Gdx.graphics.getWidth()/(mapBorders.getHeight()/16f);
 
         path = new TiledSmoothableGraphPath<FlatTiledNode>();
         heuristic = new TiledManhattanDistance<FlatTiledNode>();

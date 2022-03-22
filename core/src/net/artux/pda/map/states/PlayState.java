@@ -3,14 +3,11 @@ package net.artux.pda.map.states;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.google.gson.Gson;
@@ -32,7 +29,6 @@ public class PlayState extends State {
 
     private Texture background;
     private LevelBackground levelBackground;
-    private Texture bounds;
 
     Logger logger;
 
@@ -42,7 +38,6 @@ public class PlayState extends State {
 
     private static final String tag = "PlayState";
 
-    public static final String cachePath = "cache/";
     EntityManager entityManager;
 
     public PlayState(final GameStateManager gsm, Batch batch) {
@@ -53,12 +48,10 @@ public class PlayState extends State {
 
         Viewport viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        assetManager = new AssetsFinder().get();
+        AssetsFinder assetsFinder = new AssetsFinder();
+        assetManager = assetsFinder.get();
         stage = new Stage(viewport, batch);
         uistage = new Stage();
-
-        camera = ((OrthographicCamera) stage.getCamera());
-        camera.zoom = 0.5f;
 
         userInterface = new UserInterface(gsm, assetManager);
         uistage.addActor(userInterface);
@@ -68,28 +61,23 @@ public class PlayState extends State {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             System.out.println(gson.toJson(map));
 
-            background = new Texture(Gdx.files.local(cachePath + map.getTextureUri()));
+            background = assetsFinder.getLocal(map.getTextureUri());
             GlobalData.mapWidth = background.getWidth();
             GlobalData.mapHeight = background.getHeight();
 
-            if (map.getBlurTextureUri() != null) {
-                FileHandle fileHandle = Gdx.files.local(cachePath + map.getBlurTextureUri());
-                if (fileHandle.exists()) {
-                    levelBackground = new LevelBackground(new Texture(fileHandle), camera);
-                }
+            Texture levelTexture = assetsFinder.getLocal(map.getBlurTextureUri());
+            if (levelTexture != null) {
+                levelBackground = new LevelBackground(levelTexture, stage.getCamera());
             }
-
-            entityManager = new EntityManager(engine, assetManager, stage, map, getMember(), userInterface, gsm);
-
-            logger = new Logger(engine);
-
-            userInterface.getHudTable().row();
-            userInterface.getHudTable().add(logger);
-            //userInterface.setDebug(true, true);
         }
+        entityManager = new EntityManager(engine, assetsFinder, stage, userInterface, gsm);
+        logger = new Logger(engine);
 
-        Gdx.app.debug(tag, "State loaded, heap: " + Gdx.app.getNativeHeap());
-    }
+        userInterface.getHudTable().row();
+        userInterface.getHudTable().add(logger);
+
+        Gdx.app.debug(tag,"State loaded, heap: "+Gdx.app.getNativeHeap());
+}
 
     @Override
     protected void handleInput() {
@@ -138,14 +126,8 @@ public class PlayState extends State {
     @Override
     public void dispose() {
         stage.dispose();
-        Gdx.app.debug(tag, "after dispose stages, heap " + Gdx.app.getNativeHeap());
-        if (background != null)
-            background.dispose();
-        if (bounds != null)
-            bounds.dispose();
-        if (levelBackground != null)
-            levelBackground.dispose();
-        if (logger!=null)
+        Gdx.app.debug(tag, "after dispose stage, heap " + Gdx.app.getNativeHeap());
+        if (logger != null)
             logger.dispose();
         Gdx.app.debug(tag, "after dispose textures, heap " + Gdx.app.getNativeHeap());
         Gdx.app.debug(tag, "after dispose font, heap " + Gdx.app.getNativeHeap());

@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 
-public class MapBorder {
+public class MapBorders {
 
     private Pixmap mobPixmap; //TODO dispose
     private Texture mobLayout;
@@ -15,7 +15,7 @@ public class MapBorder {
     int tileWidth;
     int tileHeight;
 
-    public MapBorder(Texture mobLayout, Texture playerBounds) {
+    public MapBorders(Texture mobLayout, Texture playerBounds) {
         this.mobLayout = mobLayout;
         if (mobLayout != null) {
             if (!mobLayout.getTextureData().isPrepared()) {

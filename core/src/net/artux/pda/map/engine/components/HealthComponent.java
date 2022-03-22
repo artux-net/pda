@@ -14,4 +14,8 @@ public class HealthComponent implements Component {
         return value<1;
     }
 
+    public void damage(float damage){
+        value -= damage;
+    }
+
 }

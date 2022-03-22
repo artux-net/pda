@@ -4,6 +4,8 @@ import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import net.artux.pda.map.engine.data.GlobalData;
+
 public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
     public static final int tileSize = 8;
 
@@ -15,18 +17,18 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
     public static boolean diagonal;
     public FlatTiledNode startNode;
 
-    public FlatTiledGraph(MapBorder mapBorder) {
-        this.nodes = new Array<FlatTiledNode>(sizeX * sizeY);
+    public FlatTiledGraph(MapBorders mapBorders) {
+        this.nodes = new Array<>(sizeX * sizeY);
         diagonal = true;
 
-        this.sizeX = mapBorder.getWidth() / tileSize;
-        this.sizeY = mapBorder.getHeight() / tileSize;
+        this.sizeX = GlobalData.mapWidth / tileSize;
+        this.sizeY = GlobalData.mapHeight / tileSize;
 
-        mapBorder.setTilesSize(sizeX, sizeY);
+        mapBorders.setTilesSize(sizeX, sizeY);
 
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
-                nodes.add(new FlatTiledNode(this, x, y, x*tileSize + tileSize/2, y*tileSize + tileSize/2, mapBorder.getTileTypeInTileForMob(x, y), 4));
+                nodes.add(new FlatTiledNode(this, x, y, x*tileSize + tileSize/2, y*tileSize + tileSize/2, mapBorders.getTileTypeInTileForMob(x, y), 4));
             }
         }
 

@@ -16,36 +16,41 @@ import net.artux.pda.map.engine.components.VelocityComponent;
 
 public class CameraSystem extends EntitySystem {
 
-    private ImmutableArray<Entity> entities;
+    private ImmutableArray<Entity> players;
     private OrthographicCamera camera;
 
     private ComponentMapper<PlayerComponent> cm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 
+    private float initialZoom = 0.5f;
     private static float maxZoom = 2f;
     private static float minZoom = 0.1f;
     private static float maxLimit = 1.4f;
     private static float minLimit = 0.4f;
     private static float zoomingSpeed = 2f;
+    private static float specialZoomValue = 0.2f;
+    boolean detached;
+    boolean specialZoom = true;
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        entities = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class, VelocityComponent.class).get());
-        for (int i = 0; i < entities.size(); i++) {
-            Entity entity = entities.get(i);
+        players = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class, VelocityComponent.class).get());
+        for (int i = 0; i < players.size(); i++) {
+            Entity entity = players.get(i);
 
             PlayerComponent playerComponent = cm.get(entity);
             camera = (OrthographicCamera) playerComponent.camera;
         }
+        camera.zoom = initialZoom;
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        for (int i = 0; i < entities.size(); i++) {
-            Entity entity = entities.get(i);
+        for (int i = 0; i < players.size(); i++) {
+            Entity entity = players.get(i);
 
             PositionComponent positionComponent = pm.get(entity);
             VelocityComponent velocityComponent = vm.get(entity);
@@ -65,7 +70,17 @@ public class CameraSystem extends EntitySystem {
             if (!velocityComponent.velocity.isZero())
                 detached = false;
 
-            if (!zooming){
+            if (specialZoom){
+                if (camera.zoom > specialZoomValue) {
+                    float delta = camera.zoom - specialZoomValue;
+
+                    camera.zoom -= delta * deltaTime * zoomingSpeed;
+                }else if(camera.zoom != specialZoomValue){
+                    float delta = specialZoomValue - camera.zoom;
+
+                    camera.zoom += delta * deltaTime * zoomingSpeed;
+                }
+            } else if (!zooming){
                 if (camera.zoom<minLimit){
                     float delta = minLimit - camera.zoom;
 
@@ -80,9 +95,14 @@ public class CameraSystem extends EntitySystem {
         }
     }
 
-    boolean detached;
+    
     public void setDetached(boolean detached){
         this.detached = detached;
+        specialZoom = false;
+    }
+
+    public void setSpecialZoom(boolean specialZoom) {
+        this.specialZoom = specialZoom;
     }
 
     public void moveBy(float x, float y){
@@ -95,12 +115,10 @@ public class CameraSystem extends EntitySystem {
     }
 
     boolean zooming = false;
-    float currentZoom;
-
 
     public void setZooming(boolean zooming) {
         if (!this.zooming){
-            currentZoom = camera.zoom;
+            specialZoomValue = camera.zoom;
         }
         this.zooming = zooming;
     }
@@ -118,6 +136,6 @@ public class CameraSystem extends EntitySystem {
 
 
     public float getCurrentZoom(){
-        return currentZoom;
+        return specialZoomValue;
     }
 }

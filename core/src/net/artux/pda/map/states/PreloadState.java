@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import net.artux.pda.map.model.Map;
 
+import java.util.LinkedList;
+import java.util.List;
+
 
 public class PreloadState extends State {
 
@@ -21,12 +24,21 @@ public class PreloadState extends State {
         super(gsm);
     }
 
+    List<String> remoteAssets = new LinkedList<>();
+
     public void startLoad(Batch batch){
         Map map = (Map) gsm.get("map");
         if (map != null) {
-            loadTexture(batch, map.getTextureUri(), 0);
-            loadTexture(batch, map.getBlurTextureUri(), 0);
-            loadTexture(batch, map.getBoundsTextureUri(), 0);
+            remoteAssets.add(map.getTextureUri());
+            remoteAssets.add(map.getBlurTextureUri());
+            remoteAssets.add(map.getBoundsTextureUri());
+            remoteAssets.add(map.getTilesTexture());
+
+            for (String asset :
+                    remoteAssets) {
+                loadTexture(batch, asset, 0);
+            }
+
         }
         else gsm.getPlatformInterface().error("Can not start with null map", new NullPointerException());
     }
@@ -76,14 +88,12 @@ public class PreloadState extends State {
 
             if (!file.exists())
                 return;
-            String path = map.getBlurTextureUri();
-            file = Gdx.files.local(cachePath+path);
-            if (!file.exists() && path != null && !path.equals(""))
-                return;
-            path = map.getBoundsTextureUri();
-            file = Gdx.files.local(cachePath+path);
-            if (!file.exists() && path != null && !path.equals(""))
-                return;
+            for (String path :
+                    remoteAssets) {
+                file = Gdx.files.local(cachePath+path);
+                if (!file.exists() && path != null && !path.equals(""))
+                    return;
+            }
             try {
                 if (!(gsm.peek() instanceof PlayState))
                     gsm.set(new PlayState(gsm, batch));

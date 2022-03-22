@@ -1,44 +1,31 @@
 package net.artux.pda.map.engine;
 
-import static com.badlogic.gdx.math.MathUtils.random;
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 
-import net.artux.pda.map.engine.components.ControlPointComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.components.InteractiveComponent;
-import net.artux.pda.map.engine.components.player.PlayerComponent;
-import net.artux.pda.map.engine.components.ClickComponent;
-import net.artux.pda.map.engine.components.player.UserVelocityInput;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.StatesComponent;
-import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
-import net.artux.pda.map.engine.components.states.BotStatesAshley;
-import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
-import net.artux.pda.map.engine.pathfinding.MapBorder;
+import net.artux.pda.map.engine.components.player.PlayerComponent;
+import net.artux.pda.map.engine.components.player.UserVelocityInput;
+import net.artux.pda.map.engine.pathfinding.MapBorders;
 import net.artux.pda.map.engine.systems.BattleSystem;
 import net.artux.pda.map.engine.systems.CameraSystem;
 import net.artux.pda.map.engine.systems.ClicksSystem;
+import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.DeadCheckerSystem;
 import net.artux.pda.map.engine.systems.InteractionSystem;
 import net.artux.pda.map.engine.systems.LogSystem;
@@ -50,32 +37,20 @@ import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.engine.systems.StatesSystem;
 import net.artux.pda.map.engine.systems.TargetingSystem;
+import net.artux.pda.map.engine.systems.WorldSystem;
+import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
+import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
+import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
 import net.artux.pda.map.model.Map;
-import net.artux.pda.map.model.MobType;
-import net.artux.pda.map.model.MobsTypes;
-import net.artux.pda.map.model.Point;
-import net.artux.pda.map.model.Spawn;
-import net.artux.pda.map.model.Transfer;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.PlayState;
-import net.artux.pda.map.states.State;
-import net.artux.pda.map.ui.Fonts;
 import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
-import net.artux.pdalib.Checker;
 import net.artux.pdalib.Member;
-import net.artux.pdalib.profile.Story;
-import net.artux.pdalib.profile.items.Armor;
-import net.artux.pdalib.profile.items.Weapon;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 public class EntityManager extends InputListener implements Disposable, GestureDetector.GestureListener {
 
-    Stage stage;
-    AssetManager assetManager;
+    private final MapOrientationSystem mapOrientationSystem;
     Map map;
     Member member;
 
@@ -86,45 +61,46 @@ public class EntityManager extends InputListener implements Disposable, GestureD
     ClicksSystem clicksSystem;
     CameraSystem cameraSystem;
 
-    BitmapFont font;
-    Label.LabelStyle labelStyle;
-
     private boolean controlPoints = true;
     private boolean questPoints = true;
+    private boolean anomalies = true;
 
-    public EntityManager(Engine engine, AssetManager assetManager, Stage stage, Map map, Member member, UserInterface userInterface, GameStateManager gameStateManager) {
+    public EntityManager(Engine engine, AssetsFinder assetsFinder, Stage stage, UserInterface userInterface, GameStateManager gameStateManager) {
         this.engine = engine;
-        this.stage = stage;
-        this.assetManager = assetManager;
-        this.map = map;
-        this.member = member;
+        this.map = (Map) gameStateManager.get("map");
+        this.member = gameStateManager.getMember();
 
         //player
         Entity player = new Entity();
         UserVelocityInput velocityComponent = new UserVelocityInput();
         player.add(new PositionComponent(map.getPlayerPosition()))
                 .add(new VelocityComponent())
-                .add(new SpriteComponent(velocityComponent, assetManager.get("gg.png", Texture.class), 32, 32))
+                .add(new SpriteComponent(velocityComponent, assetsFinder.get().get("gg.png", Texture.class), 32, 32))
                 .add(new WeaponComponent(member))
                 .add(new MoodComponent(member))
                 .add(new HealthComponent())
                 .add(velocityComponent)
                 .add(new PlayerComponent(stage.getViewport().getCamera(), member));
         engine.addEntity(player);
+
+        mapOrientationSystem = new MapOrientationSystem(assetsFinder, map);
+        engine.addSystem(mapOrientationSystem);
+        engine.addSystem(new CameraSystem());
+        engine.addSystem(new WorldSystem());
+        engine.addSystem(new DataSystem(map, member));
+
         if (controlPoints)
-            createControlPointsEntities();
+            ControlPointsHelper.createControlPointsEntities(engine, assetsFinder.get());
         if (questPoints)
-            createQuestPointsEntities();
+            QuestPointsHelper.createQuestPointsEntities(engine, assetsFinder.get());
+        if (anomalies)
+            AnomalyHelper.createAnomalies(engine, assetsFinder.get());
 
-        MapBorder mapBorder = new MapBorder(assetManager.<Texture>get("test.png"), new Texture( Gdx.files.local(PlayState.cachePath + map.getBoundsTextureUri())));
-        engine.addSystem(new MapOrientationSystem(mapBorder));
-
-        engine.addSystem(new RenderSystem(stage.getBatch()));
-        engine.addSystem(new SoundsSystem(assetManager));
+        engine.addSystem(new RenderSystem(stage));
+        engine.addSystem(new SoundsSystem(assetsFinder.get()));
         engine.addSystem(new ClicksSystem());
         engine.addSystem(new MapLoggerSystem(stage.getBatch()));
-        engine.addSystem(new BattleSystem(assetManager, stage.getBatch()));
-        engine.addSystem(new CameraSystem());
+        engine.addSystem(new BattleSystem(assetsFinder.get(), stage.getBatch()));
         engine.addSystem(new LogSystem());
         engine.addSystem(new InteractionSystem(stage, userInterface));
         engine.addSystem(new StatesSystem());
@@ -139,232 +115,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         mapLoggerSystem = engine.getSystem(MapLoggerSystem.class);
 
         stage.addListener(this);
-
-        font = Fonts.generateFont(Fonts.Language.RUSSIAN, 16);
-        labelStyle = new Label.LabelStyle(font, Color.WHITE);
     }
-
-    private void createControlPointsEntities() {
-        JsonReader reader = new JsonReader(Gdx.files.internal("mobs.json").reader());
-        MobsTypes mobsTypes = new Gson().fromJson(reader, MobsTypes.class);
-        for (final Spawn spawn : map.getSpawns()) {
-            MobType mobType = mobsTypes.getMobType(spawn.getId());
-
-            Entity controlPoint = new Entity();
-            float size = spawn.getR() * 2 * 0.9f;
-
-            TargetMovingComponent.Targeting targeting = new TargetMovingComponent.Targeting() {
-                @Override
-                public Vector2 getTarget() {
-                    double r = (double) spawn.getR() / 2 + random.nextInt(spawn.getR());
-
-                    double angle = random.nextInt(360);
-
-                    Vector2 basePosition = spawn.getPosition();
-                    float x = (float) (Math.cos(angle) * r);
-                    float y = (float) (Math.sin(angle) * r);
-                    return new Vector2(basePosition.x + x, basePosition.y + y);
-                }
-            };
-
-            List<Entity> pointEntities = new LinkedList<>();
-            for (int i = 0; i < spawn.getN(); i++) {
-                Entity entity = new Entity();
-
-                Armor armor = new Armor();
-                Weapon w = new Weapon();
-                w.speed = 14;
-                w.damage = 2;
-                w.precision = 1;
-                w.bullet_quantity = 30;
-
-                MoodComponent moodComponent = new MoodComponent(mobType.group, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]), spawn.isAngry());
-                moodComponent.ignorePlayer = spawn.isIgnorePlayer();
-
-                entity.add(new PositionComponent(targeting.getTarget()))
-                        .add(new VelocityComponent())
-                        .add(new HealthComponent())
-                        .add(moodComponent)
-                        .add(new WeaponComponent(armor, w, w))
-                        .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
-                        .add(new TargetMovingComponent(targeting));
-
-
-                Texture texture;
-                if (member != null) {
-                    if (mobType.group < 0 || member.relations.get(mobType.group) < -2)
-                        texture = assetManager.get("red.png", Texture.class);
-                    else if (member.relations.get(mobType.group) > 2)
-                        texture = assetManager.get("green.png", Texture.class);
-                    else
-                        texture = assetManager.get("yellow.png", Texture.class);
-                } else texture = assetManager.get("yellow.png", Texture.class);
-
-                entity.add(new SpriteComponent(texture, 8, 8));
-                engine.addEntity(entity);
-                pointEntities.add(entity);
-            }
-
-            final ControlPointComponent controlPointComponent = new ControlPointComponent("Контрольная точка", mobType, pointEntities);
-
-            controlPoint.add(new PositionComponent(spawn.getPosition()))
-                    .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size))
-                    .add(controlPointComponent)
-                    .add(new ClickComponent(new ClickComponent.ClickListener() {
-                        @Override
-                        public void clicked() {
-                            final Label text = new Label(controlPointComponent.desc(), labelStyle);
-                            text.setOrigin(Align.center);
-                            text.setPosition(spawn.getPosition().x, spawn.getPosition().y);
-                            stage.addActor(text);
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        Thread.sleep(5000);
-                                        if (stage.getActors().contains(text, true))
-                                            text.remove();
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }).start();
-                        }
-                    }));
-            engine.addEntity(controlPoint);
-
-        }
-
-
-
-        Entity entity = new Entity();
-        entity.add(new VelocityComponent()).add(new TargetMovingComponent(new TargetMovingComponent.Targeting() {
-            @Override
-            public Vector2 getTarget() {
-                return Logger.LogData.position;
-            }
-        }))
-        .add(new PositionComponent(668, 770));
-        engine.addEntity(entity);
-
-    }
-
-    private void createQuestPointsEntities() {
-        for (Point point : map.getPoints()) {
-            if (member != null && Checker.check(point.getCondition(), member))
-                if (point.getData().containsKey("chapter")) {
-                    int storyId = Integer.parseInt(member.getData().getTemp().get("currentStory"));
-                    for (Story story : member.getData().getStories()) {
-                        if (story.getStoryId() == storyId
-                                && (Integer.parseInt(point.getData().get("chapter")) == story.getLastChapter()
-                                || Integer.parseInt(point.getData().get("chapter")) == 0))
-                            addPoint(point);
-                    }
-                } else addPoint(point);
-
-        }
-
-        for (Transfer transfer : map.getTransfers()) {
-            if (member != null && Checker.check(transfer.condition, member))
-                addTransferPoint(transfer);
-        }
-
-    }
-
-    private void addPoint(final Point point) {
-        Entity entity = new Entity();
-        entity.add(new PositionComponent(point.getPosition()))
-                .add(new InteractiveComponent(point.getTitle(), point.type, new InteractiveComponent.InteractListener() {
-                    @Override
-                    public void interact() {
-                        State.gsm.getPlatformInterface().send(point.getData());
-                    }
-                }))
-                .add(new ClickComponent(new ClickComponent.ClickListener() {
-                    @Override
-                    public void clicked() {
-                        final Label text = new Label("Метка: " + point.getTitle(), labelStyle);
-                        text.setOrigin(Align.center);
-                        text.setPosition(point.getPosition().x, point.getPosition().y);
-                        stage.addActor(text);
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep(5000);
-                                    if (stage.getActors().contains(text, true))
-                                        text.remove();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).start();
-                    }
-                }));
-
-        Texture texture = null;
-        switch (point.type) {
-            case 0:
-            case 1:
-                texture = assetManager.get("quest.png", Texture.class);
-                break;
-            case 4:
-                texture = assetManager.get("seller.png", Texture.class);
-                break;
-            case 5:
-                texture = assetManager.get("cache.png", Texture.class);
-                break;
-            case 6:
-                texture = assetManager.get("quest1.png", Texture.class);
-                break;
-            case 7:
-                texture = assetManager.get("transfer.png", Texture.class);
-                break;
-        }
-        if (texture != null)
-            entity.add(new SpriteComponent(texture));
-
-        engine.addEntity(entity);
-    }
-
-    private void addTransferPoint(final Transfer point) {
-        Entity entity = new Entity();
-        entity.add(new PositionComponent(point.getPosition()))
-                .add(new InteractiveComponent(point.getMessage(), -1, new InteractiveComponent.InteractListener() {
-                    @Override
-                    public void interact() {
-                        HashMap<String, String> data = new HashMap<>();
-                        data.put("map", String.valueOf(point.getTo()));
-                        data.put("pos", point.getToPosition());
-                        State.gsm.getPlatformInterface().send(data);
-                    }
-                }))
-                .add(new ClickComponent(new ClickComponent.ClickListener() {
-                    @Override
-                    public void clicked() {
-                        final Label text = new Label("Локация " + point.getMessage(), labelStyle);
-                        text.setOrigin(Align.center);
-                        text.setPosition(point.getPosition().x, point.getPosition().y);
-                        stage.addActor(text);
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep(5000);
-                                    text.remove();
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }).start();
-                    }
-                }));
-
-        entity.add(new SpriteComponent(assetManager.get("transfer.png", Texture.class), 32, 32));
-
-        engine.addEntity(entity);
-    }
-
 
     public void update(float dt) {
         engine.update(dt);
@@ -377,7 +128,10 @@ public class EntityManager extends InputListener implements Disposable, GestureD
 
     @Override
     public void dispose() {
-        font.dispose();
+        for (EntitySystem s :
+                engine.getSystems()) {
+            if (s instanceof Disposable) ((Disposable) s).dispose();
+        }
         battleSystem.dispose();
         mapLoggerSystem.dispose();
     }
@@ -425,8 +179,8 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         return false;
     }
 
-    Vector2 lastPointer;
-    float lastZoom;
+    private Vector2 lastPointer;
+    private float lastZoom;
 
     @Override
     public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
