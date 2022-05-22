@@ -29,6 +29,8 @@ public class MovingSystem extends EntitySystem {
 
     private MapOrientationSystem mapOrientationSystem;
 
+    public static boolean playerWalls = true;
+
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
@@ -64,17 +66,17 @@ public class MovingSystem extends EntitySystem {
             else
                 stepVector = velocityComponent.velocity.scl(deltaTime).scl(MOVEMENT);
 
-            if (!stepVector.isZero()){
+            if (!stepVector.isZero()) {
                 float newX = positionComponent.getX() + stepVector.x;
                 float newY = positionComponent.getY() + stepVector.y;
-                if (uvm.has(entity)) {
+                if (uvm.has(entity) && playerWalls) {
                     if (mapOrientationSystem.getMapBorder().getTileType((int) newX, (int) positionComponent.getY()) != TiledNode.TILE_WALL)
                         if (newX <= GlobalData.mapWidth && newX >= 0)
                             positionComponent.getPosition().x = newX;
                     if (mapOrientationSystem.getMapBorder().getTileType((int) positionComponent.getX(), (int) newY) != TiledNode.TILE_WALL)
                         if (newY <= GlobalData.mapHeight && newY >= 0)
                             positionComponent.getPosition().y = newY;
-                }else {
+                } else {
                     if (newX <= GlobalData.mapWidth && newX >= 0)
                         positionComponent.getPosition().x = newX;
                     if (newY <= GlobalData.mapHeight && newY >= 0)

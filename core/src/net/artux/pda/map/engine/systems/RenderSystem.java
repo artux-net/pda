@@ -1,10 +1,7 @@
 package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntityListener;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -14,16 +11,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.ui.Fonts;
 
-public class RenderSystem extends EntitySystem implements Disposable {
+public class RenderSystem extends BaseSystem implements Disposable {
 
-    private Array<Entity> entities;
     private Batch batch;
     private Stage stage;
 
@@ -34,6 +29,7 @@ public class RenderSystem extends EntitySystem implements Disposable {
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 
     public RenderSystem(Stage stage) {
+        super(Family.all(SpriteComponent.class, PositionComponent.class).get());
         this.batch = stage.getBatch();
         this.stage = stage;
 
@@ -41,24 +37,6 @@ public class RenderSystem extends EntitySystem implements Disposable {
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
     }
 
-    @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-        entities = new Array<>(engine.getEntitiesFor(Family.all(SpriteComponent.class, PositionComponent.class).get()).toArray());
-
-        engine.addEntityListener(Family.all(SpriteComponent.class, PositionComponent.class).get(), new EntityListener() {
-            @Override
-            public void entityAdded(Entity entity) {
-                entities.add(entity);
-            }
-
-            @Override
-            public void entityRemoved(Entity entity) {
-                entities.removeValue(entity, true);
-            }
-        });
-
-    }
 
     @Override
     public void update(float deltaTime) {
@@ -70,6 +48,7 @@ public class RenderSystem extends EntitySystem implements Disposable {
             PositionComponent positionComponent = pm.get(entity);
 
             Sprite sprite = spriteComponent.sprite;
+            batch.setColor(sprite.getColor());
             batch.draw(sprite, positionComponent.getX()-sprite.getOriginX(), positionComponent.getY()-sprite.getOriginY(), sprite.getOriginX(),
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), spriteComponent.getRotation());
         }

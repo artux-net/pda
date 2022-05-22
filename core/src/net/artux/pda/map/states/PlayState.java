@@ -29,9 +29,6 @@ public class PlayState extends State {
 
     private Texture background;
     private LevelBackground levelBackground;
-
-    Logger logger;
-
     public AssetManager assetManager;
 
     private final UserInterface userInterface;
@@ -53,7 +50,7 @@ public class PlayState extends State {
         stage = new Stage(viewport, batch);
         uistage = new Stage();
 
-        userInterface = new UserInterface(gsm, assetManager);
+        userInterface = new UserInterface(gsm, assetManager, stage.getCamera());
         uistage.addActor(userInterface);
 
         Map map = (Map) gsm.get("map");
@@ -71,13 +68,10 @@ public class PlayState extends State {
             }
         }
         entityManager = new EntityManager(engine, assetsFinder, stage, userInterface, gsm);
-        logger = new Logger(engine);
+        userInterface.enableDebug(assetManager, engine);
 
-        userInterface.getHudTable().row();
-        userInterface.getHudTable().add(logger);
-
-        Gdx.app.debug(tag,"State loaded, heap: "+Gdx.app.getNativeHeap());
-}
+        Gdx.app.debug(tag, "State loaded, heap: " + Gdx.app.getNativeHeap());
+    }
 
     @Override
     protected void handleInput() {
@@ -108,13 +102,15 @@ public class PlayState extends State {
 
         if (background != null)
             stage.getBatch().draw(background, 0, 0);
-
-        entityManager.update(dt); // TODO make it draw
         stage.getBatch().end();
 
-        stage.draw();
         entityManager.draw(dt);
-        uistage.draw();
+        stage.draw();
+
+        stage.getBatch().begin();
+        entityManager.update(dt); // TODO make it draw
+        stage.getBatch().end();
+        uistage.draw(); // ui always last
     }
 
     @Override
@@ -127,8 +123,7 @@ public class PlayState extends State {
     public void dispose() {
         stage.dispose();
         Gdx.app.debug(tag, "after dispose stage, heap " + Gdx.app.getNativeHeap());
-        if (logger != null)
-            logger.dispose();
+
         Gdx.app.debug(tag, "after dispose textures, heap " + Gdx.app.getNativeHeap());
         Gdx.app.debug(tag, "after dispose font, heap " + Gdx.app.getNativeHeap());
         assetManager.dispose();

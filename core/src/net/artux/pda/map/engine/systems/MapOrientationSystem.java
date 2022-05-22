@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
@@ -13,7 +14,7 @@ import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 import net.artux.pda.map.engine.pathfinding.TiledRaycastCollisionDetector;
 import net.artux.pda.map.model.Map;
 
-public class MapOrientationSystem extends EntitySystem{
+public class MapOrientationSystem extends EntitySystem implements Disposable {
 
     private FlatTiledGraph worldGraph;
     private final MapBorders mapBorders;
@@ -54,4 +55,12 @@ public class MapOrientationSystem extends EntitySystem{
         return worldGraph != null;
     }
 
+    public MapBorders getMapBorders() {
+        return mapBorders;
+    }
+
+    @Override
+    public void dispose() {
+        mapBorders.dispose();
+    }
 }

@@ -53,8 +53,12 @@ public class AssetsFinder implements Disposable {
 
             assetManager.load("contact_0.ogg", Music.class);
             assetManager.load("contact_1.ogg", Music.class);
+            assetManager.load("d-beep.ogg", Music.class);
             assetManager.load("ak74_shoot_0.ogg", Music.class);
             assetManager.load("ak74_shoot_1.ogg", Music.class);
+            assetManager.load("music/1.ogg", Music.class);
+            assetManager.load("music/2.ogg", Music.class);
+            assetManager.load("music/3.ogg", Music.class);
 
             assetManager.finishLoading();
 

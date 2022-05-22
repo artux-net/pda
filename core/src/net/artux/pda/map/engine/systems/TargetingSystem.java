@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
+import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 import net.artux.pda.map.engine.pathfinding.TiledRaycastCollisionDetector;
@@ -77,7 +78,7 @@ public class TargetingSystem extends EntitySystem {
                             targetMovingComponent.iterator = targetMovingComponent.getPath().iterator();
                         if (targetMovingComponent.tempTarget == null
                                 || positionComponent.getPosition().dst(
-                                        new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY)) < 3) {
+                                        new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY)) < 5) {
                             if (targetMovingComponent.iterator.hasNext()) {
                                 targetMovingComponent.tempTarget = targetMovingComponent.iterator.next();
                                 target = new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY);

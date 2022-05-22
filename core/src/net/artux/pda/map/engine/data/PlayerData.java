@@ -7,5 +7,6 @@ public class PlayerData {
     public static String bullet;
     public static int magazine;
     public static int resource;
+    public static int visibleEntities;
 
 }

@@ -31,10 +31,9 @@ public class MapLoggerSystem extends EntitySystem implements Disposable {
 
     private MapOrientationSystem mapOrientationSystem;
 
-
-    private boolean showTiles = false;
-    private boolean showPaths = false;
-
+    public static boolean showPlayerWalls = false;
+    public static boolean showTiles = false;
+    public static boolean showPaths = false;
 
     public MapLoggerSystem(Batch batch) {
         this.batch = batch;
@@ -63,26 +62,17 @@ public class MapLoggerSystem extends EntitySystem implements Disposable {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        /*for (int i = 0; i < entities.size; i++) {
-            Entity entity = entities.get(i);
-*//*
-            Ta healthComponent = hm.get(entity);
-            PositionComponent positionComponent = pm.get(entity);
-            if (healthComponent.isDead()){
-                Entity deadEntity = new Entity();
-                deadEntity.add(new PositionComponent(positionComponent.getPosition()))
-                        .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4,4));//TODO
-
-                getEngine().removeEntity(entity);
-                getEngine().addEntity(deadEntity);
-            }*//*
-        }*/
     }
 
     public void drawObjects(float delta) {
 
         sr.setProjectionMatrix(batch.getProjectionMatrix());
 
+        if (showPlayerWalls){
+            batch.begin();
+            batch.draw(mapOrientationSystem.getMapBorder().getPlayerLayout(), 0, 0);
+            batch.end();
+        }
 
         if (showTiles) {
             sr.begin(ShapeRenderer.ShapeType.Filled);
@@ -147,11 +137,7 @@ public class MapLoggerSystem extends EntitySystem implements Disposable {
                     sr.end();
                 }
             }
-
-
         }
-
-
     }
 
     @Override

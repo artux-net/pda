@@ -3,8 +3,6 @@ package net.artux.pda.map.engine;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
@@ -21,7 +19,7 @@ import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.player.UserVelocityInput;
-import net.artux.pda.map.engine.pathfinding.MapBorders;
+import net.artux.pda.map.engine.systems.ArtifactSystem;
 import net.artux.pda.map.engine.systems.BattleSystem;
 import net.artux.pda.map.engine.systems.CameraSystem;
 import net.artux.pda.map.engine.systems.ClicksSystem;
@@ -43,7 +41,6 @@ import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
 import net.artux.pda.map.model.Map;
 import net.artux.pda.map.states.GameStateManager;
-import net.artux.pda.map.states.PlayState;
 import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pdalib.Member;
@@ -86,7 +83,8 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         mapOrientationSystem = new MapOrientationSystem(assetsFinder, map);
         engine.addSystem(mapOrientationSystem);
         engine.addSystem(new CameraSystem());
-        engine.addSystem(new WorldSystem());
+        engine.addSystem(new SoundsSystem(assetsFinder.get()));
+        engine.addSystem(new WorldSystem(assetsFinder.get()));
         engine.addSystem(new DataSystem(map, member));
 
         if (controlPoints)
@@ -96,10 +94,10 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         if (anomalies)
             AnomalyHelper.createAnomalies(engine, assetsFinder.get());
 
-        engine.addSystem(new RenderSystem(stage));
-        engine.addSystem(new SoundsSystem(assetsFinder.get()));
+        engine.addSystem(new ArtifactSystem());
         engine.addSystem(new ClicksSystem());
         engine.addSystem(new MapLoggerSystem(stage.getBatch()));
+        engine.addSystem(new RenderSystem(stage));
         engine.addSystem(new BattleSystem(assetsFinder.get(), stage.getBatch()));
         engine.addSystem(new LogSystem());
         engine.addSystem(new InteractionSystem(stage, userInterface));
@@ -128,8 +126,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
 
     @Override
     public void dispose() {
-        for (EntitySystem s :
-                engine.getSystems()) {
+        for (EntitySystem s : engine.getSystems()) {
             if (s instanceof Disposable) ((Disposable) s).dispose();
         }
         battleSystem.dispose();

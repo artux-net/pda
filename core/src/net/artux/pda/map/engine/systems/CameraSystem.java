@@ -31,7 +31,7 @@ public class CameraSystem extends EntitySystem {
     private static float zoomingSpeed = 2f;
     private static float specialZoomValue = 0.2f;
     boolean detached;
-    boolean specialZoom = true;
+    boolean specialZoom = false;
 
     @Override
     public void addedToEngine(Engine engine) {
@@ -70,7 +70,7 @@ public class CameraSystem extends EntitySystem {
             if (!velocityComponent.velocity.isZero())
                 detached = false;
 
-            if (specialZoom){
+            if (specialZoom && !detached){
                 if (camera.zoom > specialZoomValue) {
                     float delta = camera.zoom - specialZoomValue;
 
@@ -93,8 +93,14 @@ public class CameraSystem extends EntitySystem {
                 }
             }
         }
+        updateData();
     }
 
+    private void updateData(){
+        GlobalData.cameraPosX = camera.position.x;
+        GlobalData.cameraPosY = camera.position.y;
+        GlobalData.zoom = camera.zoom;
+    }
     
     public void setDetached(boolean detached){
         this.detached = detached;
@@ -114,11 +120,12 @@ public class CameraSystem extends EntitySystem {
             camera.position.set(camera.position.x, newY, 0);
     }
 
+    float currentZoom;
     boolean zooming = false;
 
     public void setZooming(boolean zooming) {
         if (!this.zooming){
-            specialZoomValue = camera.zoom;
+            currentZoom = camera.zoom;
         }
         this.zooming = zooming;
     }
@@ -136,6 +143,6 @@ public class CameraSystem extends EntitySystem {
 
 
     public float getCurrentZoom(){
-        return specialZoomValue;
+        return currentZoom;
     }
 }

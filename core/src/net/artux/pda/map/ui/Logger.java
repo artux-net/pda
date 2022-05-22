@@ -44,6 +44,8 @@ public class Logger extends VerticalGroup implements Disposable {
         public static Vector2 logPoint;
     }
 
+    public boolean visible = false;
+
     public Logger(Engine engine) {
         super();
 
@@ -98,7 +100,8 @@ public class Logger extends VerticalGroup implements Disposable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        super.draw(batch, parentAlpha);
+        if (visible)
+            super.draw(batch, parentAlpha);
     }
 
     public void update() {

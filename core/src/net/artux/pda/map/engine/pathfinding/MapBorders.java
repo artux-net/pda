@@ -3,13 +3,14 @@ package net.artux.pda.map.engine.pathfinding;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.Disposable;
 
-public class MapBorders {
+public class MapBorders implements Disposable {
 
-    private Pixmap mobPixmap; //TODO dispose
+    private Pixmap mobPixmap;
     private Texture mobLayout;
 
-    private Pixmap playerPixmap; //TODO dispose
+    private Pixmap playerPixmap;
     private Texture playerLayout;
 
     int tileWidth;
@@ -84,4 +85,15 @@ public class MapBorders {
         return TiledNode.TILE_EMPTY;
     }
 
+    public Texture getPlayerLayout() {
+        return playerLayout;
+    }
+
+    @Override
+    public void dispose() {
+        if (mobPixmap != null)
+            mobPixmap.dispose();
+        if (playerPixmap != null)
+            playerPixmap.dispose();
+    }
 }

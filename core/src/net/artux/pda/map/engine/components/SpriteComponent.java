@@ -38,6 +38,10 @@ public class SpriteComponent implements Component {
         sprite.setSize(width, height);
     }
 
+    public void setAlpha(float a){
+        sprite.setAlpha(a);
+    }
+
     public float getRotation(){
         if (userVelocityInput != null){
             Vector2 velocity = userVelocityInput.getVelocity();
