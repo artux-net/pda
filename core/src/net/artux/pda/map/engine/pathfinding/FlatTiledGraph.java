@@ -9,8 +9,8 @@ import net.artux.pda.map.engine.data.GlobalData;
 public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
     public static final int tileSize = 8;
 
-    public  int sizeX;
-    public  int sizeY;
+    public int sizeX;
+    public int sizeY;
 
     protected Array<FlatTiledNode> nodes;
 
@@ -28,7 +28,7 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
 
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
-                nodes.add(new FlatTiledNode(this, x, y, x*tileSize + tileSize/2, y*tileSize + tileSize/2, mapBorders.getTileTypeInTileForMob(x, y), 4));
+                nodes.add(new FlatTiledNode(this, x, y, x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, mapBorders.getTileTypeInTileForMob(x, y), 4));
             }
         }
 
@@ -54,14 +54,14 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
     }
 
 
-    public FlatTiledNode getNodeInPosition(float x, float y){
+    public FlatTiledNode getNodeInPosition(float x, float y) {
         int xTile = (int) (x / tileSize);
         int yTile = (int) (y / tileSize);
 
         return getNode(xTile, yTile);
     }
 
-    public FlatTiledNode getNodeInPosition(Vector2 vector2){
+    public FlatTiledNode getNodeInPosition(Vector2 vector2) {
         return getNodeInPosition(vector2.x, vector2.y);
     }
 
@@ -94,5 +94,21 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
         FlatTiledNode target = getNode(n.x + xOffset, n.y + yOffset);
         if (target.type != FlatTiledNode.TILE_WALL)
             n.getConnections().add(new FlatTiledConnection(this, n, target, target.type));
+    }
+
+    public void dispose(){
+        for (FlatTiledNode node :
+                nodes) {
+            node.graph = null;
+            for (Connection<FlatTiledNode> c : node.connections) {
+                FlatTiledConnection flatTiledConnection = (FlatTiledConnection) c;
+                flatTiledConnection.worldMap = null;
+                flatTiledConnection.fromNode = null;
+                flatTiledConnection.toNode = null;
+            }
+            node.getConnections().clear();
+        }
+        nodes.clear();
+        nodes = null;
     }
 }

@@ -10,15 +10,13 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EntityManager;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.model.LevelBackground;
 import net.artux.pda.map.model.Map;
-import net.artux.pda.map.ui.Logger;
+import net.artux.pda.map.ui.TextureActor;
 import net.artux.pda.map.ui.UserInterface;
 
 
@@ -27,26 +25,25 @@ public class PlayState extends State {
     public Stage stage;
     public Stage uistage;
 
-    private Texture background;
     private LevelBackground levelBackground;
-    public AssetManager assetManager;
+    private final EntityManager entityManager;
+    private final AssetsFinder assetsFinder;
 
     private final UserInterface userInterface;
 
-    private static final String tag = "PlayState";
-
-    EntityManager entityManager;
+    private static final String TAG = "PlayState";
 
     public PlayState(final GameStateManager gsm, Batch batch) {
         super(gsm);
+        Gdx.app.debug(TAG, "Before start, heap " + Gdx.app.getNativeHeap());
         Engine engine = new Engine();
 
-        Gdx.app.debug(tag, "Start play state init");
+        Gdx.app.debug(TAG, "Start play state init");
 
         Viewport viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        AssetsFinder assetsFinder = new AssetsFinder();
-        assetManager = assetsFinder.get();
+        assetsFinder = new AssetsFinder();
+        AssetManager assetManager = assetsFinder.get();
         stage = new Stage(viewport, batch);
         uistage = new Stage();
 
@@ -55,12 +52,13 @@ public class PlayState extends State {
 
         Map map = (Map) gsm.get("map");
         if (map != null) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            System.out.println(gson.toJson(map));
+            //Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            //System.out.println(gson.toJson(map));
 
-            background = assetsFinder.getLocal(map.getTextureUri());
+            Texture background = assetsFinder.getLocal(map.getTextureUri());
             GlobalData.mapWidth = background.getWidth();
             GlobalData.mapHeight = background.getHeight();
+            stage.addActor(new TextureActor(background));
 
             Texture levelTexture = assetsFinder.getLocal(map.getBlurTextureUri());
             if (levelTexture != null) {
@@ -68,9 +66,10 @@ public class PlayState extends State {
             }
         }
         entityManager = new EntityManager(engine, assetsFinder, stage, userInterface, gsm);
-        userInterface.enableDebug(assetManager, engine);
+        if (userInterface!=null)
+            userInterface.enableDebug(assetManager, engine);
 
-        Gdx.app.debug(tag, "State loaded, heap: " + Gdx.app.getNativeHeap());
+        Gdx.app.debug(TAG, "State loaded, heap: " + Gdx.app.getNativeHeap());
     }
 
     @Override
@@ -96,16 +95,13 @@ public class PlayState extends State {
     public void render(SpriteBatch batch) {
         float dt = Gdx.app.getGraphics().getDeltaTime();
 
-        stage.getBatch().begin();
+        batch.begin();
         if (levelBackground != null)
             levelBackground.render(batch);
+        batch.end();
 
-        if (background != null)
-            stage.getBatch().draw(background, 0, 0);
-        stage.getBatch().end();
-
-        entityManager.draw(dt);
         stage.draw();
+        entityManager.draw(dt);
 
         stage.getBatch().begin();
         entityManager.update(dt); // TODO make it draw
@@ -115,22 +111,19 @@ public class PlayState extends State {
 
     @Override
     public void resize(int w, int h) {
-        System.out.println("Resized: " + w + " : " + h);
-        stage.getViewport().update(w, h, true);
+        stage.getViewport().update(w, h, false);
     }
 
     @Override
     public void dispose() {
+        Gdx.app.debug(TAG, "Before disposing, heap " + Gdx.app.getNativeHeap());
         stage.dispose();
-        Gdx.app.debug(tag, "after dispose stage, heap " + Gdx.app.getNativeHeap());
-
-        Gdx.app.debug(tag, "after dispose textures, heap " + Gdx.app.getNativeHeap());
-        Gdx.app.debug(tag, "after dispose font, heap " + Gdx.app.getNativeHeap());
-        assetManager.dispose();
-        Gdx.app.debug(tag, "after dispose asset manager and font, heap " + Gdx.app.getNativeHeap());
+        uistage.dispose();
+        assetsFinder.dispose();
+        entityManager.dispose();
         if (userInterface != null)
             userInterface.dispose();
-        Gdx.app.debug(tag, "after dispose ui, heap " + Gdx.app.getNativeHeap());
+        Gdx.app.debug(TAG, "Disposed, heap " + Gdx.app.getNativeHeap());
     }
 
 }

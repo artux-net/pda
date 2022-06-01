@@ -25,7 +25,8 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
     TiledRaycastCollisionDetector<FlatTiledNode> collisionDetector;
 
     public MapOrientationSystem(AssetsFinder assetsFinder, Map map) {
-        this.mapBorders = new MapBorders(assetsFinder.getLocal(map.getTilesTexture()), assetsFinder.getLocal(map.getBoundsTextureUri()));
+        this.mapBorders = new MapBorders(assetsFinder.getLocal(map.getTilesTexture()),
+                assetsFinder.getLocal(map.getBoundsTextureUri()));
         if (mapBorders.isMobTilesActive()) {
             this.worldGraph = new FlatTiledGraph(mapBorders);
             heuristic = new TiledManhattanDistance<>();
@@ -61,6 +62,7 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
 
     @Override
     public void dispose() {
+        worldGraph.dispose();
         mapBorders.dispose();
     }
 }

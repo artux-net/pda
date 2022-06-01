@@ -102,7 +102,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             });
 
             findViewById(R.id.register).setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, RegisterActivity.class)));
-
+            findViewById(R.id.help).setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, HelpActivity.class)));
             View mEmailSignInButton = findViewById(R.id.email_sign_in_button);
             mEmailSignInButton.setOnClickListener(view -> attemptLogin());
 

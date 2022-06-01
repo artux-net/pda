@@ -17,7 +17,7 @@ public class Stage {
     @SerializedName("background_url")
     @Expose
     private String backgroundUrl;
-    @SerializedName("music")
+    @SerializedName("sounds/music")
     @Expose
     private int[] music;
     @SerializedName("title")

@@ -25,7 +25,7 @@ import net.artux.pda.map.ui.UserInterface;
 public class InteractionSystem extends BaseSystem {
 
     private Stage stage;
-    private UserInterface userInterface;
+    private final UserInterface userInterface;
     private SoundsSystem soundsSystem;
     private CameraSystem cameraSystem;
 
@@ -57,7 +57,6 @@ public class InteractionSystem extends BaseSystem {
             PositionComponent positionComponent = pm.get(entities.get(i));
             InteractiveComponent interactiveComponent = im.get(entities.get(i));
 
-
             PositionComponent playerPosition = pm.get(player);
 
             String name = "q-" + interactiveComponent.title;
@@ -71,7 +70,7 @@ public class InteractionSystem extends BaseSystem {
                         userInterface.addInteractButton(name, interactiveComponent.listener);
                     }
                 } else {
-                    interactiveComponent.listener.interact();
+                    interactiveComponent.listener.interact(userInterface);
                 }
             } else {
                 removeActor(stage.getActors(), name);
@@ -122,4 +121,7 @@ public class InteractionSystem extends BaseSystem {
         }
     }
 
+    public UserInterface getUserInterface() {
+        return userInterface;
+    }
 }

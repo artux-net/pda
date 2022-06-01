@@ -57,7 +57,6 @@ public class TargetingSystem extends EntitySystem {
 
                 Vector2 target = targetMovingComponent.movementTarget;
 
-
                 if (mapOrientationSystem.isGraphActive()) {
                     FlatTiledNode startNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(positionComponent.getX(), positionComponent.getY());
                     FlatTiledNode endNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(targetMovingComponent.movementTarget.x, targetMovingComponent.movementTarget.y);

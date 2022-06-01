@@ -10,11 +10,13 @@ import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.systems.DataSystem;
+import net.artux.pda.map.engine.systems.InteractionSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.model.Map;
 import net.artux.pda.map.model.Point;
 import net.artux.pda.map.model.Transfer;
 import net.artux.pda.map.states.State;
+import net.artux.pda.map.ui.UserInterface;
 import net.artux.pdalib.Checker;
 import net.artux.pdalib.Member;
 import net.artux.pdalib.profile.Story;
@@ -52,7 +54,7 @@ public class QuestPointsHelper {
         entity.add(new PositionComponent(point.getPosition()))
                 .add(new InteractiveComponent(point.getTitle(), point.type, new InteractiveComponent.InteractListener() {
                     @Override
-                    public void interact() {
+                    public void interact(UserInterface userInterface) {
                         State.gsm.getPlatformInterface().send(point.getData());
                     }
                 }))
@@ -92,10 +94,11 @@ public class QuestPointsHelper {
 
     private static void addTransferPoint(final Engine engine, AssetManager assetManager, final Transfer point) {
         Entity entity = new Entity();
+
         entity.add(new PositionComponent(point.getPosition()))
                 .add(new InteractiveComponent(point.getMessage(), -1, new InteractiveComponent.InteractListener() {
                     @Override
-                    public void interact() {
+                    public void interact(UserInterface userInterface) {
                         HashMap<String, String> data = new HashMap<>();
                         data.put("map", String.valueOf(point.getTo()));
                         data.put("pos", point.getToPosition());

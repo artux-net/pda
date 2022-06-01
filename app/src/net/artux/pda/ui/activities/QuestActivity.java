@@ -204,8 +204,8 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
 
     }
 
-    void loadMap(int storyId, int mapId, String pos){
-        MapHelper.prepareAndLoadMap(questViewModel,this, storyId, mapId, pos);
+    void loadMap(int storyId, int mapId, String pos) {
+        MapHelper.prepareAndLoadMap(questViewModel, this, storyId, mapId, pos);
     }
 
     public void setTitle(String title) {
@@ -321,7 +321,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             Timber.d("Can not load stage, story: " + sceneController.getStoryId()
                     + " chapter: " + sceneController.getChapterId() + " stage: " + stage.getId());
             Timber.e(e);
-            Toast.makeText(this,"Can not load stage, error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Can not load stage, error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
         if (processSummary && stage.getTypeStage() == 7 && stage.getText() != null)
@@ -386,19 +386,22 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                 });
                 break;
             case R.id.log:
-                Stage stage = sceneController.getActualStage();
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("Story: ").append(sceneController.getStoryId()).append("\n");
-                stringBuilder.append("Chapter: ").append(sceneController.getChapterId()).append("\n");
+                if (sceneController != null) {
+                    Stage stage = sceneController.getActualStage();
 
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-                String json = gson.toJson(stage);
-                stringBuilder.append(json);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    stringBuilder.append("Story: ").append(sceneController.getStoryId()).append("\n");
+                    stringBuilder.append("Chapter: ").append(sceneController.getChapterId()).append("\n");
 
-                Intent intent = new Intent(this, LogActivity.class);
-                intent.putExtra("text", stringBuilder.toString());
-                startActivity(intent);
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    String json = gson.toJson(stage);
+                    stringBuilder.append(json);
 
+                    Intent intent = new Intent(this, LogActivity.class);
+                    intent.putExtra("text", stringBuilder.toString());
+                    startActivity(intent);
+                } else
+                    Toast.makeText(getApplicationContext(), "Глава не загружена!", Toast.LENGTH_SHORT).show();
                 break;
         }
     }

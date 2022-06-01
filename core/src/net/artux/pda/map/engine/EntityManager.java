@@ -3,12 +3,15 @@ package net.artux.pda.map.engine;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.components.HealthComponent;
@@ -45,6 +48,8 @@ import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pdalib.Member;
 
+import javax.xml.validation.Validator;
+
 public class EntityManager extends InputListener implements Disposable, GestureDetector.GestureListener {
 
     private final MapOrientationSystem mapOrientationSystem;
@@ -70,6 +75,9 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         //player
         Entity player = new Entity();
         UserVelocityInput velocityComponent = new UserVelocityInput();
+        Camera camera = stage.getViewport().getCamera();
+        camera.position.x = map.getPlayerPosition().x;
+        camera.position.y = map.getPlayerPosition().y;
         player.add(new PositionComponent(map.getPlayerPosition()))
                 .add(new VelocityComponent())
                 .add(new SpriteComponent(velocityComponent, assetsFinder.get().get("gg.png", Texture.class), 32, 32))
@@ -77,7 +85,7 @@ public class EntityManager extends InputListener implements Disposable, GestureD
                 .add(new MoodComponent(member))
                 .add(new HealthComponent())
                 .add(velocityComponent)
-                .add(new PlayerComponent(stage.getViewport().getCamera(), member));
+                .add(new PlayerComponent(camera, member));
         engine.addEntity(player);
 
         mapOrientationSystem = new MapOrientationSystem(assetsFinder, map);
@@ -99,7 +107,6 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         engine.addSystem(new MapLoggerSystem(stage.getBatch()));
         engine.addSystem(new RenderSystem(stage));
         engine.addSystem(new BattleSystem(assetsFinder.get(), stage.getBatch()));
-        engine.addSystem(new LogSystem());
         engine.addSystem(new InteractionSystem(stage, userInterface));
         engine.addSystem(new StatesSystem());
         engine.addSystem(new TargetingSystem());
@@ -120,6 +127,9 @@ public class EntityManager extends InputListener implements Disposable, GestureD
     }
 
     public void draw(float dt) {
+        /*for (EntitySystem s : engine.getSystems()) {
+            if (s instanceof Drawable) ((Disposable) s).d();
+        }*///TODO drawable
         battleSystem.drawObjects(dt);
         mapLoggerSystem.drawObjects(dt);
     }
@@ -129,13 +139,12 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         for (EntitySystem s : engine.getSystems()) {
             if (s instanceof Disposable) ((Disposable) s).dispose();
         }
-        battleSystem.dispose();
-        mapLoggerSystem.dispose();
     }
 
     @Override
     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-        clicksSystem.clicked(x, y);
+        if(clicksSystem!=null)
+            clicksSystem.clicked(x, y);
         return false;
     }
 

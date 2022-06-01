@@ -1,11 +1,5 @@
 package net.artux.pda.map.engine.systems;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -13,24 +7,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.UserInterface;
 
-public class DeadCheckerSystem extends EntitySystem {
+public class DeadCheckerSystem extends BaseSystem {
 
     private UserInterface ui;
     private Label.LabelStyle labelStyle;
     private boolean deadMessage;
     private GameStateManager gameStateManager;
 
-    private ImmutableArray<Entity> players;
-
-    private ComponentMapper<PlayerComponent> cm = ComponentMapper.getFor(PlayerComponent.class);
-    private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
-
     public DeadCheckerSystem(UserInterface userInterface, GameStateManager gameStateManager) {
+        super(null);
         this.ui = userInterface;
         this.gameStateManager = gameStateManager;
         labelStyle = userInterface.getLabelStyle();
@@ -38,22 +26,11 @@ public class DeadCheckerSystem extends EntitySystem {
     }
 
     @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-        players = engine.getEntitiesFor(Family.all(PlayerComponent.class, HealthComponent.class).get());
-    }
-
-
-
-    @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        if (players.size() != 0)
-            for (int i = 0; i < players.size(); i++) {
 
-            }
-        else{
-            if (!deadMessage){
+        if (!getEngine().getEntities().contains(player, false)) {
+            if (!deadMessage) {
                 Group deadMessageGroup = new Group();
 
                 TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
@@ -66,8 +43,8 @@ public class DeadCheckerSystem extends EntitySystem {
 
                 deadMessageGroup.addActor(textButton);
                 deadMessageGroup.addActor(textButton1);
-                deadMessageGroup.setPosition(ui.getStage().getWidth()/2 - textButton1.getWidth()/2, ui.getStage().getHeight()/2 - textButton1.getHeight()/2);
-                deadMessageGroup.addListener(new ClickListener(){
+                deadMessageGroup.setPosition(ui.getStage().getWidth() / 2 - textButton1.getWidth() / 2, ui.getStage().getHeight() / 2 - textButton1.getHeight() / 2);
+                deadMessageGroup.addListener(new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         gameStateManager.getPlatformInterface().restart();

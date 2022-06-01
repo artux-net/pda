@@ -21,7 +21,7 @@ public class AssetsFinder implements Disposable {
     private Map<String, Texture> textureMap = new HashMap<>();
 
     public AssetManager get() {
-        if (assetManager==null) {
+        if (assetManager == null) {
             assetManager = new AssetManager();
 
             assetManager.load("avatars/a0.jpg", Texture.class);
@@ -29,36 +29,23 @@ public class AssetsFinder implements Disposable {
                 assetManager.load("avatars/a" + i + ".png", Texture.class);
             }
 
-            assetManager.load("dialog.png", Texture.class);
-            assetManager.load("test.png", Texture.class);
-            assetManager.load("beg2.png", Texture.class);
-            assetManager.load("beg1.png", Texture.class);
-            assetManager.load("pause.png", Texture.class);
+            FileHandle ui = assetManager.getFileHandleResolver().resolve("ui");
+            loadRecursively(assetManager, ui, true, Texture.class);
+
             assetManager.load("quest.png", Texture.class);
             assetManager.load("seller.png", Texture.class);
             assetManager.load("quest1.png", Texture.class);
             assetManager.load("cache.png", Texture.class);
-            assetManager.load("direction.png", Texture.class);
             assetManager.load("transfer.png", Texture.class);
             assetManager.load("gg.png", Texture.class);
             assetManager.load("red.png", Texture.class);
             assetManager.load("green.png", Texture.class);
             assetManager.load("yellow.png", Texture.class);
             assetManager.load("gray.png", Texture.class);
-            assetManager.load("direction.png", Texture.class);
-            assetManager.load("touchpad/knob.png", Texture.class);
-            assetManager.load("touchpad/back.png", Texture.class);
-            assetManager.load("occupations.png", Texture.class);
             assetManager.load("controlPoint.png", Texture.class);
 
-            assetManager.load("contact_0.ogg", Music.class);
-            assetManager.load("contact_1.ogg", Music.class);
-            assetManager.load("d-beep.ogg", Music.class);
-            assetManager.load("ak74_shoot_0.ogg", Music.class);
-            assetManager.load("ak74_shoot_1.ogg", Music.class);
-            assetManager.load("music/1.ogg", Music.class);
-            assetManager.load("music/2.ogg", Music.class);
-            assetManager.load("music/3.ogg", Music.class);
+            FileHandle sounds = assetManager.getFileHandleResolver().resolve("sounds");
+            loadRecursively(assetManager, sounds, true, Music.class);
 
             assetManager.finishLoading();
 
@@ -66,7 +53,7 @@ public class AssetsFinder implements Disposable {
         return assetManager;
     }
 
-    public Texture getLocal(String path){
+    public Texture getLocal(String path) {
         if (textureMap.containsKey(path))
             return textureMap.get(path);
         if (path == null || path.equals(""))
@@ -76,12 +63,28 @@ public class AssetsFinder implements Disposable {
         return texture;
     }
 
+    private void loadRecursively(AssetManager assetManager, FileHandle fileHandle, boolean recursively, Class<? extends Disposable> clazz) {
+        if (recursively)
+            for (FileHandle f :
+                    fileHandle.list()) {
+                if (f.isDirectory())
+                    loadRecursively(assetManager, f, recursively, clazz);
+                else
+                    assetManager.load(f.path(), clazz);
+            }
+        else
+            for (FileHandle f :
+                    fileHandle.list()) {
+                assetManager.load(f.path(), clazz);
+            }
+    }
+
     @Override
     public void dispose() {
 
         for (Map.Entry<String, Texture> e :
                 textureMap.entrySet()) {
-            if (e.getValue()!=null)
+            if (e.getValue() != null)
                 e.getValue().dispose();
         }
 

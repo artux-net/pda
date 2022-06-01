@@ -99,4 +99,5 @@
     <string name="registrationEndDesc">На указанную почту %1$s было отправлено письмо с ссылкой для подтверждения регистрации в сталкерской сети, перейдеите по ней для завершения.</string>
     <string name="registrationEndConfirm">Я подтвердил аккаунт</string>
     <string name="notEqualPasswords">Пароли не совпадают.</string>
+    <string name="what_is_pda">Что такое ПДА?</string>
 </resources>

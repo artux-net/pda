@@ -16,6 +16,8 @@ import net.artux.pda.map.engine.components.SoundComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -23,12 +25,12 @@ public class SoundsSystem extends BaseSystem implements Disposable {
 
     private ImmutableArray<Entity> players;
 
-    private List<Music> detections = new ArrayList<>();
-    private List<Music> weapons = new ArrayList<>();
-    private List<Music> backgrounds = new ArrayList<>();
+    private final List<Music> detections = new ArrayList<>();
+    private final List<Music> weapons = new ArrayList<>();
+    private final List<Music> backgrounds = new ArrayList<>();
     private Music anomaly;
-    private Random random = new Random();
-    private AssetManager assetManager;
+    private final Random random = new Random();
+    private final AssetManager assetManager;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
@@ -42,19 +44,19 @@ public class SoundsSystem extends BaseSystem implements Disposable {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        detections.add(assetManager.get("contact_0.ogg", Music.class));
-        detections.add(assetManager.get("contact_1.ogg", Music.class));
+        detections.add(assetManager.get("sounds/contact_0.ogg", Music.class));
+        detections.add(assetManager.get("sounds/contact_1.ogg", Music.class));
 
-        weapons.add(assetManager.get("ak74_shoot_0.ogg", Music.class));
-        weapons.add(assetManager.get("ak74_shoot_1.ogg", Music.class));
-        anomaly = assetManager.get("d-beep.ogg", Music.class);
+        weapons.add(assetManager.get("sounds/ak74_shoot_0.ogg", Music.class));
+        weapons.add(assetManager.get("sounds/ak74_shoot_1.ogg", Music.class));
+        anomaly = assetManager.get("sounds/d-beep.ogg", Music.class);
         for (Music m : weapons) {
             m.setVolume(0.01f);
         }
 
-        backgrounds.add(assetManager.get("music/1.ogg", Music.class));
-        backgrounds.add(assetManager.get("music/2.ogg", Music.class));
-        backgrounds.add(assetManager.get("music/3.ogg", Music.class));
+        backgrounds.add(assetManager.get("sounds/music/1.ogg", Music.class));
+        backgrounds.add(assetManager.get("sounds/music/2.ogg", Music.class));
+        backgrounds.add(assetManager.get("sounds/music/3.ogg", Music.class));
         for (Music m : backgrounds) {
             m.setVolume(0.51f);
         }
@@ -112,7 +114,6 @@ public class SoundsSystem extends BaseSystem implements Disposable {
     }
 
     public void playSound(){
-
         anomaly.play();
     }
 
@@ -122,7 +123,13 @@ public class SoundsSystem extends BaseSystem implements Disposable {
 
     @Override
     public void dispose() {
-        for (Music music: detections) {
+        List<Music> all = new LinkedList<>();
+        all.addAll(detections);
+        all.addAll(backgrounds);
+        all.addAll(weapons);
+        all.add(anomaly);
+
+        for (Music music: all) {
             music.dispose();
         }
     }

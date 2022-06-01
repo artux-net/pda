@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 
-public class LevelBackground implements Disposable {
+public class LevelBackground {
 
     private final Texture texture;
     private final Camera camera;
@@ -35,10 +35,5 @@ public class LevelBackground implements Disposable {
                 spriteBatch.draw(texture, initX + addX ,initY + addY);
             }
         }
-    }
-
-    @Override
-    public void dispose() {
-        texture.dispose();
     }
 }

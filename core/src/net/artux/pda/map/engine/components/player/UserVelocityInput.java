@@ -3,6 +3,7 @@ package net.artux.pda.map.engine.components.player;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.pda.map.engine.systems.MovingSystem;
 import net.artux.pda.map.ui.UserInterface;
 
 public class UserVelocityInput implements Component {
@@ -17,6 +18,6 @@ public class UserVelocityInput implements Component {
     }
 
     public boolean isRunning() {
-        return UserInterface.running;
+        return MovingSystem.running;
     }
 }

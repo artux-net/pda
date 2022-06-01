@@ -155,4 +155,5 @@
     <string name="notEqualPasswords">Passwords are not equal.</string>
     <string name="exitStory">Exit story</string>
     <string name="wrong_response">Wrong response from server, please update the app or try again</string>
+    <string name="what_is_pda">Что такое ПДА?</string>
 </resources>

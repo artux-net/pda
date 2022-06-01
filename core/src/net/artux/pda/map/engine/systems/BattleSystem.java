@@ -12,11 +12,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.engine.components.DeadComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
+import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
@@ -28,9 +31,8 @@ import net.artux.pda.map.ui.UserInterface;
 
 import java.util.Random;
 
-public class BattleSystem extends EntitySystem implements Disposable {
+public class BattleSystem extends BaseSystem implements Disposable {
 
-    private Array<Entity> entities;
     private Batch batch;
     private SoundsSystem soundsSystem;
     private AssetManager assetManager;
@@ -47,6 +49,7 @@ public class BattleSystem extends EntitySystem implements Disposable {
     private MapOrientationSystem mapOrientationSystem;
 
     public BattleSystem(AssetManager assetManager, Batch batch) {
+        super(Family.all(HealthComponent.class, PositionComponent.class, WeaponComponent.class).get());
         this.batch = batch;
         this.assetManager = assetManager;
     }
@@ -54,20 +57,6 @@ public class BattleSystem extends EntitySystem implements Disposable {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        entities = new Array<>(engine.getEntitiesFor(Family.all(HealthComponent.class, PositionComponent.class, WeaponComponent.class).get()).toArray());
-
-        engine.addEntityListener(Family.all(HealthComponent.class, PositionComponent.class, WeaponComponent.class).get(), new EntityListener() {
-            @Override
-            public void entityAdded(Entity entity) {
-                entities.add(entity);
-            }
-
-            @Override
-            public void entityRemoved(Entity entity) {
-                entities.removeValue(entity, true);
-            }
-        });
-
         soundsSystem = engine.getSystem(SoundsSystem.class);
         mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
     }
@@ -81,9 +70,18 @@ public class BattleSystem extends EntitySystem implements Disposable {
             HealthComponent healthComponent = hm.get(entity);
             PositionComponent positionComponent = pm.get(entity);
             if (healthComponent.isDead()) {
-                Entity deadEntity = new Entity();
+                final Entity deadEntity = new Entity();
                 deadEntity.add(new PositionComponent(positionComponent.getPosition()))
-                        .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4));//TODO
+                        .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4))
+                        .add(new DeadComponent("Вова", "Черный"));
+                if (entity != player)
+                    deadEntity.add(new InteractiveComponent("Обыскать сталкера", 0, new InteractiveComponent.InteractListener() {
+                        @Override
+                        public void interact(UserInterface userInterface) {
+                            getEngine().removeEntity(deadEntity);//TODO
+                        }
+                    }));
+
 
                 getEngine().removeEntity(entity);
                 getEngine().addEntity(deadEntity);
@@ -117,7 +115,6 @@ public class BattleSystem extends EntitySystem implements Disposable {
                 PositionComponent enemyPosition = pm.get(enemy);
                 HealthComponent enemyHealth = hm.get(enemy);
 
-
                 if (mapOrientationSystem.isGraphActive()) {
                     FlatTiledNode entityNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(entityPosition.getPosition());
                     FlatTiledNode enemyNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(enemyPosition.getPosition());
@@ -143,7 +140,7 @@ public class BattleSystem extends EntitySystem implements Disposable {
                             }
                         }
                     }
-                }else if (entityWeapon.getSelected() != null) {
+                } else if (entityWeapon.getSelected() != null) {
                     if (entityWeapon.shoot()) {
                         sr.setColor(Color.ORANGE);
                         sr.setProjectionMatrix(batch.getProjectionMatrix());

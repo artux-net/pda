@@ -6,10 +6,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.components.StatesComponent;
 
-public class StatesSystem extends EntitySystem {
+public class StatesSystem extends EntitySystem implements Disposable {
 
     private ImmutableArray<Entity> entities;
 
@@ -32,6 +33,16 @@ public class StatesSystem extends EntitySystem {
             Entity entity = entities.get(i);
 
             sm.get(entity).stateMachine.update();
+        }
+    }
+
+    @Override
+    public void dispose() {
+        entities = getEngine().getEntitiesFor(Family.all(StatesComponent.class).get());
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+            if (sm.get(entity).stateMachine.getCurrentState() instanceof Disposable)
+                ((Disposable)sm.get(entity).stateMachine.getCurrentState()).dispose();
         }
     }
 }

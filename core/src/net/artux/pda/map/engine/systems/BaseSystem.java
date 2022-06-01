@@ -24,19 +24,21 @@ public class BaseSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         player = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get()).get(0);
-        entities = new Array<>(engine.getEntitiesFor(family).toArray());
+        if (family!=null) {
+            entities = new Array<>(engine.getEntitiesFor(family).toArray());
 
-        engine.addEntityListener(family, new EntityListener() {
-            @Override
-            public void entityAdded(Entity entity) {
-                entities.add(entity);
-            }
+            engine.addEntityListener(family, new EntityListener() {
+                @Override
+                public void entityAdded(Entity entity) {
+                    entities.add(entity);
+                }
 
-            @Override
-            public void entityRemoved(Entity entity) {
-                entities.removeValue(entity, true);
-            }
-        });
+                @Override
+                public void entityRemoved(Entity entity) {
+                    entities.removeValue(entity, true);
+                }
+            });
+        }
     }
 
 

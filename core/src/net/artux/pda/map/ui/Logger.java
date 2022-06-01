@@ -1,6 +1,7 @@
 package net.artux.pda.map.ui;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -44,7 +45,7 @@ public class Logger extends VerticalGroup implements Disposable {
         public static Vector2 logPoint;
     }
 
-    public boolean visible = false;
+    public static boolean visible = true;
 
     public Logger(Engine engine) {
         super();
@@ -54,15 +55,16 @@ public class Logger extends VerticalGroup implements Disposable {
         frameRate = Gdx.graphics.getFramesPerSecond();
         font = Fonts.generateFont(Fonts.Language.RUSSIAN, Fonts.ARIAL_FONT, 16);
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
-        columnAlign(Align.left);
+        columnAlign(Align.right);
 
-
-        LogSystem logSystem = engine.getSystem(LogSystem.class);
+        LogSystem logSystem = new LogSystem();
+        engine.addSystem(logSystem);
 
         put("FPS", this, "getFrameRate");
         put("Native Heap",  Gdx.app,"getNativeHeap");
         put("Java Heap", Gdx.app, "getJavaHeap");
-        put("Player position", logSystem, "getPlayerPosition");
+        put("Player position", logSystem, "getPosition");
+        put("Health", logSystem, "getHealth");
         put("Params", logSystem.getPlayerMember().getData(), "getParameters");
         put("Temp", logSystem.getPlayerMember().getData(), "getTemp");
         put("Stories stat", Arrays.toString(logSystem.getPlayerMember().getData().getStories().toArray()), "toString");
@@ -93,8 +95,6 @@ public class Logger extends VerticalGroup implements Disposable {
                     }
                 }
             }
-            Label label = (Label)l;
-            label.setFillParent(false);
         }
     }
 
@@ -136,6 +136,7 @@ public class Logger extends VerticalGroup implements Disposable {
             if (method != null) {
                 dataCollection.add(new Triple<>(method, o, title));
                 Label label = new Label(title, labelStyle);
+                //label.setWrap(true);
                 label.setName(title);
                 addActor(label);
             }
@@ -144,6 +145,7 @@ public class Logger extends VerticalGroup implements Disposable {
 
     public void dispose() {
         font.dispose();
+        dataCollection.clear();
     }
 
     public float getFrameRate() {
