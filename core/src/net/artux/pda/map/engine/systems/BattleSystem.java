@@ -11,9 +11,14 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -23,17 +28,19 @@ import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
+import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.ui.UserInterface;
+import net.artux.pda.map.ui.bars.Slot;
 
+import java.util.Iterator;
 import java.util.Random;
 
-public class BattleSystem extends BaseSystem implements Disposable {
+public class BattleSystem extends BaseSystem implements Disposable, Drawable {
 
-    private Batch batch;
     private SoundsSystem soundsSystem;
     private AssetManager assetManager;
 
@@ -48,9 +55,10 @@ public class BattleSystem extends BaseSystem implements Disposable {
 
     private MapOrientationSystem mapOrientationSystem;
 
-    public BattleSystem(AssetManager assetManager, Batch batch) {
+    private boolean playerShoot = false;
+
+    public BattleSystem(AssetManager assetManager) {
         super(Family.all(HealthComponent.class, PositionComponent.class, WeaponComponent.class).get());
-        this.batch = batch;
         this.assetManager = assetManager;
     }
 
@@ -59,6 +67,24 @@ public class BattleSystem extends BaseSystem implements Disposable {
         super.addedToEngine(engine);
         soundsSystem = engine.getSystem(SoundsSystem.class);
         mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
+        InteractionSystem interactionSystem = engine.getSystem(InteractionSystem.class);
+        interactionSystem.addButton("ui/icons/icon_shoot.png", new ClickListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                playerShoot = true;
+                return super.touchDown(event, x, y, pointer, button);
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                playerShoot = false;
+                super.touchUp(event, x, y, pointer, button);
+            }
+        });
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot_wide.png", Texture.class));
+        style.imageUp = new TextureRegionDrawable(assetManager.get("ui/icons/icon_run.png", Texture.class));
+       // interactionSystem.getUserInterface().getHudTable().add(new Slot(interactionSystem.getUserInterface(), style)).space(20);
     }
 
     @Override
@@ -69,33 +95,9 @@ public class BattleSystem extends BaseSystem implements Disposable {
 
             HealthComponent healthComponent = hm.get(entity);
             PositionComponent positionComponent = pm.get(entity);
-            if (healthComponent.isDead()) {
-                final Entity deadEntity = new Entity();
-                deadEntity.add(new PositionComponent(positionComponent.getPosition()))
-                        .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4))
-                        .add(new DeadComponent("Вова", "Черный"));
-                if (entity != player)
-                    deadEntity.add(new InteractiveComponent("Обыскать сталкера", 0, new InteractiveComponent.InteractListener() {
-                        @Override
-                        public void interact(UserInterface userInterface) {
-                            getEngine().removeEntity(deadEntity);//TODO
-                        }
-                    }));
 
-
-                getEngine().removeEntity(entity);
-                getEngine().addEntity(deadEntity);
-            }
-        }
-    }
-
-    public void drawObjects(float delta) {
-        for (int i = 0; i < entities.size; i++) {
-            Entity entity = entities.get(i);
-
-            PositionComponent entityPosition = pm.get(entity);
             WeaponComponent entityWeapon = wm.get(entity);
-            entityWeapon.update(delta);
+            entityWeapon.update(deltaTime);
 
             if (pcm.has(entity) && entityWeapon.getSelected() != null) {
                 PlayerData.selectedWeapon = entityWeapon.getSelected().title;
@@ -104,67 +106,11 @@ public class BattleSystem extends BaseSystem implements Disposable {
                     PlayerData.resource = entityWeapon.resource.quantity;
                     PlayerData.magazine = entityWeapon.getMagazine();
                 }
-                //UserInterface.getLogger().put("Reloading", entityWeapon.reloading, "toString");
             }
 
-            MoodComponent moodComponent = mm.get(entity);
 
-            Entity enemy = moodComponent.enemy;
-
-            if (enemy != null && pm.has(enemy)) {
-                PositionComponent enemyPosition = pm.get(enemy);
-                HealthComponent enemyHealth = hm.get(enemy);
-
-                if (mapOrientationSystem.isGraphActive()) {
-                    FlatTiledNode entityNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(entityPosition.getPosition());
-                    FlatTiledNode enemyNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(enemyPosition.getPosition());
-                    if (!mapOrientationSystem.collisionDetector.collides(new Ray<>(new Vector2(entityNode.x, entityNode.y), new Vector2(enemyNode.x, enemyNode.y)))) {
-                        if (entityWeapon.getSelected() != null) {
-                            if (entityWeapon.shoot()) {
-                                sr.setColor(Color.ORANGE);
-                                sr.setProjectionMatrix(batch.getProjectionMatrix());
-
-                                sr.begin(ShapeRenderer.ShapeType.Filled);
-
-                                Vector2 diff = enemyPosition.getPosition().cpy().sub(entityPosition.getPosition());
-                                Vector2 delayed = entityPosition.getPosition().cpy().add(diff.scl(0.3f));
-
-
-                                sr.rectLine(delayed,
-                                        getPointNear(enemyPosition, entityWeapon.getSelected().precision), 1);
-                                sr.end();
-                                enemyHealth.value -= entityWeapon.getSelected().damage;
-                                soundsSystem.playShoot(entityPosition.getPosition());
-                                if (enemyHealth.isDead())
-                                    moodComponent.setEnemy(null);
-                            }
-                        }
-                    }
-                } else if (entityWeapon.getSelected() != null) {
-                    if (entityWeapon.shoot()) {
-                        sr.setColor(Color.ORANGE);
-                        sr.setProjectionMatrix(batch.getProjectionMatrix());
-
-                        sr.begin(ShapeRenderer.ShapeType.Filled);
-
-                        Vector2 diff = enemyPosition.getPosition().cpy().sub(entityPosition.getPosition());
-                        Vector2 delayed = entityPosition.getPosition().cpy().add(diff.scl(0.3f));
-
-
-                        sr.rectLine(delayed,
-                                getPointNear(enemyPosition, entityWeapon.getSelected().precision), 1);
-                        sr.end();
-                        enemyHealth.value -= entityWeapon.getSelected().damage;
-                        soundsSystem.playShoot(entityPosition.getPosition());
-                        if (enemyHealth.isDead())
-                            moodComponent.setEnemy(null);
-                    }
-                }
-            }
         }
-
     }
-
 
     public Vector2 getPointNear(PositionComponent positionComponent, float precision) {
         double r = 5 / precision;
@@ -180,5 +126,82 @@ public class BattleSystem extends BaseSystem implements Disposable {
     @Override
     public void dispose() {
         sr.dispose();
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        batch.end();
+        for (int i = 0; i < entities.size; i++) {
+            Entity entity = entities.get(i);
+
+            PositionComponent entityPosition = pm.get(entity);
+            WeaponComponent entityWeapon = wm.get(entity);
+            MoodComponent moodComponent = mm.get(entity);
+            Entity enemy = moodComponent.enemy;
+
+            if (player != entity) {
+                if (enemy != null) {
+                    PositionComponent enemyPosition = pm.get(enemy);
+                    HealthComponent enemyHealth = hm.get(enemy);
+
+                    if (mapOrientationSystem.isGraphActive()) {
+                        FlatTiledNode entityNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(entityPosition.getPosition());
+                        FlatTiledNode enemyNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(enemyPosition.getPosition());
+                        if (!mapOrientationSystem.collisionDetector.collides(new Ray<>(new Vector2(entityNode.x, entityNode.y), new Vector2(enemyNode.x, enemyNode.y)))) { //TODO new in update
+                            if (entityWeapon.getSelected() != null) {
+                                if (entityWeapon.shoot()) {
+                                    drawShoot(batch, enemyPosition.getPosition(), entityPosition.getPosition());
+                                    shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
+                                }
+                            }
+                        }
+                    } else if (entityWeapon.getSelected() != null) {
+                        if (entityWeapon.shoot()) {
+                            drawShoot(batch, enemyPosition.getPosition(), entityPosition.getPosition());
+                            shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
+                        }
+                    }
+                    if (enemyHealth.isDead())
+                        moodComponent.setEnemy(null);
+                }
+            } else if (playerShoot) {
+                if (enemy != null) {
+                    PositionComponent enemyPosition = pm.get(enemy);
+                    HealthComponent enemyHealth = hm.get(enemy);
+
+                    if (entityWeapon.getSelected() != null) {
+                        if (entityWeapon.shoot()) {
+                            drawShoot(batch, enemyPosition.getPosition(), entityPosition.getPosition());
+                            shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
+                        }
+                    }
+                    if (enemyHealth.isDead())
+                        moodComponent.setEnemy(null);
+                }
+            }
+        }
+        batch.begin();
+
+    }
+
+    private void drawShoot(Batch batch, Vector2 enemyPosition, Vector2 entityPosition) {
+        sr.setColor(Color.ORANGE);
+        sr.setProjectionMatrix(batch.getProjectionMatrix());
+
+        sr.begin(ShapeRenderer.ShapeType.Filled);
+
+        Vector2 diff = enemyPosition.cpy().sub(entityPosition);
+        Vector2 delayed = entityPosition.cpy().add(diff.scl(0.3f));
+
+        /*sr.rectLine(delayed,
+                getPointNear(enemyPosition, entityWeapon.getSelected().precision), 1);*/ // разбос
+        sr.rectLine(delayed, enemyPosition, 1);
+        sr.end();
+
+    }
+
+    private void shoot(HealthComponent enemyHealth, WeaponComponent entityWeapon, Vector2 shootPosition) {
+        enemyHealth.value -= entityWeapon.getSelected().damage;
+        soundsSystem.playShoot(shootPosition);
     }
 }

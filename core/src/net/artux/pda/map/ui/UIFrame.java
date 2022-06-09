@@ -1,5 +1,6 @@
 package net.artux.pda.map.ui;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -23,6 +24,7 @@ import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.data.PlayerData;
+import net.artux.pda.map.engine.systems.CameraSystem;
 
 public class UIFrame extends Group implements Disposable {
 
@@ -154,7 +156,7 @@ public class UIFrame extends Group implements Disposable {
     @Override
     public void act(float delta) {
         super.act(delta);
-        counter.setText(Integer.toString(PlayerData.visibleEntities));
+        counter.setText(String.valueOf(PlayerData.visibleEntities));
     }
 
     @Override

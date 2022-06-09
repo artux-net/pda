@@ -96,8 +96,13 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
                 Entity enemy = mm.get(entity).getEnemy();
                 if (wm.get(entity).getSelected() != null) {
                     Weapon weapon = wm.get(entity).getSelected();
-                    if (pm.get(enemy).getPosition().dst(pm.get(entity).getPosition()) < distanceToAttack(weapon.precision)) {
+                    float dst = pm.get(enemy).getPosition().dst(pm.get(entity).getPosition());
+                    if (dst < distanceToAttack(weapon.precision)) {
                         //shoot
+                    } else if (dst < 10) {
+                      // отодвинутся от врага
+                        //TODO
+                        //statesComponent.stateMachine.
                     } else {
                         statesComponent.stateMachine.changeState(MOVING_FOR_SHOOT);
                     }

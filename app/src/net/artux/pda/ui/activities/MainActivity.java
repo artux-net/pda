@@ -54,6 +54,8 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm dd/MM/yy", Locale.US);
     private MemberViewModel viewModel;
 
+    public static boolean TESTING_MAP = true;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +95,8 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         });
 
         setListeners();
+        if (TESTING_MAP)
+            presenter.addFragment(new StoriesFragment(), true);
         //startService(new Intent(this, NotificationService.class));
     }
 

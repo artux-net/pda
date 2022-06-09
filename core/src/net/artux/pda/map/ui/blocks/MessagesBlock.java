@@ -8,12 +8,16 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Scaling;
 
+import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.MessageGenerator;
 import net.artux.pda.map.ui.DebugMenu;
 import net.artux.pda.map.ui.Fonts;
@@ -28,14 +32,16 @@ import java.util.TimerTask;
 
 public class MessagesBlock extends ScrollPane implements Disposable {
 
-    private final MessageGenerator messageGenerator = new MessageGenerator();
+    private final MessageGenerator messageGenerator = new MessageGenerator(new ContentGenerator());// TODO
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.US);
     private final Timer timer = new Timer();
     private final BitmapFont font;
     int w = Gdx.graphics.getWidth();
+    private AssetManager assetManager;
 
-    public MessagesBlock(final AssetManager assetManager){
+    public MessagesBlock(final AssetManager assetManager) {
         super(new Table().left().bottom());
+        this.assetManager = assetManager;
 
         font = Fonts.generateFont(Fonts.Language.RUSSIAN, 24);
         setScrollingDisabled(true, false);
@@ -43,43 +49,49 @@ public class MessagesBlock extends ScrollPane implements Disposable {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                addMessage(assetManager, messageGenerator.generateMessage());
+                addMessage(messageGenerator.generateMessage());
             }
         }, MathUtils.random(60000, 120000), MathUtils.random(60000, 120000));
 
     }
 
-    public void addMessage(final AssetManager assetManager, UserMessage message) {
+    public void addMessage(UserMessage message) {
+        addMessage(message.avatarId, message.message, simpleDateFormat.format(new Date(message.time)) + " " + message.senderLogin);
+    }
+
+    public void addMessage(String icon, String content, String title) {
         final Table messagesTable = (Table) getActor();
         final Table mainGroup = new Table().left();
 
-        Texture image;
-        if (isInteger(message.avatarId))
-            image = assetManager
-                    .get("avatars/a" + (Integer.parseInt(message.avatarId)) + ".png", Texture.class);
+        Image image;
+        if (isInteger(icon))
+            image = new Image(assetManager
+                    .get("avatars/a" + (Integer.parseInt(icon)) + ".png", Texture.class));
         else
-            image = assetManager
-                    .get("avatars/a0.jpg", Texture.class);
-        mainGroup.add(new TextureActor(image));
+            image = new Image(assetManager
+                    .get("avatars/a0.jpg", Texture.class));
+
+        image.setWidth(w/9f);
+        image.setScaling(Scaling.fill);
+        mainGroup.add(image);
 
         Table contentGroup = new Table().left().top();
         mainGroup.add(contentGroup);
         messagesTable.row();
         messagesTable.add(mainGroup).fill();
 
-        Label title = new Label(simpleDateFormat.format(new Date(message.time)) + " " + message.senderLogin, getLabelStyle());
-        title.setAlignment(Align.left);
+        Label titleLabel = new Label(title, getLabelStyle());
+        titleLabel.setAlignment(Align.left);
         contentGroup.row();
-        contentGroup.add(title).fill();
+        contentGroup.add(titleLabel).fill();
 
-        Label content = new Label(message.message, getLabelStyle());
-        content.setWrap(true);
-        content.setFontScale(0.8f);
-        content.setAlignment(Align.left);
-        content.setWidth(w / 4);
+        Label contentContent = new Label(content, getLabelStyle());
+        contentContent.setWrap(true);
+        contentContent.setFontScale(0.8f);
+        contentContent.setAlignment(Align.left);
+        contentContent.setWidth(w / 4);
         contentGroup.row();
-        contentGroup.add(content).expandX().prefWidth(w / 3);
-
+        contentGroup.add(contentContent).expandX().prefWidth(w / 3);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {

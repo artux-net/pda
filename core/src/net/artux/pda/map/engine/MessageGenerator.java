@@ -10,37 +10,13 @@ import net.artux.pdalib.UserMessage;
 
 public class MessageGenerator {
 
-    private final String folder = "templates/";
-    private final String[] names;
-    private final String[] nicks;
-    private final String[] messages;
-    private final String[] actions;
-    private final String[] locations;
+    private final ContentGenerator contentGenerator;
 
-    public MessageGenerator() {
-        names = readFile(folder + "names");
-        nicks = readFile(folder + "nicks");
-        messages = readFile(folder + "messages");
-        locations = readFile(folder + "locations");
-        actions = readFile(folder + "actions");
+    public MessageGenerator(ContentGenerator contentGenerator) {
+        this.contentGenerator = contentGenerator;
     }
 
-    private String[] readFile(String file) {
-        FileHandle handle = Gdx.files.internal(file);
-        String text = handle.readString();
-        return text.split("\\r?\\n");
-    }
-
-    public String generateName(){
-        return names[random(0, names.length-1)] + " " +
-                nicks[random(0, nicks.length-1)];
-    }
-
-    public String generateMessageContent(){
-        return messages[random(0, messages.length-1)];
-    }
-
-    public UserMessage generateMessage(){
-        return new UserMessage(generateName(), generateMessageContent(), String.valueOf(random(1, 30)));
+    public UserMessage generateMessage() {
+        return new UserMessage(contentGenerator.generateName(), contentGenerator.generateMessageContent(), String.valueOf(random(1, 30)));
     }
 }

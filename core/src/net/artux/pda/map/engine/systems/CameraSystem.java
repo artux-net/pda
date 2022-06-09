@@ -148,4 +148,8 @@ public class CameraSystem extends BaseSystem {
     public float getCurrentZoom() {
         return currentZoom;
     }
+
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
 }

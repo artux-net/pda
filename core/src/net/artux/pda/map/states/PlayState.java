@@ -9,10 +9,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 import net.artux.pda.map.engine.AssetsFinder;
-import net.artux.pda.map.engine.EntityManager;
+import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.model.LevelBackground;
 import net.artux.pda.map.model.Map;
@@ -26,7 +25,7 @@ public class PlayState extends State {
     public Stage uistage;
 
     private LevelBackground levelBackground;
-    private final EntityManager entityManager;
+    private final EngineManager engineManager;
     private final AssetsFinder assetsFinder;
 
     private final UserInterface userInterface;
@@ -36,15 +35,12 @@ public class PlayState extends State {
     public PlayState(final GameStateManager gsm, Batch batch) {
         super(gsm);
         Gdx.app.debug(TAG, "Before start, heap " + Gdx.app.getNativeHeap());
-        Engine engine = new Engine();
 
         Gdx.app.debug(TAG, "Start play state init");
 
-        Viewport viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
         assetsFinder = new AssetsFinder();
         AssetManager assetManager = assetsFinder.get();
-        stage = new Stage(viewport, batch);
+        stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), batch);
         uistage = new Stage();
 
         userInterface = new UserInterface(gsm, assetManager, stage.getCamera());
@@ -65,9 +61,9 @@ public class PlayState extends State {
                 levelBackground = new LevelBackground(levelTexture, stage.getCamera());
             }
         }
-        entityManager = new EntityManager(engine, assetsFinder, stage, userInterface, gsm);
-        if (userInterface!=null)
-            userInterface.enableDebug(assetManager, engine);
+        engineManager = new EngineManager(assetsFinder, stage, userInterface, gsm);
+        if (userInterface != null)
+            userInterface.enableDebug(assetManager, engineManager.getEngine());
 
         Gdx.app.debug(TAG, "State loaded, heap: " + Gdx.app.getNativeHeap());
     }
@@ -76,7 +72,7 @@ public class PlayState extends State {
     protected void handleInput() {
         gsm.addInputProcessor(uistage);
         gsm.addInputProcessor(stage);
-        gsm.addInputProcessor(new GestureDetector(entityManager));
+        gsm.addInputProcessor(new GestureDetector(engineManager));
     }
 
     @Override
@@ -89,22 +85,19 @@ public class PlayState extends State {
     public void update(float dt) {
         uistage.act(dt);
         stage.act(dt);
+        engineManager.update(dt);
     }
 
     @Override
     public void render(SpriteBatch batch) {
-        float dt = Gdx.app.getGraphics().getDeltaTime();
-
         batch.begin();
         if (levelBackground != null)
             levelBackground.render(batch);
         batch.end();
 
         stage.draw();
-        entityManager.draw(dt);
-
         stage.getBatch().begin();
-        entityManager.update(dt); // TODO make it draw
+        engineManager.draw(batch, 1);
         stage.getBatch().end();
         uistage.draw(); // ui always last
     }
@@ -120,7 +113,7 @@ public class PlayState extends State {
         stage.dispose();
         uistage.dispose();
         assetsFinder.dispose();
-        entityManager.dispose();
+        engineManager.dispose();
         if (userInterface != null)
             userInterface.dispose();
         Gdx.app.debug(TAG, "Disposed, heap " + Gdx.app.getNativeHeap());

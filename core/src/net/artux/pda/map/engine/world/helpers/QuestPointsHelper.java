@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.QuestComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.InteractionSystem;
@@ -70,6 +71,7 @@ public class QuestPointsHelper {
         switch (point.type) {
             case 0:
             case 1:
+                entity.add(new QuestComponent());
                 texture = assetManager.get("quest.png", Texture.class);
                 break;
             case 4:
@@ -79,6 +81,7 @@ public class QuestPointsHelper {
                 texture = assetManager.get("cache.png", Texture.class);
                 break;
             case 6:
+                entity.add(new QuestComponent());
                 texture = assetManager.get("quest1.png", Texture.class);
                 break;
             case 7:

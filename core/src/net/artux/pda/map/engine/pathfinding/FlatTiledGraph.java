@@ -18,11 +18,10 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
     public FlatTiledNode startNode;
 
     public FlatTiledGraph(MapBorders mapBorders) {
-        this.nodes = new Array<>(sizeX * sizeY);
-        diagonal = true;
-
         this.sizeX = GlobalData.mapWidth / tileSize;
         this.sizeY = GlobalData.mapHeight / tileSize;
+        this.nodes = new Array<>(sizeX * sizeY);
+        diagonal = true;
 
         mapBorders.setTilesSize(sizeX, sizeY);
 
@@ -61,6 +60,15 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
         return getNode(xTile, yTile);
     }
 
+    public int getTypeInPosition(float x, float y) {
+        int xTile = (int) (x / tileSize);
+        int yTile = (int) (y / tileSize);
+
+        if (x * sizeY + y >= nodes.size) {
+            return TiledNode.TILE_WALL;
+        } else return getNode(xTile, yTile).type;
+    }
+
     public FlatTiledNode getNodeInPosition(Vector2 vector2) {
         return getNodeInPosition(vector2.x, vector2.y);
     }
@@ -96,7 +104,7 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
             n.getConnections().add(new FlatTiledConnection(this, n, target, target.type));
     }
 
-    public void dispose(){
+    public void dispose() {
         for (FlatTiledNode node :
                 nodes) {
             node.graph = null;

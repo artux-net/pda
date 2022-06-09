@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.data.GlobalData;
@@ -32,6 +33,7 @@ public class AssetsFinder implements Disposable {
             FileHandle ui = assetManager.getFileHandleResolver().resolve("ui");
             loadRecursively(assetManager, ui, true, Texture.class);
 
+            assetManager.load("data/uiskin.atlas", TextureAtlas.class);
             assetManager.load("quest.png", Texture.class);
             assetManager.load("seller.png", Texture.class);
             assetManager.load("quest1.png", Texture.class);

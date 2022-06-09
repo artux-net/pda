@@ -54,9 +54,9 @@ public class DebugMenu extends Table implements Disposable {
         addCheckBox("Always run", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                MovingSystem.running = ((CheckBox) actor).isChecked();
+                MovingSystem.alwaysRun = ((CheckBox) actor).isChecked();
             }
-        }, MovingSystem.running);
+        }, MovingSystem.alwaysRun);
 
         addCheckBox("Player collision with walls", new ChangeListener() {
             @Override

@@ -1,14 +1,26 @@
 package net.artux.pda.map.engine.systems;
 
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import net.artux.pda.map.engine.components.HealthComponent;
+import net.artux.pda.map.engine.components.InteractiveComponent;
+import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.SpriteComponent;
+import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.UserInterface;
+
+import java.util.Random;
 
 public class DeadCheckerSystem extends BaseSystem {
 
@@ -17,10 +29,17 @@ public class DeadCheckerSystem extends BaseSystem {
     private boolean deadMessage;
     private GameStateManager gameStateManager;
 
-    public DeadCheckerSystem(UserInterface userInterface, GameStateManager gameStateManager) {
-        super(null);
+    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
+
+    private AssetManager assetManager;
+    private Random random = new Random();
+
+    public DeadCheckerSystem(UserInterface userInterface, GameStateManager gameStateManager, AssetManager assetManager) {
+        super(Family.all(HealthComponent.class, PositionComponent.class).get());
         this.ui = userInterface;
         this.gameStateManager = gameStateManager;
+        this.assetManager = assetManager;
         labelStyle = userInterface.getLabelStyle();
         labelStyle.fontColor = Color.RED;
     }
@@ -29,6 +48,34 @@ public class DeadCheckerSystem extends BaseSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
+        for (int i = 0; i<entities.size; i++){
+            Entity entity = entities.get(i);
+
+            HealthComponent healthComponent = hm.get(entity);
+            PositionComponent positionComponent = pm.get(entity);
+
+            if (healthComponent.isDead()) {
+                final Entity deadEntity = new Entity();
+                deadEntity.add(new PositionComponent(positionComponent.getPosition()))
+                        .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4));
+
+                if (entity != player) {
+                    StalkerComponent stalkerComponent = entity.getComponent(StalkerComponent.class);
+                    deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 0, new InteractiveComponent.InteractListener() {
+                        @Override
+                        public void interact(UserInterface userInterface) {
+                            PlayerSystem playerSystem = getEngine().getSystem(PlayerSystem.class);
+                            playerSystem.addMedicine(random.nextInt(3));
+                            playerSystem.addRadiation(random.nextInt(2));
+                            getEngine().removeEntity(deadEntity);//TODO
+                        }
+                    })).add(stalkerComponent);
+                }
+
+                getEngine().removeEntity(entity);
+                getEngine().addEntity(deadEntity);
+            }
+        }
         if (!getEngine().getEntities().contains(player, false)) {
             if (!deadMessage) {
                 Group deadMessageGroup = new Group();

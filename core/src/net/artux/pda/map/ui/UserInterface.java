@@ -1,7 +1,5 @@
 package net.artux.pda.map.ui;
 
-import static net.artux.pdalib.Checker.isInteger;
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -10,35 +8,39 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Scaling;
 
-import net.artux.pda.map.engine.MessageGenerator;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.systems.MovingSystem;
 import net.artux.pda.map.model.Map;
 import net.artux.pda.map.model.Point;
 import net.artux.pda.map.states.GameStateManager;
+import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.HealthBar;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
+import net.artux.pda.map.ui.blocks.ControlBlock;
 import net.artux.pda.map.ui.blocks.MessagesBlock;
 import net.artux.pdalib.Checker;
 import net.artux.pdalib.Member;
-import net.artux.pdalib.UserMessage;
 import net.artux.pdalib.profile.Story;
 
 import java.text.SimpleDateFormat;
@@ -50,14 +52,12 @@ import java.util.TimerTask;
 
 public class UserInterface extends Group implements Disposable {
 
-    private final Button.ButtonStyle textButtonStyle;
     private GameStateManager gsm;
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.US);
     private final Color primaryColor = Color.valueOf("#3c3d48");
     private final Color backgroundColor = Color.valueOf("#161719");
 
-    private HealthBar healthBar;
     private float w = Gdx.graphics.getWidth();
     private float h = Gdx.graphics.getHeight();
     private Group menu;
@@ -77,12 +77,15 @@ public class UserInterface extends Group implements Disposable {
     private DebugMenu debugMenu;
     private MessagesBlock messagesBlock;
     private AssistantBlock assistantBlock;
+    private ControlBlock controlBlock;
 
+    private AssetManager assetManager;
     private Timer timer = new Timer();
 
     public UserInterface(final GameStateManager gsm, final AssetManager assetManager, Camera camera) {
         super();
         this.gsm = gsm;
+        this.assetManager = assetManager;
 
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
         style.knob = new TextureRegionDrawable(assetManager.get("ui/touchpad/knob.png", Texture.class));
@@ -107,25 +110,6 @@ public class UserInterface extends Group implements Disposable {
         });
         addActor(touchpad);
 
-        Button.ButtonStyle runButtonStyle = new Button.ButtonStyle();
-        runButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/beg2.png", Texture.class));
-        runButtonStyle.down = new TextureRegionDrawable(assetManager.get("ui/beg1.png", Texture.class));
-        final Button runButton = new Button(runButtonStyle);
-        runButton.setPosition(11 * Gdx.graphics.getWidth() / 12f, Gdx.graphics.getHeight() / 12f);
-        runButton.setSize(Gdx.graphics.getHeight() / 10f, Gdx.graphics.getHeight() / 10f);
-        runButton.addListener(new ClickListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                MovingSystem.running = true;
-                return super.touchDown(event, x, y, pointer, button);
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                MovingSystem.running = false;
-                super.touchUp(event, x, y, pointer, button);
-            }
-        });
         font = Fonts.generateFont(Fonts.Language.RUSSIAN, 24);
 
         initMenu(font);
@@ -155,14 +139,6 @@ public class UserInterface extends Group implements Disposable {
             }
         });
 
-        textButtonStyle = new Button.ButtonStyle();
-        textButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/dialog.png", Texture.class));
-        textButtonStyle.down = new TextureRegionDrawable(assetManager.get("ui/dialog.png", Texture.class));
-        textButtonStyle.checked = new TextureRegionDrawable(assetManager.get("ui/dialog.png", Texture.class));
-        textButtonStyle.over = new TextureRegionDrawable(assetManager.get("ui/dialog.png", Texture.class));
-
-        addActor(runButton);
-
         uiFrame = new UIFrame(camera, font, primaryColor, backgroundColor);
         addActor(uiFrame);
         timeLabel = new Label("00:00", getLabelStyle());
@@ -173,32 +149,33 @@ public class UserInterface extends Group implements Disposable {
         uiFrame.getRightHeaderTable().add(pauseButton);
 
         hudTable = new Table();
-        hudTable.setPosition(leftMargin * getDensity(), h - h / 14);
+        hudTable.setPosition(uiFrame.getHeaderLeftX(), h - h / 14);
         hudTable.align(Align.left | Align.top);
         hudTable.defaults().align(Align.left);
         hudTable.setWidth(w / 3);
         addActor(hudTable);
 
-        /*healthBar = new HealthBar(this, assetManager);
-        WeaponBar weaponBar = new WeaponBar(this);
-
-        hudTable.pad(leftMargin * getDensity())
-                .row()
-                .height(120);
-        hudTable.add().setActor(healthBar);
-
-        hudTable.row()
-                .padTop(20)
-                .height(70);
-        hudTable.add().setActor(weaponBar);*/
-
         assistantBlock = new AssistantBlock();
-        assistantBlock.setPosition(w - w / 3 - h/28f, h - h / 2 - h/14f);
+        assistantBlock.setPosition(w - w / 3 - h / 28f, h - h / 2 - h / 14f);
         addActor(assistantBlock);
 
         messagesBlock = new MessagesBlock(assetManager);
         messagesBlock.setPosition(leftMargin * getDensity(), h / 10 + h / 2.5f - uiFrame.frame);
         addActor(messagesBlock);
+
+        controlBlock = new ControlBlock();
+        controlBlock.defaults()
+                .pad(10)
+                .height(h / 10)
+                .width(h / 10)
+                .right();
+        controlBlock.setPosition(w - w / 3 - h / 28f, h / 28f);
+        addActor(controlBlock);
+        Color color = getColor();
+        color.a = 0.7f;
+        controlBlock.setColor(color);
+        color.a = 1f;
+        setColor(color);
 
         timer.schedule(new TimerTask() {
             @Override
@@ -206,6 +183,10 @@ public class UserInterface extends Group implements Disposable {
                 timeLabel.setText(simpleDateFormat.format(new Date())); // TODO eat memory every time
             }
         }, 0, 2000);
+    }
+
+    public MessagesBlock getMessagesBlock() {
+        return messagesBlock;
     }
 
     public void enableDebug(AssetManager assetManager, Engine engine) {
@@ -238,23 +219,35 @@ public class UserInterface extends Group implements Disposable {
         return assistantBlock;
     }
 
+    public ControlBlock getControlBlock() {
+        return controlBlock;
+    }
+
     public Member getMember() {
         return gsm.getMember();
     }
 
-    public void addInteractButton(String id, final InteractiveComponent.InteractListener listener) {
-        Button button = new Button(textButtonStyle);
-        button.setPosition(w - w / 12, 2.5f * h / 12);
-        button.setSize(h / 10, h / 10);
-        button.addListener(new ChangeListener() {
+    public void addInteractButton(String id, String iconPath, final InteractiveComponent.InteractListener listener) {
+        addInteractButton(id, iconPath, new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 listener.interact(UserInterface.this);
             }
         });
+    }
 
+    public void addInteractButton(String id, String iconPath, EventListener listener) {
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.up = new TextureRegionDrawable(assetManager.get("ui/buttonBack.png", Texture.class));
+        TextureRegion textureRegion = new TextureRegion(assetManager.get(iconPath, Texture.class));
+        float pad = textureRegion.getRegionHeight() * 0.15f;
+        style.imageUp = new TextureRegionDrawable(textureRegion);
+
+        ImageButton button = new ImageButton(style);
+        button.pad(pad);
         button.setName(id);
-        this.addActor(button);
+        button.addListener(listener);
+        controlBlock.add(button);
     }
 
     void initMenu(BitmapFont font) {
@@ -326,14 +319,6 @@ public class UserInterface extends Group implements Disposable {
         return Gdx.graphics.getDensity();
     }
 
-    public boolean contains(String name) {
-        for (Actor actor : getChildren()) {
-            if (actor.getName() != null && actor.getName().equals(name))
-                return true;
-        }
-        return false;
-    }
-
     @Override
     public void act(float delta) {
         super.act(delta);
@@ -349,8 +334,6 @@ public class UserInterface extends Group implements Disposable {
 
     @Override
     public void dispose() {
-        if (healthBar != null)
-            healthBar.dispose();
         if (texture != null)
             texture.dispose();
         if (bgPixmap != null)

@@ -17,9 +17,8 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.ui.Fonts;
 
-public class RenderSystem extends BaseSystem implements Disposable {
+public class RenderSystem extends BaseSystem implements Drawable, Disposable {
 
-    private Batch batch;
     private Stage stage;
 
     private BitmapFont font;
@@ -28,30 +27,14 @@ public class RenderSystem extends BaseSystem implements Disposable {
     private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 
+    public static boolean showAll = true;
+
     public RenderSystem(Stage stage) {
         super(Family.all(SpriteComponent.class, PositionComponent.class).get());
-        this.batch = stage.getBatch();
         this.stage = stage;
 
         font = Fonts.generateFont(Fonts.Language.RUSSIAN, 16);
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
-    }
-
-
-    @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
-        for (int i = 0; i < entities.size; i++) {
-            Entity entity = entities.get(i);
-
-            SpriteComponent spriteComponent = sm.get(entity);
-            PositionComponent positionComponent = pm.get(entity);
-
-            Sprite sprite = spriteComponent.sprite;
-            batch.setColor(sprite.getColor());
-            batch.draw(sprite, positionComponent.getX()-sprite.getOriginX(), positionComponent.getY()-sprite.getOriginY(), sprite.getOriginX(),
-                    sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), spriteComponent.getRotation());
-        }
     }
 
     public void showText(String text, float x, float y){
@@ -84,5 +67,26 @@ public class RenderSystem extends BaseSystem implements Disposable {
     @Override
     public void dispose() {
         font.dispose();
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+
+        for (int i = 0; i < entities.size; i++) {
+            Entity entity = entities.get(i);
+
+            SpriteComponent spriteComponent = sm.get(entity);
+            PositionComponent positionComponent = pm.get(entity);
+
+            Sprite sprite = spriteComponent.sprite;
+            Color buffer = batch.getColor();
+            if (!showAll)
+                batch.setColor(sprite.getColor());
+            batch.setColor(buffer);
+            batch.draw(sprite, positionComponent.getX()-sprite.getOriginX(), positionComponent.getY()-sprite.getOriginY(), sprite.getOriginX(),
+                    sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), spriteComponent.getRotation());
+
+        }
+
     }
 }

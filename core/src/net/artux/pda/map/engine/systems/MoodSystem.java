@@ -6,51 +6,106 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 
+import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
+import net.artux.pda.map.ui.UserInterface;
 
-public class MoodSystem extends EntitySystem {
+import java.util.Iterator;
+import java.util.LinkedList;
 
-    private ImmutableArray<Entity> entities;
+public class MoodSystem extends BaseSystem implements Drawable {
 
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private LinkedList<Entity> playerEnemies = new LinkedList<>();
+    private InteractionSystem interactionSystem;
+    private Sprite enemyTarget;
+
+    public MoodSystem(AssetManager assetManager) {
+        super(Family.all(MoodComponent.class, PositionComponent.class).get());
+        enemyTarget = new Sprite(assetManager.get("transfer.png", Texture.class));
+        enemyTarget.setSize(16, 16);
+        enemyTarget.setOriginCenter();
+    }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        entities = engine.getEntitiesFor(Family.all(MoodComponent.class, PositionComponent.class).get());
+        interactionSystem = engine.getSystem(InteractionSystem.class);
+        interactionSystem.addButton("ui/icons/icon_target.png", new InteractiveComponent.InteractListener() {
+            @Override
+            public void interact(UserInterface userInterface) {
+                MoodComponent moodComponent = mm.get(player);
+                if (playerEnemies.size() > 1) {
+                    Iterator<Entity> iterator = playerEnemies.iterator();
+                    Entity enemy = moodComponent.enemy;
+                    if (enemy == playerEnemies.getLast() || moodComponent.enemy == null)
+                        moodComponent.setEnemy(playerEnemies.getFirst());
+                    else while (iterator.hasNext()) {
+                        if (iterator.next() == moodComponent.enemy) {
+                            moodComponent.enemy = iterator.next();
+                            break;
+                        }
+                    }
+                }
 
+            }
+        });
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        for (int i = 0; i < entities.size()-1; i++) {
+        playerEnemies.clear();
+        for (int i = 0; i < entities.size - 1; i++) {
             Entity entity1 = entities.get(i);
 
             MoodComponent moodComponent1 = mm.get(entity1);
 
-            for (int j = i+1; j < entities.size(); j++) {
+            for (int j = i + 1; j < entities.size; j++) {
                 Entity entity2 = entities.get(j);
 
                 float dst = pm.get(entity1).getPosition().dst(pm.get(entity2).getPosition());
                 MoodComponent moodComponent2 = mm.get(entity2);
 
-                if (dst < 60){
-                    if (moodComponent1.enemy==null && moodComponent1.isEnemy(moodComponent2) ){
-                        moodComponent1.setEnemy(entity2);
+                if (dst < 60) {
+                    if (moodComponent1.isEnemy(moodComponent2)) {
+                        if (moodComponent1.enemy == null) {
+                            moodComponent1.setEnemy(entity2);
+                        }
+                        if (player == entity1) {
+                            playerEnemies.add(entity2);
+                        }
                     }
                 }
 
-                if(moodComponent1.enemy == entity2)
+                if (moodComponent1.enemy == entity2)
                     moodComponent2.setEnemy(entity1);
-
             }
 
             if (moodComponent1.enemy != null && pm.get(entity1).getPosition().dst(pm.get(moodComponent1.enemy).getPosition()) > 100)
                 moodComponent1.setEnemy(null);
+        }
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        Sprite sprite = enemyTarget;
+        MoodComponent moodComponent = mm.get(player);
+        if(moodComponent.enemy!= null) {
+            Vector2 enemyPosition = pm.get(moodComponent.enemy).getPosition();
+            batch.draw(sprite, enemyPosition.x - sprite.getOriginX(), enemyPosition.y - sprite.getOriginY(), sprite.getOriginX(),
+                    sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), enemyTarget.getRotation());
+
+            enemyTarget.rotate(-1.5f);
+            enemyTarget.draw(batch);
         }
     }
 }

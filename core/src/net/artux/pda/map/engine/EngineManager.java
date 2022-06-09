@@ -5,13 +5,12 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.components.HealthComponent;
@@ -28,12 +27,14 @@ import net.artux.pda.map.engine.systems.CameraSystem;
 import net.artux.pda.map.engine.systems.ClicksSystem;
 import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.DeadCheckerSystem;
+import net.artux.pda.map.engine.systems.Drawable;
 import net.artux.pda.map.engine.systems.InteractionSystem;
-import net.artux.pda.map.engine.systems.LogSystem;
 import net.artux.pda.map.engine.systems.MapLoggerSystem;
 import net.artux.pda.map.engine.systems.MapOrientationSystem;
+import net.artux.pda.map.engine.systems.MessagesSystem;
 import net.artux.pda.map.engine.systems.MoodSystem;
 import net.artux.pda.map.engine.systems.MovingSystem;
+import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.engine.systems.StatesSystem;
@@ -44,31 +45,26 @@ import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
 import net.artux.pda.map.model.Map;
 import net.artux.pda.map.states.GameStateManager;
-import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
+import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pdalib.Member;
 
-import javax.xml.validation.Validator;
+public class EngineManager extends InputListener implements Drawable, Disposable, GestureDetector.GestureListener {
 
-public class EntityManager extends InputListener implements Disposable, GestureDetector.GestureListener {
+    private Map map;
+    private Member member;
 
-    private final MapOrientationSystem mapOrientationSystem;
-    Map map;
-    Member member;
+    private Engine engine;
 
-    Engine engine;
-
-    BattleSystem battleSystem;
-    MapLoggerSystem mapLoggerSystem;
-    ClicksSystem clicksSystem;
-    CameraSystem cameraSystem;
+    private ClicksSystem clicksSystem;
+    private CameraSystem cameraSystem;
 
     private boolean controlPoints = true;
     private boolean questPoints = true;
     private boolean anomalies = true;
 
-    public EntityManager(Engine engine, AssetsFinder assetsFinder, Stage stage, UserInterface userInterface, GameStateManager gameStateManager) {
-        this.engine = engine;
+    public EngineManager(AssetsFinder assetsFinder, Stage stage, UserInterface userInterface, GameStateManager gameStateManager) {
+        this.engine = new Engine();
         this.map = (Map) gameStateManager.get("map");
         this.member = gameStateManager.getMember();
 
@@ -88,12 +84,14 @@ public class EntityManager extends InputListener implements Disposable, GestureD
                 .add(new PlayerComponent(camera, member));
         engine.addEntity(player);
 
-        mapOrientationSystem = new MapOrientationSystem(assetsFinder, map);
-        engine.addSystem(mapOrientationSystem);
+        engine.addSystem(new MapOrientationSystem(assetsFinder, map));
         engine.addSystem(new CameraSystem());
         engine.addSystem(new SoundsSystem(assetsFinder.get()));
         engine.addSystem(new WorldSystem(assetsFinder.get()));
         engine.addSystem(new DataSystem(map, member));
+        engine.addSystem(new InteractionSystem(stage, userInterface, assetsFinder.get()));
+        engine.addSystem(new PlayerSystem(assetsFinder.get()));
+        userInterface.getHudTable().add(new HUD(assetsFinder.get(), engine, userInterface));
 
         if (controlPoints)
             ControlPointsHelper.createControlPointsEntities(engine, assetsFinder.get());
@@ -102,22 +100,20 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         if (anomalies)
             AnomalyHelper.createAnomalies(engine, assetsFinder.get());
 
+        engine.addSystem(new MessagesSystem(userInterface));
         engine.addSystem(new ArtifactSystem());
         engine.addSystem(new ClicksSystem());
-        engine.addSystem(new MapLoggerSystem(stage.getBatch()));
+        engine.addSystem(new MapLoggerSystem());
         engine.addSystem(new RenderSystem(stage));
-        engine.addSystem(new BattleSystem(assetsFinder.get(), stage.getBatch()));
-        engine.addSystem(new InteractionSystem(stage, userInterface));
+        engine.addSystem(new BattleSystem(assetsFinder.get()));
         engine.addSystem(new StatesSystem());
         engine.addSystem(new TargetingSystem());
-        engine.addSystem(new MoodSystem());
+        engine.addSystem(new MoodSystem(assetsFinder.get()));
         engine.addSystem(new MovingSystem());
-        engine.addSystem(new DeadCheckerSystem(userInterface, gameStateManager));
+        engine.addSystem(new DeadCheckerSystem(userInterface, gameStateManager, assetsFinder.get()));
 
         clicksSystem = engine.getSystem(ClicksSystem.class);
-        battleSystem = engine.getSystem(BattleSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);
-        mapLoggerSystem = engine.getSystem(MapLoggerSystem.class);
 
         stage.addListener(this);
     }
@@ -126,12 +122,11 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         engine.update(dt);
     }
 
-    public void draw(float dt) {
-        /*for (EntitySystem s : engine.getSystems()) {
-            if (s instanceof Drawable) ((Disposable) s).d();
-        }*///TODO drawable
-        battleSystem.drawObjects(dt);
-        mapLoggerSystem.drawObjects(dt);
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        for (EntitySystem s : engine.getSystems()) {
+            if (s instanceof Drawable) ((Drawable) s).draw(batch, parentAlpha);
+        }
     }
 
     @Override
@@ -182,6 +177,8 @@ public class EntityManager extends InputListener implements Disposable, GestureD
 
     @Override
     public boolean fling(float velocityX, float velocityY, int button) {
+        //Gdx.app.debug("", velocityX + ":" + velocityY);
+        //TODO fling
         return false;
     }
 
@@ -198,8 +195,6 @@ public class EntityManager extends InputListener implements Disposable, GestureD
         float newZoom = (initAmount / panAmount) * cameraSystem.getCurrentZoom();
 
         Vector2 centerPoint = new Vector2((pointer1.x + pointer2.x) / 2, (pointer1.y + pointer2.y) / 2);
-
-        Logger.LogData.logPoint = cameraSystem.getPosition();
 
         if (lastPointer != null) {
             Vector2 cameraPosition = cameraSystem.getPosition();
@@ -222,5 +217,9 @@ public class EntityManager extends InputListener implements Disposable, GestureD
     public void pinchStop() {
         cameraSystem.setZooming(false);
         lastPointer = null;
+    }
+
+    public Engine getEngine() {
+        return engine;
     }
 }

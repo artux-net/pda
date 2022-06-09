@@ -76,7 +76,7 @@ public class HealthBar extends VerticalGroup implements Disposable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        float progress = Logger.LogData.health / 100;
+        float progress = 1f;
 
         float w = getWidth() * getScaleX();
         float h = getHeight() * getScaleY();

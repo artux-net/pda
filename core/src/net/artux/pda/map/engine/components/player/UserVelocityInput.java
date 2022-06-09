@@ -17,7 +17,4 @@ public class UserVelocityInput implements Component {
         return new Vector2(UserInterface.joyDeltaX, UserInterface.joyDeltaY);
     }
 
-    public boolean isRunning() {
-        return MovingSystem.running;
-    }
 }

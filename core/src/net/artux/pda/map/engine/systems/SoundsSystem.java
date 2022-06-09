@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-public class SoundsSystem extends BaseSystem implements Disposable {
+public class SoundsSystem extends BaseSystem {
 
     private ImmutableArray<Entity> players;
 
@@ -33,7 +33,6 @@ public class SoundsSystem extends BaseSystem implements Disposable {
     private final AssetManager assetManager;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
 
 
     public SoundsSystem(AssetManager assetManager) {
@@ -58,7 +57,7 @@ public class SoundsSystem extends BaseSystem implements Disposable {
         backgrounds.add(assetManager.get("sounds/music/2.ogg", Music.class));
         backgrounds.add(assetManager.get("sounds/music/3.ogg", Music.class));
         for (Music m : backgrounds) {
-            m.setVolume(0.51f);
+            m.setVolume(0.71f);
         }
         startBackgroundMusic();
         players = engine.getEntitiesFor(Family.all(PositionComponent.class, PlayerComponent.class).get());
@@ -120,19 +119,5 @@ public class SoundsSystem extends BaseSystem implements Disposable {
     public void playSoundAtDistance(SoundComponent soundComponent){
 
     }
-
-    @Override
-    public void dispose() {
-        List<Music> all = new LinkedList<>();
-        all.addAll(detections);
-        all.addAll(backgrounds);
-        all.addAll(weapons);
-        all.add(anomaly);
-
-        for (Music music: all) {
-            music.dispose();
-        }
-    }
-
 
 }

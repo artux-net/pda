@@ -13,9 +13,9 @@ import net.artux.pda.map.engine.data.GlobalData;
 
 public class MovingSystem extends BaseSystem {
 
-    private float MOVEMENT = 10f;
-    private float RUN_MOVEMENT = 20f;
-    private float PLAYER_MULTIPLICATION = 6f;
+    private final float MOVEMENT = 10f;
+    private final float RUN_MOVEMENT = 20f;
+    private final float PLAYER_MULTIPLICATION = 6f;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
@@ -25,7 +25,7 @@ public class MovingSystem extends BaseSystem {
 
     public static boolean playerWalls = true;
     public static boolean speedup = true;
-    public static boolean running = true;
+    public static boolean alwaysRun = true;
 
     public MovingSystem() {
         super(Family.all(VelocityComponent.class, PositionComponent.class).get());
@@ -49,7 +49,8 @@ public class MovingSystem extends BaseSystem {
             velocityComponent.setVelocity(userVelocityInput.getVelocity());
             if (speedup)
                 velocityComponent.velocity.scl(PLAYER_MULTIPLICATION);
-            velocityComponent.setRunning(running);
+            if (alwaysRun)
+                velocityComponent.setRunning(true);
         }
 
         for (int i = 0; i < entities.size; i++) {
@@ -59,10 +60,14 @@ public class MovingSystem extends BaseSystem {
             VelocityComponent velocityComponent = vm.get(entity);
 
             Vector2 stepVector;
-            if (velocityComponent.isRunning())
+            float staminaDifference = 0;
+            if (velocityComponent.isRunning() && velocityComponent.stamina > 0) {
                 stepVector = velocityComponent.velocity.scl(deltaTime).scl(RUN_MOVEMENT);
-            else
+                if (!alwaysRun && entity == player)
+                    staminaDifference = -0.1f;
+            } else {
                 stepVector = velocityComponent.velocity.scl(deltaTime).scl(MOVEMENT);
+            }
 
             if (!stepVector.isZero()) {
                 float newX = positionComponent.getX() + stepVector.x;
@@ -78,8 +83,11 @@ public class MovingSystem extends BaseSystem {
                     if (insideMap(positionComponent.getX(), newY))
                         positionComponent.getPosition().y = newY;
                 }
+            }else{
+                if (velocityComponent.stamina < 100)
+                    staminaDifference = 0.06f;
             }
-
+            velocityComponent.stamina += staminaDifference;
         }
     }
 

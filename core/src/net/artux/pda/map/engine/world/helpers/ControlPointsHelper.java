@@ -11,12 +11,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
+import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.ControlPointComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
+import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
@@ -30,14 +32,17 @@ import net.artux.pda.map.model.MobsTypes;
 import net.artux.pda.map.model.Spawn;
 import net.artux.pdalib.Member;
 import net.artux.pdalib.profile.items.Armor;
+import net.artux.pdalib.profile.items.Item;
 import net.artux.pdalib.profile.items.Weapon;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ControlPointsHelper {
 
     public static void createControlPointsEntities(final Engine engine, AssetManager assetManager) {
+        ContentGenerator contentGenerator = new ContentGenerator();
         JsonReader reader = new JsonReader(Gdx.files.internal("mobs.json").reader());
         MobsTypes mobsTypes = new Gson().fromJson(reader, MobsTypes.class);
 
@@ -82,6 +87,7 @@ public class ControlPointsHelper {
                         .add(new VelocityComponent())
                         .add(new HealthComponent())
                         .add(moodComponent)
+                        .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<Item>()))
                         .add(new WeaponComponent(armor, w, w))
                         .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
                         .add(new TargetMovingComponent(targeting));

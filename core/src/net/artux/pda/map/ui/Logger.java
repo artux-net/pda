@@ -1,13 +1,10 @@
 package net.artux.pda.map.ui;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
@@ -15,18 +12,14 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.engine.Pair;
 import net.artux.pda.map.engine.Triple;
-import net.artux.pda.map.engine.systems.LogSystem;
-import net.artux.pdalib.Member;
+import net.artux.pda.map.engine.systems.PlayerSystem;
 
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 public class Logger extends VerticalGroup implements Disposable {
@@ -35,15 +28,10 @@ public class Logger extends VerticalGroup implements Disposable {
     private float sinceChange;
     private float frameRate;
     private final BitmapFont font;
+    private final PlayerSystem playerSystem;
 
     public static List<Triple<Method, Object, String>> dataCollection = new ArrayList<>();
 
-    public abstract static class LogData {
-        public static Vector2 position = new Vector2();
-        public static float health;
-        public static Member member;
-        public static Vector2 logPoint;
-    }
 
     public static boolean visible = true;
 
@@ -57,17 +45,16 @@ public class Logger extends VerticalGroup implements Disposable {
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
         columnAlign(Align.right);
 
-        LogSystem logSystem = new LogSystem();
-        engine.addSystem(logSystem);
+        playerSystem = engine.getSystem(PlayerSystem.class);
 
         put("FPS", this, "getFrameRate");
         put("Native Heap",  Gdx.app,"getNativeHeap");
         put("Java Heap", Gdx.app, "getJavaHeap");
-        put("Player position", logSystem, "getPosition");
-        put("Health", logSystem, "getHealth");
-        put("Params", logSystem.getPlayerMember().getData(), "getParameters");
-        put("Temp", logSystem.getPlayerMember().getData(), "getTemp");
-        put("Stories stat", Arrays.toString(logSystem.getPlayerMember().getData().getStories().toArray()), "toString");
+        put("Player position", playerSystem, "getPosition");
+        put("Health", playerSystem, "getHealth");
+        put("Params", playerSystem.getPlayerMember().getData(), "getParameters");
+        put("Temp", playerSystem.getPlayerMember().getData(), "getTemp");
+        put("Stories stat", Arrays.toString(playerSystem.getPlayerMember().getData().getStories().toArray()), "toString");
 
         put("Screen width", Gdx.app.getGraphics(),"getWidth");
         put("Height", Gdx.app.getGraphics(),"getHeight");
