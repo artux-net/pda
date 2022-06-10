@@ -66,6 +66,8 @@ public class MovingSystem extends BaseSystem {
                 if (!alwaysRun && entity == player)
                     staminaDifference = -0.1f;
             } else {
+                if (velocityComponent.stamina < 100)
+                 staminaDifference = 0.06f;
                 stepVector = velocityComponent.velocity.scl(deltaTime).scl(MOVEMENT);
             }
 
@@ -83,9 +85,6 @@ public class MovingSystem extends BaseSystem {
                     if (insideMap(positionComponent.getX(), newY))
                         positionComponent.getPosition().y = newY;
                 }
-            }else{
-                if (velocityComponent.stamina < 100)
-                    staminaDifference = 0.06f;
             }
             velocityComponent.stamina += staminaDifference;
         }

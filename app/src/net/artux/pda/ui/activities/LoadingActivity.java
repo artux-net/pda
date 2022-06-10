@@ -27,8 +27,9 @@ import net.artux.pda.app.App;
 import net.artux.pda.repositories.Result;
 import net.artux.pda.viewmodels.MemberViewModel;
 
-public class LoadingActivity extends AppCompatActivity {
+import timber.log.Timber;
 
+public class LoadingActivity extends AppCompatActivity {
 
     private boolean loaded, gifEnd, afterClearCache = false;
     private MemberViewModel viewModel;
@@ -43,7 +44,7 @@ public class LoadingActivity extends AppCompatActivity {
 
         Glide.with(this)
                 .asGif()
-                .load(Uri.parse("file:///android_asset/load.gif"))
+                .load(Uri.parse("file:///android_asset/ui/load.gif"))
                 .listener(new RequestListener<GifDrawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
@@ -71,13 +72,16 @@ public class LoadingActivity extends AppCompatActivity {
             if(memberResult instanceof Result.Success){
                 if (afterClearCache){
                     loaded = true;
+                    Timber.i("User information loaded from cache, try to start...");
                     start();
                 }else {
                     afterClearCache = true;
+                    Timber.i("Clear cache, update info from server...");
                     viewModel.updateMemberWithReset();
                 }
             }else{
-                Toast.makeText(getApplicationContext(), "Member error, try to login again", Toast.LENGTH_SHORT).show();
+                Timber.i("User information loaded, try to start...");
+                Toast.makeText(getApplicationContext(), "Данные не найдены, попробуйте ввойти снова", Toast.LENGTH_SHORT).show();
                 App.getDataManager().removeAllData();
                 startActivity(new Intent(LoadingActivity.this, LoginActivity.class));
                 LoadingActivity.this.finish();
@@ -85,9 +89,14 @@ public class LoadingActivity extends AppCompatActivity {
         });
     }
 
+    public static boolean TESTING_MAP = false;
+
     void start(){
         if (loaded && (gifEnd || BuildConfig.DEBUG)){
-            startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+            if (TESTING_MAP)
+                startActivity(new Intent(this, QuestActivity.class));
+            else
+                startActivity(new Intent(LoadingActivity.this, MainActivity.class));
             LoadingActivity.this.finish();
         }
     }

@@ -58,8 +58,6 @@ public class InteractionSystem extends BaseSystem {
         mobs = engine.getEntitiesFor(Family.all(MoodComponent.class, PositionComponent.class, StatesComponent.class).get());
         soundsSystem = engine.getSystem(SoundsSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);
-
-        //userInterface.getAssistantBlock().row();
     }
 
     @Override
@@ -72,7 +70,7 @@ public class InteractionSystem extends BaseSystem {
 
             PositionComponent playerPosition = pm.get(player);
 
-            String name = "q-" + interactiveComponent.title;
+            String name = "q-" + interactiveComponent.type;
             if (playerPosition.getPosition().dst(positionComponent.getPosition()) < 35f) {
                 if (interactiveComponent.type != InteractiveComponent.Type.ACTION) {
                     activeActions.add(name);

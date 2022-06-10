@@ -170,6 +170,12 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
     }
 
     @Override
+    public void toast(String msg) {
+        Looper.prepare();
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
     public void error(String msg, Throwable t) {
         Timber.e(t, msg);
         if (Looper.myLooper()==null)

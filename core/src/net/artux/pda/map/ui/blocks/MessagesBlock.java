@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -38,11 +39,12 @@ public class MessagesBlock extends ScrollPane implements Disposable {
     private final BitmapFont font;
     int w = Gdx.graphics.getWidth();
     private AssetManager assetManager;
+    private final Table table;
 
     public MessagesBlock(final AssetManager assetManager) {
         super(new Table().left().bottom());
+        table = (Table) getActor();
         this.assetManager = assetManager;
-
         font = Fonts.generateFont(Fonts.Language.RUSSIAN, 24);
         setScrollingDisabled(true, false);
         setSize(w / 3f, 300);
@@ -55,12 +57,15 @@ public class MessagesBlock extends ScrollPane implements Disposable {
 
     }
 
+    public Table getTable() {
+        return table;
+    }
+
     public void addMessage(UserMessage message) {
         addMessage(message.avatarId, message.message, simpleDateFormat.format(new Date(message.time)) + " " + message.senderLogin);
     }
 
     public void addMessage(String icon, String content, String title) {
-        final Table messagesTable = (Table) getActor();
         final Table mainGroup = new Table().left();
 
         Image image;
@@ -71,14 +76,13 @@ public class MessagesBlock extends ScrollPane implements Disposable {
             image = new Image(assetManager
                     .get("avatars/a0.jpg", Texture.class));
 
-        image.setWidth(w/9f);
-        image.setScaling(Scaling.fill);
-        mainGroup.add(image);
+        image.setScaling(Scaling.fillX);
+        mainGroup.add(image).width(w/9f);
 
         Table contentGroup = new Table().left().top();
         mainGroup.add(contentGroup);
-        messagesTable.row();
-        messagesTable.add(mainGroup).fill();
+        table.row();
+        table.add(mainGroup).fill();
 
         Label titleLabel = new Label(title, getLabelStyle());
         titleLabel.setAlignment(Align.left);
@@ -95,9 +99,21 @@ public class MessagesBlock extends ScrollPane implements Disposable {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                messagesTable.removeActor(mainGroup);
+                removeCellWithActor(mainGroup);
             }
         }, 20000);
+    }
+
+    private void removeCellWithActor(Actor remove) {
+        for (Actor actor : table.getChildren()) {
+            if (actor == remove) {
+                Cell<Actor> cell = table.getCell(actor);
+                actor.remove();
+                // remove cell from table
+                table.getCells().removeValue(cell, true);
+                table.invalidate();
+            }
+        }
     }
 
     public Label.LabelStyle getLabelStyle() {

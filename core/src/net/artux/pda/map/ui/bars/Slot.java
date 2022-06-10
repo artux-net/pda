@@ -22,6 +22,10 @@ public class Slot extends ImageButton {
         add(label);
     }
 
+    public Label getLabel() {
+        return label;
+    }
+
     public void setText(String text){
         label.setText(text);
     }

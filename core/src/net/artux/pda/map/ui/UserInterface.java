@@ -166,8 +166,8 @@ public class UserInterface extends Group implements Disposable {
         controlBlock = new ControlBlock();
         controlBlock.defaults()
                 .pad(10)
-                .height(h / 10)
-                .width(h / 10)
+                .height(h / 8)
+                .width(h / 8)
                 .right();
         controlBlock.setPosition(w - w / 3 - h / 28f, h / 28f);
         addActor(controlBlock);

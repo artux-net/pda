@@ -10,6 +10,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -59,7 +61,7 @@ public class WorldSystem extends EntitySystem implements Disposable {
     private MapOrientationSystem mapOrientationSystem;
     private Timer timer;
 
-    public static boolean radiation = false;
+    public static boolean radiation = true;
 
     public WorldSystem(AssetManager assetManager) {
         this.assetManager = assetManager;
@@ -146,6 +148,7 @@ public class WorldSystem extends EntitySystem implements Disposable {
                             }
                         }));
                 getEngine().addEntity(entity);
+                Gdx.app.log("WorldSystem", "New entity created.");
                 generateGroup();
             }
         }, 1000 * random(40, 60));
@@ -158,8 +161,8 @@ public class WorldSystem extends EntitySystem implements Disposable {
                     || cameraSystem.getCamera().frustum.pointInFrustum(position.x, position.y, 0))
                 position = new Vector2(random.nextInt(GlobalData.mapWidth), random.nextInt(GlobalData.mapHeight));
             return position;
-    }
-*/
+    }*/
+
     @Override
     public void dispose() {
         timer.cancel();

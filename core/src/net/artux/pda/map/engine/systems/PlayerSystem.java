@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
@@ -23,6 +24,7 @@ import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
+import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
 import net.artux.pdalib.Member;
@@ -39,11 +41,10 @@ public class PlayerSystem extends BaseSystem {
 
     private Slot medicineSlot;
     private Slot radiationSlot;
+    private HUD hud;
 
     private int medicineCount = 0;
     private int radiationCount = 0;
-
-
 
     public PlayerSystem(AssetManager assetManager) {
         super(Family.all(PositionComponent.class, QuestComponent.class).get());
@@ -70,10 +71,16 @@ public class PlayerSystem extends BaseSystem {
             }
         });
 
-        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        UserInterface userInterface = interactionSystem.getUserInterface();
+        hud = new HUD(assetManager, engine, userInterface);
+        userInterface.getHudTable().add(hud);
+
+        ImageButton.ImageButtonStyle
+
+        style = new ImageButton.ImageButtonStyle();
         style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
         style.imageUp = new TextureRegionDrawable(assetManager.get("ui/bar/ic_health.png", Texture.class));
-        UserInterface userInterface = interactionSystem.getUserInterface();
+
         AssistantBlock assistantBlock = userInterface.getAssistantBlock();
         medicineSlot = new Slot(userInterface, style);
         style = new ImageButton.ImageButtonStyle();
@@ -109,6 +116,10 @@ public class PlayerSystem extends BaseSystem {
         super.update(deltaTime);
         medicineSlot.setText(String.valueOf(medicineCount));
         radiationSlot.setText(String.valueOf(radiationCount));
+    }
+
+    public HUD getHud() {
+        return hud;
     }
 
     public void addMedicine(int medicineCount){

@@ -9,7 +9,6 @@ import net.artux.pdalib.Member;
 
 public abstract class State {
 
-    protected Vector3 mouse;
     public static GameStateManager gsm;
 
     protected float w = Gdx.graphics.getWidth();
@@ -17,7 +16,6 @@ public abstract class State {
 
     public State(GameStateManager gsm){
         this.gsm = gsm;
-        mouse = new Vector3();
     }
 
     protected abstract void handleInput();

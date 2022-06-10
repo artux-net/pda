@@ -97,7 +97,7 @@ public class PlayState extends State {
 
         stage.draw();
         stage.getBatch().begin();
-        engineManager.draw(batch, 1);
+        engineManager.draw(stage.getBatch(), 1);
         stage.getBatch().end();
         uistage.draw(); // ui always last
     }

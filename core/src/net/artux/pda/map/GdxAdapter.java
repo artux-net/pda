@@ -27,7 +27,6 @@ public class GdxAdapter extends ApplicationAdapter {
 	public void create () {
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		Gdx.app.debug("GDX","Before load, heap " + Gdx.app.getNativeHeap());
-		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		batch = new SpriteBatch();
 		PreloadState preloadState = new PreloadState(gsm);
 		gsm.push(preloadState);

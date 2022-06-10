@@ -61,7 +61,7 @@ public class DeadCheckerSystem extends BaseSystem {
 
                 if (entity != player) {
                     StalkerComponent stalkerComponent = entity.getComponent(StalkerComponent.class);
-                    deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 0, new InteractiveComponent.InteractListener() {
+                    deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, new InteractiveComponent.InteractListener() {
                         @Override
                         public void interact(UserInterface userInterface) {
                             PlayerSystem playerSystem = getEngine().getSystem(PlayerSystem.class);

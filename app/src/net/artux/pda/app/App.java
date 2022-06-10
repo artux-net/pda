@@ -126,7 +126,7 @@ public class App extends Application {
                 message = tag + " : " + message;
             logBuilder.append(message).append("\n");
             FirebaseCrashlytics.getInstance().log(message);
-            if (t != null) {
+            if (t != null && !BuildConfig.DEBUG) {
                 logBuilder.append(t.toString()).append("\n");
                 FirebaseCrashlytics.getInstance().recordException(t);
                 t.printStackTrace();

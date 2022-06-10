@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -33,14 +34,18 @@ import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
+import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.Slot;
+import net.artux.pdalib.profile.Data;
+import net.artux.pdalib.profile.items.Item;
 
 import java.util.Iterator;
 import java.util.Random;
 
 public class BattleSystem extends BaseSystem implements Disposable, Drawable {
 
+    private final GameStateManager gsm;
     private SoundsSystem soundsSystem;
     private AssetManager assetManager;
 
@@ -48,7 +53,6 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
     private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
-    private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
 
     private ShapeRenderer sr = new ShapeRenderer();
     private Random random = new Random();
@@ -57,9 +61,12 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
 
     private boolean playerShoot = false;
 
-    public BattleSystem(AssetManager assetManager) {
+    private Slot weaponSlot;
+
+    public BattleSystem(AssetManager assetManager, GameStateManager gameStateManager) {
         super(Family.all(HealthComponent.class, PositionComponent.class, WeaponComponent.class).get());
         this.assetManager = assetManager;
+        this.gsm = gameStateManager;
     }
 
     @Override
@@ -68,7 +75,7 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
         soundsSystem = engine.getSystem(SoundsSystem.class);
         mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
         InteractionSystem interactionSystem = engine.getSystem(InteractionSystem.class);
-        interactionSystem.addButton("ui/icons/icon_shoot.png", new ClickListener(){
+        interactionSystem.addButton("ui/icons/icon_shoot.png", new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 playerShoot = true;
@@ -81,34 +88,58 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
                 super.touchUp(event, x, y, pointer, button);
             }
         });
-        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-        style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot_wide.png", Texture.class));
-        style.imageUp = new TextureRegionDrawable(assetManager.get("ui/icons/icon_run.png", Texture.class));
-       // interactionSystem.getUserInterface().getHudTable().add(new Slot(interactionSystem.getUserInterface(), style)).space(20);
+
+        UserInterface userInterface = interactionSystem.getUserInterface();
+        PlayerSystem playerSystem = engine.getSystem(PlayerSystem.class);
+        WeaponComponent entityWeapon = wm.get(player);
+        if (entityWeapon.getSelected() != null) {
+            ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+            style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
+            style.imageUp = new TextureRegionDrawable(assetManager.get("ui/icons/ic_rifle.png", Texture.class));
+
+            weaponSlot = new Slot(userInterface, style);
+            weaponSlot.pad(20);
+            weaponSlot.getCell(weaponSlot.getLabel()).align(Align.left);
+            float height = playerSystem.getHud().getHeight() * 0.9f;
+            userInterface.getHudTable().add(weaponSlot).height(height).padLeft(20);
+
+            if (entityWeapon.resource != null) {
+                PlayerData.bullet = entityWeapon.resource.title;
+                weaponSlot.setText(entityWeapon.resource.quantity + "/" + entityWeapon.getMagazine());
+            }else{
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Item i:
+                        getEngine().getSystem(DataSystem.class).getMember().getData().getItems()     ) {
+                    stringBuilder.append("{").append(i.id).append("}").append(" ");
+                }
+
+                gsm.getPlatformInterface().toast("Патроны для "+ entityWeapon.getSelected().title
+                        + " отсутсутвуют, необходим id: " + entityWeapon.getSelected().bullet_id + ", есть " + stringBuilder.toString());
+            }
+
+        }
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        for (int i = 0; i < entities.size; i++) {
-            Entity entity = entities.get(i);
 
-            HealthComponent healthComponent = hm.get(entity);
-            PositionComponent positionComponent = pm.get(entity);
-
+        for (Entity entity : entities) {
             WeaponComponent entityWeapon = wm.get(entity);
             entityWeapon.update(deltaTime);
+        }
 
-            if (pcm.has(entity) && entityWeapon.getSelected() != null) {
-                PlayerData.selectedWeapon = entityWeapon.getSelected().title;
-                if (entityWeapon.resource != null) {
-                    PlayerData.bullet = entityWeapon.resource.title;
-                    PlayerData.resource = entityWeapon.resource.quantity;
-                    PlayerData.magazine = entityWeapon.getMagazine();
-                }
+        HealthComponent healthComponent = hm.get(player);
+        PositionComponent positionComponent = pm.get(player);
+        WeaponComponent entityWeapon = wm.get(player);
+
+
+        if (entityWeapon.getSelected() != null) {
+            PlayerData.selectedWeapon = entityWeapon.getSelected().title;
+            if (entityWeapon.resource != null) {
+                PlayerData.bullet = entityWeapon.resource.title;
+                weaponSlot.setText(entityWeapon.resource.quantity + "/" + entityWeapon.getMagazine());
             }
-
-
         }
     }
 

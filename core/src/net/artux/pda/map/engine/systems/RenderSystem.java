@@ -27,7 +27,7 @@ public class RenderSystem extends BaseSystem implements Drawable, Disposable {
     private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 
-    public static boolean showAll = true;
+    public static boolean showAll = false;
 
     public RenderSystem(Stage stage) {
         super(Family.all(SpriteComponent.class, PositionComponent.class).get());
@@ -79,12 +79,12 @@ public class RenderSystem extends BaseSystem implements Drawable, Disposable {
             PositionComponent positionComponent = pm.get(entity);
 
             Sprite sprite = spriteComponent.sprite;
-            Color buffer = batch.getColor();
             if (!showAll)
                 batch.setColor(sprite.getColor());
-            batch.setColor(buffer);
+
             batch.draw(sprite, positionComponent.getX()-sprite.getOriginX(), positionComponent.getY()-sprite.getOriginY(), sprite.getOriginX(),
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), spriteComponent.getRotation());
+            batch.setColor(Color.WHITE);
 
         }
 

@@ -91,7 +91,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addSystem(new DataSystem(map, member));
         engine.addSystem(new InteractionSystem(stage, userInterface, assetsFinder.get()));
         engine.addSystem(new PlayerSystem(assetsFinder.get()));
-        userInterface.getHudTable().add(new HUD(assetsFinder.get(), engine, userInterface));
+
 
         if (controlPoints)
             ControlPointsHelper.createControlPointsEntities(engine, assetsFinder.get());
@@ -105,7 +105,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addSystem(new ClicksSystem());
         engine.addSystem(new MapLoggerSystem());
         engine.addSystem(new RenderSystem(stage));
-        engine.addSystem(new BattleSystem(assetsFinder.get()));
+        engine.addSystem(new BattleSystem(assetsFinder.get(), gameStateManager));
         engine.addSystem(new StatesSystem());
         engine.addSystem(new TargetingSystem());
         engine.addSystem(new MoodSystem(assetsFinder.get()));
