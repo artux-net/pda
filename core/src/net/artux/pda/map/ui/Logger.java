@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
@@ -14,7 +15,6 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.engine.Triple;
 import net.artux.pda.map.engine.systems.PlayerSystem;
-
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,38 +27,34 @@ public class Logger extends VerticalGroup implements Disposable {
     long lastTimeCounted;
     private float sinceChange;
     private float frameRate;
-    private final BitmapFont font;
-    private final PlayerSystem playerSystem;
 
-    public static List<Triple<Method, Object, String>> dataCollection = new ArrayList<>();
-
-
+    private final List<Triple<Method, Object, String>> dataCollection = new ArrayList<>();
     public static boolean visible = true;
 
-    public Logger(Engine engine) {
+    public Logger(Engine engine, Skin skin) {
         super();
 
         lastTimeCounted = TimeUtils.millis();
         sinceChange = 0;
         frameRate = Gdx.graphics.getFramesPerSecond();
-        font = Fonts.generateFont(Fonts.Language.RUSSIAN, Fonts.ARIAL_FONT, 16);
+        BitmapFont font = skin.getFont("font");
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
         columnAlign(Align.right);
 
-        playerSystem = engine.getSystem(PlayerSystem.class);
+        PlayerSystem playerSystem = engine.getSystem(PlayerSystem.class);
 
         put("FPS", this, "getFrameRate");
-        put("Native Heap",  Gdx.app,"getNativeHeap");
+        put("Native Heap", Gdx.app, "getNativeHeap");
         put("Java Heap", Gdx.app, "getJavaHeap");
         put("Player position", playerSystem, "getPosition");
-        put("Health", playerSystem, "getHealth");
+        put("Здоровье", playerSystem, "getHealth");
         put("Params", playerSystem.getPlayerMember().getData(), "getParameters");
         put("Temp", playerSystem.getPlayerMember().getData(), "getTemp");
         put("Stories stat", Arrays.toString(playerSystem.getPlayerMember().getData().getStories().toArray()), "toString");
 
-        put("Screen width", Gdx.app.getGraphics(),"getWidth");
-        put("Height", Gdx.app.getGraphics(),"getHeight");
-        put("Density", Gdx.app.getGraphics(),"getDensity");
+        put("Screen width", Gdx.app.getGraphics(), "getWidth");
+        put("Height", Gdx.app.getGraphics(), "getHeight");
+        put("Density", Gdx.app.getGraphics(), "getDensity");
     }
 
     @Override
@@ -68,16 +64,14 @@ public class Logger extends VerticalGroup implements Disposable {
         for (Actor l : getChildren()) {
             for (Triple<Method, Object, String> tr :
                     dataCollection) {
-                if (tr.getThird().equals(l.getName())){
+                if (tr.getThird().equals(l.getName())) {
                     try {
-                        if (tr.getSecond()!=null && tr.getFirst()!=null)
+                        if (tr.getSecond() != null && tr.getFirst() != null)
                             ((Label) l).setText(tr.getThird() + ": " + tr.getFirst().invoke(tr.getSecond()).toString());
 
                         else
                             ((Label) l).setText(tr.getThird() + ": null");
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
+                    } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
                 }
@@ -102,7 +96,7 @@ public class Logger extends VerticalGroup implements Disposable {
         }
     }
 
-    public void put(String title, Object o, String nameOfMethod){
+    public void put(String title, Object o, String nameOfMethod) {
         Method method = null;
         try {
             if (nameOfMethod == null || nameOfMethod.equals(""))
@@ -131,7 +125,6 @@ public class Logger extends VerticalGroup implements Disposable {
     }
 
     public void dispose() {
-        font.dispose();
         dataCollection.clear();
     }
 

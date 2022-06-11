@@ -8,16 +8,16 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.ui.Fonts;
 
-public class RenderSystem extends BaseSystem implements Drawable, Disposable {
+public class RenderSystem extends BaseSystem implements Drawable {
 
     private Stage stage;
 
@@ -29,45 +29,53 @@ public class RenderSystem extends BaseSystem implements Drawable, Disposable {
 
     public static boolean showAll = false;
 
-    public RenderSystem(Stage stage) {
+    public RenderSystem(Stage stage, AssetsFinder assetsFinder) {
         super(Family.all(SpriteComponent.class, PositionComponent.class).get());
         this.stage = stage;
 
-        font = Fonts.generateFont(Fonts.Language.RUSSIAN, 16);
+        font = assetsFinder.getFontManager().getFont(16);
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
     }
 
-    public void showText(String text, float x, float y){
-        final Label label = new Label(text, labelStyle);
-        label.setOrigin(Align.center);
-        label.setPosition(x, y);
-        stage.addActor(label);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(5000);
-                    if (stage.getActors().contains(label, true))
-                        label.remove();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+    public void showText(String text, float x, float y) {
+        if (!hasStageActorWithName(stage, text)) {
+            final Label label = new Label(text, labelStyle);
+            label.setName(text);
+            label.setOrigin(Align.center);
+            label.setPosition(x, y);
+            stage.addActor(label);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(5000);
+                        if (stage.getActors().contains(label, true))
+                            label.remove();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }).start();
+            }).start();
+        }
     }
 
-    public void showText(String text, int x, int y, int offsetX, int offsetY){
+    private boolean hasStageActorWithName(Stage stage, String name) {
+        for (Actor actor : stage.getActors()) {
+            if (actor.getName() != null && actor.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void showText(String text, int x, int y, int offsetX, int offsetY) {
         showText(text, x + offsetX, y + offsetY);
     }
 
-    public void showText(String text, Vector2 position){
+    public void showText(String text, Vector2 position) {
         showText(text, position.x, position.y);
     }
 
-    @Override
-    public void dispose() {
-        font.dispose();
-    }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
@@ -82,7 +90,7 @@ public class RenderSystem extends BaseSystem implements Drawable, Disposable {
             if (!showAll)
                 batch.setColor(sprite.getColor());
 
-            batch.draw(sprite, positionComponent.getX()-sprite.getOriginX(), positionComponent.getY()-sprite.getOriginY(), sprite.getOriginX(),
+            batch.draw(sprite, positionComponent.getX() - sprite.getOriginX(), positionComponent.getY() - sprite.getOriginY(), sprite.getOriginX(),
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), spriteComponent.getRotation());
             batch.setColor(Color.WHITE);
 

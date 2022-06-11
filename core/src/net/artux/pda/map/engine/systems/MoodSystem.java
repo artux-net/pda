@@ -3,19 +3,17 @@ package net.artux.pda.map.engine.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
-import net.artux.pda.map.engine.components.InteractiveComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
-import net.artux.pda.map.ui.UserInterface;
+import net.artux.pda.map.engine.components.PositionComponent;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -39,9 +37,9 @@ public class MoodSystem extends BaseSystem implements Drawable {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         interactionSystem = engine.getSystem(InteractionSystem.class);
-        interactionSystem.addButton("ui/icons/icon_target.png", new InteractiveComponent.InteractListener() {
+        interactionSystem.addButton("ui/icons/icon_target.png", new ChangeListener() {
             @Override
-            public void interact(UserInterface userInterface) {
+            public void changed(ChangeEvent event, Actor actor) {
                 MoodComponent moodComponent = mm.get(player);
                 if (playerEnemies.size() > 1) {
                     Iterator<Entity> iterator = playerEnemies.iterator();
@@ -55,7 +53,6 @@ public class MoodSystem extends BaseSystem implements Drawable {
                         }
                     }
                 }
-
             }
         });
     }
@@ -99,13 +96,17 @@ public class MoodSystem extends BaseSystem implements Drawable {
     public void draw(Batch batch, float parentAlpha) {
         Sprite sprite = enemyTarget;
         MoodComponent moodComponent = mm.get(player);
-        if(moodComponent.enemy!= null) {
-            Vector2 enemyPosition = pm.get(moodComponent.enemy).getPosition();
-            batch.draw(sprite, enemyPosition.x - sprite.getOriginX(), enemyPosition.y - sprite.getOriginY(), sprite.getOriginX(),
-                    sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), enemyTarget.getRotation());
+        if (moodComponent.enemy != null) {
+            if (getEngine().getEntities().contains(moodComponent.enemy, true)) {
+                Vector2 enemyPosition = pm.get(moodComponent.enemy).getPosition();
+                batch.draw(sprite, enemyPosition.x - sprite.getOriginX(), enemyPosition.y - sprite.getOriginY(), sprite.getOriginX(),
+                        sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), enemyTarget.getRotation());
 
-            enemyTarget.rotate(-1.5f);
-            enemyTarget.draw(batch);
+                enemyTarget.rotate(-1.5f);
+                enemyTarget.draw(batch);
+            }else {
+                moodComponent.enemy = null; // TODO here null?
+            }
         }
     }
 }

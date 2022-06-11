@@ -3,6 +3,7 @@ package net.artux.pda.map.engine.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
@@ -48,7 +50,7 @@ public class DeadCheckerSystem extends BaseSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        for (int i = 0; i<entities.size; i++){
+        for (int i = 0; i < entities.size; i++) {
             Entity entity = entities.get(i);
 
             HealthComponent healthComponent = hm.get(entity);
@@ -70,6 +72,8 @@ public class DeadCheckerSystem extends BaseSystem {
                             getEngine().removeEntity(deadEntity);//TODO
                         }
                     })).add(stalkerComponent);
+                } else {
+                    getEngine().removeSystem(getEngine().getSystem(PlayerSystem.class));
                 }
 
                 getEngine().removeEntity(entity);
@@ -84,13 +88,11 @@ public class DeadCheckerSystem extends BaseSystem {
                 style.font = labelStyle.font;
                 style.fontColor = Color.RED;
 
-                TextButton textButton = new TextButton("Игра провалена!", style);
-                TextButton textButton1 = new TextButton("Для продолжения нажмите здесь..", style);
-                textButton1.moveBy(0, -50);
-
+                TextButton textButton = new TextButton("Игра провалена! \n Для продолжения нажмите в любом месте.", style);
+                textButton.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                textButton.align(Align.center);
+                textButton.getLabel().setAlignment(Align.center);
                 deadMessageGroup.addActor(textButton);
-                deadMessageGroup.addActor(textButton1);
-                deadMessageGroup.setPosition(ui.getStage().getWidth() / 2 - textButton1.getWidth() / 2, ui.getStage().getHeight() / 2 - textButton1.getHeight() / 2);
                 deadMessageGroup.addListener(new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {

@@ -1,104 +1,121 @@
 package net.artux.pda.map.ui;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Scaling;
 
 import net.artux.pda.map.engine.systems.MapLoggerSystem;
 import net.artux.pda.map.engine.systems.MovingSystem;
+import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
+import net.artux.pda.map.ui.bars.Utils;
 
 public class DebugMenu extends Table implements Disposable {
 
     private Logger logger;
-    private Texture background;
     private Skin skin;
 
-    public DebugMenu(final UserInterface userInterface, final Engine engine, Color color) {
+    private Label label;
+    private Table content;
+
+    public DebugMenu(final UserInterface userInterface, final Engine engine, Skin skin) {
         super();
-        logger = new Logger(engine);
-        skin = new Skin(Gdx.files.internal("data/assets/uiskin.json"));
+        this.skin = skin;
+        setSkin(skin);
+        logger = new Logger(engine, skin);
 
         Table hudTable = userInterface.getAssistantBlock();
         hudTable.row();
-        hudTable.add(logger);
+        hudTable.add(logger).fillX();
 
-        defaults().align(Align.left);
+        top();
+        left();
 
-        Pixmap bgPixmap = new Pixmap(1, 1, Pixmap.Format.RGB565);
-        bgPixmap.setColor(color);
-        bgPixmap.fill();
+        label = new Label("Режим тестирования", userInterface.getLabelStyle());
+        top();
+        add(label);
+        row();
+        content = new Table();
+        content.defaults().align(Align.left);
+        content.left();
+        ScrollPane scrollPane = new ScrollPane(content, skin);
+        scrollPane.setScrollingDisabled(true, false);
+        add(scrollPane).growX();
 
-        background = new Texture(bgPixmap);
-        bgPixmap.dispose();
-        setBackground(new TextureRegionDrawable(new TextureRegion(background)));
 
-        addCheckBox("Speedup", new ChangeListener() {
+        setBackground(Utils.getColoredDrawable(1, 1, Color.BLACK));
+
+        addCheckBox("Ускорение движения", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 MovingSystem.speedup = ((CheckBox) actor).isChecked();
             }
         }, MovingSystem.speedup);
 
-        addCheckBox("Always run", new ChangeListener() {
+        addCheckBox("Вечный бег", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 MovingSystem.alwaysRun = ((CheckBox) actor).isChecked();
             }
         }, MovingSystem.alwaysRun);
 
-        addCheckBox("Player collision with walls", new ChangeListener() {
+        addCheckBox("Учитывать столкновения", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 MovingSystem.playerWalls = ((CheckBox) actor).isChecked();
             }
         }, MovingSystem.playerWalls);
-        addCheckBox("Show Player walls", new ChangeListener() {
+        addCheckBox("Отобразить стены игрока", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 MapLoggerSystem.showPlayerWalls = ((CheckBox) actor).isChecked();
             }
         }, MapLoggerSystem.showPlayerWalls);
 
-        addCheckBox("Show UI borders", new ChangeListener() {
+        addCheckBox("Показать границы UI элементов", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 userInterface.setDebug(((CheckBox) actor).isChecked(), true);
             }
         }, false);
 
-        addCheckBox("Show AI tiles", new ChangeListener() {
+        addCheckBox("Отобразить карту ИИ", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 MapLoggerSystem.showTiles = ((CheckBox) actor).isChecked();
             }
         }, MapLoggerSystem.showTiles);
-        addCheckBox("Show AI paths", new ChangeListener() {
+        addCheckBox("Пути ИИ", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 MapLoggerSystem.showPaths = ((CheckBox) actor).isChecked();
             }
         }, MapLoggerSystem.showPaths);
 
-        addCheckBox("Logger", new ChangeListener() {
+        addCheckBox("Показывать все сущности", new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                RenderSystem.showAll = ((CheckBox) actor).isChecked();
+            }
+        }, RenderSystem.showAll);
+
+        addCheckBox("Логгер", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Logger.visible = ((CheckBox) actor).isChecked();
             }
         }, Logger.visible);
 
-        addCheckBox("Background music", new ChangeListener() {
+        addCheckBox("Фоновая музыка", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (((CheckBox) actor).isChecked())
@@ -111,8 +128,11 @@ public class DebugMenu extends Table implements Disposable {
 
     private void addCheckBox(String title, ChangeListener changeListener, boolean checked) {
         CheckBox checkBox = new CheckBox(title, skin);
-        row();
-        add(checkBox);
+        //checkBox.getStyle().fontColor = Color.WHITE;
+        //.getStyle().font = Fonts.getFont(Fonts.Language.RUSSIAN, 25);
+        content.row();
+        content.add(checkBox);
+        checkBox.getImage().setScaling(Scaling.fit);
         checkBox.getImageCell().size(50, 50);
         checkBox.addListener(changeListener);
         checkBox.setChecked(checked);
@@ -121,7 +141,5 @@ public class DebugMenu extends Table implements Disposable {
     @Override
     public void dispose() {
         logger.dispose();
-        background.dispose();
-        skin.dispose();
     }
 }

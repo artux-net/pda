@@ -18,11 +18,9 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Scaling;
 
+import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.MessageGenerator;
-import net.artux.pda.map.ui.DebugMenu;
-import net.artux.pda.map.ui.Fonts;
-import net.artux.pda.map.ui.TextureActor;
 import net.artux.pdalib.UserMessage;
 
 import java.text.SimpleDateFormat;
@@ -41,11 +39,11 @@ public class MessagesBlock extends ScrollPane implements Disposable {
     private AssetManager assetManager;
     private final Table table;
 
-    public MessagesBlock(final AssetManager assetManager) {
+    public MessagesBlock(AssetsFinder finder) {
         super(new Table().left().bottom());
         table = (Table) getActor();
-        this.assetManager = assetManager;
-        font = Fonts.generateFont(Fonts.Language.RUSSIAN, 24);
+        this.assetManager = finder.getManager();
+        font = finder.getFontManager().getFont(24);
         setScrollingDisabled(true, false);
         setSize(w / 3f, 300);
         timer.schedule(new TimerTask() {
@@ -77,7 +75,7 @@ public class MessagesBlock extends ScrollPane implements Disposable {
                     .get("avatars/a0.jpg", Texture.class));
 
         image.setScaling(Scaling.fillX);
-        mainGroup.add(image).width(w/9f);
+        mainGroup.add(image).width(w / 9f);
 
         Table contentGroup = new Table().left().top();
         mainGroup.add(contentGroup);
@@ -122,7 +120,6 @@ public class MessagesBlock extends ScrollPane implements Disposable {
 
     @Override
     public void dispose() {
-        font.dispose();
         timer.cancel();
         timer.purge();
     }

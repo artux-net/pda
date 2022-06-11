@@ -1,6 +1,5 @@
 package net.artux.pda.map.states;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -8,14 +7,17 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.model.LevelBackground;
 import net.artux.pda.map.model.Map;
-import net.artux.pda.map.ui.TextureActor;
 import net.artux.pda.map.ui.UserInterface;
 
 
@@ -34,38 +36,36 @@ public class PlayState extends State {
 
     public PlayState(final GameStateManager gsm, Batch batch) {
         super(gsm);
-        Gdx.app.debug(TAG, "Before start, heap " + Gdx.app.getNativeHeap());
-
-        Gdx.app.debug(TAG, "Start play state init");
 
         assetsFinder = new AssetsFinder();
-        AssetManager assetManager = assetsFinder.get();
+        AssetManager assetManager = assetsFinder.getManager();
         stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), batch);
         uistage = new Stage();
 
-        userInterface = new UserInterface(gsm, assetManager, stage.getCamera());
+        userInterface = new UserInterface(gsm, assetsFinder, stage.getCamera());
         uistage.addActor(userInterface);
 
         Map map = (Map) gsm.get("map");
         if (map != null) {
-            //Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            //System.out.println(gson.toJson(map));
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gdx.app.debug("PlayState", gson.toJson(map));
+
+            long loadTime = TimeUtils.millis();
 
             Texture background = assetsFinder.getLocal(map.getTextureUri());
             GlobalData.mapWidth = background.getWidth();
             GlobalData.mapHeight = background.getHeight();
-            stage.addActor(new TextureActor(background));
+            stage.addActor(new Image(background));
 
             Texture levelTexture = assetsFinder.getLocal(map.getBlurTextureUri());
             if (levelTexture != null) {
                 levelBackground = new LevelBackground(levelTexture, stage.getCamera());
             }
+            Gdx.app.log("Main textures", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
         }
         engineManager = new EngineManager(assetsFinder, stage, userInterface, gsm);
         if (userInterface != null)
             userInterface.enableDebug(assetManager, engineManager.getEngine());
-
-        Gdx.app.debug(TAG, "State loaded, heap: " + Gdx.app.getNativeHeap());
     }
 
     @Override
@@ -109,14 +109,12 @@ public class PlayState extends State {
 
     @Override
     public void dispose() {
-        Gdx.app.debug(TAG, "Before disposing, heap " + Gdx.app.getNativeHeap());
         stage.dispose();
         uistage.dispose();
         assetsFinder.dispose();
         engineManager.dispose();
         if (userInterface != null)
             userInterface.dispose();
-        Gdx.app.debug(TAG, "Disposed, heap " + Gdx.app.getNativeHeap());
     }
 
 }

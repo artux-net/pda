@@ -10,15 +10,19 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class Utils {
 
     public static Drawable getColoredDrawable(int width, int height, Color color) {
+        return new TextureRegionDrawable(getColoredRegion(width, height, color));
+    }
+
+    public static TextureRegion getColoredRegion(int width, int height, Color color) {
         Pixmap pixmap = new Pixmap(width, height, Pixmap.Format.RGBA8888);
         pixmap.setColor(color);
         pixmap.fill();
 
-        TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
+        TextureRegion region = new TextureRegion(new Texture(pixmap));
 
         pixmap.dispose();
 
-        return drawable;
+        return region;
     }
 
 }

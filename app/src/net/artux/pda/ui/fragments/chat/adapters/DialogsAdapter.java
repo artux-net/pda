@@ -46,7 +46,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         notifyDataSetChanged();
     }
 
-    public void updateDialog(UserMessage message){
+    public void updateDialog(UserMessage message) {
         for (Dialog d :
                 mDialogList) {
             if (d.id == message.cid)
@@ -122,19 +122,13 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @Override
         public void onClick(Dialog dialog) {
-            FragmentTransaction fragmentTransaction = mContext.getSupportFragmentManager().beginTransaction();
-
             ChatFragment chatFragment = new ChatFragment();
-            chatFragment.attachPresenter(presenter);
             Bundle bundle = new Bundle();
             bundle.putInt("type", dialog.type);
             bundle.putInt("c", dialog.id);
 
             chatFragment.setArguments(bundle);
-
-            fragmentTransaction.replace(R.id.containerView, chatFragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+            presenter.addFragment(chatFragment, true);
         }
     }
 
@@ -161,7 +155,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         @Override
         public void onClick(View view) {
-            switch (view.getId()){
+            switch (view.getId()) {
                 case R.id.chat_general:
                     ChatFragment chatFragment = new ChatFragment();
                     presenter.addFragment(chatFragment, true);

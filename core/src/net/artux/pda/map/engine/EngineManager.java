@@ -3,6 +3,7 @@ package net.artux.pda.map.engine;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
@@ -38,7 +40,7 @@ import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.engine.systems.StatesSystem;
-import net.artux.pda.map.engine.systems.TargetingSystem;
+import net.artux.pda.map.engine.systems.MovementTargetingSystem;
 import net.artux.pda.map.engine.systems.WorldSystem;
 import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
@@ -46,7 +48,6 @@ import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
 import net.artux.pda.map.model.Map;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.UserInterface;
-import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pdalib.Member;
 
 public class EngineManager extends InputListener implements Drawable, Disposable, GestureDetector.GestureListener {
@@ -54,10 +55,10 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private Map map;
     private Member member;
 
-    private Engine engine;
+    private final Engine engine;
 
-    private ClicksSystem clicksSystem;
-    private CameraSystem cameraSystem;
+    private final ClicksSystem clicksSystem;
+    private final CameraSystem cameraSystem;
 
     private boolean controlPoints = true;
     private boolean questPoints = true;
@@ -67,6 +68,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         this.engine = new Engine();
         this.map = (Map) gameStateManager.get("map");
         this.member = gameStateManager.getMember();
+        long loadTime = TimeUtils.millis();
 
         //player
         Entity player = new Entity();
@@ -76,7 +78,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         camera.position.y = map.getPlayerPosition().y;
         player.add(new PositionComponent(map.getPlayerPosition()))
                 .add(new VelocityComponent())
-                .add(new SpriteComponent(velocityComponent, assetsFinder.get().get("gg.png", Texture.class), 32, 32))
+                .add(new SpriteComponent(velocityComponent, assetsFinder.getManager().get("gg.png", Texture.class), 32, 32))
                 .add(new WeaponComponent(member))
                 .add(new MoodComponent(member))
                 .add(new HealthComponent())
@@ -86,36 +88,37 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
         engine.addSystem(new MapOrientationSystem(assetsFinder, map));
         engine.addSystem(new CameraSystem());
-        engine.addSystem(new SoundsSystem(assetsFinder.get()));
-        engine.addSystem(new WorldSystem(assetsFinder.get()));
+        engine.addSystem(new SoundsSystem(assetsFinder.getManager()));
+        engine.addSystem(new WorldSystem(assetsFinder.getManager()));
         engine.addSystem(new DataSystem(map, member));
-        engine.addSystem(new InteractionSystem(stage, userInterface, assetsFinder.get()));
-        engine.addSystem(new PlayerSystem(assetsFinder.get()));
+        engine.addSystem(new InteractionSystem(stage, userInterface));
+        engine.addSystem(new PlayerSystem(assetsFinder.getManager()));
 
 
         if (controlPoints)
-            ControlPointsHelper.createControlPointsEntities(engine, assetsFinder.get());
+            ControlPointsHelper.createControlPointsEntities(engine, assetsFinder.getManager());
         if (questPoints)
-            QuestPointsHelper.createQuestPointsEntities(engine, assetsFinder.get());
+            QuestPointsHelper.createQuestPointsEntities(engine, assetsFinder.getManager());
         if (anomalies)
-            AnomalyHelper.createAnomalies(engine, assetsFinder.get());
+            AnomalyHelper.createAnomalies(engine, assetsFinder.getManager());
 
         engine.addSystem(new MessagesSystem(userInterface));
         engine.addSystem(new ArtifactSystem());
         engine.addSystem(new ClicksSystem());
         engine.addSystem(new MapLoggerSystem());
-        engine.addSystem(new RenderSystem(stage));
-        engine.addSystem(new BattleSystem(assetsFinder.get(), gameStateManager));
+        engine.addSystem(new RenderSystem(stage, assetsFinder));
+        engine.addSystem(new BattleSystem(assetsFinder.getManager(), gameStateManager));
         engine.addSystem(new StatesSystem());
-        engine.addSystem(new TargetingSystem());
-        engine.addSystem(new MoodSystem(assetsFinder.get()));
+        engine.addSystem(new MovementTargetingSystem());
+        engine.addSystem(new MoodSystem(assetsFinder.getManager()));
         engine.addSystem(new MovingSystem());
-        engine.addSystem(new DeadCheckerSystem(userInterface, gameStateManager, assetsFinder.get()));
+        engine.addSystem(new DeadCheckerSystem(userInterface, gameStateManager, assetsFinder.getManager()));
 
         clicksSystem = engine.getSystem(ClicksSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);
 
         stage.addListener(this);
+        Gdx.app.log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");
     }
 
     public void update(float dt) {

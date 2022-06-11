@@ -2,26 +2,37 @@ package net.artux.pda.map.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.engine.data.GlobalData;
-import net.artux.pda.map.model.LevelBackground;
+import net.artux.pda.map.ui.FontManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AssetsFinder implements Disposable {
 
-    private AssetManager assetManager;
-
     public static final String cachePath = "cache/";
-    private Map<String, Texture> textureMap = new HashMap<>();
 
-    public AssetManager get() {
+    private AssetManager assetManager;
+    private final Map<String, Texture> textureMap;
+    private final FontManager fontManager;
+
+    public AssetsFinder() {
+        fontManager = new FontManager();
+        textureMap = new HashMap<>();
+    }
+
+    public AssetManager getManager() {
+        long loadTime = TimeUtils.millis();
+        Gdx.app.log("Assets", "Loading assets.");
         if (assetManager == null) {
             assetManager = new AssetManager();
 
@@ -46,13 +57,24 @@ public class AssetsFinder implements Disposable {
             assetManager.load("gray.png", Texture.class);
             assetManager.load("controlPoint.png", Texture.class);
 
+            ObjectMap<String, Object> fontsMap = new ObjectMap<>();
+            fontsMap.put("font", fontManager.getDisposableFont(FontManager.LIBERAL_FONT, 24));
+            fontsMap.put("title", fontManager.getDisposableFont(FontManager.IMPERIAL_FONT, 28));
+
+            SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("skins/cloud/cloud-form-ui.atlas", fontsMap);
+            assetManager.load("skins/cloud/cloud-form-ui.json", Skin.class, skinParameter);
+
             FileHandle sounds = assetManager.getFileHandleResolver().resolve("sounds");
             loadRecursively(assetManager, sounds, true, Music.class);
 
             assetManager.finishLoading();
-
+            Gdx.app.log("Assets", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
         }
         return assetManager;
+    }
+
+    public FontManager getFontManager() {
+        return fontManager;
     }
 
     public Texture getLocal(String path) {
@@ -83,13 +105,13 @@ public class AssetsFinder implements Disposable {
 
     @Override
     public void dispose() {
-
         for (Map.Entry<String, Texture> e :
                 textureMap.entrySet()) {
             if (e.getValue() != null)
                 e.getValue().dispose();
         }
 
+        fontManager.dispose();
         assetManager.dispose();
         assetManager = null;
     }

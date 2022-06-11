@@ -273,6 +273,12 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, MainActivity.class));
+        finish();
+    }
+
+    @Override
     public void setStage(Stage stage, boolean processSummary) {
         FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
         try {

@@ -2,17 +2,13 @@ package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.engine.data.GlobalData;
-import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
+import net.artux.pda.map.engine.components.player.PlayerComponent;
+import net.artux.pda.map.engine.data.GlobalData;
 
 public class CameraSystem extends BaseSystem {
 
@@ -50,48 +46,50 @@ public class CameraSystem extends BaseSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        PositionComponent positionComponent = pm.get(player);
-        VelocityComponent velocityComponent = vm.get(player);
+        if (isPlayerActive()) {
+            PositionComponent positionComponent = pm.get(player);
+            VelocityComponent velocityComponent = vm.get(player);
 
-        if (!detached) {
-            cameraV2Position.x = camera.position.x;
-            cameraV2Position.y = camera.position.y;
-            Vector2 unit = positionComponent.getPosition().cpy().sub(cameraV2Position);
+            if (!detached) {
+                cameraV2Position.x = camera.position.x;
+                cameraV2Position.y = camera.position.y;
+                Vector2 unit = positionComponent.getPosition().cpy().sub(cameraV2Position);
 
-            float speed = cameraV2Position.dst(positionComponent.getPosition()) * 3f * (1 / camera.zoom);
+                float speed = cameraV2Position.dst(positionComponent.getPosition()) * 3f * (1 / camera.zoom);
 
-            if (1 / unit.len() < 1.5) {
-                unit.scl((1 / unit.len()) * deltaTime * speed);
+                if (1 / unit.len() < 1.5) {
+                    unit.scl((1 / unit.len()) * deltaTime * speed);
+                }
+
+                internalMoveBy(unit.x, unit.y);
             }
+            if (!velocityComponent.velocity.isZero())
+                detached = false;
 
-            internalMoveBy(unit.x, unit.y);
+            if (specialZoom && !detached) {
+                if (camera.zoom > specialZoomValue) {
+                    float delta = camera.zoom - specialZoomValue;
+
+                    camera.zoom -= delta * deltaTime * zoomingSpeed;
+                } else if (camera.zoom != specialZoomValue) {
+                    float delta = specialZoomValue - camera.zoom;
+
+                    camera.zoom += delta * deltaTime * zoomingSpeed;
+                }
+            } else if (!zooming) {
+                if (camera.zoom < minLimit) {
+                    float delta = minLimit - camera.zoom;
+
+                    camera.zoom += delta * deltaTime * zoomingSpeed;
+                }
+
+                if (camera.zoom > maxLimit) {
+                    float delta = camera.zoom - maxLimit;
+                    camera.zoom -= delta * deltaTime * zoomingSpeed;
+                }
+            }
+            updateData();
         }
-        if (!velocityComponent.velocity.isZero())
-            detached = false;
-
-        if (specialZoom && !detached) {
-            if (camera.zoom > specialZoomValue) {
-                float delta = camera.zoom - specialZoomValue;
-
-                camera.zoom -= delta * deltaTime * zoomingSpeed;
-            } else if (camera.zoom != specialZoomValue) {
-                float delta = specialZoomValue - camera.zoom;
-
-                camera.zoom += delta * deltaTime * zoomingSpeed;
-            }
-        } else if (!zooming) {
-            if (camera.zoom < minLimit) {
-                float delta = minLimit - camera.zoom;
-
-                camera.zoom += delta * deltaTime * zoomingSpeed;
-            }
-
-            if (camera.zoom > maxLimit) {
-                float delta = camera.zoom - maxLimit;
-                camera.zoom -= delta * deltaTime * zoomingSpeed;
-            }
-        }
-        updateData();
     }
 
     private void updateData() {
@@ -117,10 +115,12 @@ public class CameraSystem extends BaseSystem {
     public void moveBy(float x, float y) {
         float newX = camera.position.x + x * camera.zoom;
         float newY = camera.position.y + y * camera.zoom;
-        if (newX <= GlobalData.mapWidth && newX >= 0)
-            camera.position.set(newX, camera.position.y, 0);
-        if (newY <= GlobalData.mapHeight && newY >= 0)
-            camera.position.set(camera.position.x, newY, 0);
+        if (isPlayerActive()) {
+            if (newX <= GlobalData.mapWidth && newX >= 0)
+                camera.position.set(newX, camera.position.y, 0);
+            if (newY <= GlobalData.mapHeight && newY >= 0)
+                camera.position.set(camera.position.x, newY, 0);
+        }
     }
 
     float currentZoom;
@@ -134,7 +134,7 @@ public class CameraSystem extends BaseSystem {
     }
 
     public boolean setZoom(float newZoom) {
-        if (newZoom < maxZoom && newZoom > minZoom) {
+        if (newZoom < maxZoom && newZoom > minZoom && isPlayerActive()) {
             camera.zoom = newZoom;
             return true;
         } else return false;

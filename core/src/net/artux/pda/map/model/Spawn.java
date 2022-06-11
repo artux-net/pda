@@ -23,18 +23,15 @@ public class Spawn {
     private String pos;
     private boolean angry;
     private boolean ignorePlayer;
-    private Vector2 position = null;
     private HashMap<String, String> data;
+
     public HashMap<String, String> getData() {
         return data;
     }
 
     public Vector2 getPosition() {
-        if (position==null) {
-            String[] s = pos.split(":");
-            position = new Vector2(Integer.parseInt(s[0]), Integer.parseInt(s[1]));
-        }
-        return position;
+        String[] s = pos.split(":");
+        return new Vector2(Integer.parseInt(s[0]), Integer.parseInt(s[1]));
     }
 
     public boolean isAngry() {
@@ -51,10 +48,6 @@ public class Spawn {
 
     public int getR() {
         return r;
-    }
-
-    public Vector2 getPos() {
-        return position;
     }
 
     public int getId() {

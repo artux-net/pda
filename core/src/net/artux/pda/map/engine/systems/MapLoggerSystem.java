@@ -94,7 +94,10 @@ public class MapLoggerSystem extends BaseSystem implements Drawable, Disposable 
                     sr.begin(ShapeRenderer.ShapeType.Filled);
                     for (int j = 0; j < nodeCount; j++) {
                         FlatTiledNode node = graph.nodes.get(j);
-                        sr.rect(node.realX, node.realY, 2, 2);
+                        if (j == nodeCount - 1)
+                            sr.rect(node.realX, node.realY, 4, 4);
+                        else
+                            sr.circle(node.realX, node.realY, 2);
                     }
                     sr.end();
 

@@ -18,7 +18,7 @@ import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 import net.artux.pda.map.engine.pathfinding.TiledRaycastCollisionDetector;
 
-public class TargetingSystem extends EntitySystem {
+public class MovementTargetingSystem extends EntitySystem {
 
     private ImmutableArray<Entity> entities;
 

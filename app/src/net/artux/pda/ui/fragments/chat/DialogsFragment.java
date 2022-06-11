@@ -1,6 +1,5 @@
 package net.artux.pda.ui.fragments.chat;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,6 @@ import com.google.gson.reflect.TypeToken;
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pda.app.NotificationService;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;

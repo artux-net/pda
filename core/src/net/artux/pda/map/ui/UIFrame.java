@@ -1,11 +1,8 @@
 package net.artux.pda.map.ui;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.PolygonRegion;
@@ -24,7 +21,7 @@ import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.data.PlayerData;
-import net.artux.pda.map.engine.systems.CameraSystem;
+import net.artux.pda.map.ui.bars.Utils;
 
 public class UIFrame extends Group implements Disposable {
 
@@ -88,12 +85,7 @@ public class UIFrame extends Group implements Disposable {
 
         addActor(rightGroup);
 
-        Pixmap pix = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pix.setColor(primaryColor);
-        pix.fill();
-        textureSolid = new Texture(pix);
-        pix.dispose();
-        solidTextureRegion = new TextureRegion(textureSolid);
+        solidTextureRegion = Utils.getColoredRegion(1,1, primaryColor);
 
         PolygonRegion polyRegHeaderFrame = new PolygonRegion(solidTextureRegion,
                 new float[]{
@@ -146,7 +138,6 @@ public class UIFrame extends Group implements Disposable {
 
     PolygonSpriteBatch polyBatch;
 
-    Texture textureSolid;
     TextureRegion solidTextureRegion;
 
     public float getHeaderLeftX() {
@@ -264,7 +255,6 @@ public class UIFrame extends Group implements Disposable {
 
     @Override
     public void dispose() {
-        textureSolid.dispose();
         polyBatch.dispose();
         shapeRenderer.dispose();
     }

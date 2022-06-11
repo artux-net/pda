@@ -104,6 +104,10 @@ public class EncyclopediaFragment extends BaseFragment {
         super.receiveData(data);
         if (data.containsKey("load"))
             webView.loadUrl(data.getString("load"));
+        if (data.containsKey("reset")){
+            webView.loadUrl("https://" + BuildConfig.URL_API + "enc");
+            lastUrl = "https://" + BuildConfig.URL_API + "enc";
+        }
     }
 
 

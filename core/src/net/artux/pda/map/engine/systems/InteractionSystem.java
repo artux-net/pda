@@ -5,16 +5,13 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
@@ -24,7 +21,7 @@ import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.ui.UserInterface;
-import net.artux.pda.map.ui.bars.Slot;
+import net.artux.pda.map.ui.blocks.ControlBlock;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -35,11 +32,9 @@ public class InteractionSystem extends BaseSystem {
     private final UserInterface userInterface;
     private SoundsSystem soundsSystem;
     private CameraSystem cameraSystem;
-    private AssetManager assetManager;
 
-    public InteractionSystem(Stage stage, UserInterface userInterface, AssetManager assetManager) {
+    public InteractionSystem(Stage stage, UserInterface userInterface) {
         super(Family.all(InteractiveComponent.class, PositionComponent.class).get());
-        this.assetManager = assetManager;
         this.stage = stage;
         this.userInterface = userInterface;
     }
@@ -61,12 +56,18 @@ public class InteractionSystem extends BaseSystem {
     }
 
     @Override
+    public void removedFromEngine(Engine engine) {
+        super.removedFromEngine(engine);
+
+    }
+
+    @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
         activeActions.clear();
         for (int i = 0; i < entities.size; i++) {
             PositionComponent positionComponent = pm.get(entities.get(i));
-            InteractiveComponent interactiveComponent = im.get(entities.get(i));
+            final InteractiveComponent interactiveComponent = im.get(entities.get(i));
 
             PositionComponent playerPosition = pm.get(player);
 
@@ -75,7 +76,7 @@ public class InteractionSystem extends BaseSystem {
                 if (interactiveComponent.type != InteractiveComponent.Type.ACTION) {
                     activeActions.add(name);
                     if (userInterface.getControlBlock().findActor(name) == null) {
-                        Label text = new Label(interactiveComponent.title, userInterface.getLabelStyle());
+                        final Label text = new Label(interactiveComponent.title, userInterface.getLabelStyle());
                         text.setPosition(positionComponent.getX(), positionComponent.getY());
                         text.setName(name);
                         stage.addActor(text);
@@ -95,15 +96,28 @@ public class InteractionSystem extends BaseSystem {
                                 break;
                         }
 
-                        userInterface.addInteractButton(name, icon, interactiveComponent.listener);
+                        userInterface.addInteractButton(name, icon,new ChangeListener(){
+                            @Override
+                            public void changed(ChangeEvent event, Actor actor) {
+                                interactiveComponent.listener.interact(userInterface);
+                                text.remove();
+                                ControlBlock controlBlock = userInterface.getControlBlock();
+                                Cell<Actor> cell = controlBlock.getCell(actor);
+                                actor.remove();
+                                controlBlock.getCells().removeValue(cell, true);
+                                controlBlock.invalidate();
+                            }
+                        });
                     }
                 } else {
                     interactiveComponent.listener.interact(userInterface);
                 }
             }
         }
+
         removeActorsFromStage(stage);
         removeActor(userInterface.getControlBlock());
+
         int counter = 0;
         for (int i = 0; i < mobs.size(); i++) {
             Entity mob = mobs.get(i);

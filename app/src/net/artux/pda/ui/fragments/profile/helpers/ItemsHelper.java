@@ -9,11 +9,15 @@ import net.artux.pdalib.profile.items.Detector;
 import net.artux.pdalib.profile.items.Item;
 import net.artux.pdalib.profile.items.Weapon;
 
+import java.text.DecimalFormat;
+
 public class ItemsHelper {
+
+    private static DecimalFormat decimalFormat = new DecimalFormat("###.##");
 
     private static String getDefault(Item item, Context context){
         return context.getString(R.string.item_desc, String.valueOf(item.price),
-                String.valueOf(item.weight), String.valueOf(item.quantity), String.valueOf(item.quantity*item.weight));
+                String.valueOf(item.weight), String.valueOf(item.quantity), decimalFormat.format(item.quantity*item.weight));
     }
 
     public static String getDesc(Item item, Context context) {

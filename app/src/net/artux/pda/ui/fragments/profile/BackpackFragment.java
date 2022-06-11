@@ -35,6 +35,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import timber.log.Timber;
 
 public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnClickListener {
 
@@ -73,7 +74,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
 
                     float weight = 0;
                     for (Item item: items)
-                        weight += item.weight;
+                        weight += item.weight * item.quantity;
 
                     navigationPresenter.setTitle("Денег: " + member.getMoney() + ", вес рюкзака: " + formater.format(weight) + " кг");
                 }else viewModel.updateMember();
@@ -87,6 +88,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
     @Override
     public void onClick(int pos) {
         Item item = itemsAdapter.getItems().get(pos);
+        Timber.i("Opened item dialog with item: %s", item.title);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle);
         builder.setTitle(item.title);
         builder.setMessage(ItemsHelper.getDesc(item, getContext()));

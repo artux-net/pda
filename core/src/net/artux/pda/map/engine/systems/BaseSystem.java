@@ -41,6 +41,9 @@ public class BaseSystem extends EntitySystem {
         }
     }
 
+    protected boolean isPlayerActive(){
+        return getEngine().getEntities().contains(player, true);
+    }
 
     public Array<Entity> listenEntities(Family family){
         final Array<Entity> entities = new Array<>(getEngine().getEntitiesFor(family).toArray());

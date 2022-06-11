@@ -82,7 +82,7 @@ public class App extends Application {
         else
             Timber.plant(new CrashReportingTree());
 
-        Timber.d("App started.");
+        Timber.i("App started.");
         MobileAds.initialize(this, initializationStatus -> {
             Timber.d("Ads initialization");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

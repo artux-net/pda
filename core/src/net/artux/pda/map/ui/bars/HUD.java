@@ -6,12 +6,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Scaling;
 
 import net.artux.pda.map.engine.systems.PlayerSystem;
-import net.artux.pda.map.ui.TextureActor;
 import net.artux.pda.map.ui.UserInterface;
 
 public class HUD extends Table {
@@ -34,27 +35,27 @@ public class HUD extends Table {
         setSize(textureRegionDrawable.getRegion().getRegionWidth(), textureRegionDrawable.getRegion().getRegionHeight());
         defaults().pad(5);
         float iconSize = Gdx.graphics.getHeight() / 60f;
-        TextureActor actor = new TextureActor(assetManager.get("ui/bar/ic_health.png", Texture.class));
-        actor.setSize(iconSize, iconSize);
-        add(actor);
+        Image actor = new Image(assetManager.get("ui/bar/ic_health.png", Texture.class));
+        actor.setScaling(Scaling.fill);
+        add(actor).size(iconSize);
         healthBar = new Bar(Color.RED);
         add(healthBar)
                 .fillX()
                 .expandX();
 
-        actor = new TextureActor(assetManager.get("ui/bar/ic_stamina.png", Texture.class));
-        actor.setSize(iconSize, iconSize);
+        actor = new Image(assetManager.get("ui/bar/ic_stamina.png", Texture.class));
+        actor.setScaling(Scaling.fill);
         row();
-        add(actor);
+        add(actor).size(iconSize);
         staminaBar = new Bar(Color.CYAN);
         add(staminaBar)
                 .growX();
 
         row();
 
-        actor = new TextureActor(assetManager.get("ui/bar/ic_radiation.png", Texture.class));
-        actor.setSize(iconSize, iconSize);
-        add(actor);
+        actor = new Image(assetManager.get("ui/bar/ic_radiation.png", Texture.class));
+        actor.setScaling(Scaling.fill);
+        add(actor).size(iconSize);
         radiationBar = new Bar(Color.GREEN);
         add(radiationBar)
                 .growX();

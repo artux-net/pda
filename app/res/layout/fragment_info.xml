@@ -113,38 +113,15 @@
                         android:layout_weight="1"
                         android:textSize="@dimen/infosp"
                         android:gravity="start"
-                        android:text="@string/jobs"/>
+                        android:text="@string/rating"/>
 
                     <TextView
-                        android:id="@+id/achievementsInfo"
+                        android:id="@+id/ratingInfo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="end"
                         android:textSize="@dimen/infosp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="@dimen/infosp"
-                        android:gravity="start"
-                        android:text="@string/location"/>
-
-                    <TextView
-                        android:id="@+id/locationInfo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="end"
-                        android:textSize="@dimen/infosp" />
-
                 </LinearLayout>
 
             </LinearLayout>

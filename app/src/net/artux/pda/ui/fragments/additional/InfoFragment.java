@@ -28,8 +28,7 @@ public class InfoFragment extends AdditionalBaseFragment {
     TextView mLoginView;
     TextView mGroupView;
     TextView mRangView;
-    TextView mAchievementsView;
-    TextView mLocationInfo;
+    TextView mXpView;
     ImageView mAvatarView;
 
     DataManager mDataManager;
@@ -38,7 +37,7 @@ public class InfoFragment extends AdditionalBaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        return  inflater.inflate(R.layout.fragment_info, container, false);
+        return inflater.inflate(R.layout.fragment_info, container, false);
     }
 
     @Override
@@ -51,8 +50,7 @@ public class InfoFragment extends AdditionalBaseFragment {
         mDaysView = view.findViewById(R.id.daysInfo);
         mGroupView = view.findViewById(R.id.groupInfo);
         mRangView = view.findViewById(R.id.rangInfo);
-        mAchievementsView = view.findViewById(R.id.achievementsInfo);
-        mLocationInfo = view.findViewById(R.id.locationInfo);
+        mXpView = view.findViewById(R.id.ratingInfo);
 
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
             if(memberResult instanceof Result.Success){
@@ -66,8 +64,7 @@ public class InfoFragment extends AdditionalBaseFragment {
                 mDaysView.setText(ProfileHelper.getDays(profile));
                 mGroupView.setText(ProfileHelper.getGroup(profile, mGroupView.getContext()));
                 mRangView.setText(ProfileHelper.getRang(profile, mRangView.getContext()));
-                mAchievementsView.setText("");
-                mLocationInfo.setText(profile.getLocation());
+                mXpView.setText(String.valueOf(profile.getXp()));
             }else viewModel.updateMember();
         });
 

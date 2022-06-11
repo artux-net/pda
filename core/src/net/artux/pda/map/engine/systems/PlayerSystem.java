@@ -2,27 +2,21 @@ package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.components.InteractiveComponent;
+import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.QuestComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Slot;
@@ -49,6 +43,17 @@ public class PlayerSystem extends BaseSystem {
     public PlayerSystem(AssetManager assetManager) {
         super(Family.all(PositionComponent.class, QuestComponent.class).get());
         this.assetManager = assetManager;
+    }
+
+    @Override
+    public void removedFromEngine(Engine engine) {
+        super.removedFromEngine(engine);
+        InteractionSystem interactionSystem = engine.getSystem(InteractionSystem.class);
+        interactionSystem.getUserInterface().getAssistantBlock().setTouchable(Touchable.disabled);
+        interactionSystem.getUserInterface().getControlBlock().setTouchable(Touchable.disabled);
+        interactionSystem.getUserInterface().getTouchpad().setTouchable(Touchable.disabled);
+        interactionSystem.getUserInterface().getAssistantBlock().setVisible(false);
+        interactionSystem.getUserInterface().getControlBlock().setVisible(false);
     }
 
     @Override

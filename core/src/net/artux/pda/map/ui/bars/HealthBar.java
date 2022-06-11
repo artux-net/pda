@@ -6,20 +6,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.ui.Fonts;
-import net.artux.pda.map.ui.Logger;
-import net.artux.pda.map.ui.TextureActor;
 import net.artux.pda.map.ui.UserInterface;
 
 public class HealthBar extends VerticalGroup implements Disposable {
@@ -28,7 +24,6 @@ public class HealthBar extends VerticalGroup implements Disposable {
     private final NinePatchDrawable barBackground;
     private final NinePatchDrawable healthBar;
     private final NinePatchDrawable healthBarBackground;
-    private final BitmapFont font;
 
     private int padding = 10;
 
@@ -42,7 +37,6 @@ public class HealthBar extends VerticalGroup implements Disposable {
         healthBar = new NinePatchDrawable(new NinePatch(skinAtlas.findRegion("default-round-down"), 5, 5, 4, 4));
         healthBarBackground = new NinePatchDrawable(new NinePatch(skinAtlas.findRegion("default-round"), 5, 5, 4, 4));
         barBackground = new NinePatchDrawable(new NinePatch(skinAtlas.findRegion("default-scroll"), 4, 5, 4, 5));
-        font = Fonts.generateFont(Fonts.Language.RUSSIAN, 32);
         padTop(20);
         HorizontalGroup horizontalGroup = new HorizontalGroup();
         horizontalGroup.align(Align.left | Align.center);
@@ -56,7 +50,7 @@ public class HealthBar extends VerticalGroup implements Disposable {
             image = assetManager
                     .get("avatars/a0.jpg", Texture.class);
 
-        horizontalGroup.addActor(new TextureActor(image));
+        horizontalGroup.addActor(new Image(image));
 
         VerticalGroup labelsTable = new VerticalGroup();
         labelsTable.align(Align.left|Align.top);
@@ -89,7 +83,6 @@ public class HealthBar extends VerticalGroup implements Disposable {
 
     @Override
     public void dispose() {
-        font.dispose();
         skinAtlas.dispose();
     }
 }

@@ -5,37 +5,35 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.TimeUtils;
 
+import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.InteractiveComponent;
-import net.artux.pda.map.engine.systems.MovingSystem;
 import net.artux.pda.map.model.Map;
 import net.artux.pda.map.model.Point;
 import net.artux.pda.map.states.GameStateManager;
-import net.artux.pda.map.ui.bars.HUD;
-import net.artux.pda.map.ui.bars.HealthBar;
+import net.artux.pda.map.ui.bars.Utils;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
 import net.artux.pda.map.ui.blocks.ControlBlock;
 import net.artux.pda.map.ui.blocks.MessagesBlock;
@@ -61,8 +59,6 @@ public class UserInterface extends Group implements Disposable {
     private float w = Gdx.graphics.getWidth();
     private float h = Gdx.graphics.getHeight();
     private Group menu;
-    private Texture texture;
-    private Pixmap bgPixmap;
     private boolean isMenuOpen = false;
 
     public static float joyDeltaX;
@@ -78,21 +74,23 @@ public class UserInterface extends Group implements Disposable {
     private MessagesBlock messagesBlock;
     private AssistantBlock assistantBlock;
     private ControlBlock controlBlock;
+    private Touchpad touchpad;
 
     private AssetManager assetManager;
     private Timer timer = new Timer();
 
-    public UserInterface(final GameStateManager gsm, final AssetManager assetManager, Camera camera) {
+    public UserInterface(final GameStateManager gsm, AssetsFinder assetsFinder, Camera camera) {
         super();
         this.gsm = gsm;
-        this.assetManager = assetManager;
+        this.assetManager = assetsFinder.getManager();
+        long loadTime = TimeUtils.millis();
 
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
         style.knob = new TextureRegionDrawable(assetManager.get("ui/touchpad/knob.png", Texture.class));
         style.knob.setMinHeight(170);
         style.knob.setMinWidth(170);
         style.background = new TextureRegionDrawable(assetManager.get("ui/touchpad/back.png", Texture.class));
-        final Touchpad touchpad = new Touchpad(10, style);
+        touchpad = new Touchpad(10, style);
 
         touchpad.setPosition(Gdx.graphics.getWidth() / 12f, Gdx.graphics.getHeight() / 10f);
         touchpad.setBounds(50, 50, Gdx.graphics.getHeight() / 2.5f, Gdx.graphics.getHeight() / 2.5f);
@@ -110,8 +108,7 @@ public class UserInterface extends Group implements Disposable {
         });
         addActor(touchpad);
 
-        font = Fonts.generateFont(Fonts.Language.RUSSIAN, 24);
-
+        font = assetsFinder.getFontManager().getFont(24);
         initMenu(font);
 
         TextureRegionDrawable pauseDrawable = new TextureRegionDrawable(assetManager.get("ui/exit.png", Texture.class));
@@ -159,7 +156,7 @@ public class UserInterface extends Group implements Disposable {
         assistantBlock.setPosition(w - w / 3 - h / 28f, h - h / 2 - h / 14f);
         addActor(assistantBlock);
 
-        messagesBlock = new MessagesBlock(assetManager);
+        messagesBlock = new MessagesBlock(assetsFinder);
         messagesBlock.setPosition(leftMargin * getDensity(), h / 10 + h / 2.5f - uiFrame.frame);
         addActor(messagesBlock);
 
@@ -183,6 +180,7 @@ public class UserInterface extends Group implements Disposable {
                 timeLabel.setText(simpleDateFormat.format(new Date())); // TODO eat memory every time
             }
         }, 0, 2000);
+        Gdx.app.log("UI", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
     }
 
     public MessagesBlock getMessagesBlock() {
@@ -206,7 +204,7 @@ public class UserInterface extends Group implements Disposable {
         });
         uiFrame.getLeftHeaderTable().add(debugButton);
 
-        debugMenu = new DebugMenu(this, engine, backgroundColor);
+        debugMenu = new DebugMenu(this, engine, assetManager.<Skin>get("skins/cloud/cloud-form-ui.json"));
         debugMenu.setPosition(w / 4, h / 3);
         debugMenu.setSize(w / 2, h / 2);
     }
@@ -223,6 +221,10 @@ public class UserInterface extends Group implements Disposable {
         return controlBlock;
     }
 
+    public Touchpad getTouchpad() {
+        return touchpad;
+    }
+
     public Member getMember() {
         return gsm.getMember();
     }
@@ -232,6 +234,10 @@ public class UserInterface extends Group implements Disposable {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 listener.interact(UserInterface.this);
+                Cell<Actor> cell = controlBlock.getCell(actor);
+                actor.remove();
+                controlBlock.getCells().removeValue(cell, true);
+                controlBlock.invalidate();
             }
         });
     }
@@ -254,11 +260,7 @@ public class UserInterface extends Group implements Disposable {
         menu = new Group();
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
 
-        bgPixmap = new Pixmap(1, 1, Pixmap.Format.RGB888);
-        bgPixmap.setColor(Color.rgb888(26 / 255, 27 / 255, 29 / 255));
-        bgPixmap.fill();
-        texture = new Texture(bgPixmap);
-        Image image = new Image(texture);
+        Image image = new Image(Utils.getColoredDrawable(1, 1, primaryColor));
         image.setSize(w / 4 + 20, h);
         menu.addActor(image);
         Label text = new Label("Метки", new Label.LabelStyle(font, Color.WHITE));
@@ -334,11 +336,6 @@ public class UserInterface extends Group implements Disposable {
 
     @Override
     public void dispose() {
-        if (texture != null)
-            texture.dispose();
-        if (bgPixmap != null)
-            bgPixmap.dispose();
-        font.dispose();
         if (messagesBlock != null)
             messagesBlock.dispose();
         debugMenu.dispose();
