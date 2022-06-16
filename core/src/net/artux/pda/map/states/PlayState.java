@@ -29,10 +29,7 @@ public class PlayState extends State {
     private LevelBackground levelBackground;
     private final EngineManager engineManager;
     private final AssetsFinder assetsFinder;
-
     private final UserInterface userInterface;
-
-    private static final String TAG = "PlayState";
 
     public PlayState(final GameStateManager gsm, Batch batch) {
         super(gsm);

@@ -16,6 +16,10 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.activities.HelpActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".ui.activities.FinishRegistrationActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
