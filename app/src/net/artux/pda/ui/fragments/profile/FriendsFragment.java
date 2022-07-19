@@ -12,10 +12,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
 import net.artux.pda.app.App;
+import net.artux.pda.models.profile.FriendModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.profile.adapters.FriendsAdapter;
-import net.artux.pdalib.profile.FriendModel;
 
 import java.util.List;
 

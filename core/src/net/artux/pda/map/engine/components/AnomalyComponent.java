@@ -2,12 +2,6 @@ package net.artux.pda.map.engine.components;
 
 import com.badlogic.ashley.core.Component;
 
-import net.artux.pdalib.Member;
-import net.artux.pdalib.profile.Equipment;
-import net.artux.pdalib.profile.items.Armor;
-import net.artux.pdalib.profile.items.Item;
-import net.artux.pdalib.profile.items.Weapon;
-
 public class AnomalyComponent implements Component {
 
     private String name;

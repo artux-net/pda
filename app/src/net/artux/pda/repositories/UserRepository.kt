@@ -1,11 +1,11 @@
 package net.artux.pda.repositories
 
-import net.artux.pda.services.PdaAPI
-import net.artux.pdalib.Member
-import net.artux.pdalib.Profile
-import net.artux.pdalib.Status
+import net.artux.pda.generated.apis.DefaultApi
+import net.artux.pda.generated.models.*
+import net.artux.pda.repositories.util.Result
 import retrofit2.Call
 import retrofit2.Callback
+import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -13,9 +13,10 @@ import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class UserRepository @Inject constructor(
-    private val webservice: PdaAPI,
+    private val webservice: DefaultApi,
     private val userCache: Cache<Profile>,
-    private val memberCache: Cache<Member>) {
+    private val memberCache: Cache<UserDto>
+) {
 
     fun clearMemberCache() {
         memberCache.clear()
@@ -25,21 +26,21 @@ class UserRepository @Inject constructor(
         val cache = userCache.get(userId.toString())
         return if (cache != null)
             Result.Success(cache)
-        else Result.Error(java.lang.Exception("Cache isn't found"))
+        else Result.Error(Exception("Cache isn't found"))
     }
 
-    suspend fun getProfile(userId: Int): Result<Profile>{
+    suspend fun getProfile(userId: Long): Result<Profile> {
         return suspendCoroutine {
-            webservice.getProfile(userId).enqueue(object : Callback<Profile> {
+            webservice.getProfileUsingGET1(userId).enqueue(object : Callback<Profile> {
                 override fun onResponse(
                     call: Call<Profile>,
                     response: retrofit2.Response<Profile>
                 ) {
                     val data = response.body()
-                    if (data!=null) {
+                    if (data != null) {
                         userCache.put(userId.toString(), data)
                         it.resume(Result.Success(data))
-                    }else
+                    } else
                         it.resume(Result.Error(Exception("Profile null")))
                 }
 
@@ -51,7 +52,7 @@ class UserRepository @Inject constructor(
         }
     }
 
-    fun getCachedMember(): Result<Member> {
+    fun getCachedMember(): Result<UserDto> {
         val cache = memberCache.get("user")
         return if (cache != null)
             Result.Success(cache)
@@ -59,57 +60,63 @@ class UserRepository @Inject constructor(
 
     }
 
-    suspend fun getMember(): Result<Member>{
+    suspend fun getMember(): Result<UserDto> {
         return suspendCoroutine {
-            webservice.loginUser().enqueue(object : Callback<Member> {
-                override fun onResponse(call: Call<Member>, response: retrofit2.Response<Member>) {
+            webservice.loginUserUsingGET().enqueue(object : Callback<UserDto> {
+                override fun onResponse(
+                    call: Call<UserDto>,
+                    response: retrofit2.Response<UserDto>
+                ) {
                     val data = response.body()
-                    if (data!=null) {
+                    if (data != null) {
                         memberCache.put("user", data)
                         it.resume(Result.Success(data))
-                    }else
+                    } else
                         it.resume(Result.Error(Exception("Profile null")))
                 }
 
-                override fun onFailure(call: Call<Member>, t: Throwable) {
+                override fun onFailure(call: Call<UserDto>, t: Throwable) {
                     it.resume(Result.Error(java.lang.Exception(t)))
                 }
             })
         }
     }
 
-    suspend fun syncMember(map: HashMap<String, List<String>>): Result<Member>{
-        return suspendCoroutine {
-            webservice.synchronize(map).enqueue(object : Callback<Member> {
-                override fun onResponse(call: Call<Member>, response: retrofit2.Response<Member>) {
-                    val data = response.body()
-                    if (data!=null) {
-                        memberCache.put("user", data)
-                        it.resume(Result.Success(data))
-                    }else
-                        it.resume(Result.Error(Exception("Profile null")))
-                }
 
-                override fun onFailure(call: Call<Member>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
-                }
-            })
-        }
-    }
 
-    suspend fun resetData(): Result<Member>{
+
+
+    suspend fun registerUser(registerUser: RegisterUserDto): Result<Status> {
         return suspendCoroutine {
-            webservice.resetData().enqueue(object : Callback<Member> {
-                override fun onResponse(call: Call<Member>, response: retrofit2.Response<Member>) {
+            webservice.registerUserUsingPOST(registerUser).enqueue(object : Callback<Status> {
+                override fun onResponse(call: Call<Status>, response: Response<Status>) {
                     val data = response.body()
-                    if (data!=null) {
-                        memberCache.put("user", data)
+                    if (data != null) {
                         it.resume(Result.Success(data))
-                    }else
+                    } else
                         it.resume(Result.Error(Exception("Status null")))
                 }
 
-                override fun onFailure(call: Call<Member>, t: Throwable) {
+                override fun onFailure(call: Call<Status>, t: Throwable) {
+                    it.resume(Result.Error(java.lang.Exception(t)))
+                }
+            })
+        }
+    }
+
+    suspend fun getRatingPage(numberPage: Int): Result<List<UserInfoDto>> {
+        return suspendCoroutine {
+            webservice.getRatingUsingGET(numberPage).enqueue(object : Callback<ResponsePageUserInfoDto> {
+                override fun onResponse(call: Call<ResponsePageUserInfoDto>, response: Response<ResponsePageUserInfoDto>) {
+                    val data = response.body()
+
+                    if (data?.data != null) {
+                        it.resume(Result.Success(data.data))
+                    } else
+                        it.resume(Result.Error(Exception("Не удалось загрузить больше")))
+                }
+
+                override fun onFailure(call: Call<ResponsePageUserInfoDto>, t: Throwable) {
                     it.resume(Result.Error(java.lang.Exception(t)))
                 }
             })

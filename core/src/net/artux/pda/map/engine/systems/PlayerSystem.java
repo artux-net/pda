@@ -17,11 +17,11 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.QuestComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
+import net.artux.pda.map.models.UserGdx;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
-import net.artux.pdalib.Member;
 
 public class PlayerSystem extends BaseSystem {
 
@@ -82,7 +82,7 @@ public class PlayerSystem extends BaseSystem {
 
         ImageButton.ImageButtonStyle
 
-        style = new ImageButton.ImageButtonStyle();
+                style = new ImageButton.ImageButtonStyle();
         style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
         style.imageUp = new TextureRegionDrawable(assetManager.get("ui/bar/ic_health.png", Texture.class));
 
@@ -93,20 +93,20 @@ public class PlayerSystem extends BaseSystem {
         style.imageUp = new TextureRegionDrawable(assetManager.get("ui/bar/ic_radiation.png", Texture.class));
         radiationSlot = new Slot(userInterface, style);
         assistantBlock.getButtonsTable().add(medicineSlot);
-        medicineSlot.addListener(new ClickListener(){
+        medicineSlot.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (medicineCount>0) {
+                if (medicineCount > 0) {
                     medicineCount -= 1;
                     hm.get(player).treat(15);
                 }
                 super.clicked(event, x, y);
             }
         });
-        radiationSlot.addListener(new ClickListener(){
+        radiationSlot.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (radiationCount>0) {
+                if (radiationCount > 0) {
                     radiationCount -= 1;
                     hm.get(player).decreaseRadiation(5);
                 }
@@ -127,17 +127,21 @@ public class PlayerSystem extends BaseSystem {
         return hud;
     }
 
-    public void addMedicine(int medicineCount){
+    public void addMedicine(int medicineCount) {
         this.medicineCount += medicineCount;
     }
 
-    public void addRadiation(int radiationCount){
+    public void addRadiation(int radiationCount) {
         this.radiationCount += radiationCount;
     }
 
-    public Member getPlayerMember() {
+    public UserGdx getPlayerMember() {
         PlayerComponent playerComponent = pmm.get(player);
-        return playerComponent.member;
+        return playerComponent.userModel;
+    }
+
+    public PlayerComponent getPlayerComponent() {
+        return pmm.get(player);
     }
 
     public float getHealth() {
@@ -158,8 +162,8 @@ public class PlayerSystem extends BaseSystem {
     }
 
     public int getDistance() {
-        if (entities.size > 0){
+        if (entities.size > 0) {
             return (int) (getPosition().dst(pm.get(entities.get(0)).getPosition()) / pixelsPerMeter);//TODO select target
-        }else return -1;
+        } else return -1;
     }
 }

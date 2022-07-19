@@ -3,10 +3,7 @@ package net.artux.pda.map.engine;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
-
-import net.artux.pdalib.UserMessage;
+import net.artux.pda.map.models.UserMessage;
 
 public class MessageGenerator {
 

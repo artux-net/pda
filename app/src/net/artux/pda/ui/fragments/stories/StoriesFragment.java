@@ -1,5 +1,7 @@
 package net.artux.pda.ui.fragments.stories;
 
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,12 +19,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.repositories.Result;
+import net.artux.pda.ui.util.GsonProvider;
+import net.artux.pda.models.quest.story.StoryDataModel;
+import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.quest.models.Stories;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.profile.items.GsonProvider;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,7 +35,8 @@ import timber.log.Timber;
 
 public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnStoryClickListener {
 
-    FragmentListBinding binding;
+    private FragmentListBinding binding;
+    private QuestViewModel questViewModel;
 
     @Nullable
     @Override
@@ -44,15 +48,18 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
-            if (memberResult instanceof Result.Success){
-                Member member = ((Result.Success<Member>) memberResult).getData();
-                if (member.getData().getTemp().containsKey("currentStory")) {
+        if (questViewModel == null)
+            questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
+
+        questViewModel.getStoryData().observe(getViewLifecycleOwner(), memberResult -> {
+            if (memberResult instanceof Result.Success) {
+                StoryDataModel model = memberResult.getOrThrow();
+                if (model.getCurrent() != null) {
                     Intent intent = new Intent(getActivity(), QuestActivity.class);
                     requireActivity().startActivity(intent);
                     requireActivity().finish();
-                }else loadStories();
-            }else viewModel.updateMember();
+                } else loadStories();
+            } else questViewModel.updateData();
         });
     }
 
@@ -61,11 +68,11 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
         navigationPresenter.setLoadingState(true);
         binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        StoriesAdapter adapter = new StoriesAdapter( StoriesFragment.this);
+        StoriesAdapter adapter = new StoriesAdapter(StoriesFragment.this);
         binding.list.setAdapter(adapter);
 
-        Stories cacheStories= GsonProvider.getInstance().fromJson(App.getDataManager().getString("stories"), Stories.class);
-        if(cacheStories!=null){
+        Stories cacheStories = GsonProvider.getInstance().fromJson(App.getDataManager().getString("stories"), Stories.class);
+        if (cacheStories != null) {
             binding.list.setVisibility(View.VISIBLE);
             binding.viewMessage.setVisibility(View.GONE);
             adapter.setStories(cacheStories.get());
@@ -78,8 +85,8 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 Stories stories = response.body();
                 navigationPresenter.setLoadingState(false);
                 if (((stories != null && cacheStories != null && stories.hashCode() != cacheStories.hashCode())
-                        || (cacheStories == null && stories!=null))
-                        && binding !=null) {
+                        || (cacheStories == null && stories != null))
+                        && binding != null) {
                     binding.list.setVisibility(View.VISIBLE);
                     binding.viewMessage.setVisibility(View.GONE);
                     App.getDataManager().setString("stories", GsonProvider.getInstance().toJson(stories));
@@ -98,14 +105,14 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
 
     @Override
     public void onClick(int id) {
-        if (id>-1) {
+        if (id > -1) {
             Intent intent = new Intent(getActivity(), QuestActivity.class);
             intent.putExtra("story", id);
             if (getActivity() != null) {
                 getActivity().startActivity(intent);
                 getActivity().finish();
             }
-        }else if(id==-1){
+        } else if (id == -1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Input like that {story}:{chapter}:{stage}.");
 
@@ -114,17 +121,17 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             builder.setView(input);
             builder.setPositiveButton("Load", (dialog, which) -> {
                 String[] keys = input.getText().toString().split(":");
-                if (keys.length==3){
+                if (keys.length == 3) {
                     try {
                         Intent intent = new Intent(getActivity(), QuestActivity.class);
                         int[] scs = {Integer.parseInt(keys[0]), Integer.parseInt(keys[1]), Integer.parseInt(keys[2])};
                         intent.putExtra("keys", scs);
                         if (getActivity() != null)
                             getActivity().startActivity(intent);
-                    }catch (NumberFormatException e){
+                    } catch (NumberFormatException e) {
                         Toast.makeText(getActivity(), "Error, not numbers", Toast.LENGTH_SHORT).show();
                     }
-                }else
+                } else
                     Toast.makeText(getActivity(), "Error, must be 3 keys", Toast.LENGTH_SHORT).show();
 
             });

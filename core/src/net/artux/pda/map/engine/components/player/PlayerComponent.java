@@ -3,15 +3,18 @@ package net.artux.pda.map.engine.components.player;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.Camera;
 
-import net.artux.pdalib.Member;
+import net.artux.pda.map.models.UserGdx;
+import net.artux.pda.map.models.user.GdxData;
 
 public class PlayerComponent implements Component {
 
     public Camera camera;
-    public Member member;
+    public UserGdx userModel;
+    public GdxData gdxData;
 
-    public PlayerComponent(Camera camera, Member member) {
+    public PlayerComponent(Camera camera, UserGdx userModel, GdxData gdxData) {
         this.camera = camera;
-        this.member = member;
+        this.userModel = userModel;
+        this.gdxData = gdxData;
     }
 }

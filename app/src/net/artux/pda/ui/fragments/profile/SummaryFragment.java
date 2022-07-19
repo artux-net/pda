@@ -9,18 +9,15 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
+import net.artux.pda.models.UserMessage;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.additional.SummaryAdditionalFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
-import net.artux.pda.viewmodels.SummaryViewModel;
-import net.artux.pdalib.Summary;
-import net.artux.pdalib.UserMessage;
+import net.artux.pda.ui.viewmodels.SummaryViewModel;
 
 public class SummaryFragment extends BaseFragment implements ChatAdapter.MessageClickListener {
 

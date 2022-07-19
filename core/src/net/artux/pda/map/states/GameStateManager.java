@@ -4,11 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.models.UserGdx;
 import net.artux.pda.map.platform.PlatformInterface;
-import net.artux.pdalib.Member;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -74,13 +73,13 @@ public class GameStateManager {
             states.peek().resize(width, height);
     }
 
-    public void render(SpriteBatch sb){
+    public void render(){
         if (states.size()>0)
-            states.peek().render(sb);
+            states.peek().render();
     }
 
-    public Member getMember() {
-        return (Member) bundle.get("member");
+    public UserGdx getMember() {
+        return (UserGdx) bundle.get("user");
     }
 
     public void addInputProcessor(InputProcessor inputProcessor){

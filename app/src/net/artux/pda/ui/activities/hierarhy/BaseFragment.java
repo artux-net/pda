@@ -11,15 +11,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import net.artux.pda.ui.fragments.additional.InfoFragment;
-import net.artux.pda.viewmodels.MemberViewModel;
-import net.artux.pda.viewmodels.ProfileViewModel;
+import net.artux.pda.ui.viewmodels.UserViewModel;
 
 import timber.log.Timber;
 
 public abstract class BaseFragment extends Fragment implements FragmentNavigation.View {
 
     protected FragmentNavigation.Presenter navigationPresenter;
-    protected MemberViewModel viewModel;
+    protected UserViewModel viewModel;
 
     public Class<? extends AdditionalBaseFragment> defaultAdditionalFragment = InfoFragment.class;
 
@@ -28,7 +27,7 @@ public abstract class BaseFragment extends Fragment implements FragmentNavigatio
         super.onViewCreated(view, savedInstanceState);
         Timber.d("Fragment %s created", getClass().getName());
         if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(MemberViewModel.class);
+            viewModel = getViewModelFactory(this).create(UserViewModel.class);
 
     }
 

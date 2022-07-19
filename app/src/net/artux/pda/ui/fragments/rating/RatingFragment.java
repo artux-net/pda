@@ -9,29 +9,26 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
-import net.artux.pdalib.ResponsePage;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClickListener {
 
-    private int number = 1;
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
+
+    RatingViewModel ratingViewModel;
 
     @Nullable
     @Override
@@ -42,10 +39,13 @@ public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClick
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (navigationPresenter!=null) {
+        if (navigationPresenter != null) {
             navigationPresenter.setTitle(getString(R.string.rating));
             navigationPresenter.setLoadingState(true);
         }
+
+        if (ratingViewModel == null)
+            ratingViewModel = getViewModelFactory(this).create(RatingViewModel.class);
 
         RecyclerView recyclerView = view.findViewById(R.id.list);
         View v = view.findViewById(R.id.viewMessage);
@@ -53,41 +53,25 @@ public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClick
         RatingAdapter ratingAdapter = new RatingAdapter(this, viewModel.getId());
         recyclerView.setAdapter(ratingAdapter);
 
-        App.getRetrofitService().getPdaAPI().getRating(number).enqueue(new Callback<ResponsePage<UserInfo>>() {
+        ratingViewModel.getList().observe(getViewLifecycleOwner(), new Observer<Result<List<UserInfo>>>() {
             @Override
-            public void onResponse(Call<ResponsePage<UserInfo>> call, Response<ResponsePage<UserInfo>> response) {
-                ResponsePage<UserInfo> rating = response.body();
-                if(rating!=null){
-                    List<UserInfo> list = rating.getData();
-                    if (navigationPresenter!=null)
+            public void onChanged(Result<List<UserInfo>> listResult) {
+                if (listResult.isSuccess()) {
+                    List<UserInfo> list = ((Result.Success<List<UserInfo>>) listResult).getData();
+                    if (navigationPresenter != null)
                         navigationPresenter.setLoadingState(false);
                     recyclerView.setVisibility(View.VISIBLE);
                     v.setVisibility(View.GONE);
                     ratingAdapter.addData(list);
                 }
             }
-
-            @Override
-            public void onFailure(Call<ResponsePage<UserInfo>> call, Throwable t) {
-
-            }
         });
 
-        view.findViewById(R.id.rating_more).setOnClickListener(view1 -> App.getRetrofitService()
-                .getPdaAPI().getRating(++number).enqueue(new Callback<ResponsePage<UserInfo>>() {
-                    @Override
-                    public void onResponse(Call<ResponsePage<UserInfo>> call, Response<ResponsePage<UserInfo>> response) {
-                        ResponsePage<UserInfo> rating = response.body();
-                        if(rating!=null){
-                            ratingAdapter.addData(rating.getData());
-                        }
-                    }
+        view.findViewById(R.id.rating_more).setOnClickListener(view1 -> {
+            ratingViewModel.nextPage();
+        });
 
-                    @Override
-                    public void onFailure(Call<ResponsePage<UserInfo>> call, Throwable t) {
-
-                    }
-                }));
+        ratingViewModel.updateList();
     }
 
     @Override
@@ -96,7 +80,7 @@ public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClick
         Bundle bundle = new Bundle();
         bundle.putInt("pdaId", pos);
         profileFragment.setArguments(bundle);
-        if (navigationPresenter!=null) {
+        if (navigationPresenter != null) {
             navigationPresenter.addFragment(profileFragment, true);
         }
     }

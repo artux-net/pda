@@ -2,50 +2,38 @@ package net.artux.pda.services;
 
 
 import net.artux.pda.BuildConfig;
-import net.artux.pda.map.model.Map;
-import net.artux.pda.ui.fragments.chat.Dialog;
+import net.artux.pda.map.model.input.Map;
+import net.artux.pda.models.user.ProfileModel;
+import net.artux.pda.models.user.UserModel;
+import net.artux.pda.models.user.RegisterUser;
+import net.artux.pda.models.ResponsePage;
+import net.artux.pda.models.Status;
+import net.artux.pda.models.news.Article;
+import net.artux.pda.models.profile.FriendModel;
+import net.artux.pda.models.profile.Note;
+import net.artux.pda.models.profile.Seller;
+import net.artux.pda.models.profile.UpdateData;
 import net.artux.pda.ui.fragments.quest.models.Chapter;
 import net.artux.pda.ui.fragments.quest.models.Stories;
 import net.artux.pda.ui.fragments.rating.UserInfo;
-import net.artux.pdalib.LoginStatus;
-import net.artux.pdalib.LoginUser;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.Profile;
-import net.artux.pdalib.QueryPage;
-import net.artux.pdalib.RegisterUser;
-import net.artux.pdalib.ResponsePage;
-import net.artux.pdalib.Status;
-import net.artux.pdalib.news.Article;
-import net.artux.pdalib.profile.FriendModel;
-import net.artux.pdalib.profile.Note;
-import net.artux.pdalib.profile.Seller;
-import net.artux.pdalib.profile.UpdateData;
-import net.artux.pdalib.profile.items.Armor;
-import net.artux.pdalib.profile.items.Weapon;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import dagger.Component;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-import retrofit2.http.Url;
 
 public interface PdaAPI{
 
-    @POST("login")
-    Call<LoginStatus> loginUser(@Body LoginUser user);
-
     @GET("login")
-    Call<Member> loginUser();
+    Call<UserModel> loginUser();
 
     @PUT("login")
     Call<Status> updateFields(@Body UpdateData updateData);
@@ -56,14 +44,14 @@ public interface PdaAPI{
     @GET("reset")
     Call<Status> resetPassword(@Query("email") String loginOrEmail);
 
-    @GET("profile/{pdaId}")
-    Call<Profile> getProfile(@Path("pdaId") int pdaId);
+    @GET("profileModel/{pdaId}")
+    Call<ProfileModel> getProfile(@Path("pdaId") int pdaId);
 
-    @GET("profile")
-    Call<Profile> getMyProfile();
+    @GET("profileModel")
+    Call<ProfileModel> getMyProfile();
 
     @PUT("actions")
-    Call<Member> synchronize(@Body HashMap<String, List<String>> actions);
+    Call<UserModel> synchronize(@Body HashMap<String, List<String>> actions);
 
     @GET(BuildConfig.PROTOCOL + "://" + BuildConfig.URL + "stories/story_{story}/chapter_{chapter}.cqe")
     Call<Chapter> getQuest(@Path("story") int story, @Path("chapter") int chapter);
@@ -105,7 +93,7 @@ public interface PdaAPI{
     Call<Status> setWeapon(@Query("hash") int hash);
 
     @GET("reset/data")
-    Call<Member> resetData();
+    Call<UserModel> resetData();
 
     @PUT("notes")
     Call<Note> updateNote(@Body Note note);

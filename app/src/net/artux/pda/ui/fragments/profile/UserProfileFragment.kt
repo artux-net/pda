@@ -12,15 +12,16 @@ import androidx.recyclerview.widget.RecyclerView
 import net.artux.pda.R
 import net.artux.pda.app.App
 import net.artux.pda.databinding.FragmentProfileBinding
+import net.artux.pda.models.Status
+import net.artux.pda.repositories.util.Result
 import net.artux.pda.ui.PdaAlertDialog
 import net.artux.pda.ui.activities.hierarhy.BaseFragment
 import net.artux.pda.ui.fragments.additional.AdditionalFragment
 import net.artux.pda.ui.fragments.chat.ChatFragment
-import net.artux.pda.ui.fragments.profile.adapters.GroupsAdapter
+import net.artux.pda.ui.fragments.profile.adapters.GroupRelationsAdapter
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper
 import net.artux.pda.ui.util.getViewModelFactory
-import net.artux.pda.viewmodels.ProfileViewModel
-import net.artux.pdalib.Status
+import net.artux.pda.ui.viewmodels.ProfileViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,7 +29,8 @@ import retrofit2.Response
 class UserProfileFragment : BaseFragment(), View.OnClickListener {
 
     private var binding: FragmentProfileBinding? = null
-    private var groupsAdapter = GroupsAdapter()
+    private var groupRelationsAdapter =
+        GroupRelationsAdapter()
     private var recyclerView: RecyclerView? = null
 
     private val profileViewModel: ProfileViewModel by viewModels { getViewModelFactory() }
@@ -50,47 +52,36 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         if (navigationPresenter != null) {
-            navigationPresenter.setTitle(getString(R.string.profile))
+            navigationPresenter.setTitle(getString(R.string.profileModel))
             navigationPresenter.setLoadingState(true)
         }
 
-        if (arguments != null)
-            profileViewModel.updateProfile(requireArguments().getInt("pdaId", viewModel.getId()))
-        else
-            profileViewModel.updateProfile(viewModel.getId())
-
         profileViewModel.profile.observe(viewLifecycleOwner) {
-            if (it != null) {
+            if (it is Result.Success) {
+                val model = it.data
+
                 val binding = this.binding!!
-                ProfileHelper.setAvatar(binding.profileAvatar, it.avatar)
-                binding.profileLogin.text = it.login
-                binding.profileGroup.text =
-                    getString(
-                        R.string.group_p, ProfileHelper.getGroup(
-                            it,
-                            context
-                        )
-                    )
-                binding.profileLocation.text =
-                    getString(R.string.location_p, it.location)
+                ProfileHelper.setAvatar(binding.profileAvatar, model.avatar)
+                binding.profileLogin.text = model.login
+                binding.profileGroup.text = model.gang.getTitle(context)
                 binding.profileTime.text =
-                    getString(R.string.in_zone_time_p, ProfileHelper.getDays(it))
+                    getString(R.string.in_zone_time_p, ProfileHelper.getDays(model))
                 binding.profileRang.text =
-                    getString(R.string.rang_p, ProfileHelper.getRang(it, view.context))
+                    getString(R.string.rang_p, ProfileHelper.getRang(model, view.context))
                 binding.profileRating.text =
-                    getString(R.string.rating_p, it.xp.toString())
+                    getString(R.string.rating_p, model.xp.toString())
 
                 binding.profileFriends.text =
-                    view.context.getString(R.string.friends, it.friends.toString())
+                    view.context.getString(R.string.friends, model.friends.toString())
                 binding.profileFriends.setOnClickListener(this)
                 binding.profileRequests.text =
-                    view.context.getString(R.string.subscribers, it.subs.toString())
+                    view.context.getString(R.string.subscribers, model.subs.toString())
                 binding.profileRequests.setOnClickListener(this)
 
 
-                groupsAdapter.setRelations(it.relations)
+                groupRelationsAdapter.setRelations(model.relations)
                 recyclerView = view.findViewById(R.id.list)
-                recyclerView!!.adapter = groupsAdapter
+                recyclerView!!.adapter = groupRelationsAdapter
 
                 recyclerView!!.visibility = View.VISIBLE
                 view.findViewById<View>(R.id.viewMessage).visibility = View.GONE
@@ -99,8 +90,8 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 val subsButton: Button = binding.requests
                 val messageButton: Button = binding.writeMessage
                 messageButton.setOnClickListener(this)
-                if (viewModel.getId() != it.pdaId) {
-                    when (it.friendStatus) {
+                if (viewModel.getId() != model.pdaId) {
+                    when (model.friendStatus) {
                         0 -> {
                             friendButton.setText(R.string.add_friend)
                             friendButton.setOnClickListener { view1: View? ->
@@ -113,7 +104,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                 pdaAlertDialog.setPositiveButton(
                                     R.string.okay
                                 ) { _, _ ->
-                                    App.getRetrofitService().pdaAPI.requestFriend(it.pdaId)
+                                    App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
                                         .enqueue(object : Callback<Status?> {
                                             override fun onResponse(
                                                 call: Call<Status?>,
@@ -125,7 +116,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                                     status.description,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                                profileViewModel.updateProfile(it.pdaId)
+                                                profileViewModel.updateProfile(model.pdaId)
                                             }
 
                                             override fun onFailure(
@@ -142,7 +133,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                             }
                         }
                         1 -> {
-                            friendButton.text = getString(R.string.is_friend, it.name)
+                            friendButton.text = getString(R.string.is_friend,model.name)
                             friendButton.setOnClickListener { view: View? ->
                                 val pdaAlertDialog =
                                     AlertDialog.Builder(context, R.style.AlertDialogStyle)
@@ -150,7 +141,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                 pdaAlertDialog.setPositiveButton(
                                     R.string.okay
                                 ) { dialogInterface, _ ->
-                                    App.getRetrofitService().pdaAPI.requestFriend(it.pdaId)
+                                    App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
                                         .enqueue(object : Callback<Status?> {
                                             override fun onResponse(
                                                 call: Call<Status?>,
@@ -162,7 +153,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                                     status.description,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                                profileViewModel.updateProfile(it.pdaId)
+                                                profileViewModel.updateProfile(model.pdaId)
                                             }
 
                                             override fun onFailure(
@@ -179,7 +170,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                             }
                         }
                         2 -> {
-                            friendButton.text = getString(R.string.is_sub, it.name)
+                            friendButton.text = getString(R.string.is_sub,model.name)
                             friendButton.setOnClickListener { view: View? ->
                                 val pdaAlertDialog =
                                     AlertDialog.Builder(context, R.style.AlertDialogStyle)
@@ -187,7 +178,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                 pdaAlertDialog.setPositiveButton(
                                     R.string.okay
                                 ) { dialogInterface, _ ->
-                                    App.getRetrofitService().pdaAPI.requestFriend(it.pdaId)
+                                    App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
                                         .enqueue(object : Callback<Status?> {
                                             override fun onResponse(
                                                 call: Call<Status?>,
@@ -199,7 +190,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                                     status.description,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                                profileViewModel.updateProfile(it.pdaId)
+                                                profileViewModel.updateProfile(model.pdaId)
                                             }
 
                                             override fun onFailure(
@@ -224,7 +215,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                 pdaAlertDialog.setPositiveButton(
                                     R.string.okay
                                 ) { dialogInterface, _ ->
-                                    App.getRetrofitService().pdaAPI.requestFriend(it.pdaId)
+                                    App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
                                         .enqueue(object : Callback<Status?> {
                                             override fun onResponse(
                                                 call: Call<Status?>,
@@ -236,7 +227,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                                     status.description,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                                profileViewModel.updateProfile(it.pdaId)
+                                                profileViewModel.updateProfile(model.pdaId)
                                             }
 
                                             override fun onFailure(
@@ -263,31 +254,38 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 }
             }
         }
+        /*if (arguments != null)
+            profileViewModel.updateProfile(requireArguments().getInt("pdaId", viewModel.getId()))
+        else
+            profileViewModel.updateProfile(viewModel.getId())*/
     }
 
     override fun onClick(p0: View?) {
         val friendsFragment = FriendsFragment()
         val bundle = Bundle()
-        val profile = profileViewModel.profile.value
+        val result = profileViewModel.profile.value
+        if (result is Result.Success) {
+            val profile = result.data
 
-        when (p0!!.id) {
-            R.id.profile_friends -> {
-                bundle.putInt("type", 0)
-                bundle.putInt("pdaId", profile!!.pdaId)
-                friendsFragment.arguments = bundle
-                navigationPresenter.addFragment(friendsFragment, true)
-            }
-            R.id.profile_requests -> {
-                bundle.putInt("type", 1)
-                bundle.putInt("pdaId", profile!!.pdaId)
-                friendsFragment.arguments = bundle
-                navigationPresenter.addFragment(friendsFragment, true)
-            }
-            R.id.write_message -> {
-                bundle.putInt("to", profile!!.pdaId)
-                val chatFragment = ChatFragment()
-                chatFragment.arguments = bundle
-                navigationPresenter.addFragment(chatFragment, true)
+            when (p0!!.id) {
+                R.id.profile_friends -> {
+                    bundle.putInt("type", 0)
+                    bundle.putInt("pdaId", profile!!.pdaId)
+                    friendsFragment.arguments = bundle
+                    navigationPresenter.addFragment(friendsFragment, true)
+                }
+                R.id.profile_requests -> {
+                    bundle.putInt("type", 1)
+                    bundle.putInt("pdaId", profile!!.pdaId)
+                    friendsFragment.arguments = bundle
+                    navigationPresenter.addFragment(friendsFragment, true)
+                }
+                R.id.write_message -> {
+                    bundle.putInt("to", profile!!.pdaId)
+                    val chatFragment = ChatFragment()
+                    chatFragment.arguments = bundle
+                    navigationPresenter.addFragment(chatFragment, true)
+                }
             }
         }
     }

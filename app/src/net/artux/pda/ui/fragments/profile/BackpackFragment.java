@@ -1,41 +1,20 @@
 package net.artux.pda.ui.fragments.profile;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.app.App;
-import net.artux.pda.repositories.Result;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
-import net.artux.pda.ui.fragments.encyclopedia.EncyclopediaFragment;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
-import net.artux.pda.ui.fragments.profile.helpers.ItemsHelper;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.Status;
-import net.artux.pdalib.profile.Data;
-import net.artux.pdalib.profile.items.Armor;
-import net.artux.pdalib.profile.items.Item;
-import net.artux.pdalib.profile.items.Weapon;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timber.log.Timber;
 
 public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnClickListener {
 
@@ -59,7 +38,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
         recyclerView.setVisibility(View.VISIBLE);
         view.findViewById(R.id.viewMessage).setVisibility(View.GONE);
 
-        viewModel.getMember().observe(getViewLifecycleOwner(), new Observer<Result<Member>>() {
+       /* viewModel.getMember().observe(getViewLifecycleOwner(), new Observer<Result<Member>>() {
             @Override
             public void onChanged(Result<Member> memberResult) {
                 if(memberResult instanceof Result.Success) {
@@ -79,7 +58,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
                     navigationPresenter.setTitle("Денег: " + member.getMoney() + ", вес рюкзака: " + formater.format(weight) + " кг");
                 }else viewModel.updateMember();
             }
-        });
+        });*/
 
         recyclerView.setAdapter(itemsAdapter);
         recyclerView.setLayoutManager(itemsAdapter.getLayoutManager(getContext(),3));
@@ -87,7 +66,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
 
     @Override
     public void onClick(int pos) {
-        Item item = itemsAdapter.getItems().get(pos);
+        /*Item item = itemsAdapter.getItems().get(pos);
         Timber.i("Opened item dialog with item: %s", item.title);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle);
         builder.setTitle(item.title);
@@ -108,8 +87,8 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
                 navigationPresenter.addFragment(encyclopediaFragment, true);
                 navigationPresenter.addAdditionalFragment(additionalFragment);
             }
-        });
-
+        });*/
+/*
         if (item instanceof Armor || item instanceof Weapon)
         builder.setNeutralButton("Сделать основным", (dialogInterface, i) -> {
             if (item instanceof Armor) {
@@ -145,10 +124,10 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
                     }
                 });
             }
-        });
+        });*/
 
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        //AlertDialog alertDialog = builder.create();
+        //alertDialog.show();
     }
 
 }

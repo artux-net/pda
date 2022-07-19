@@ -8,7 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -33,24 +36,28 @@ import com.google.gson.GsonBuilder;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
+import net.artux.pda.databinding.FragmentNotificationBinding;
 import net.artux.pda.gdx.MapHelper;
-import net.artux.pda.repositories.Result;
-import net.artux.pda.ui.fragments.quest.Quest0Scene;
-import net.artux.pda.ui.fragments.quest.Quest1Scene;
+import net.artux.pda.models.Summary;
+import net.artux.pda.models.UserMessage;
+import net.artux.pda.models.quest.StageMapper;
+import net.artux.pda.models.quest.StageModel;
+import net.artux.pda.models.quest.TransferModel;
+import net.artux.pda.models.quest.UserDataCompanion;
+import net.artux.pda.models.quest.story.StoryDataModel;
+import net.artux.pda.models.quest.story.StoryStateModel;
+import net.artux.pda.models.user.UserModel;
+import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.fragments.quest.QuestController;
-import net.artux.pda.ui.fragments.quest.SellerActivity;
-import net.artux.pda.ui.fragments.quest.models.Chapter;
-import net.artux.pda.ui.fragments.quest.models.Transfer;
-import net.artux.pda.utils.MultiExoPlayer;
-import net.artux.pda.viewmodels.MemberViewModel;
 import net.artux.pda.ui.fragments.quest.SceneQuestController;
+import net.artux.pda.ui.fragments.quest.SellerActivity;
+import net.artux.pda.ui.fragments.quest.StageFragment;
+import net.artux.pda.ui.fragments.quest.models.Chapter;
 import net.artux.pda.ui.fragments.quest.models.Stage;
-import net.artux.pda.viewmodels.QuestViewModel;
-import net.artux.pda.viewmodels.SummaryViewModel;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.Summary;
-import net.artux.pdalib.UserMessage;
-import net.artux.pdalib.profile.Story;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
+import net.artux.pda.ui.viewmodels.SummaryViewModel;
+import net.artux.pda.ui.viewmodels.UserViewModel;
+import net.artux.pda.utils.MultiExoPlayer;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,7 +81,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     private BroadcastReceiver _broadcastReceiver;
     private final SimpleDateFormat _sdfWatchTime = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
-    private MemberViewModel viewModel;
+    private UserViewModel viewModel;
     private QuestViewModel questViewModel;
 
     private InterstitialAd mInterstitialAd;
@@ -82,7 +89,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
 
     private SummaryViewModel summaryViewModel;
     private Summary summary;
-    private Member member;
+    private UserModel userModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +97,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_quest);
 
         if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(MemberViewModel.class);
+            viewModel = getViewModelFactory(this).create(UserViewModel.class);
         if (questViewModel == null)
             questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
         if (summaryViewModel == null)
@@ -106,17 +113,19 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         switcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
         switcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
 
-        viewModel.getMember().observe(this, new Observer<Result<Member>>() {
+        questViewModel.getStoryData().observe(this, new Observer<Result<StoryDataModel>>() {
             @Override
-            public void onChanged(Result<Member> memberResult) {
+            public void onChanged(Result<StoryDataModel> memberResult) {
                 if (memberResult instanceof Result.Success) {
-                    member = ((Result.Success<Member>) memberResult).getData();
-                    startLoading(member);
-                    viewModel.getMember().removeObserver(this);
-                } else viewModel.updateMember();
+                    startLoading(memberResult.getOrThrow().getCurrent());
+                    questViewModel.getStoryData().removeObserver(this);
+                } else questViewModel.updateData();
             }
         });
+
         summary = summaryViewModel.getCachedSummary(Summary.getCurrentId()).getValue();
+        userModel = viewModel.getMember().getValue().getOrThrow();
+
         if (summary == null)
             summary = new Summary();
     }
@@ -130,43 +139,54 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             actions = new HashMap<>();
 
         actions.put("set", arrayList);
-        viewModel.syncMember(actions);
+        questViewModel.applyActions(actions);
 
         Timber.d("Synced, story: " + sceneController.getStoryId() + ", chapter: " + sceneController.getChapterId() + ", stage: " + id);
     }
 
-    private void startLoading(Member member) {
+    @Override
+    public void prepareStage(Stage actualStage) {
+        if (actualStage != null && actualStage.getMessage() != null && !actualStage.getMessage().trim().equals("")) {
+            FragmentNotificationBinding binding = FragmentNotificationBinding.inflate(getLayoutInflater());
+            binding.notificationTitle.setText("Уведомление");
+            binding.notificationContent.setText(actualStage.getMessage());
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setView(binding.getRoot());
+            AlertDialog dialog = builder.create();
+            Window window = dialog.getWindow();
+            window.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
+            dialog.show();
+        }
+
+        setBackground(actualStage.getBackgroundUrl());
+    }
+
+    private void startLoading(StoryStateModel currentState) {
         int[] keys = getIntent().getIntArrayExtra("keys");
         // keys for loading specific stage
         if (keys == null) {
-            HashMap<String, String> temp = member.getData().getTemp();
+
 
             int storyId = getIntent().getIntExtra("story", -1);
-
             if (storyId < 0) {
                 // если нет номера истории в намерении
-                String currentStory = temp.get("currentStory");
-                if (currentStory != null)
-                    storyId = Integer.parseInt(currentStory);
+                if (currentState != null)
+                    storyId = currentState.getStoryId();
                 else {
-                    Intent intent = new Intent(QuestActivity.this, MainActivity.class);
+                    Intent intent = new Intent(this, MainActivity.class);
                     intent.putExtra("section", "stories");
                     startActivity(intent);
                     finish();
                 }
             }
 
-            boolean found = false;
-            for (Story story : member.getData().getStories()) {
-                if (story.getStoryId() == storyId) {
-                    found = true;
-                    int chapter = getIntent().getIntExtra("chapter", story.getLastChapter());
-                    int stage = getIntent().getIntExtra("stage", story.getLastStage());
-                    // загрузка последней стадии или намеренной
-                    loadChapter(story.getStoryId(), chapter, stage, getIntent().hasExtra("chapter") && getIntent().hasExtra("stage"));
-                }
-            }
-            if (!found)
+            if (currentState != null) {
+                int chapter = getIntent().getIntExtra("chapter", currentState.getChapterId());
+                int stage = getIntent().getIntExtra("stage", currentState.getStageId());
+                // загрузка последней стадии или намеренной
+                loadChapter(currentState.getStoryId(), chapter, stage, getIntent().hasExtra("chapter") && getIntent().hasExtra("stage"));
+            } else
                 loadChapter(storyId, 1, 0, true);// первое открытие
 
         } else
@@ -220,9 +240,9 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public void processTransfer(Transfer transfer) {
+    public void processTransfer(TransferModel transfer) {
         if (sceneController.getActualStage().getTypeStage() == 7) {
-            summary.addMessage(new UserMessage(member, transfer.text));
+            summary.addMessage(new UserMessage(userModel, transfer.getText()));
         }
     }
 
@@ -272,6 +292,13 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    private UserDataCompanion getActualDataCompanion() {
+        StoryDataModel storyDataModel = questViewModel.getStoryData().getValue().getOrThrow();
+
+
+        return UserDataCompanion.of(userModel, storyDataModel);
+    }
+
     @Override
     public void onBackPressed() {
         startActivity(new Intent(this, MainActivity.class));
@@ -284,17 +311,9 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         try {
             switch (stage.getTypeStage()) {
                 default:
-                    Quest0Scene quest0Scene = new Quest0Scene();
-                    quest0Scene.setStage(stage);
-                    quest0Scene.setController(sceneController);
-                    mFragmentTransaction.replace(R.id.containerView, quest0Scene);
-                    setLoading(false);
-                    break;
-                case 1:
-                    Quest1Scene quest1Scene = new Quest1Scene();
-                    quest1Scene.setStage(stage);
-                    quest1Scene.setController(sceneController);
-                    mFragmentTransaction.replace(R.id.containerView, quest1Scene);
+                    StageModel stageModel = StageMapper.INSTANCE.model(stage, getActualDataCompanion(), this);
+                    StageFragment stageFragment = StageFragment.createInstance(stageModel, sceneController);
+                    mFragmentTransaction.replace(R.id.containerView, stageFragment);
                     setLoading(false);
                     break;
                 case 4:
@@ -342,18 +361,19 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void setBackground(String backgroundUrl) {
-        if (!background_url.equals(backgroundUrl)) {
-            if (!backgroundUrl.contains("http")) {
-                background_url = "https://" + BuildConfig.URL + "/" + backgroundUrl;
-            } else background_url = backgroundUrl;
+        if (backgroundUrl != null)
+            if (!background_url.equals(backgroundUrl)) {
+                if (!backgroundUrl.contains("http")) {
+                    background_url = "https://" + BuildConfig.URL + "/" + backgroundUrl;
+                } else background_url = backgroundUrl;
 
-            Glide.with(this)
-                    .load(background_url)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .centerCrop()
-                    .into((ImageView) switcher.getNextView());
-            switcher.showNext();
-        }
+                Glide.with(this)
+                        .load(background_url)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .centerCrop()
+                        .into((ImageView) switcher.getNextView());
+                switcher.showNext();
+            }
     }
 
     boolean isFirst = true;
@@ -377,9 +397,9 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                 finish();
                 break;
             case R.id.exitButton:
-                HashMap<String, List<String>> action = new HashMap<>();
-                action.put("reset_current", new ArrayList<>());
-                viewModel.syncMember(action);
+                HashMap<String, List<String>> actions = new HashMap<>();
+                actions.put("reset_current", new ArrayList<>());
+                questViewModel.applyActions(actions);
                 viewModel.getMember().observe(this, memberResult -> {
                     if (isFirst)
                         isFirst = false;
@@ -388,7 +408,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                         intent.putExtra("section", "stories");
                         startActivity(intent);
                         finish();
-                    } else viewModel.syncMember(action);
+                    } else questViewModel.applyActions(actions);
                 });
                 break;
             case R.id.log:

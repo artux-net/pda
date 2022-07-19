@@ -1,30 +1,28 @@
 buildscript {
-    ext.kotlin_version = '1.5.30'
+    ext.kotlin_version = '1.7.0'
 
     repositories {
         mavenLocal()
         mavenCentral()
+        maven { url "https://jitpack.io" }
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         google()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath 'com.android.tools.build:gradle:7.2.1'
         classpath 'com.google.gms:google-services:4.3.10'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.8.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'org.projectlombok:lombok:1.18.0'
         classpath "com.badlogicgames.gdx:gdx-ai:1.8.1"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
     }
 }
 
 allprojects {
-    apply plugin: "eclipse"
-
     version = '1.0'
     ext {
+        kotlin_version = '1.7.0'
         appName = "test"
         gdxVersion = '1.9.10'
         roboVMVersion = '2.3.8'
@@ -49,8 +47,8 @@ project(":app") {
     configurations { natives }
 
     dependencies {
+        implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.6'
         implementation project(":core")
-        implementation project(":pdanetworklib")
 
         api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
@@ -75,18 +73,12 @@ project(":app") {
     }
 }
 
-project(":pdanetworklib") {
-    dependencies {
-    }
-}
-
 project(":core") {
     apply plugin: "java-library"
 
     configurations { natives }
 
     dependencies {
-        implementation project(":pdanetworklib")
         implementation 'com.google.code.gson:gson:2.8.9'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
@@ -95,22 +87,6 @@ project(":core") {
         implementation "com.badlogicgames.gdx:gdx-ai:1.8.1"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
-    }
-}
-
-project(":tests") {
-    apply plugin: "java-library"
-
-    configurations { natives }
-
-    dependencies {
-        implementation project(":core")
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-
-        implementation "com.badlogicgames.gdx:gdx-ai:1.8.1"
-        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
 }
 

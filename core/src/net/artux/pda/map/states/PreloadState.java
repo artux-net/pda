@@ -3,11 +3,9 @@ package net.artux.pda.map.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.model.Map;
+import net.artux.pda.map.model.input.Map;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +27,7 @@ public class PreloadState extends State {
 
     long preloadTime;
 
-    public void startLoad(Batch batch) {
+    public void startLoad() {
         Map map = (Map) gsm.get("map");
         preloadTime = TimeUtils.millis();
         if (map != null) {
@@ -41,14 +39,14 @@ public class PreloadState extends State {
 
             for (String asset :
                     remoteAssets) {
-                loadTexture(batch, asset, 0);
+                loadTexture(asset, 0);
             }
 
         } else
             gsm.getPlatformInterface().error("Can not start with null map", new NullPointerException());
     }
 
-    public void loadTexture(final Batch batch, final String path, final int tries) {
+    public void loadTexture(final String path, final int tries) {
         final FileHandle file = Gdx.files.local(cachePath + path);
         if (!file.exists() && path != null && !path.equals("")) {
             final String url = baseUrl + path;
@@ -65,7 +63,7 @@ public class PreloadState extends State {
                             public void run() {
                                 file.writeBytes(bytes, false);
                                 Gdx.app.error("Preload", path + " loaded, caching.");
-                                checkForStartPlay(batch);
+                                checkForStartPlay();
                             }
                         });
                     }
@@ -75,20 +73,20 @@ public class PreloadState extends State {
                 public void failed(Throwable t) {
                     if (tries > triesLimit) {
                         gsm.getPlatformInterface().error("Could not load " + url, t);
-                    } else loadTexture(batch, path, tries + 1);
+                    } else loadTexture(path, tries + 1);
                 }
 
                 @Override
                 public void cancelled() {
                     if (tries > triesLimit) {
                         gsm.getPlatformInterface().error("Loading stopped " + url, new RuntimeException());
-                    } else loadTexture(batch, path, tries + 1);
+                    } else loadTexture(path, tries + 1);
                 }
             });
-        } else checkForStartPlay(batch);
+        } else checkForStartPlay();
     }
 
-    void checkForStartPlay(Batch batch) {
+    void checkForStartPlay() {
         Map map = (Map) gsm.get("map");
         if (map != null) {
             FileHandle file = Gdx.files.local(cachePath + map.getTextureUri());
@@ -104,7 +102,7 @@ public class PreloadState extends State {
             try {
                 if (!(gsm.peek() instanceof PlayState)) {
                     Gdx.app.log("Preload", "Ok, try to load Play State. Preload took " + (TimeUtils.millis() - preloadTime) + " ms.");
-                    gsm.set(new PlayState(gsm, batch));
+                    gsm.set(new PlayState(gsm));
                 }
             } catch (Throwable e) {
                 gsm.getPlatformInterface().error("Can not start PlayState", e);
@@ -129,10 +127,8 @@ public class PreloadState extends State {
 
     }
 
-
     @Override
-    public void render(SpriteBatch batch) {
-
+    public void render() {
 
     }
 

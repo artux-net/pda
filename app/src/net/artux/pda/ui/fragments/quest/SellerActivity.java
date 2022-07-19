@@ -2,7 +2,6 @@ package net.artux.pda.ui.fragments.quest;
 
 import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -19,17 +18,12 @@ import com.bumptech.glide.Glide;
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pda.repositories.Result;
+import net.artux.pda.models.profile.Seller;
+import net.artux.pda.models.user.UserModel;
+import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
-import net.artux.pda.viewmodels.MemberViewModel;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.Status;
-import net.artux.pdalib.profile.Data;
-import net.artux.pdalib.profile.Seller;
-import net.artux.pdalib.profile.items.Item;
-
-import java.util.List;
+import net.artux.pda.ui.viewmodels.UserViewModel;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,7 +37,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
     private RecyclerView buyerView;
     private ImageView background;
 
-    private MemberViewModel viewModel;
+    private UserViewModel viewModel;
 
     private int sellerId = 0;
 
@@ -52,7 +46,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_quest3);
         if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(MemberViewModel.class);
+            viewModel = getViewModelFactory(this).create(UserViewModel.class);
 
         sellerId = getIntent().getIntExtra("seller", 0);
 
@@ -64,13 +58,13 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
 
         viewModel.getMember().observe(this, memberResult -> {
             if (memberResult instanceof Result.Success)
-                updateList(((Result.Success<Member>) memberResult).getData());
+                updateList(((Result.Success<UserModel>) memberResult).getData());
             else viewModel.updateMember();
         });
 
         sellerAdapter = new ItemsAdapter();
         sellerAdapter.setOnClickListener(pos -> {
-            Item item = sellerAdapter.getItems().get(pos);
+            /*Item item = sellerAdapter.getItems().get(pos);
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
             builder.setTitle("Вы хотите купить " + item.title + " за " + item.price + "?");
 
@@ -97,7 +91,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {});
 
             AlertDialog alertDialog = builder.create();
-            alertDialog.show();
+            alertDialog.show();*/
         });
 
         App.getRetrofitService().getPdaAPI().getSeller(sellerId).enqueue(new Callback<Seller>() {
@@ -137,10 +131,11 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
         sellerView.setAdapter(sellerAdapter);
     }
 
-    void updateList(Member member){
-        Data data = member.getData();
-        ((TextView)findViewById(R.id.playerName)).setText(member.getName());
-        ((TextView)findViewById(R.id.playerMoney)).setText(getString(R.string.money, String.valueOf(member.getMoney())));
+    void updateList(UserModel userModel){
+        //TODO
+        /*Data data = userModel.getData();//
+        ((TextView)findViewById(R.id.playerName)).setText(userModel.getName());
+        ((TextView)findViewById(R.id.playerMoney)).setText(getString(R.string.money, String.valueOf(userModel.getMoney())));
         List<Item> buyerList = data.getAllItems();
         ItemsAdapter buyerAdapter = new ItemsAdapter();
         buyerAdapter.setOnClickListener(pos -> {
@@ -174,7 +169,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
         });
         buyerAdapter.setItems(buyerList);
         buyerView.setAdapter(buyerAdapter);
-        buyerView.setLayoutManager(buyerAdapter.getLayoutManager(this,3));
+        buyerView.setLayoutManager(buyerAdapter.getLayoutManager(this,3));*/
     }
 
     @Override

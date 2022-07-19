@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
@@ -23,16 +22,15 @@ import com.bumptech.glide.request.target.Target;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.App;
-import net.artux.pda.repositories.Result;
-import net.artux.pda.viewmodels.MemberViewModel;
+import net.artux.pda.repositories.util.Result;
+import net.artux.pda.ui.viewmodels.UserViewModel;
 
 import timber.log.Timber;
 
 public class LoadingActivity extends AppCompatActivity {
 
     private boolean loaded, gifEnd, afterClearCache = false;
-    private MemberViewModel viewModel;
+    private UserViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +38,7 @@ public class LoadingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_loading);
 
         if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(MemberViewModel.class);
+            viewModel = getViewModelFactory(this).create(UserViewModel.class);
 
         Glide.with(this)
                 .asGif()
@@ -82,7 +80,6 @@ public class LoadingActivity extends AppCompatActivity {
             }else{
                 Timber.i("User information loaded, try to start...");
                 Toast.makeText(getApplicationContext(), "Данные не найдены, попробуйте ввойти снова", Toast.LENGTH_SHORT).show();
-                App.getDataManager().removeAllData();
                 startActivity(new Intent(LoadingActivity.this, LoginActivity.class));
                 LoadingActivity.this.finish();
             }

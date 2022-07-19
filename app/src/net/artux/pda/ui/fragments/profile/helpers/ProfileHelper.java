@@ -8,14 +8,14 @@ import com.bumptech.glide.Glide;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pdalib.Profile;
+import net.artux.pda.models.user.ProfileModel;
 
 import java.util.Date;
 
 public class ProfileHelper {
 
-    public static String getGroup(Profile profile, Context context) {
-        return context.getResources().getStringArray(R.array.groups)[profile.getGroup()];
+    public static String getGroup(ProfileModel profileModel, Context context) {
+        return context.getResources().getStringArray(R.array.groups)[profileModel.getGroup()];
     }
 
     public static String getGroup(Context context, int group) {
@@ -46,11 +46,11 @@ public class ProfileHelper {
         return true;
     }
 
-    public static void setAvatar(ImageView imageView, String avatar){
+    public static void setAvatar(ImageView imageView, String avatar) {
         Context context = imageView.getContext();
-        if (isInteger(avatar) && context.getResources()!=null)
+        if (isInteger(avatar) && context.getResources() != null)
             Glide.with(context)
-                    .load(Uri.parse("file:///android_asset/avatars/a"+ (Integer.parseInt(avatar) + 1) +".png"))
+                    .load(Uri.parse("file:///android_asset/avatars/a" + (Integer.parseInt(avatar) + 1) + ".png"))
                     .into(imageView);
         else {
             if (!avatar.contains("http")) {
@@ -61,37 +61,37 @@ public class ProfileHelper {
         }
     }
 
-    public static String getRang(Profile profile, Context context) {
-        return context.getResources().getStringArray(R.array.rang)[rang(profile.getXp())];
+    public static String getRang(ProfileModel profileModel, Context context) {
+        return context.getResources().getStringArray(R.array.rang)[rang(profileModel.getXp())];
     }
 
-    public static String getRang(Context context, int xp){
+    public static String getRang(Context context, int xp) {
         return context.getResources().getStringArray(R.array.rang)[rang(xp)];
     }
 
-    private static int rang(int xp){
-        if(xp<500)
+    private static int rang(int xp) {
+        if (xp < 500)
             return 0;
-        else if(xp<1500)
+        else if (xp < 1500)
             return 1;
-        else if(xp<3500)
+        else if (xp < 3500)
             return 2;
-        else if(xp<6000)
+        else if (xp < 6000)
             return 3;
-        else if(xp<9000)
+        else if (xp < 9000)
             return 4;
-        else if(xp<12000)
+        else if (xp < 12000)
             return 5;
         else return 6;
     }
 
-    public static String getDays(Profile profile) {
-        if (profile.getRegistration()!=null) {
-            Date now = new Date(), past = new Date(profile.getRegistration());
+    public static String getDays(ProfileModel profileModel) {
+        if (profileModel.getRegistration() != null) {
+            Date now = new Date(), past = new Date(profileModel.getRegistration());
             int days = daysBetween(past, now);
 
             return days + " " + getDayAddition(days);
-        }else return "null";
+        } else return "null";
     }
 
     public static String getDays(Long date) {
@@ -101,19 +101,17 @@ public class ProfileHelper {
         return days + " " + getDayAddition(days);
     }
 
-    private static int daysBetween(Date d1, Date d2){
-        return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+    private static int daysBetween(Date d1, Date d2) {
+        return (int) ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
     }
 
     private static String getDayAddition(int num) {
         int preLastDigit = num % 100 / 10;
-        if (preLastDigit == 1)
-        {
+        if (preLastDigit == 1) {
             return "дней";
         }
 
-        switch (num % 10)
-        {
+        switch (num % 10) {
             case 1:
                 return "день";
             case 2:

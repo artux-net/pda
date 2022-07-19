@@ -16,14 +16,14 @@ import com.bumptech.glide.request.RequestOptions;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pdalib.profile.items.Item;
+import net.artux.pda.models.items.ItemModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> {
 
-    private List<Item> items = new ArrayList<>();
+    private List<ItemModel> items = new ArrayList<>();
     OnClickListener onClickListener;
 
     public ItemsAdapter(){}
@@ -66,7 +66,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position).type;
+        return items.get(position).getType().getTypeId();
     }
 
     @Override
@@ -74,12 +74,12 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
         return items.size();
     }
 
-    public void setItems(List<Item> items){
+    public void setItems(List<ItemModel> items){
         this.items = items;
         notifyDataSetChanged();
     }
 
-    public List<Item> getItems() {
+    public List<ItemModel> getItems() {
         return items;
     }
 
@@ -98,8 +98,8 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
             quantity = itemView.findViewById(R.id.itemQuantity);
         }
 
-        void bind(Item item){
-            title.setText(item.title);
+        void bind(ItemModel item){
+            title.setText(item.getTitle());
 
             itemView.setOnClickListener(view -> {
                 onClickListener.onClick(getPosition());
@@ -111,12 +111,12 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
             Glide.with(title.getContext())
                     .asGif()
-                    .load(BuildConfig.PROTOCOL + "://"+ BuildConfig.URL+"/base/items/icons/"+item.icon)
+                    .load(BuildConfig.PROTOCOL + "://"+ BuildConfig.URL+"/base/items/icons/"+item.getIcon())
                     .apply(options)
                     .into(image);
 
-            quantity.setText(String.valueOf(item.quantity));
-            weight.setText(weight.getContext().getString(R.string.weight, String.valueOf(item.weight)));
+            quantity.setText(String.valueOf(item.getQuantity()));
+            weight.setText(weight.getContext().getString(R.string.weight, String.valueOf(item.getWeight())));
         }
     }
 

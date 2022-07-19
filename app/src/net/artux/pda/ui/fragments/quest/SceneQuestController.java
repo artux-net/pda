@@ -1,9 +1,9 @@
 package net.artux.pda.ui.fragments.quest;
 
+import net.artux.pda.models.quest.TransferModel;
 import net.artux.pda.ui.activities.StageListener;
 import net.artux.pda.ui.fragments.quest.models.Chapter;
 import net.artux.pda.ui.fragments.quest.models.Stage;
-import net.artux.pda.ui.fragments.quest.models.Transfer;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -24,45 +24,44 @@ public class SceneQuestController implements Serializable, QuestController {
         listener.setLoading(true);
     }
 
-    public void beginWithStage(int stageId, boolean sync){
+    public void beginWithStage(int stageId, boolean sync) {
         listener.setTitle("Глава " + chapterId);
         loadStage(stageId, sync);
     }
 
-    public void beginWithStage(int stageId){
+    public void beginWithStage(int stageId) {
         listener.setTitle("Глава " + chapterId);
         loadStage(stageId, false);
     }
 
     @Override
-    public void chooseTransfer(Transfer transfer) {
+    public void chooseTransfer(TransferModel transfer) {
         listener.processTransfer(transfer);
-        loadStage(transfer.stage_id);
+        loadStage(transfer.getStageId());
     }
 
-    private void synchronize(Stage stage, int id){
+    private void synchronize(Stage stage, int id) {
         listener.sync(stage, id);
     }
 
-    void loadStage(int id){
-        actualStage = getStage(id);
-        synchronize(actualStage, id);
-        listener.setStage(actualStage, true);
+    void loadStage(int id) {
+        loadStage(id, true);
     }
 
-    void loadStage(int id, boolean sync){
+    void loadStage(int id, boolean sync) {
         actualStage = getStage(id);
         if (sync)
             synchronize(actualStage, id);
+        listener.prepareStage(actualStage);
         listener.setStage(actualStage, sync);
     }
 
-    private Stage getStage(int id){
+    private Stage getStage(int id) {
         Iterator<Stage> iterator = chapter.getStages().iterator();
         Stage stage = null;
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             stage = iterator.next();
-            if(stage.getId()==id) break;
+            if (stage.getId() == id) break;
         }
         return stage;
     }

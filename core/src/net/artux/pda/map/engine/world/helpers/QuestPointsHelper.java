@@ -11,16 +11,17 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.QuestComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.systems.DataSystem;
-import net.artux.pda.map.engine.systems.InteractionSystem;
+import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
-import net.artux.pda.map.model.Map;
-import net.artux.pda.map.model.Point;
 import net.artux.pda.map.model.Transfer;
+import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.model.input.Point;
+import net.artux.pda.map.models.Checker;
+import net.artux.pda.map.models.UserGdx;
+import net.artux.pda.map.models.user.GdxData;
+import net.artux.pda.map.models.user.StoryStateGdx;
 import net.artux.pda.map.states.State;
 import net.artux.pda.map.ui.UserInterface;
-import net.artux.pdalib.Checker;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.profile.Story;
 
 import java.util.HashMap;
 
@@ -29,23 +30,21 @@ public class QuestPointsHelper {
 
     public static void createQuestPointsEntities(Engine engine, AssetManager assetManager) {
         Map map = engine.getSystem(DataSystem.class).getMap();
-        Member member = engine.getSystem(DataSystem.class).getMember();
-
+        UserGdx userModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().userModel;
+        GdxData dataModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().gdxData;
+        StoryStateGdx storyStateModel = dataModel.getCurrent();
         for (Point point : map.getPoints()) {
-            if (member != null && Checker.check(point.getCondition(), member))
+            //TODO sync with ui
+            if (Checker.check(point.getCondition(), dataModel, userModel.getMoney()))
                 if (point.getData().containsKey("chapter")) {
-                    int storyId = Integer.parseInt(member.getData().getTemp().get("currentStory"));
-                    for (Story story : member.getData().getStories()) {
-                        if (story.getStoryId() == storyId
-                                && (Integer.parseInt(point.getData().get("chapter")) == story.getLastChapter()
-                                || Integer.parseInt(point.getData().get("chapter")) == 0))
-                            addPoint(engine, assetManager, point);
-                    }
+                    if ((Integer.parseInt(point.getData().get("chapter")) == storyStateModel.getChapterId()
+                            || Integer.parseInt(point.getData().get("chapter")) == 0))
+                        addPoint(engine, assetManager, point);
                 } else addPoint(engine, assetManager, point);
         }
 
         for (Transfer transfer : map.getTransfers()) {
-            if (member != null && Checker.check(transfer.condition, member))
+            if (userModel != null && Checker.check(transfer.condition, dataModel, userModel.getMoney()))
                 addTransferPoint(engine, assetManager, transfer);
         }
     }
@@ -63,7 +62,7 @@ public class QuestPointsHelper {
                     @Override
                     public void clicked() {
                         engine.getSystem(RenderSystem.class)
-                                .showText("Метка: " + point.getTitle(),point.getPosition());
+                                .showText("Метка: " + point.getTitle(), point.getPosition());
                     }
                 }));
 
@@ -112,7 +111,7 @@ public class QuestPointsHelper {
                     @Override
                     public void clicked() {
                         engine.getSystem(RenderSystem.class)
-                                .showText("Локация " + point.getMessage(),point.getPosition());
+                                .showText("Локация " + point.getMessage(), point.getPosition());
                     }
                 }));
 

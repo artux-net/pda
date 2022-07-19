@@ -3,17 +3,17 @@ package net.artux.pda.map.engine.systems;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 
-import net.artux.pda.map.model.Map;
-import net.artux.pdalib.Member;
+import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.models.UserGdx;
 
 public class DataSystem extends EntitySystem {
 
     private final Map map;
-    private final Member member;
+    private final UserGdx userModel;
 
-    public DataSystem(Map map, Member member) {
+    public DataSystem(Map map, UserGdx userModel) {
         this.map = map;
-        this.member = member;
+        this.userModel = userModel;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class DataSystem extends EntitySystem {
         return map;
     }
 
-    public Member getMember() {
-        return member;
+    public UserGdx getMember() {
+        return userModel;
     }
 }

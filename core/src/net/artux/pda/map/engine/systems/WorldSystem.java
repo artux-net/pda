@@ -2,15 +2,12 @@ package net.artux.pda.map.engine.systems;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
-import static net.artux.pda.map.engine.pathfinding.TiledNode.TILE_WALL;
-
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -31,10 +28,9 @@ import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.states.BotStatesAshley;
-import net.artux.pda.map.engine.data.GlobalData;
-import net.artux.pdalib.profile.items.Armor;
-import net.artux.pdalib.profile.items.Item;
-import net.artux.pdalib.profile.items.Weapon;
+import net.artux.pda.map.models.items.Armor;
+import net.artux.pda.map.models.items.Item;
+import net.artux.pda.map.models.items.Weapon;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -106,7 +102,7 @@ public class WorldSystem extends EntitySystem implements Disposable {
                             entity.add(new PositionComponent(randomPosition
                                     .getRandomAround(positionComponent1.getPosition(),
                                             anomalyComponent.size)));
-                            entity.add(new SpriteComponent(assetManager.get("yellow.png", Texture.class), 1,1));
+                            entity.add(new SpriteComponent(assetManager.get("yellow.png", Texture.class), 1, 1));
                             entity.add(new ArtifactComponent());
                             getEngine().addEntity(entity);
                         }
@@ -120,7 +116,7 @@ public class WorldSystem extends EntitySystem implements Disposable {
 
     }
 
-    private void generateGroup(){
+    private void generateGroup() {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -128,13 +124,13 @@ public class WorldSystem extends EntitySystem implements Disposable {
 
                 Armor armor = new Armor();
                 Weapon w = new Weapon();
-                w.speed = 30;
-                w.damage = 2;
-                w.precision = 1;
-                w.bullet_quantity = 15;
+                w.setSpeed(30);
+                w.setDamage(1);
+                w.setPrecision(1);
+                w.setBulletQuantity(15);
 
                 entity.add(new PositionComponent(mapOrientationSystem.getRandomFreePoint(cameraSystem.getCamera())))
-                        .add(new SpriteComponent(assetManager.get("red.png", Texture.class), 8,8))
+                        .add(new SpriteComponent(assetManager.get("red.png", Texture.class), 8, 8))
                         .add(new VelocityComponent())
                         .add(new HealthComponent())
                         .add(new WeaponComponent(armor, w, w))

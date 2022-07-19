@@ -23,7 +23,7 @@
     <string name="news">Новости</string>
     <string name="chat">Чат</string>
     <string name="messages">Сообщения</string>
-    <string name="profile">Профиль</string>
+    <string name="profileModel">Профиль</string>
     <string name="notes">Заметки</string>
     <string name="map">Карта</string>
     <string name="choose_avatar">Выберите аватар</string>

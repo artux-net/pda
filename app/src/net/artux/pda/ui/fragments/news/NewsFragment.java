@@ -13,11 +13,10 @@ import com.google.gson.reflect.TypeToken;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
+import net.artux.pda.models.ResponsePage;
+import net.artux.pda.models.news.Article;
+import net.artux.pda.ui.util.GsonProvider;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.fragments.additional.InfoFragment;
-import net.artux.pdalib.ResponsePage;
-import net.artux.pdalib.news.Article;
-import net.artux.pdalib.profile.items.GsonProvider;
 
 import java.lang.reflect.Type;
 import java.util.List;

@@ -1,13 +1,9 @@
 package net.artux.pda.app;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 
-import net.artux.pdalib.LoginUser;
-import net.artux.pdalib.Member;
-
-import org.jetbrains.annotations.NotNull;
+import net.artux.pda.models.user.LoginUser;
 
 import okhttp3.Credentials;
 

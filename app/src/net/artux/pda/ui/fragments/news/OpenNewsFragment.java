@@ -11,7 +11,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
@@ -32,8 +30,8 @@ import com.google.android.gms.ads.nativead.NativeAdView;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
+import net.artux.pda.models.news.Article;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pdalib.news.Article;
 
 import timber.log.Timber;
 

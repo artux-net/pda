@@ -19,7 +19,6 @@ import net.artux.pda.map.engine.systems.PlayerSystem;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Logger extends VerticalGroup implements Disposable {
@@ -48,9 +47,9 @@ public class Logger extends VerticalGroup implements Disposable {
         put("Java Heap", Gdx.app, "getJavaHeap");
         put("Player position", playerSystem, "getPosition");
         put("Здоровье", playerSystem, "getHealth");
-        put("Params", playerSystem.getPlayerMember().getData(), "getParameters");
-        put("Temp", playerSystem.getPlayerMember().getData(), "getTemp");
-        put("Stories stat", Arrays.toString(playerSystem.getPlayerMember().getData().getStories().toArray()), "toString");
+        put("Params", playerSystem.getPlayerComponent().gdxData, "getParameters");
+        put("Temp", playerSystem.getPlayerComponent().gdxData.getCurrent(), "toString");
+        //put("Stories stat", Arrays.toString(playerSystem.getPlayerMember().getData().getStories().toArray()), "toString");
 
         put("Screen width", Gdx.app.getGraphics(), "getWidth");
         put("Height", Gdx.app.getGraphics(), "getHeight");

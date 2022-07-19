@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
+import net.artux.pda.models.UserMessage;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
-import net.artux.pdalib.UserMessage;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -96,21 +96,21 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             SimpleDateFormat outputFormat =
                     new SimpleDateFormat("HH:mm", Locale.getDefault());
             outputFormat.setTimeZone(TimeZone.getDefault());
-            Instant instant = new Instant(userMessage.time);
+            Instant instant = new Instant(userMessage.getTimestamp());
             DateTime time = instant.toDateTime().toDateTime(DateTimeZone.getDefault());
 
-            nicknameView.setText(userMessage.senderLogin);
-            messageView.setText(Html.fromHtml(userMessage.message));
+            nicknameView.setText(userMessage.getLogin());
+            messageView.setText(Html.fromHtml(userMessage.getContent()));
 
-            if (userMessage.pdaId < 0 || userMessage.groupId < 0){
+            if (userMessage.getPdaId() < 0 || userMessage.getGang().getId() < 0){
                 infoView.setText(" [PDA ###]"
                         + " - " + outputFormat.format(time.toDate()));
             }else {
-                infoView.setText(" [PDA #" + userMessage.pdaId + "] "
-                        + infoView.getContext().getResources().getStringArray(R.array.groups)[userMessage.groupId] // группировка
+                infoView.setText(" [PDA #" + userMessage.getPdaId() + "] "
+                        + infoView.getContext().getResources().getStringArray(R.array.groups)[userMessage.getGang().getId()] // группировка
                         + " - " + outputFormat.format(time.toDate()));
             }
-            ProfileHelper.setAvatar(avatarView, userMessage.avatarId);
+            ProfileHelper.setAvatar(avatarView, userMessage.getAvatar());
         }
     }
 

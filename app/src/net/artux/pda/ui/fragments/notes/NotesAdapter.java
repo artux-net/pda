@@ -15,9 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.ItemNoteBinding;
+import net.artux.pda.models.profile.Note;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.profile.Note;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -33,7 +32,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.internal.EverythingIsNonNull;
-import timber.log.Timber;
 
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {

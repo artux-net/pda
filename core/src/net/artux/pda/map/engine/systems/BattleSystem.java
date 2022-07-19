@@ -3,44 +3,32 @@ package net.artux.pda.map.engine.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntityListener;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.engine.components.DeadComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
-import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
+import net.artux.pda.map.models.items.Item;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.Slot;
-import net.artux.pdalib.profile.Data;
-import net.artux.pdalib.profile.items.Item;
 
-import java.util.Iterator;
 import java.util.Random;
 
 public class BattleSystem extends BaseSystem implements Disposable, Drawable {
@@ -104,17 +92,17 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
             userInterface.getHudTable().add(weaponSlot).height(height).padLeft(20);
 
             if (entityWeapon.resource != null) {
-                PlayerData.bullet = entityWeapon.resource.title;
-                weaponSlot.setText(entityWeapon.resource.quantity + "/" + entityWeapon.getMagazine());
+                PlayerData.bullet = entityWeapon.resource.getTitle();
+                weaponSlot.setText(entityWeapon.resource.getQuantity() + "/" + entityWeapon.getMagazine());
             }else{
                 StringBuilder stringBuilder = new StringBuilder();
                 for (Item i:
-                        getEngine().getSystem(DataSystem.class).getMember().getData().getItems()     ) {
-                    stringBuilder.append("{").append(i.id).append("}").append(" ");
+                        getEngine().getSystem(PlayerSystem.class).getPlayerComponent().gdxData.getAllItems()) {
+                    stringBuilder.append("{").append(i.getId()).append("}").append(" ");
                 }
 
-                gsm.getPlatformInterface().toast("Патроны для "+ entityWeapon.getSelected().title
-                        + " отсутсутвуют, необходим id: " + entityWeapon.getSelected().bullet_id + ", есть " + stringBuilder.toString());
+                gsm.getPlatformInterface().toast("Патроны для "+ entityWeapon.getSelected().getTitle()
+                        + " отсутсутвуют, необходим id: " + entityWeapon.getSelected().getBulletId() + ", есть " + stringBuilder.toString());
             }
 
         }
@@ -135,10 +123,10 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
 
 
         if (entityWeapon.getSelected() != null) {
-            PlayerData.selectedWeapon = entityWeapon.getSelected().title;
+            PlayerData.selectedWeapon = entityWeapon.getSelected().getTitle();
             if (entityWeapon.resource != null) {
-                PlayerData.bullet = entityWeapon.resource.title;
-                weaponSlot.setText(entityWeapon.resource.quantity + "/" + entityWeapon.getMagazine());
+                PlayerData.bullet = entityWeapon.resource.getTitle();
+                weaponSlot.setText(entityWeapon.resource.getQuantity() + "/" + entityWeapon.getMagazine());
             }
         }
     }
@@ -232,7 +220,7 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
     }
 
     private void shoot(HealthComponent enemyHealth, WeaponComponent entityWeapon, Vector2 shootPosition) {
-        enemyHealth.value -= entityWeapon.getSelected().damage;
+        enemyHealth.value -= entityWeapon.getSelected().getDamage();
         soundsSystem.playShoot(shootPosition);
     }
 }

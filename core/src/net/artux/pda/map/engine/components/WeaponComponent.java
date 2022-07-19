@@ -2,11 +2,11 @@ package net.artux.pda.map.engine.components;
 
 import com.badlogic.ashley.core.Component;
 
-import net.artux.pdalib.Member;
-import net.artux.pdalib.profile.Equipment;
-import net.artux.pdalib.profile.items.Armor;
-import net.artux.pdalib.profile.items.Item;
-import net.artux.pdalib.profile.items.Weapon;
+import net.artux.pda.map.models.items.Armor;
+import net.artux.pda.map.models.items.Item;
+import net.artux.pda.map.models.items.ItemType;
+import net.artux.pda.map.models.items.Weapon;
+import net.artux.pda.map.models.user.GdxData;
 
 public class WeaponComponent implements Component {
 
@@ -22,17 +22,18 @@ public class WeaponComponent implements Component {
 
     float timeout;
 
-    Member member;
+    GdxData dataModel;
     boolean player;
 
-    public WeaponComponent(Member member) {
-        Equipment equipment = member.getData().getEquipment();
-        this.armor = equipment.getArmor();
-        this.weapon1 = equipment.getSecondWeapon();
-        this.weapon2 = equipment.getFirstWeapon();
-        this.member = member;
-        if (getSelected()!=null)
-            setResource(member.getData().getItemById(getSelected().bullet_id));
+    public WeaponComponent(GdxData dataModel) {
+        this.armor = (Armor) dataModel.getCurrentWearable(ItemType.ARMOR);
+        this.weapon1 = (Weapon) dataModel.getCurrentWearable(ItemType.RIFLE);
+        this.weapon2 = (Weapon) dataModel.getCurrentWearable(ItemType.PISTOL);
+
+        Weapon selectedWeapon = getSelected();
+        if (selectedWeapon != null)
+            setResource(dataModel.getItemByBaseId(selectedWeapon.getBulletId()));
+
         player = true;
         reload();
     }
@@ -54,13 +55,13 @@ public class WeaponComponent implements Component {
 
     public Item resource;
 
-    public void setResource(Item item){
-        if (item != null && getSelected().bullet_id == item.id){
+    public void setResource(Item item) {
+        if (item != null && getSelected().getBulletId() == item.getBaseId()) {
             resource = item;
         }
     }
 
-    public int getMagazine(){
+    public int getMagazine() {
         int magazine;
         if (selected == 0)
             magazine = bullets_2;
@@ -70,7 +71,7 @@ public class WeaponComponent implements Component {
     }
 
     public Weapon getSelected() {
-        if (selected ==0 && weapon1!=null)
+        if (selected == 0 && weapon1 != null)
             return weapon1;
         else {
             selected = 1;
@@ -79,23 +80,23 @@ public class WeaponComponent implements Component {
     }
 
     public void setWeapon(Weapon weapon, int id) {
-        if (id==0)
+        if (id == 0)
             weapon1 = weapon;
         else weapon2 = weapon;
     }
 
-    public void update(float dt){
-        if (timeout>0)
+    public void update(float dt) {
+        if (timeout > 0)
             timeout -= dt;
-        if (timeout<0)
+        if (timeout < 0)
             reloading = false;
 
-        if (resource != null && resource.quantity < 1){
+        if (resource != null && resource.quantity < 1) {
             //swap
-            Weapon another = getSelected()==weapon1 ? weapon2 : weapon1;
-            if (another!=null){
-                Item bullet = member.getData().getItemById(getSelected().bullet_id);
-                if (bullet!=null && bullet.quantity > 0){
+            Weapon another = getSelected() == weapon1 ? weapon2 : weapon1;
+            if (another != null) {
+                Item bullet = dataModel.getItemByBaseId(getSelected().getBulletId());
+                if (bullet != null && bullet.quantity > 0) {
                     selected = selected == 0 ? 1 : 0;
                     setResource(bullet);
                 }
@@ -105,8 +106,8 @@ public class WeaponComponent implements Component {
 
     public boolean reloading;
 
-    public boolean shoot(){
-        if (timeout <= 0  && ((resource!=null && resource.quantity > 0) || !player)) {
+    public boolean shoot() {
+        if (timeout <= 0 && ((resource != null && resource.quantity > 0) || !player)) {
             Weapon weapon = getSelected();
             int magazine;
             if (selected == 0)
@@ -120,7 +121,7 @@ public class WeaponComponent implements Component {
                 else
                     bullets_1--;
 
-                timeout += 1 / weapon.speed;
+                timeout += 1 / weapon.getSpeed();
                 stack++;
                 if (player)
                     resource.quantity--;
@@ -129,25 +130,25 @@ public class WeaponComponent implements Component {
                 reloading = true;
 
                 reload();
-                timeout += 20 / weapon.speed; // перезарядка
+                timeout += 20 / weapon.getSpeed(); // перезарядка
                 return false;
             } else {
                 stack = 0;
-                timeout += 10 / weapon.speed;
+                timeout += 10 / weapon.getSpeed();
                 return false;
             }
-        }else return false;
+        } else return false;
     }
 
 
-    void reload(){
+    void reload() {
         Weapon weapon = getSelected();
-        if (weapon!=null && (!player || (resource!=null && resource.quantity>0))) {
-            int take = weapon.bullet_quantity;
+        if (weapon != null && (!player || (resource != null && resource.quantity > 0))) {
+            int take = weapon.getBulletQuantity();
             if (player) {
                 take = resource.quantity;
-                if (weapon.bullet_quantity < take) {
-                    take = weapon.bullet_quantity;
+                if (weapon.getBulletQuantity() < take) {
+                    take = weapon.getBulletQuantity();
                 }
             }
             stack = 0;

@@ -1,7 +1,7 @@
 package net.artux.pda.ui.fragments.chat;
 
-import net.artux.pdalib.Status;
-import net.artux.pdalib.UserMessage;
+import net.artux.pda.models.Status;
+import net.artux.pda.models.UserMessage;
 
 import java.util.List;
 

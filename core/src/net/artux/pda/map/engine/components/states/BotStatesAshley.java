@@ -13,7 +13,7 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
-import net.artux.pdalib.profile.items.Weapon;
+import net.artux.pda.map.models.items.Weapon;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -76,7 +76,7 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
                 Entity enemy = mm.get(entity).getEnemy();
                 if (wm.get(entity).getSelected() != null) {
                     Weapon weapon = wm.get(entity).getSelected();
-                    if (pm.get(enemy).getPosition().dst(pm.get(entity).getPosition()) < distanceToAttack(weapon.precision)) {
+                    if (pm.get(enemy).getPosition().dst(pm.get(entity).getPosition()) < distanceToAttack(weapon.getPrecision())) {
                         tmm.get(entity).setMovementTarget(null);
                         statesComponent.stateMachine.changeState(SHOOT);
                     } else {
@@ -97,7 +97,7 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
                 if (wm.get(entity).getSelected() != null) {
                     Weapon weapon = wm.get(entity).getSelected();
                     float dst = pm.get(enemy).getPosition().dst(pm.get(entity).getPosition());
-                    if (dst < distanceToAttack(weapon.precision)) {
+                    if (dst < distanceToAttack(weapon.getPrecision())) {
                         //shoot
                     } else if (dst < 10) {
                       // отодвинутся от врага

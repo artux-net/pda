@@ -16,7 +16,7 @@ import androidx.appcompat.app.AlertDialog;
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentAddProfileBinding;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
-import net.artux.pda.viewmodels.SummaryViewModel;
+import net.artux.pda.ui.viewmodels.SummaryViewModel;
 
 import org.jetbrains.annotations.Nullable;
 

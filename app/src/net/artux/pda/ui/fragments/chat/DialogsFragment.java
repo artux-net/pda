@@ -17,12 +17,12 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
+import net.artux.pda.models.Status;
+import net.artux.pda.models.UserMessage;
+import net.artux.pda.ui.util.GsonProvider;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
-import net.artux.pdalib.Status;
-import net.artux.pdalib.UserMessage;
-import net.artux.pdalib.profile.items.GsonProvider;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -64,6 +64,8 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
         }
 
         binding.list.setAdapter(dialogsAdapter);
+        binding.list.setVisibility(View.VISIBLE);
+        binding.viewMessage.setVisibility(View.GONE);
 
         /*Intent intent = new Intent(getActivity(), NotificationService.class).putExtra("t", App.getDataManager().getAuthToken());
         getActivity().startService(intent);*/
@@ -123,15 +125,14 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
 
                 try {
                     UserMessage userMessage = App.getRetrofitService().getGson().fromJson(text,UserMessage.class);
-                    if (userMessage.cid == -1) throw new JsonSyntaxException("");
+                    if (userMessage.getId() == -1) throw new JsonSyntaxException("");
                     dialogsAdapter.updateDialog(userMessage);
                     Timber.d("Dialogs, new message: " + userMessage.toString());
                 }catch (JsonSyntaxException e){
                     try {
                         ArrayList<Dialog> list = gson.fromJson(text, listType);
                         if (list!=null) {
-                            binding.list.setVisibility(View.VISIBLE);
-                            binding.viewMessage.setVisibility(View.GONE);
+
                             Timber.d("Set dialogs");
                             dialogsAdapter.setDialogs(list);
                             App.getDataManager().setString("dialogs",gson.toJson(list));

@@ -19,20 +19,20 @@ import androidx.savedstate.SavedStateRegistryOwner;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
 import net.artux.pda.map.GdxAdapter;
-import net.artux.pda.map.model.Map;
+import net.artux.pda.map.model.input.Map;
 import net.artux.pda.map.platform.PlatformInterface;
-import net.artux.pda.repositories.Result;
+import net.artux.pda.models.quest.story.StoryDataModel;
+import net.artux.pda.models.quest.story.StoryStateModel;
+import net.artux.pda.models.user.UserMapper;
+import net.artux.pda.models.user.UserModel;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
-import net.artux.pda.viewmodels.ProfileViewModel;
-import net.artux.pda.viewmodels.QuestViewModel;
-import net.artux.pdalib.Member;
+import net.artux.pda.ui.viewmodels.ProfileViewModel;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
 
 import java.util.HashMap;
 
@@ -41,7 +41,7 @@ import timber.log.Timber;
 public class MapEngine extends AndroidApplication implements PlatformInterface, LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner {
 
     private final Gson gson = new Gson();
-    private GdxAdapter gdxAdapter;
+    private GdxMapper mapper = GdxMapper.INSTANCE;
     private ProfileViewModel viewModel;
     private LifecycleRegistry lifecycleRegistry;
     private final SavedStateRegistryController mSavedStateRegistryController = SavedStateRegistryController.create(this);
@@ -49,6 +49,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
     private QuestViewModel questViewModel;
 
     ViewModelStore viewModelStore = new ViewModelStore();
+    UserMapper userMapper = UserMapper.INSTANCE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,17 +66,16 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
 
         String pos = getIntent().getStringExtra("pos");
 
-        Result<Member> member = viewModel.getUserRepository().getCachedMember();
-        if (member instanceof Result.Success ) {
-            Map map = gson.fromJson(getIntent().getStringExtra("map"),Map.class);
+        UserModel member = userMapper.dto(viewModel.getUserRepository().getCachedMember().getOrThrow());
+        StoryDataModel dataModel = questViewModel.getStoryData().getValue().getOrThrow();
+        Map map = gson.fromJson(getIntent().getStringExtra("map"), Map.class);
+        map.setPlayerPos(pos);
+        GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
+                .map(map)
+                .user(mapper.user(member))
+                .storyData(mapper.data(dataModel));
 
-            gdxAdapter = new GdxAdapter(MapEngine.this);
-
-            map.setPlayerPos(pos);
-            gdxAdapter.put("map", gson.fromJson(getIntent().getStringExtra("map"), Map.class));
-            gdxAdapter.put("member", ((Result.Success<Member>) member).getData());
-            initialize(gdxAdapter, config);
-        }
+        initialize(builder.build(), config);
     }
 
 
@@ -116,19 +116,19 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
                 Timber.d("Got command: %s", data.toString());
                 Intent intent = null;
                 if (data.containsKey("chapter")) {
-                        String chapterId = data.get("chapter");
-                        String stageId = data.get("stage");
-                        if (chapterId!=null && stageId!=null) {
-                            intent = new Intent(this, QuestActivity.class);
-                            intent.putExtra("chapter", Integer.parseInt(chapterId));
-                            intent.putExtra("stage", Integer.parseInt(stageId));
-                            Timber.d("Start QuestActivity - %s - %s", data.get("chapter"), data.get("stage"));
-                        }
+                    String chapterId = data.get("chapter");
+                    String stageId = data.get("stage");
+                    if (chapterId != null && stageId != null) {
+                        intent = new Intent(this, QuestActivity.class);
+                        intent.putExtra("chapter", Integer.parseInt(chapterId));
+                        intent.putExtra("stage", Integer.parseInt(stageId));
+                        Timber.d("Start QuestActivity - %s - %s", data.get("chapter"), data.get("stage"));
+                    }
                 } else if (data.containsKey("seller")) {
                     String sellerId = data.get("seller");
                     String mapId = data.get("map");
 
-                    if(sellerId != null && mapId!=null) {
+                    if (sellerId != null && mapId != null) {
                         intent = new Intent(this, SellerActivity.class);
                         intent.putExtra("seller", Integer.parseInt(sellerId));
                         intent.putExtra("map", Integer.parseInt(mapId));
@@ -140,15 +140,8 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
                     if (mapIdObject != null) {
                         int mapId = Integer.parseInt(mapIdObject);
                         String pos = data.get("pos");
-                        Result<Member> memberResult = viewModel.getUserRepository().getCachedMember();
-                        if (memberResult instanceof Result.Success) {
-                            Member member = ((Result.Success<Member>) memberResult).getData();
-                            String currentStory = member.getData().getTemp().get("currentStory");
-                            if (currentStory != null) {
-                                int storyId = Integer.parseInt(currentStory);
-                                MapHelper.prepareAndLoadMap(questViewModel, this, storyId, mapId, pos);
-                            }
-                        }
+                        StoryStateModel memberResult = questViewModel.getStoryData().getValue().getOrThrow().getCurrent();
+                        MapHelper.prepareAndLoadMap(questViewModel, this, memberResult.getStoryId(), mapId, pos);
                     }
                     Timber.d("Start map - %s, position: %s", data.get("map"), data.get("pos"));
                 } else if (data.containsKey("openPda")) {
@@ -178,7 +171,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
     @Override
     public void error(String msg, Throwable t) {
         Timber.e(t, msg);
-        if (Looper.myLooper()==null)
+        if (Looper.myLooper() == null)
             Looper.prepare();
         Toast.makeText(getApplicationContext(), "Critical error with map, try again later", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, MainActivity.class);
@@ -195,7 +188,6 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
     @Override
     protected void onDestroy() {
         Timber.d("Destroyed CoreStarter");
-        gdxAdapter = null;
         super.onDestroy();
     }
 

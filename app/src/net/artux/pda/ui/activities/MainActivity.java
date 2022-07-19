@@ -26,7 +26,8 @@ import com.bumptech.glide.request.target.Target;
 
 import net.artux.pda.R;
 import net.artux.pda.databinding.ActivityMainBinding;
-import net.artux.pda.repositories.Result;
+import net.artux.pda.models.user.UserModel;
+import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.activities.hierarhy.MainContract;
@@ -36,8 +37,7 @@ import net.artux.pda.ui.fragments.news.NewsFragment;
 import net.artux.pda.ui.fragments.notes.NoteFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.stories.StoriesFragment;
-import net.artux.pda.viewmodels.MemberViewModel;
-import net.artux.pdalib.Member;
+import net.artux.pda.ui.viewmodels.UserViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,7 +52,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     private MainPresenter presenter;
     private BroadcastReceiver timeReceiver;
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm dd/MM/yy", Locale.US);
-    private MemberViewModel viewModel;
+    private UserViewModel viewModel;
 
 
 
@@ -60,7 +60,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(MemberViewModel.class);
+            viewModel = getViewModelFactory(this).create(UserViewModel.class);
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -75,7 +75,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
                 case "stories":
                     presenter.addFragment(new StoriesFragment(), false);
                     break;
-                case "profile":
+                case "profileModel":
                     presenter.addFragment(new UserProfileFragment(), false);
                     break;
                 default:
@@ -89,8 +89,8 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
         viewModel.getMember().observe(this, memberResult -> {
             if (memberResult instanceof Result.Success) {
-                Member member = ((Result.Success<Member>) memberResult).getData();
-                presenter.setAdditionalTitle("PDA #" + member.getPdaId());
+                UserModel userModel = ((Result.Success<UserModel>) memberResult).getData();
+                presenter.setAdditionalTitle("PDA #" + userModel.getPdaId());
             }
         });
 

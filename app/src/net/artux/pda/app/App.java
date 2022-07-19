@@ -1,7 +1,6 @@
 package net.artux.pda.app;
 
 import android.app.Application;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -12,17 +11,18 @@ import com.google.gson.Gson;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.map.model.Map;
+import net.artux.pda.generated.models.Profile;
+import net.artux.pda.generated.models.StoryData;
+import net.artux.pda.generated.models.UserDto;
+import net.artux.pda.map.model.input.Map;
+import net.artux.pda.models.Summary;
+import net.artux.pda.ui.util.GsonProvider;
 import net.artux.pda.repositories.Cache;
 import net.artux.pda.repositories.QuestRepository;
 import net.artux.pda.repositories.SummaryRepository;
 import net.artux.pda.repositories.UserRepository;
 import net.artux.pda.services.RetrofitService;
 import net.artux.pda.ui.fragments.quest.models.Chapter;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.Profile;
-import net.artux.pdalib.Summary;
-import net.artux.pdalib.profile.items.GsonProvider;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +36,7 @@ public class App extends Application {
     static RetrofitService mRetrofitService = new RetrofitService();
     static Gson gson;
     static Cache<Profile> profileCache;
-    static Cache<Member> memberCache;
+    static Cache<UserDto> memberCache;
     static Cache<Chapter> chapterCache;
     static Cache<Map> mapCache;
     static Cache<Summary> summaryCache;
@@ -65,16 +65,19 @@ public class App extends Application {
 
         sDataManager = new DataManager(getApplicationContext());
         mRetrofitService.initRetrofit(sDataManager);
+
         gson = GsonProvider.getInstance();
 
         profileCache = new Cache<>(Profile.class, getApplicationContext(), gson);
-        memberCache = new Cache<>(Member.class, getApplicationContext(), gson);
+        memberCache = new Cache<>(UserDto.class, getApplicationContext(), gson);
         chapterCache = new Cache<>(Chapter.class, getApplicationContext(), gson);
         mapCache = new Cache<>(Map.class, getApplicationContext(), gson);
         summaryCache = new Cache<>(Summary.class, getApplicationContext(), gson);
 
-        userRepository = new UserRepository(mRetrofitService.getPdaAPI(), profileCache, memberCache);
-        questRepository = new QuestRepository(mRetrofitService.getPdaAPI(), chapterCache, mapCache);
+        userRepository = new UserRepository(mRetrofitService.getDefaultApi(), profileCache, memberCache);
+        questRepository = new QuestRepository(mRetrofitService.getPdaAPI(), mRetrofitService.getDefaultApi(),
+                new Cache<>(StoryData.class, getApplicationContext(), gson),
+                chapterCache, mapCache);
         summaryRepository = new SummaryRepository(summaryCache);
 
         if (BuildConfig.DEBUG)
@@ -85,11 +88,8 @@ public class App extends Application {
         Timber.i("App started.");
         MobileAds.initialize(this, initializationStatus -> {
             Timber.d("Ads initialization");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                initializationStatus.getAdapterStatusMap().forEach((s, adapterStatus) ->
-                        Timber.d(s + " : " + adapterStatus.getDescription() + " latency: " + adapterStatus.getLatency()));
-            }
-
+            initializationStatus.getAdapterStatusMap().forEach((s, adapterStatus) ->
+                    Timber.d(s + " : " + adapterStatus.getDescription() + " latency: " + adapterStatus.getLatency()));
         });
 
     }
@@ -127,7 +127,7 @@ public class App extends Application {
             logBuilder.append(message).append("\n");
             FirebaseCrashlytics.getInstance().log(message);
             if (t != null && !BuildConfig.DEBUG) {
-                logBuilder.append(t.toString()).append("\n");
+                logBuilder.append(t).append("\n");
                 FirebaseCrashlytics.getInstance().recordException(t);
                 t.printStackTrace();
             }

@@ -1,13 +1,13 @@
 package net.artux.pda.ui.fragments.quest;
 
+import net.artux.pda.models.quest.TransferModel;
 import net.artux.pda.ui.fragments.quest.models.Stage;
-import net.artux.pda.ui.fragments.quest.models.Transfer;
 
 public interface QuestController {
 
     void beginWithStage(int stageId);
     void beginWithStage(int stageId, boolean sync);
-    void chooseTransfer(Transfer transfer);
+    void chooseTransfer(TransferModel transfer);
     Stage getActualStage();
     int getStoryId();
     int getChapterId();

@@ -7,14 +7,12 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 
-import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.repositories.Result;
+import net.artux.pda.models.user.UserModel;
+import net.artux.pda.models.profile.Note;
+import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.profile.Note;
 
 public class NotesFragment extends AdditionalBaseFragment implements NotesAdapter.OnNoteClickListener {
 
@@ -39,7 +37,7 @@ public class NotesFragment extends AdditionalBaseFragment implements NotesAdapte
 
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
             if (memberResult instanceof Result.Success){
-                notesAdapter.setNotes(((Result.Success<Member>) memberResult).getData().notes);
+                notesAdapter.setNotes(((Result.Success<UserModel>) memberResult).getData().notes);
             }else viewModel.updateMember();
         });
 

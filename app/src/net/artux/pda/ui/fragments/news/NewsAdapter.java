@@ -11,13 +11,10 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
 
 import net.artux.pda.R;
+import net.artux.pda.models.news.Article;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
-import net.artux.pdalib.news.Article;
-
-import org.joda.time.Instant;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

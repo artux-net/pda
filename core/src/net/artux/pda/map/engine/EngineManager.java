@@ -35,25 +35,26 @@ import net.artux.pda.map.engine.systems.MapLoggerSystem;
 import net.artux.pda.map.engine.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.systems.MessagesSystem;
 import net.artux.pda.map.engine.systems.MoodSystem;
+import net.artux.pda.map.engine.systems.MovementTargetingSystem;
 import net.artux.pda.map.engine.systems.MovingSystem;
 import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.engine.systems.StatesSystem;
-import net.artux.pda.map.engine.systems.MovementTargetingSystem;
 import net.artux.pda.map.engine.systems.WorldSystem;
 import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
-import net.artux.pda.map.model.Map;
+import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.models.UserGdx;
+import net.artux.pda.map.models.user.GdxData;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.UserInterface;
-import net.artux.pdalib.Member;
 
 public class EngineManager extends InputListener implements Drawable, Disposable, GestureDetector.GestureListener {
 
     private Map map;
-    private Member member;
+    private UserGdx userModel;
 
     private final Engine engine;
 
@@ -67,7 +68,8 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     public EngineManager(AssetsFinder assetsFinder, Stage stage, UserInterface userInterface, GameStateManager gameStateManager) {
         this.engine = new Engine();
         this.map = (Map) gameStateManager.get("map");
-        this.member = gameStateManager.getMember();
+        this.userModel = gameStateManager.getMember();
+        GdxData gdxData = (GdxData) gameStateManager.get("data");
         long loadTime = TimeUtils.millis();
 
         //player
@@ -79,18 +81,18 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         player.add(new PositionComponent(map.getPlayerPosition()))
                 .add(new VelocityComponent())
                 .add(new SpriteComponent(velocityComponent, assetsFinder.getManager().get("gg.png", Texture.class), 32, 32))
-                .add(new WeaponComponent(member))
-                .add(new MoodComponent(member))
+                .add(new WeaponComponent(gdxData))
+                .add(new MoodComponent(userModel))
                 .add(new HealthComponent())
                 .add(velocityComponent)
-                .add(new PlayerComponent(camera, member));
+                .add(new PlayerComponent(camera, userModel, gdxData));
         engine.addEntity(player);
 
         engine.addSystem(new MapOrientationSystem(assetsFinder, map));
         engine.addSystem(new CameraSystem());
         engine.addSystem(new SoundsSystem(assetsFinder.getManager()));
         engine.addSystem(new WorldSystem(assetsFinder.getManager()));
-        engine.addSystem(new DataSystem(map, member));
+        engine.addSystem(new DataSystem(map, userModel));
         engine.addSystem(new InteractionSystem(stage, userInterface));
         engine.addSystem(new PlayerSystem(assetsFinder.getManager()));
 

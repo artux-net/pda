@@ -9,20 +9,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import net.artux.pda.viewmodels.MemberViewModel;
-import net.artux.pda.viewmodels.ProfileViewModel;
-import net.artux.pdalib.Member;
+import net.artux.pda.ui.viewmodels.UserViewModel;
 
 public abstract class AdditionalBaseFragment extends Fragment implements FragmentNavigation.View {
 
     protected FragmentNavigation.Presenter navigationPresenter;
-    protected MemberViewModel viewModel;
+    protected UserViewModel viewModel;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(MemberViewModel.class);
+            viewModel = getViewModelFactory(this).create(UserViewModel.class);
     }
 
     @Override

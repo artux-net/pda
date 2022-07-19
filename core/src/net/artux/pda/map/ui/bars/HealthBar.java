@@ -1,7 +1,5 @@
 package net.artux.pda.map.ui.bars;
 
-import static net.artux.pdalib.Checker.isInteger;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -43,12 +41,12 @@ public class HealthBar extends VerticalGroup implements Disposable {
         horizontalGroup.space(20);
         horizontalGroup.setFillParent(true);
 
-        if(isInteger(userInterface.getMember().getAvatar()))
+        /*if(isInteger(userInterface.getMember().getAvatar()))
             image = assetManager
                     .get("avatars/a"+(Integer.parseInt(userInterface.getMember().getAvatar())+1)+".png", Texture.class);
         else
             image = assetManager
-                    .get("avatars/a0.jpg", Texture.class);
+                    .get("avatars/a0.jpg", Texture.class);*/
 
         horizontalGroup.addActor(new Image(image));
 

@@ -26,14 +26,14 @@ import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.states.BotStatesAshley;
 import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
-import net.artux.pda.map.model.Map;
+import net.artux.pda.map.model.input.Map;
 import net.artux.pda.map.model.MobType;
 import net.artux.pda.map.model.MobsTypes;
 import net.artux.pda.map.model.Spawn;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.profile.items.Armor;
-import net.artux.pdalib.profile.items.Item;
-import net.artux.pdalib.profile.items.Weapon;
+import net.artux.pda.map.models.UserGdx;
+import net.artux.pda.map.models.items.Armor;
+import net.artux.pda.map.models.items.Item;
+import net.artux.pda.map.models.items.Weapon;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -47,7 +47,7 @@ public class ControlPointsHelper {
         MobsTypes mobsTypes = new Gson().fromJson(reader, MobsTypes.class);
 
         Map map = engine.getSystem(DataSystem.class).getMap();
-        Member member = engine.getSystem(DataSystem.class).getMember();
+        UserGdx userModel = engine.getSystem(DataSystem.class).getMember();
 
         for (final Spawn spawn : map.getSpawns()) {
             MobType mobType = mobsTypes.getMobType(spawn.getId());
@@ -75,10 +75,10 @@ public class ControlPointsHelper {
 
                 Armor armor = new Armor();
                 Weapon w = new Weapon();
-                w.speed = 14;
-                w.damage = 2;
-                w.precision = 1;
-                w.bullet_quantity = 30;
+                w.setSpeed(14);
+                w.setDamage(2);
+                w.setPrecision(1);
+                w.setBulletQuantity(30);
 
                 MoodComponent moodComponent = new MoodComponent(mobType.group, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]), spawn.isAngry());
                 moodComponent.ignorePlayer = spawn.isIgnorePlayer();
@@ -94,10 +94,10 @@ public class ControlPointsHelper {
 
 
                 Texture texture;
-                if (member != null) {
-                    if (mobType.group < 0 || member.relations.get(mobType.group) < -2)
+                if (userModel != null) {
+                    if (mobType.group < 0 || userModel.getRelation(mobType.group) < -2)
                         texture = assetManager.get("red.png", Texture.class);
-                    else if (member.relations.get(mobType.group) > 2)
+                    else if (userModel.getRelation(mobType.group) > 2)
                         texture = assetManager.get("green.png", Texture.class);
                     else
                         texture = assetManager.get("yellow.png", Texture.class);
@@ -117,7 +117,7 @@ public class ControlPointsHelper {
                         @Override
                         public void clicked() {
                             engine.getSystem(RenderSystem.class)
-                                    .showText(controlPointComponent.desc(),spawn.getPosition());
+                                    .showText(controlPointComponent.desc(), spawn.getPosition());
                         }
                     }));
             engine.addEntity(controlPoint);

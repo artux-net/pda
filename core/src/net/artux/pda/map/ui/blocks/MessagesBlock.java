@@ -1,6 +1,6 @@
 package net.artux.pda.map.ui.blocks;
 
-import static net.artux.pdalib.Checker.isInteger;
+import static net.artux.pda.map.models.Checker.isInteger;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.Scaling;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.MessageGenerator;
-import net.artux.pdalib.UserMessage;
+import net.artux.pda.map.models.UserMessage;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

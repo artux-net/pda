@@ -1,6 +1,7 @@
 package net.artux.pda.repositories
 
-import net.artux.pdalib.Summary
+import net.artux.pda.models.Summary
+import net.artux.pda.repositories.util.Result
 import javax.inject.Inject
 import javax.inject.Singleton
 

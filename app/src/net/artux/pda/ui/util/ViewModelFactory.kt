@@ -20,13 +20,14 @@ import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
+import net.artux.pda.app.App
+import net.artux.pda.models.quest.story.StoryMapper
+import net.artux.pda.models.user.UserMapper
 import net.artux.pda.repositories.QuestRepository
 import net.artux.pda.repositories.SummaryRepository
-import net.artux.pda.viewmodels.ProfileViewModel
 import net.artux.pda.repositories.UserRepository
-import net.artux.pda.viewmodels.MemberViewModel
-import net.artux.pda.viewmodels.QuestViewModel
-import net.artux.pda.viewmodels.SummaryViewModel
+import net.artux.pda.ui.fragments.rating.RatingViewModel
+import net.artux.pda.ui.viewmodels.*
 
 /**
  * Factory for all ViewModels.
@@ -48,13 +49,17 @@ class ViewModelFactory constructor(
         when {
             //todo another view models
             isAssignableFrom(ProfileViewModel::class.java) ->
-                ProfileViewModel(usersRepository)
-            isAssignableFrom(MemberViewModel::class.java) ->
-                MemberViewModel(usersRepository)
+                ProfileViewModel(usersRepository, UserMapper.INSTANCE)
+            isAssignableFrom(UserViewModel::class.java) ->
+                UserViewModel(usersRepository, UserMapper.INSTANCE)
             isAssignableFrom(QuestViewModel::class.java) ->
-                QuestViewModel(questRepository)
+                QuestViewModel(questRepository, StoryMapper.INSTANCE)
             isAssignableFrom(SummaryViewModel::class.java) ->
                 SummaryViewModel(summaryRepository)
+            isAssignableFrom(RatingViewModel::class.java) ->
+                RatingViewModel(usersRepository, UserMapper.INSTANCE)
+            isAssignableFrom(AuthViewModel::class.java) ->
+                AuthViewModel(usersRepository, UserMapper.INSTANCE, App.getDataManager())
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

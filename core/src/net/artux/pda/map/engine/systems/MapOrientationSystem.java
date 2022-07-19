@@ -10,13 +10,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.AssetsFinder;
-import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.engine.pathfinding.MapBorders;
 import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 import net.artux.pda.map.engine.pathfinding.TiledRaycastCollisionDetector;
-import net.artux.pda.map.model.Map;
+import net.artux.pda.map.model.input.Map;
 
 import java.util.Random;
 

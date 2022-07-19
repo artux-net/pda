@@ -1,7 +1,6 @@
 package net.artux.pda.ui.activities;
 
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -28,12 +27,15 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pdalib.LoginUser;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.Status;
+import net.artux.pda.models.Status;
+import net.artux.pda.models.user.LoginUser;
+import net.artux.pda.models.user.UserModel;
+import net.artux.pda.repositories.util.Result;
+import net.artux.pda.ui.viewmodels.AuthViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +43,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import timber.log.Timber;
 
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
@@ -51,16 +52,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private AuthViewModel authViewModel;
 
     private static final String PASSWORD_VALIDATION_REGEX = "^[A-Za-z\\d!@#$%^&*()_+№\";:?><\\[\\]{}]*$";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(!App.getDataManager().getAuthToken().equals("")){
+
+        if (authViewModel == null)
+            authViewModel = getViewModelFactory(this).create(AuthViewModel.class);
+
+        if (authViewModel.isLoggedIn()) {
             startActivity(new Intent(this, LoadingActivity.class));
             finish();
-        }else {
+        } else {
             setContentView(R.layout.activity_login);
             View mResetPassword = findViewById(R.id.forgotPassword);
             mResetPassword.setOnClickListener(v -> {
@@ -109,6 +115,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mLoginFormView = findViewById(R.id.login_form);
             mProgressView = findViewById(R.id.login_progress);
         }
+        authViewModel.getMember().observe(this, new Observer<Result<UserModel>>() {
+            @Override
+            public void onChanged(Result<UserModel> userModelResult) {
+                showProgress(false);
+                if (userModelResult instanceof Result.Success) {
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Неправильный логин или пароль", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     private void attemptLogin() {
@@ -143,40 +161,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             loginUser = new LoginUser(email, password);
-            App.getDataManager().setLoginUser(loginUser);
             showProgress(true);
-            App.getRetrofitService().getPdaAPI().loginUser().enqueue(new Callback<Member>() {
-                @Override
-                public void onResponse(Call<Member> call, Response<Member> response) {
-                        showProgress(false);
-                        Member member = response.body();
-                        Timber.d("Member auth %s", App.getDataManager().getAuthToken());
-                        if (response.code() == 502)
-                            Toast.makeText(LoginActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
-                        else if (response.code() == 401){
-                            Toast.makeText(LoginActivity.this, "Неправильный логин или пароль", Toast.LENGTH_SHORT).show();
-                        }
-                        else if (member != null) {
-                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                finish();
-                            }
-                        else {
-                            if (!response.message().equals(""))
-                                Toast.makeText(getApplicationContext(), response.code() + ":" + response.message(), Toast.LENGTH_LONG).show();
-                            else
-                                Toast.makeText(getApplicationContext(), response.code() + ":" + getString(R.string.unable_connect), Toast.LENGTH_LONG).show();
-                            Timber.e("Login error - %s", response.toString());
-                        }
-
-                    }
-
-                @Override
-                public void onFailure(Call<Member> call, Throwable t) {
-                    Toast.makeText(LoginActivity.this, R.string.unable_connect, Toast.LENGTH_SHORT).show();
-                    showProgress(false);
-                    Timber.e(t);
-                }
-            });
+            authViewModel.login(loginUser);
         }
     }
 
@@ -232,7 +218,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
+                // Retrieve data rows for the device user's 'profileModel' contact.
                 Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
                         ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
 

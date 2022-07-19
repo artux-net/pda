@@ -16,15 +16,11 @@ import com.bumptech.glide.signature.ObjectKey;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.repositories.Result;
+import net.artux.pda.models.items.ItemModel;
+import net.artux.pda.models.user.UserModel;
+import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
-import net.artux.pda.ui.fragments.profile.helpers.GlideUtil;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.profile.Equipment;
-import net.artux.pdalib.profile.items.Item;
-
-import java.nio.charset.StandardCharsets;
 
 public class EquipmentFragment extends BaseFragment {
 
@@ -46,8 +42,9 @@ public class EquipmentFragment extends BaseFragment {
 
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
             if(memberResult instanceof Result.Success){
-                Member member = ((Result.Success<Member>) memberResult).getData();
-                Equipment equipment = member
+                UserModel userModel = ((Result.Success<UserModel>) memberResult).getData();
+                //TODO
+               /* Equipment equipment = userModel
                         .getData()
                         .getEquipment();
 
@@ -56,14 +53,14 @@ public class EquipmentFragment extends BaseFragment {
                 if (equipment.getFirstWeapon()!=null)
                     defineSlot(view, R.id.slot2, equipment.getFirstWeapon());
                 if (equipment.getSecondWeapon()!=null)
-                    defineSlot(view, R.id.slot1, equipment.getSecondWeapon());
+                    defineSlot(view, R.id.slot1, equipment.getSecondWeapon());*/
             }else viewModel.updateMember();
         });
 
 
     }
 
-    private void defineSlot(View view, int slotId, Item item){
+    private void defineSlot(View view, int slotId, ItemModel item){
         View slot = view.findViewById(slotId);
         TextView title = slot.findViewById(R.id.itemTitle);
         ImageView imageView = slot.findViewById(R.id.itemImage);
@@ -74,7 +71,7 @@ public class EquipmentFragment extends BaseFragment {
                 .placeholder(R.mipmap.ic_launcher)
                 .error(R.mipmap.ic_launcher);
 
-        String link = BuildConfig.PROTOCOL + "://"+ BuildConfig.URL+"base/items/icons/"+item.icon;
+        String link = BuildConfig.PROTOCOL + "://"+ BuildConfig.URL+"base/items/icons/"+item.getIcon();
 
         //String cached = GlideUtil.sha256BytesToHex(link.getBytes(StandardCharsets.UTF_8));
 

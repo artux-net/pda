@@ -29,7 +29,7 @@
     <string name="messages">Messages</string>
 
     <!-- Strings related to main view -->
-    <string name="profile">Profile</string>
+    <string name="profileModel">Profile</string>
     <string name="notes">Notes</string>
     <string name="map">Map</string>
     <string name="inptmsg">Input a message..</string>
@@ -51,7 +51,7 @@
     <string name="profile_achievements">Achievements</string>
     <string name="profile_brief">Сводка</string>
 
-    <!-- Strings related to profile view -->
+    <!-- Strings related to profileModel view -->
     <string name="profile_arena">Арена</string>
     <string name="profile_shop">Shop</string>
     <string name="profile_error">Cannot find this pdaId</string>
@@ -94,7 +94,7 @@
     <string name="armor_desc">Thermal protection: %1$s \nElectric protection: %2$s \nChemical protection: %3$s \nRadio protection: %4$s \nPsy protection: %5$s \nDamage protection: %6$s \nCondition: %7$s \n</string>
     <string name="artifact_desc">"Health: %1$s  Radio: %2$s  Damage: %3$s  Bleeding: %4$s  Thermal: %5$s  Chemical: %6$s  Endurance: %7$s  Electric: %8$s  "</string>
 
-    <string name="member_debug">Show member debug info</string>
+    <string name="member_debug">Show userModel debug info</string>
     <string name="resetData">Reset data</string>
     <string name="wr_message">Write a message</string>
     <string name="okay">Okay</string>

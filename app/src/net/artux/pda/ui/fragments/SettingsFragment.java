@@ -2,8 +2,6 @@ package net.artux.pda.ui.fragments;
 
 import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
 
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -16,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -26,24 +23,17 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.ActivitySettingsBinding;
-import net.artux.pda.repositories.Result;
+import net.artux.pda.models.user.UserModel;
+import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.LoginActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
-import net.artux.pda.viewmodels.QuestViewModel;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.Status;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import timber.log.Timber;
 
 public class SettingsFragment extends BaseFragment implements View.OnClickListener {
@@ -79,8 +69,8 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
             if (memberResult instanceof Result.Success){
-                Member member = ((Result.Success<Member>) memberResult).getData();
-                String json = gson.toJson(member);
+                UserModel userModel = ((Result.Success<UserModel>) memberResult).getData();
+                String json = gson.toJson(userModel);
                 binding.debugMember.setText(json);
             }
         });
@@ -137,6 +127,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
             case R.id.signOut:
                 App.getDataManager().removeAllData();
                 viewModel.clearCache();
+                questViewModel.clear();
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 requireActivity().finish();
                 break;
@@ -159,7 +150,8 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                     binding.debugMember.setVisibility(View.VISIBLE);
                 break;
             case R.id.resetData:
-                viewModel.resetData();
+                questViewModel.resetData();
+                questViewModel.clear();
                 Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.mapCacheResetButton:

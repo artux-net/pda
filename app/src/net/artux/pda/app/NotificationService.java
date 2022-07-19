@@ -1,27 +1,19 @@
 package net.artux.pda.app;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.widget.Toast;
 
-import androidx.core.app.NotificationCompat;
-
-import com.google.firebase.crashlytics.internal.model.CrashlyticsReport;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import net.artux.pda.BuildConfig;
-import net.artux.pda.R;
-import net.artux.pda.ui.activities.MainActivity;
+import net.artux.pda.models.Status;
 import net.artux.pda.ui.fragments.chat.Dialog;
 import net.artux.pda.ui.fragments.chat.MessageListener;
-import net.artux.pdalib.Status;
-import net.artux.pdalib.UserMessage;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -42,7 +34,7 @@ public class NotificationService extends Service {
 
     public void onCreate() {
         super.onCreate();
-        Timber.d( "MyService onCreate");
+        Timber.d("MyService onCreate");
     }
 
     public void onDestroy() {
@@ -51,7 +43,7 @@ public class NotificationService extends Service {
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Timber.d( "MyService onStartCommand");
+        Timber.d("MyService onStartCommand");
 
         OkHttpClient client = new OkHttpClient();
 
@@ -77,19 +69,13 @@ public class NotificationService extends Service {
         return super.onUnbind(intent);
     }
 
-    public void setListener(MessageListener listener){
+    public void setListener(MessageListener listener) {
         this.listener = listener;
     }
 
-    public void updateDialog(UserMessage message){
-        for (Dialog d : list) {
-            if (d.id == message.cid)
-                d.lastMessage = message.senderLogin + ": " + message.message;
-        }
-    }
-
-    public void parseResponse(final String text){
-        Type listType = new TypeToken<ArrayList<Dialog>>(){}.getType();
+    public void parseResponse(final String text) {
+        Type listType = new TypeToken<ArrayList<Dialog>>() {
+        }.getType();
 
         try {
            /* UserMessage userMessage = App.getRetrofitService().getGson().fromJson(text,UserMessage.class);
@@ -99,12 +85,12 @@ public class NotificationService extends Service {
             if (!userMessage.senderLogin.equals(App.getDataManager().getMember().getLogin()))
                 sendNotif(userMessage);
             Timber.d("Dialogs, new message: " + userMessage.toString());*/
-        }catch (JsonSyntaxException e){
+        } catch (JsonSyntaxException e) {
             try {
                 ArrayList<Dialog> list = gson.fromJson(text, listType);
                 Timber.d("Set dialogs");
                 this.list = list; //dialogsAdapter.setDialogs(list);
-            }catch (JsonSyntaxException e1){
+            } catch (JsonSyntaxException e1) {
                 Timber.d("Unable to parse: " + text);
                 Status status = gson.fromJson(text, Status.class);
                 Toast.makeText(getApplicationContext(), status.getDescription(), Toast.LENGTH_LONG).show();
@@ -113,19 +99,19 @@ public class NotificationService extends Service {
 
     }
 
-    void sendNotif(UserMessage message) {
+    /*void sendNotif(UserMessage message) {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
-                        .setContentTitle(message.senderLogin)
-                        .setContentText(message.message);
+                        .setContentTitle(message.ge)
+                        .setContentText(message.getContent());
 
         Notification notification = builder.build();
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(message.cid, notification);
+        notificationManager.notify(message.getId(), notification);
     }
-
+*/
     private final class EchoWebSocketListener extends WebSocketListener {
         private static final int NORMAL_CLOSURE_STATUS = 1000;
 
@@ -150,13 +136,13 @@ public class NotificationService extends Service {
 
         @Override
         public void onFailure(WebSocket webSocket, Throwable t, okhttp3.Response response) {
-           //load false
+            //load false
             Timber.e(t);
         }
     }
 
     public class MyBinder extends Binder {
-       public NotificationService getService() {
+        public NotificationService getService() {
             return NotificationService.this;
         }
     }

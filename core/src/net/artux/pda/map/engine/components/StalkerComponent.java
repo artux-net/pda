@@ -4,7 +4,7 @@ import static com.badlogic.gdx.math.MathUtils.random;
 
 import com.badlogic.ashley.core.Component;
 
-import net.artux.pdalib.profile.items.Item;
+import net.artux.pda.map.models.items.Item;
 
 import java.util.List;
 

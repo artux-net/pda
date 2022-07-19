@@ -10,9 +10,9 @@ import androidx.annotation.Nullable;
 
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentNoteBinding;
+import net.artux.pda.models.Status;
+import net.artux.pda.models.profile.Note;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pdalib.Status;
-import net.artux.pdalib.profile.Note;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

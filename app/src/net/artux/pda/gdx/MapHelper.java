@@ -11,8 +11,8 @@ import androidx.lifecycle.Observer;
 
 import com.google.gson.Gson;
 
-import net.artux.pda.map.model.Map;
-import net.artux.pda.viewmodels.QuestViewModel;
+import net.artux.pda.map.model.input.Map;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
 
 public class MapHelper {
 

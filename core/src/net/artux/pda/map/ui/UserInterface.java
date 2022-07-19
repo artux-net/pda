@@ -30,16 +30,17 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.InteractiveComponent;
-import net.artux.pda.map.model.Map;
-import net.artux.pda.map.model.Point;
+import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.model.input.Point;
+import net.artux.pda.map.models.Checker;
+import net.artux.pda.map.models.UserGdx;
+import net.artux.pda.map.models.user.GdxData;
+import net.artux.pda.map.models.user.StoryStateGdx;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.bars.Utils;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
 import net.artux.pda.map.ui.blocks.ControlBlock;
 import net.artux.pda.map.ui.blocks.MessagesBlock;
-import net.artux.pdalib.Checker;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.profile.Story;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -225,7 +226,7 @@ public class UserInterface extends Group implements Disposable {
         return touchpad;
     }
 
-    public Member getMember() {
+    public UserGdx getMember() {
         return gsm.getMember();
     }
 
@@ -271,18 +272,21 @@ public class UserInterface extends Group implements Disposable {
         VerticalGroup menuTable = new VerticalGroup();
         menuTable.setFillParent(true);
         menuTable.align(Align.top);
-        if (gsm.get("map") != null)
-            for (final Point point : ((Map) gsm.get("map")).getPoints()) {
+
+        UserGdx userModel = gsm.getMember();
+        Map map = (Map) gsm.get("map");
+        GdxData dataModel = (GdxData) gsm.get("data");
+        StoryStateGdx storyStateModel = dataModel.getCurrent();
+
+        if (map != null)
+            for (final Point point : map.getPoints()) {
                 if (point.type < 2 || point.type > 3)
-                    if (gsm.getMember() != null && Checker.check(point.getCondition(), gsm.getMember())) {
-                        if (point.getData().containsKey("chapter") && gsm.getMember() != null) {
-                            int storyId = Integer.parseInt(gsm.getMember().getData().getTemp().get("currentStory"));
-                            for (Story story : gsm.getMember().getData().getStories()) {
-                                if (story.getStoryId() == storyId
-                                        && (Integer.parseInt(point.getData().get("chapter")) == story.getLastChapter()
-                                        || Integer.parseInt(point.getData().get("chapter")) == 0)) {
-                                    menuTable.addActor(getLabel(point.getTitle(), labelStyle));
-                                }
+                    if (userModel != null && Checker.check(point.getCondition(), dataModel, userModel.getMoney())) {
+                        if (point.getData().containsKey("chapter")) {
+                            int chapterId = storyStateModel.getChapterId();
+                            if ((Integer.parseInt(point.getData().get("chapter")) == chapterId
+                                    || Integer.parseInt(point.getData().get("chapter")) == 0)) {
+                                menuTable.addActor(getLabel(point.getTitle(), labelStyle));
                             }
                         } else {
                             menuTable.addActor(getLabel(point.getTitle(), labelStyle));

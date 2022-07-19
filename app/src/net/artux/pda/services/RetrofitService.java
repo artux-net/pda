@@ -7,6 +7,7 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.app.App;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.app.GsonInstantAdapter;
+import net.artux.pda.generated.apis.DefaultApi;
 
 import org.joda.time.Instant;
 
@@ -21,6 +22,7 @@ import timber.log.Timber;
 public class RetrofitService {
 
     private PdaAPI mPdaAPI;
+    private DefaultApi defaultApi;
     private Gson gson;
 
     public void initRetrofit(final DataManager dataManager){
@@ -39,8 +41,6 @@ public class RetrofitService {
             return chain.proceed(request);
         });
 
-
-
         gson = new GsonBuilder()
                 .disableHtmlEscaping()
                 .registerTypeAdapter(Instant.class, new GsonInstantAdapter())
@@ -53,7 +53,11 @@ public class RetrofitService {
                 .build();
 
         mPdaAPI = mRetrofit.create(PdaAPI.class);
+        defaultApi = mRetrofit.create(DefaultApi.class);
+    }
 
+    public DefaultApi getDefaultApi() {
+        return defaultApi;
     }
 
     public PdaAPI getPdaAPI(){

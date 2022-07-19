@@ -11,23 +11,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.models.Checker;
+import net.artux.pda.models.UserMessage;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
 import net.artux.pda.ui.fragments.chat.ChatFragment;
 import net.artux.pda.ui.fragments.chat.Dialog;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
-import net.artux.pdalib.UserMessage;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static net.artux.pdalib.Checker.isInteger;
 
 public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -49,8 +45,8 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void updateDialog(UserMessage message) {
         for (Dialog d :
                 mDialogList) {
-            if (d.id == message.cid)
-                d.lastMessage = message.senderLogin + ": " + message.message;
+            if (d.id == message.getId())
+                d.lastMessage = message.getLogin() + ": " + message.getContent();
         }
     }
 
@@ -177,7 +173,7 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                     builder.setPositiveButton("OK", (dialog, which) -> {
                         ChatFragment chatFragment1 = new ChatFragment();
                         Bundle bundle1 = new Bundle();
-                        if (isInteger(input.getText().toString())) {
+                        if (Checker.isInteger(input.getText().toString())) {
                             bundle1.putInt("to", Integer.parseInt(input.getText().toString()));
                             chatFragment1.setArguments(bundle1);
                             presenter.addFragment(chatFragment1, true);

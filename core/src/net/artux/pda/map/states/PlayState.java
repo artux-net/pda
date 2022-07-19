@@ -3,7 +3,6 @@ package net.artux.pda.map.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -17,7 +16,7 @@ import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.model.LevelBackground;
-import net.artux.pda.map.model.Map;
+import net.artux.pda.map.model.input.Map;
 import net.artux.pda.map.ui.UserInterface;
 
 
@@ -31,12 +30,12 @@ public class PlayState extends State {
     private final AssetsFinder assetsFinder;
     private final UserInterface userInterface;
 
-    public PlayState(final GameStateManager gsm, Batch batch) {
+    public PlayState(final GameStateManager gsm) {
         super(gsm);
 
         assetsFinder = new AssetsFinder();
         AssetManager assetManager = assetsFinder.getManager();
-        stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), batch);
+        stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         uistage = new Stage();
 
         userInterface = new UserInterface(gsm, assetsFinder, stage.getCamera());
@@ -86,7 +85,8 @@ public class PlayState extends State {
     }
 
     @Override
-    public void render(SpriteBatch batch) {
+    public void render() {
+        SpriteBatch batch = (SpriteBatch) stage.getBatch();
         batch.begin();
         if (levelBackground != null)
             levelBackground.render(batch);

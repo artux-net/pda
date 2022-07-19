@@ -14,11 +14,11 @@ import androidx.annotation.Nullable;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.app.DataManager;
-import net.artux.pda.repositories.Result;
+import net.artux.pda.models.user.ProfileModel;
+import net.artux.pda.models.user.UserModel;
+import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
-import net.artux.pdalib.Member;
-import net.artux.pdalib.Profile;
 
 import me.grantland.widget.AutofitHelper;
 
@@ -53,19 +53,19 @@ public class InfoFragment extends AdditionalBaseFragment {
         mXpView = view.findViewById(R.id.ratingInfo);
 
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
-            if(memberResult instanceof Result.Success){
-                Member member = ((Result.Success<Member>) memberResult).getData();
-                Profile profile = new Profile(member);
-                navigationPresenter.setAdditionalTitle("PDA #" + member.getPdaId());
-                ProfileHelper.setAvatar(mAvatarView, profile.getAvatar());
-                mLoginView.setText(profile.getLogin());
+            if (memberResult instanceof Result.Success) {
+                UserModel userModel = ((Result.Success<UserModel>) memberResult).getData();
+                ProfileModel profileModel = new ProfileModel(userModel);
+                navigationPresenter.setAdditionalTitle("PDA #" + userModel.getPdaId());
+                ProfileHelper.setAvatar(mAvatarView, profileModel.getAvatar());
+                mLoginView.setText(profileModel.getLogin());
                 AutofitHelper.create(mLoginView);
 
-                mDaysView.setText(ProfileHelper.getDays(profile));
-                mGroupView.setText(ProfileHelper.getGroup(profile, mGroupView.getContext()));
-                mRangView.setText(ProfileHelper.getRang(profile, mRangView.getContext()));
-                mXpView.setText(String.valueOf(profile.getXp()));
-            }else viewModel.updateMember();
+                mDaysView.setText(ProfileHelper.getDays(profileModel));
+                mGroupView.setText(ProfileHelper.getGroup(profileModel, mGroupView.getContext()));
+                mRangView.setText(ProfileHelper.getRang(profileModel, mRangView.getContext()));
+                mXpView.setText(String.valueOf(profileModel.getXp()));
+            } else viewModel.updateMember();
         });
 
     }

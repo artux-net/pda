@@ -107,7 +107,7 @@
                 android:layout_weight="9"
                 android:gravity="center_horizontal"
                 android:singleLine="true"
-                android:text="@string/profile" />
+                android:text="@string/profileModel" />
 
             <TextView
                 android:layout_width="wrap_content"
