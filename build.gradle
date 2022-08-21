@@ -22,15 +22,6 @@ buildscript {
     }
 }
 
-apply plugin: "com.yelp.codegen.plugin"
-
-generateSwagger {
-    platform = "kotlin-coroutines"
-    packageName = "net.artux.pda.models"
-    inputFile = file("./api_doc.json")
-    outputDir = file("./app/src/")
-}
-
 allprojects {
     apply plugin: "eclipse"
 
