@@ -17,12 +17,12 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.models.Status;
-import net.artux.pda.models.UserMessage;
-import net.artux.pda.ui.util.GsonProvider;
+import net.artux.pda.model.StatusModel;
+import net.artux.pda.model.UserMessage;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
+import net.artux.pda.ui.util.GsonProvider;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -67,13 +67,13 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
         binding.list.setVisibility(View.VISIBLE);
         binding.viewMessage.setVisibility(View.GONE);
 
-        /*Intent intent = new Intent(getActivity(), NotificationService.class).putExtra("t", App.getDataManager().getAuthToken());
+        /*Intent intent = new Intent(getActivity(), NotificationService.class).putExtra("t",((App)getApplication()).getDataManager().getAuthToken());
         getActivity().startService(intent);*/
 
         OkHttpClient client = new OkHttpClient();
 
         Request.Builder builder = new Request.Builder();
-        builder.addHeader("Authorization", App.getDataManager().getAuthToken());
+        builder.addHeader("Authorization",((App)getActivity().getApplication()).getDataManager().getAuthToken());
         navigationPresenter.setLoadingState(true);
 
         builder.url(BuildConfig.WS_PROTOCOL +"://" + BuildConfig.URL_API + "dialogs ");
@@ -124,7 +124,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
                 Type listType = new TypeToken<ArrayList<Dialog>>(){}.getType();
 
                 try {
-                    UserMessage userMessage = App.getRetrofitService().getGson().fromJson(text,UserMessage.class);
+                    UserMessage userMessage = new Gson().fromJson(text,UserMessage.class);
                     if (userMessage.getId() == -1) throw new JsonSyntaxException("");
                     dialogsAdapter.updateDialog(userMessage);
                     Timber.d("Dialogs, new message: " + userMessage.toString());
@@ -139,7 +139,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
                         }
                     }catch (JsonSyntaxException e1){
                         Timber.d("Unable to parse: " + text);
-                        Status status = gson.fromJson(text, Status.class);
+                        StatusModel status = gson.fromJson(text, StatusModel.class);
                         Toast.makeText(getActivity(), status.getDescription(), Toast.LENGTH_LONG).show();
                     }
                 }
@@ -157,7 +157,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
     }
 
     @Override
-    public void newStatus(Status status) {
+    public void newStatus(StatusModel status) {
 
     }
 

@@ -11,18 +11,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.app.App;
-import net.artux.pda.models.profile.FriendModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.profile.adapters.FriendsAdapter;
 
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.internal.EverythingIsNonNull;
+import java.util.UUID;
 
 public class FriendsFragment extends BaseFragment {
 
@@ -49,14 +42,15 @@ public class FriendsFragment extends BaseFragment {
 
 
         if (getArguments() != null) {
-            int pdaId = getArguments().getInt("pdaId", viewModel.getId());
+            UUID pdaId = (UUID) getArguments().getSerializable("pdaId");
             int type = getArguments().getInt("type", 0);
             updateFriends(pdaId, type);
         } else updateFriends(viewModel.getId(), 0);
     }
 
-    void updateFriends(int pdaId, int type){
-        if (type==0)
+    void updateFriends(UUID pdaId, int type){
+        //todo
+        /*if (type==0)
             App.getRetrofitService().getPdaAPI().getFriends(pdaId).enqueue(new Callback<List<FriendModel>>() {
                 @Override
                 @EverythingIsNonNull
@@ -91,6 +85,6 @@ public class FriendsFragment extends BaseFragment {
                 public void onFailure(Call<List<FriendModel>> call, Throwable t) {
 
                 }
-            });
+            });*/
     }
 }

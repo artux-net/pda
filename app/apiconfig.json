@@ -1,0 +1,5 @@
+{
+  "modelPackage": "net.artux.pdanetwork.model",
+  "apiPackage": "net.artux.pdanetwork.api",
+  "library": "retrofit2"
+}

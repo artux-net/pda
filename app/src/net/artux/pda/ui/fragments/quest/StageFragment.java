@@ -16,9 +16,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import net.artux.pda.R;
-import net.artux.pda.models.quest.StageModel;
-import net.artux.pda.models.quest.StageType;
-import net.artux.pda.models.quest.TransferModel;
+import net.artux.pda.model.quest.StageModel;
+import net.artux.pda.model.quest.StageType;
+import net.artux.pda.model.quest.TransferModel;
 import net.artux.pda.ui.activities.QuestActivity;
 
 import java.util.List;

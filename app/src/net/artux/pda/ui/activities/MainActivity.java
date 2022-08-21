@@ -26,7 +26,7 @@ import com.bumptech.glide.request.target.Target;
 
 import net.artux.pda.R;
 import net.artux.pda.databinding.ActivityMainBinding;
-import net.artux.pda.models.user.UserModel;
+import net.artux.pda.model.user.UserModel;
 import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;

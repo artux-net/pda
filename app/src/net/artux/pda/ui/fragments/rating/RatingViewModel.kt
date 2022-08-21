@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import net.artux.pda.models.user.UserMapper
+import net.artux.pda.model.mapper.UserMapper
 import net.artux.pda.repositories.UserRepository
 import net.artux.pda.repositories.util.Result
 import java.util.*

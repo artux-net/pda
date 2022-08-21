@@ -3,7 +3,7 @@ package net.artux.pda.app;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import net.artux.pda.models.user.LoginUser;
+import net.artux.pda.model.user.LoginUser;
 
 import okhttp3.Credentials;
 

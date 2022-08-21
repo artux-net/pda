@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.7.0'
+    ext.kotlin_version = '1.7.10'
 
     repositories {
         mavenLocal()
@@ -11,19 +11,20 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath 'com.google.gms:google-services:4.3.10'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.8.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.badlogicgames.gdx:gdx-ai:1.8.1"
     }
+
 }
 
 allprojects {
     version = '1.0'
     ext {
         kotlin_version = '1.7.0'
-        appName = "test"
+        appName = "PDA"
         gdxVersion = '1.9.10'
         roboVMVersion = '2.3.8'
         box2DLightsVersion = '1.4'
@@ -47,8 +48,8 @@ project(":app") {
     configurations { natives }
 
     dependencies {
-        implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.6'
         implementation project(":core")
+        implementation project(":model")
 
         api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
@@ -69,7 +70,6 @@ project(":app") {
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
-
     }
 }
 

@@ -11,18 +11,15 @@ import com.google.gson.Gson;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.generated.models.Profile;
-import net.artux.pda.generated.models.StoryData;
-import net.artux.pda.generated.models.UserDto;
-import net.artux.pda.map.model.input.Map;
-import net.artux.pda.models.Summary;
-import net.artux.pda.ui.util.GsonProvider;
-import net.artux.pda.repositories.Cache;
+import net.artux.pda.di.AppComponent;
+import net.artux.pda.di.ContextModule;
+import net.artux.pda.di.DaggerAppComponent;
 import net.artux.pda.repositories.QuestRepository;
 import net.artux.pda.repositories.SummaryRepository;
 import net.artux.pda.repositories.UserRepository;
-import net.artux.pda.services.RetrofitService;
-import net.artux.pda.ui.fragments.quest.models.Chapter;
+import net.artux.pda.services.PdaAPI;
+import net.artux.pda.ui.util.GsonProvider;
+import net.artux.pdanetwork.api.DefaultApi;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -33,16 +30,9 @@ import timber.log.Timber;
 @Module
 public class App extends Application {
 
-    static RetrofitService mRetrofitService = new RetrofitService();
+    private AppComponent daggerAppComponent;
     static Gson gson;
-    static Cache<Profile> profileCache;
-    static Cache<UserDto> memberCache;
-    static Cache<Chapter> chapterCache;
-    static Cache<Map> mapCache;
-    static Cache<Summary> summaryCache;
-    static UserRepository userRepository;
-    static QuestRepository questRepository;
-    static SummaryRepository summaryRepository;
+
     static DataManager sDataManager;
 
     public static int[] group_avatars = {
@@ -64,21 +54,18 @@ public class App extends Application {
         super.onCreate();
 
         sDataManager = new DataManager(getApplicationContext());
-        mRetrofitService.initRetrofit(sDataManager);
+        //mRetrofitService.getRetrofit(sDataManager);
+        daggerAppComponent = DaggerAppComponent.builder()
+                .contextModule(new ContextModule(this))
+                .build();
 
         gson = GsonProvider.getInstance();
 
-        profileCache = new Cache<>(Profile.class, getApplicationContext(), gson);
-        memberCache = new Cache<>(UserDto.class, getApplicationContext(), gson);
-        chapterCache = new Cache<>(Chapter.class, getApplicationContext(), gson);
-        mapCache = new Cache<>(Map.class, getApplicationContext(), gson);
-        summaryCache = new Cache<>(Summary.class, getApplicationContext(), gson);
-
-        userRepository = new UserRepository(mRetrofitService.getDefaultApi(), profileCache, memberCache);
+        /*userRepository = new UserRepository(mRetrofitService.getDefaultApi(), profileCache, memberCache);
         questRepository = new QuestRepository(mRetrofitService.getPdaAPI(), mRetrofitService.getDefaultApi(),
                 new Cache<>(StoryData.class, getApplicationContext(), gson),
                 chapterCache, mapCache);
-        summaryRepository = new SummaryRepository(summaryCache);
+        summaryRepository = new SummaryRepository(summaryCache);*/
 
         if (BuildConfig.DEBUG)
             Timber.plant(new Timber.DebugTree());
@@ -101,16 +88,16 @@ public class App extends Application {
 
     @NotNull
     public UserRepository getUserRepository() {
-        return userRepository;
+        return daggerAppComponent.userRepository();
     }
 
     @NotNull
     public QuestRepository getQuestRepository() {
-        return questRepository;
+        return daggerAppComponent.questRepository();
     }
 
     public SummaryRepository getSummaryRepository() {
-        return summaryRepository;
+        return daggerAppComponent.summaryRepository();
     }
 
     /**
@@ -138,7 +125,11 @@ public class App extends Application {
         return sDataManager;
     }
 
-    public static RetrofitService getRetrofitService() {
-        return mRetrofitService;
+    public DefaultApi getDefaultApi() {
+        return daggerAppComponent.defaultApi();
+    }
+
+    public PdaAPI getOldApi() {
+        return daggerAppComponent.oldApi();
     }
 }

@@ -8,8 +8,9 @@ import com.bumptech.glide.Glide;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.models.user.ProfileModel;
+import net.artux.pda.model.user.ProfileModel;
 
+import java.time.Instant;
 import java.util.Date;
 
 public class ProfileHelper {
@@ -87,15 +88,15 @@ public class ProfileHelper {
 
     public static String getDays(ProfileModel profileModel) {
         if (profileModel.getRegistration() != null) {
-            Date now = new Date(), past = new Date(profileModel.getRegistration());
+            Date now = new Date(), past = new Date(profileModel.getRegistration().getEpochSecond());
             int days = daysBetween(past, now);
 
             return days + " " + getDayAddition(days);
         } else return "null";
     }
 
-    public static String getDays(Long date) {
-        Date now = new Date(), past = new Date(date);
+    public static String getDays(Instant date) {
+        Date now = new Date(), past = new Date(date.getEpochSecond());
         int days = daysBetween(past, now);
 
         return days + " " + getDayAddition(days);

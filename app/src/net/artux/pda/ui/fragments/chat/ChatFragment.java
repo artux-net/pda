@@ -22,7 +22,7 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentChatBinding;
-import net.artux.pda.models.UserMessage;
+import net.artux.pda.model.UserMessage;
 import net.artux.pda.ui.PdaAlertDialog;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
@@ -81,7 +81,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         OkHttpClient client = new OkHttpClient();
 
         Request.Builder builder = new Request.Builder();
-        builder.addHeader("Authorization", App.getDataManager().getAuthToken());
+        builder.addHeader("Authorization",((App)getActivity().getApplication()).getDataManager().getAuthToken());
         Bundle args = getArguments();
         String path = BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API + "pdanetwork/";
         navigationPresenter.setLoadingState(true);
@@ -140,7 +140,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
                     Type listType = new TypeToken<ArrayList<UserMessage>>(){}.getType();
 
                     try {
-                        UserMessage userMessage = App.getRetrofitService().getGson().fromJson(text,UserMessage.class);
+                        UserMessage userMessage = new Gson().fromJson(text,UserMessage.class);
                         mChatAdapter.addMessage(userMessage);
                         mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount()-1);
                     }catch (JsonSyntaxException e){

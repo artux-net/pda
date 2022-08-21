@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import net.artux.pda.R;
-import net.artux.pda.models.news.Article;
+import net.artux.pda.model.news.Article;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
 
 import java.text.SimpleDateFormat;

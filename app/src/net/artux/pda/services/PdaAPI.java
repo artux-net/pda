@@ -3,16 +3,16 @@ package net.artux.pda.services;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.map.model.input.Map;
-import net.artux.pda.models.user.ProfileModel;
-import net.artux.pda.models.user.UserModel;
-import net.artux.pda.models.user.RegisterUser;
-import net.artux.pda.models.ResponsePage;
-import net.artux.pda.models.Status;
-import net.artux.pda.models.news.Article;
-import net.artux.pda.models.profile.FriendModel;
-import net.artux.pda.models.profile.Note;
-import net.artux.pda.models.profile.Seller;
-import net.artux.pda.models.profile.UpdateData;
+import net.artux.pda.model.ResponsePage;
+import net.artux.pda.model.StatusModel;
+import net.artux.pda.model.news.Article;
+import net.artux.pda.model.profile.FriendModel;
+import net.artux.pda.model.profile.NoteModel;
+import net.artux.pda.model.profile.Seller;
+import net.artux.pda.model.profile.UpdateData;
+import net.artux.pda.model.user.ProfileModel;
+import net.artux.pda.model.user.RegisterUserModel;
+import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.fragments.quest.models.Chapter;
 import net.artux.pda.ui.fragments.quest.models.Stories;
 import net.artux.pda.ui.fragments.rating.UserInfo;
@@ -36,13 +36,13 @@ public interface PdaAPI{
     Call<UserModel> loginUser();
 
     @PUT("login")
-    Call<Status> updateFields(@Body UpdateData updateData);
+    Call<StatusModel> updateFields(@Body UpdateData updateData);
 
     @POST("register")
-    Call<Status> registerUser(@Body RegisterUser user);
+    Call<StatusModel> registerUser(@Body RegisterUserModel user);
 
     @GET("reset")
-    Call<Status> resetPassword(@Query("email") String loginOrEmail);
+    Call<StatusModel> resetPassword(@Query("email") String loginOrEmail);
 
     @GET("profileModel/{pdaId}")
     Call<ProfileModel> getProfile(@Path("pdaId") int pdaId);
@@ -72,7 +72,7 @@ public interface PdaAPI{
     Call<List<FriendModel>> getSubs(@Path("id") int pdaId);
 
     @POST("friends")
-    Call<Status> requestFriend(@Query("pdaId") int id);
+    Call<StatusModel> requestFriend(@Query("pdaId") int id);
 
     @GET("ratings")
     Call<ResponsePage<UserInfo>> getRating(@Query("number") Integer number);
@@ -81,28 +81,28 @@ public interface PdaAPI{
     Call<Seller> getSeller(@Path("id") int sellerId);
 
     @POST("items/buy")
-    Call<Status> buyItem(@Query("seller") int sellerId, @Query("hash") int hash);
+    Call<StatusModel> buyItem(@Query("seller") int sellerId, @Query("hash") int hash);
 
     @POST("items/sell")
-    Call<Status> sellItem(@Query("hash") int hash);
+    Call<StatusModel> sellItem(@Query("hash") int hash);
 
     @POST("items/set")
-    Call<Status> setArmor(@Query("hash") int hash);
+    Call<StatusModel> setArmor(@Query("hash") int hash);
 
     @POST("items/set")
-    Call<Status> setWeapon(@Query("hash") int hash);
+    Call<StatusModel> setWeapon(@Query("hash") int hash);
 
     @GET("reset/data")
     Call<UserModel> resetData();
 
     @PUT("notes")
-    Call<Note> updateNote(@Body Note note);
+    Call<NoteModel> updateNote(@Body NoteModel note);
 
     @POST("notes")
-    Call<Note> createNote(@Body String title);
+    Call<NoteModel> createNote(@Body String title);
 
     @DELETE("notes")
-    Call<Status> deleteNote(@Query("id") int cid);
+    Call<StatusModel> deleteNote(@Query("id") int cid);
 
     @GET("feed")
     Call<ResponsePage<Article>> getFeed();

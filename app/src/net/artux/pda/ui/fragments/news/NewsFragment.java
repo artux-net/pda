@@ -13,10 +13,10 @@ import com.google.gson.reflect.TypeToken;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.models.ResponsePage;
-import net.artux.pda.models.news.Article;
-import net.artux.pda.ui.util.GsonProvider;
+import net.artux.pda.model.ResponsePage;
+import net.artux.pda.model.news.Article;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
+import net.artux.pda.ui.util.GsonProvider;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -57,7 +57,7 @@ public class NewsFragment extends BaseFragment {
             adapter.setNews(news);
         }
 
-        App.getRetrofitService().getPdaAPI().getFeed().enqueue(new Callback<ResponsePage<Article>>() {
+        ((App)getActivity().getApplication()).getOldApi().getFeed().enqueue(new Callback<ResponsePage<Article>>() {
             @Override
             public void onResponse(Call<ResponsePage<Article>> call, Response<ResponsePage<Article>> response) {
                 ResponsePage<Article> page = response.body();

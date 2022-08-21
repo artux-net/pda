@@ -5,11 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import net.artux.pda.map.model.input.Map
-import net.artux.pda.models.quest.story.StoryDataModel
-import net.artux.pda.models.quest.story.StoryMapper
+import net.artux.pda.model.mapper.StoryMapper
+import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
 import net.artux.pda.repositories.util.Result
 import net.artux.pda.ui.fragments.quest.models.Chapter
+import net.artux.pdanetwork.model.CommandBlock
 import javax.inject.Inject
 
 class QuestViewModel @Inject constructor(
@@ -38,24 +39,24 @@ class QuestViewModel @Inject constructor(
 
     fun applyActions(map: HashMap<String, List<String>>) {
         viewModelScope.launch {
-            storyData.postValue(repository.syncMember(map).map { mapper.dataModel(it) })
+            storyData.postValue(repository.syncMember(CommandBlock().actions(map)).map { mapper.dataModel(it) })
         }
     }
 
 
     fun updateChapter(storyId: Int, chapterId: Int) {
         viewModelScope.launch {
-            val response = repository.getChapter(storyId, chapterId)
+            /*val response = repository.getChapter(storyId, chapterId)
             if (response is Result.Success)
-                chapter.postValue(response.data)
+                chapter.postValue(response.data!!) TODO*/
         }
     }
 
     fun updateMap(storyId: Int, mapId: Int) {
         viewModelScope.launch {
             val response = repository.getMap(storyId, mapId)
-            if (response is Result.Success)
-                map.postValue(response.data)
+            /*if (response is Result.Success)
+                map.postValue(response.data!!) TODO*/
         }
     }
 

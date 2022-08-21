@@ -4,11 +4,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import net.artux.pda.generated.models.UserDto
-import net.artux.pda.models.user.ProfileModel
-import net.artux.pda.models.user.UserMapper
+import net.artux.pda.model.mapper.UserMapper
+import net.artux.pda.model.user.ProfileModel
 import net.artux.pda.repositories.UserRepository
 import net.artux.pda.repositories.util.Result
+import java.util.*
 import javax.inject.Inject
 
 class ProfileViewModel @Inject constructor(
@@ -16,19 +16,19 @@ class ProfileViewModel @Inject constructor(
 ) : ViewModel() {
     var profile: MutableLiveData<Result<ProfileModel>> = MutableLiveData(getCachedProfile(getId()))
 
-    private fun getCachedProfile(pdaId: Int): Result<ProfileModel> {
+    private fun getCachedProfile(pdaId: UUID): Result<ProfileModel> {
         val response = userRepository.getCachedProfile(pdaId)
         return response.map { userMapper.model(it) }
     }
 
-    fun updateProfile(pdaId: Int) {
+    fun updateProfile(pdaId: UUID) {
         viewModelScope.launch {
-            profile.postValue(userRepository.getProfile(pdaId.toLong()).map { userMapper.model(it) })
+            profile.postValue(userRepository.getProfile(pdaId).map { userMapper.model(it) })
         }
     }
 
-    fun getId(): Int {
-        return userRepository.getCachedMember().getOrDefault(UserDto()).pdaId!!.toInt()
+    fun getId(): UUID {
+        return userRepository.getCachedMember().getOrThrow().id!!
     }
 
 }

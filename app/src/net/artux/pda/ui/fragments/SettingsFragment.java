@@ -23,7 +23,7 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.ActivitySettingsBinding;
-import net.artux.pda.models.user.UserModel;
+import net.artux.pda.model.user.UserModel;
 import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.LoginActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;

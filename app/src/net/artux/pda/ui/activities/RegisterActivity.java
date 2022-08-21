@@ -21,8 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.generated.models.RegisterUserDto;
-import net.artux.pda.generated.models.Status;
+import net.artux.pda.model.StatusModel;
+import net.artux.pda.model.user.RegisterUserModel;
 import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.adapters.AvatarsAdapter;
 import net.artux.pda.ui.viewmodels.AuthViewModel;
@@ -32,7 +32,7 @@ import java.util.Collection;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    RegisterUserDto mRegisterUser;
+    RegisterUserModel mRegisterUser;
 
     // UI references.
     private EditText mLoginView;
@@ -114,7 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
         authViewModel.getStatus().observe(this, statusResult -> {
             showProgress(false);
             if (statusResult instanceof Result.Success) {
-                Status status = statusResult.getOrNull();
+                StatusModel status = statusResult.getOrNull();
                 if (status.getSuccess()) {
                     Intent intent = new Intent(RegisterActivity.this, FinishRegistrationActivity.class);
                     intent.putExtra("email", mRegisterUser.getEmail());
@@ -198,12 +198,12 @@ public class RegisterActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            mRegisterUser = new RegisterUserDto(String.valueOf(avatarsAdapter.getSelected()),
-                    mEmailView.getText().toString(),
-                    mLoginView.getText().toString(),
+            mRegisterUser = new RegisterUserModel(mLoginView.getText().toString(),
                     mNameView.getText().toString(),
                     mNicknameView.getText().toString(),
-                    mPasswordView.getText().toString());
+                    mEmailView.getText().toString(),
+                    mPasswordView.getText().toString(),
+                    String.valueOf(avatarsAdapter.getSelected()));
 
             showProgress(true);
             authViewModel.registerUser(mRegisterUser);

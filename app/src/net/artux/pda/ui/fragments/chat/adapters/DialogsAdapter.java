@@ -14,8 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.models.Checker;
-import net.artux.pda.models.UserMessage;
+import net.artux.pda.model.Checker;
+import net.artux.pda.model.UserMessage;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
 import net.artux.pda.ui.fragments.chat.ChatFragment;

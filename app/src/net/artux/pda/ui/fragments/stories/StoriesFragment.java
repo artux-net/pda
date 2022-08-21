@@ -19,18 +19,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.ui.util.GsonProvider;
-import net.artux.pda.models.quest.story.StoryDataModel;
+import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.quest.models.Stories;
+import net.artux.pda.ui.util.GsonProvider;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.internal.EverythingIsNonNull;
 import timber.log.Timber;
 
 public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnStoryClickListener {
@@ -78,9 +77,8 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             adapter.setStories(cacheStories.get());
         }
 
-        App.getRetrofitService().getPdaAPI().getStories().enqueue(new Callback<Stories>() {
+        ((App) getActivity().getApplication()).getOldApi().getStories().enqueue(new Callback<Stories>() {
             @Override
-            @EverythingIsNonNull
             public void onResponse(Call<Stories> call, Response<Stories> response) {
                 Stories stories = response.body();
                 navigationPresenter.setLoadingState(false);
@@ -95,7 +93,6 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             }
 
             @Override
-            @EverythingIsNonNull
             public void onFailure(Call<Stories> call, Throwable throwable) {
                 navigationPresenter.setLoadingState(false);
                 Timber.e(throwable);

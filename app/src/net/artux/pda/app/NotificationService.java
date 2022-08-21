@@ -11,7 +11,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import net.artux.pda.BuildConfig;
-import net.artux.pda.models.Status;
+import net.artux.pda.model.StatusModel;
 import net.artux.pda.ui.fragments.chat.Dialog;
 import net.artux.pda.ui.fragments.chat.MessageListener;
 
@@ -48,7 +48,7 @@ public class NotificationService extends Service {
         OkHttpClient client = new OkHttpClient();
 
         Request.Builder builder = new Request.Builder();
-        builder.addHeader("t", App.getDataManager().getAuthToken());
+        builder.addHeader("t",((App)getApplication()).getDataManager().getAuthToken());
 
         builder.url("wss://" + BuildConfig.URL_API + "dialogs/*");
 
@@ -78,7 +78,7 @@ public class NotificationService extends Service {
         }.getType();
 
         try {
-           /* UserMessage userMessage = App.getRetrofitService().getGson().fromJson(text,UserMessage.class);
+           /* UserMessage userMessage =((App)getApplication()).getRetrofitService().getGson().fromJson(text,UserMessage.class);
             if (userMessage.cid == -1) throw new JsonSyntaxException("");
             if (listener!=null) listener.newMessage(userMessage);
             updateDialog(userMessage);
@@ -92,7 +92,7 @@ public class NotificationService extends Service {
                 this.list = list; //dialogsAdapter.setDialogs(list);
             } catch (JsonSyntaxException e1) {
                 Timber.d("Unable to parse: " + text);
-                Status status = gson.fromJson(text, Status.class);
+                StatusModel status = gson.fromJson(text, StatusModel.class);
                 Toast.makeText(getApplicationContext(), status.getDescription(), Toast.LENGTH_LONG).show();
             }
         }

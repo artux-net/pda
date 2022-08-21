@@ -16,7 +16,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.models.items.ItemModel;
+import net.artux.pda.model.items.ItemModel;
 
 import java.util.ArrayList;
 import java.util.List;

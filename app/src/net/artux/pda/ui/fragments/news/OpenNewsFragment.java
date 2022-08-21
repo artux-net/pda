@@ -30,7 +30,7 @@ import com.google.android.gms.ads.nativead.NativeAdView;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.models.news.Article;
+import net.artux.pda.model.news.Article;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 
 import timber.log.Timber;

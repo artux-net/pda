@@ -2,9 +2,8 @@ package net.artux.pda.ui.viewmodels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import net.artux.pda.models.Summary
+import net.artux.pda.model.Summary
 import net.artux.pda.repositories.SummaryRepository
-import net.artux.pda.repositories.util.Result
 import javax.inject.Inject
 
 class SummaryViewModel @Inject constructor(
@@ -13,9 +12,10 @@ class SummaryViewModel @Inject constructor(
     var summary: MutableLiveData<Summary> = MutableLiveData()
 
     fun getCachedSummary(id: String) : MutableLiveData<Summary> {
-        val response = repository.getCachedSummary(id)
+        /*val response = repository.getCachedSummary(id)
         if (response is Result.Success)
-            summary.value = response.data
+            summary.postValue(response.data!!)
+        return summary TODO*/
         return summary
     }
 

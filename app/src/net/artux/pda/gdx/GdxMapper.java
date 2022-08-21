@@ -4,9 +4,9 @@ import net.artux.pda.map.models.GangRelation;
 import net.artux.pda.map.models.UserGdx;
 import net.artux.pda.map.models.user.GdxData;
 import net.artux.pda.map.models.user.ParameterGdx;
-import net.artux.pda.models.quest.story.ParameterModel;
-import net.artux.pda.models.quest.story.StoryDataModel;
-import net.artux.pda.models.user.UserModel;
+import net.artux.pda.model.quest.story.ParameterModel;
+import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.model.user.UserModel;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,5 +25,5 @@ public interface GdxMapper {
 
     ParameterGdx parameter(ParameterModel model);
 
-    GangRelation relation(net.artux.pda.models.user.GangRelation relation);
+    GangRelation relation(net.artux.pda.model.user.GangRelation relation);
 }

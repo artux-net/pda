@@ -10,28 +10,25 @@ import androidx.annotation.Nullable;
 
 import net.artux.pda.app.App;
 import net.artux.pda.databinding.FragmentNoteBinding;
-import net.artux.pda.models.Status;
-import net.artux.pda.models.profile.Note;
+import net.artux.pda.model.StatusModel;
+import net.artux.pda.model.profile.NoteModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import okhttp3.internal.annotations.EverythingIsNonNull;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.internal.EverythingIsNonNull;
 import timber.log.Timber;
 
 public class NoteFragment extends BaseFragment {
 
     FragmentNoteBinding binding;
-    Note selectedNote;
+    NoteModel selectedNote;
+
     {
         defaultAdditionalFragment = NotesFragment.class;
     }
@@ -46,10 +43,10 @@ public class NoteFragment extends BaseFragment {
     @Override
     public void receiveData(Bundle data) {
         super.receiveData(data);
-        if (data!=null){
+        if (data != null) {
             updateNote();
-            selectedNote = (Note) data.getSerializable("note");
-            if (selectedNote!=null) {
+            selectedNote = (NoteModel) data.getSerializable("note");
+            if (selectedNote != null) {
                 bindNote(selectedNote);
             }
         }
@@ -60,13 +57,13 @@ public class NoteFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        binding.deleteButton.setOnClickListener(view1 -> App.getRetrofitService().getPdaAPI()
-                .deleteNote(selectedNote.cid).enqueue(new Callback<Status>() {
+        binding.deleteButton.setOnClickListener(view1 -> ((App) getActivity().getApplication()).getOldApi()
+                .deleteNote(0).enqueue(new Callback<StatusModel>() {
                     @Override
                     @EverythingIsNonNull
-                    public void onResponse(Call<Status> call, Response<Status> response) {
-                        Status status = response.body();
-                        if (status!=null){
+                    public void onResponse(Call<StatusModel> call, Response<StatusModel> response) {
+                        StatusModel status = response.body();
+                        if (status != null) {
                             Bundle bundle = new Bundle();
                             bundle.putInt("updated", 1);
                             navigationPresenter.passData(bundle);
@@ -78,37 +75,34 @@ public class NoteFragment extends BaseFragment {
 
                     @Override
                     @EverythingIsNonNull
-                    public void onFailure(Call<Status> call, Throwable t) {
+                    public void onFailure(Call<StatusModel> call, Throwable t) {
 
                     }
                 }));
     }
 
-    public void bindNote(Note note){
+    public void bindNote(NoteModel note) {
         binding.viewMessage.setVisibility(View.GONE);
         binding.editNoteView.setVisibility(View.VISIBLE);
-        binding.editNoteTitle.setText(note.title);
-        binding.editNoteContent.setText(note.content);
+        binding.editNoteTitle.setText(note.getTitle());
+        binding.editNoteContent.setText(note.getContent());
         SimpleDateFormat outputFormat =
                 new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         outputFormat.setTimeZone(TimeZone.getDefault());
-        Instant instant = new Instant(note.time);
-        DateTime time = instant.toDateTime().toDateTime(DateTimeZone.getDefault());
-
-        binding.noteTime.setText(outputFormat.format(time.toDate()));
+        binding.noteTime.setText(outputFormat.format(note.getTime()));
     }
 
-    public void updateNote(){
+    public void updateNote() {
         String title = binding.editNoteTitle.getEditableText().toString();
         String content = binding.editNoteContent.getEditableText().toString();
-        if (selectedNote !=null && (!selectedNote.title.equals(title) || !selectedNote.content.equals(content))) {
-            selectedNote.title = title;
-            selectedNote.content = content;
-            App.getRetrofitService().getPdaAPI().updateNote(selectedNote).enqueue(new Callback<Note>() {
+        if (selectedNote != null && (!selectedNote.getTitle().equals(title) || !selectedNote.getContent().equals(content))) {
+            selectedNote.setTitle(title);
+            selectedNote.setContent(content);
+            ((App) getActivity().getApplication()).getOldApi().updateNote(selectedNote).enqueue(new Callback<NoteModel>() {
                 @Override
                 @EverythingIsNonNull
-                public void onResponse(Call<Note> call, Response<Note> response) {
-                    Note note = response.body();
+                public void onResponse(Call<NoteModel> call, Response<NoteModel> response) {
+                    NoteModel note = response.body();
                     if (note != null) {
                         Bundle bundle = new Bundle();
                         bundle.putInt("updated", 1);
@@ -120,7 +114,7 @@ public class NoteFragment extends BaseFragment {
 
                 @Override
                 @EverythingIsNonNull
-                public void onFailure(Call<Note> call, Throwable t) {
+                public void onFailure(Call<NoteModel> call, Throwable t) {
                     Timber.e(t);
                 }
             });

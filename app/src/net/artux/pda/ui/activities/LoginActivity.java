@@ -31,9 +31,9 @@ import androidx.lifecycle.Observer;
 
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pda.models.Status;
-import net.artux.pda.models.user.LoginUser;
-import net.artux.pda.models.user.UserModel;
+import net.artux.pda.model.StatusModel;
+import net.artux.pda.model.user.LoginUser;
+import net.artux.pda.model.user.UserModel;
 import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.viewmodels.AuthViewModel;
 
@@ -78,16 +78,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                 builder.setView(input);
 
-                builder.setPositiveButton("OK", (dialog, which) -> App.getRetrofitService().getPdaAPI().resetPassword(input.getText().toString()).enqueue(new Callback<Status>() {
+                builder.setPositiveButton("OK", (dialog, which) -> ((App)getApplication()).getOldApi().resetPassword(input.getText().toString()).enqueue(new Callback<StatusModel>() {
                     @Override
-                    public void onResponse(Call<Status> call, Response<Status> response) {
-                        Status status = response.body();
+                    public void onResponse(Call<StatusModel> call, Response<StatusModel> response) {
+                        StatusModel status = response.body();
                         if (status != null)
                             Toast.makeText(LoginActivity.this, status.getDescription(), Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
-                    public void onFailure(Call<Status> call, Throwable t) {
+                    public void onFailure(Call<StatusModel> call, Throwable t) {
 
                     }
                 }));

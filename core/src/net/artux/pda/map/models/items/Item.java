@@ -1,8 +1,10 @@
 package net.artux.pda.map.models.items;
 
+import java.util.UUID;
+
 public class Item {
 
-    protected long id;
+    protected UUID id;
     protected ItemType type;
     protected String icon;
     protected String title;
@@ -11,11 +13,11 @@ public class Item {
     protected int price;
     public int quantity;
 
-    public long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 

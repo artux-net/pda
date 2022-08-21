@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.models.user.UserModel;
-import net.artux.pda.models.profile.Note;
+import net.artux.pda.model.profile.NoteModel;
+import net.artux.pda.model.user.UserModel;
 import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 
@@ -52,7 +52,7 @@ public class NotesFragment extends AdditionalBaseFragment implements NotesAdapte
     }
 
     @Override
-    public void onClick(Note note) {
+    public void onClick(NoteModel note) {
         Bundle bundle = new Bundle();
         bundle.putSerializable("note", note);
         navigationPresenter.passData(bundle);

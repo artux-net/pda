@@ -11,19 +11,20 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
+import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder> {
 
     List<UserInfo> list = new ArrayList<>();
     ItemsAdapter.OnClickListener clickListener;
-    int ownerId;
+    UUID ownerId;
 
-    RatingAdapter(ItemsAdapter.OnClickListener clickListener, int ownerId){
+    RatingAdapter(ItemsAdapter.OnClickListener clickListener, UUID ownerId){
         this.clickListener = clickListener;
         this.ownerId = ownerId;
     }
@@ -66,7 +67,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
 
         void bind(UserInfo userInfo, int pos){
             this.pos.setText("#" + pos);
-            if (ownerId == userInfo.pdaId)
+            if (ownerId.equals(userInfo.pdaId))
                 itemView.setBackgroundColor(Color.rgb(30, 40, 50));
             ProfileHelper.setAvatar(avatar, userInfo.avatar);
             title.setText(title.getContext().getString(R.string.rating_title,userInfo.login,

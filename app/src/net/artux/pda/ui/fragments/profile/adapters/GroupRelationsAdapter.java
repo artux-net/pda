@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pda.models.user.Gang;
-import net.artux.pda.models.user.GangRelation;
+import net.artux.pda.model.user.Gang;
+import net.artux.pda.model.user.GangRelation;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;

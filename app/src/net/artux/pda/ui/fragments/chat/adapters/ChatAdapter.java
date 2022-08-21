@@ -12,14 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.models.UserMessage;
+import net.artux.pda.model.UserMessage;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -96,19 +93,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             SimpleDateFormat outputFormat =
                     new SimpleDateFormat("HH:mm", Locale.getDefault());
             outputFormat.setTimeZone(TimeZone.getDefault());
-            Instant instant = new Instant(userMessage.getTimestamp());
-            DateTime time = instant.toDateTime().toDateTime(DateTimeZone.getDefault());
+            Instant instant = userMessage.getTimestamp();
 
             nicknameView.setText(userMessage.getLogin());
             messageView.setText(Html.fromHtml(userMessage.getContent()));
 
             if (userMessage.getPdaId() < 0 || userMessage.getGang().getId() < 0){
                 infoView.setText(" [PDA ###]"
-                        + " - " + outputFormat.format(time.toDate()));
+                        + " - " + outputFormat.format(instant));
             }else {
                 infoView.setText(" [PDA #" + userMessage.getPdaId() + "] "
                         + infoView.getContext().getResources().getStringArray(R.array.groups)[userMessage.getGang().getId()] // группировка
-                        + " - " + outputFormat.format(time.toDate()));
+                        + " - " + outputFormat.format(instant));
             }
             ProfileHelper.setAvatar(avatarView, userMessage.getAvatar());
         }

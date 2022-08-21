@@ -1,20 +1,15 @@
 package net.artux.pda.ui.fragments.profile
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import net.artux.pda.R
-import net.artux.pda.app.App
 import net.artux.pda.databinding.FragmentProfileBinding
-import net.artux.pda.models.Status
 import net.artux.pda.repositories.util.Result
-import net.artux.pda.ui.PdaAlertDialog
 import net.artux.pda.ui.activities.hierarhy.BaseFragment
 import net.artux.pda.ui.fragments.additional.AdditionalFragment
 import net.artux.pda.ui.fragments.chat.ChatFragment
@@ -22,9 +17,7 @@ import net.artux.pda.ui.fragments.profile.adapters.GroupRelationsAdapter
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper
 import net.artux.pda.ui.util.getViewModelFactory
 import net.artux.pda.ui.viewmodels.ProfileViewModel
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import net.artux.pda.utils.GroupHelper
 
 class UserProfileFragment : BaseFragment(), View.OnClickListener {
 
@@ -63,7 +56,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 val binding = this.binding!!
                 ProfileHelper.setAvatar(binding.profileAvatar, model.avatar)
                 binding.profileLogin.text = model.login
-                binding.profileGroup.text = model.gang.getTitle(context)
+                binding.profileGroup.text = GroupHelper.getTitle(model.gang, context)
                 binding.profileTime.text =
                     getString(R.string.in_zone_time_p, ProfileHelper.getDays(model))
                 binding.profileRang.text =
@@ -90,7 +83,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 val subsButton: Button = binding.requests
                 val messageButton: Button = binding.writeMessage
                 messageButton.setOnClickListener(this)
-                if (viewModel.getId() != model.pdaId) {
+                /*if (viewModel.getId() != model.id) {
                     when (model.friendStatus) {
                         0 -> {
                             friendButton.setText(R.string.add_friend)
@@ -105,10 +98,10 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                     R.string.okay
                                 ) { _, _ ->
                                     App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
-                                        .enqueue(object : Callback<Status?> {
+                                        .enqueue(object : Callback<StatusModel?> {
                                             override fun onResponse(
-                                                call: Call<Status?>,
-                                                response: Response<Status?>
+                                                call: Call<StatusModel?>,
+                                                response: Response<StatusModel?>
                                             ) {
                                                 val status = response.body()
                                                 if (status != null) Toast.makeText(
@@ -116,11 +109,11 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                                     status.description,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                                profileViewModel.updateProfile(model.pdaId)
+                                                profileViewModel.updateProfile(model.id)
                                             }
 
                                             override fun onFailure(
-                                                call: Call<Status?>,
+                                                call: Call<StatusModel?>,
                                                 throwable: Throwable
                                             ) {
                                             }
@@ -141,11 +134,12 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                 pdaAlertDialog.setPositiveButton(
                                     R.string.okay
                                 ) { dialogInterface, _ ->
+                                    //todo
                                     App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
-                                        .enqueue(object : Callback<Status?> {
+                                        .enqueue(object : Callback<StatusModel?> {
                                             override fun onResponse(
-                                                call: Call<Status?>,
-                                                response: Response<Status?>
+                                                call: Call<StatusModel?>,
+                                                response: Response<StatusModel?>
                                             ) {
                                                 val status = response.body()
                                                 if (status != null) Toast.makeText(
@@ -153,11 +147,11 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                                     status.description,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                                profileViewModel.updateProfile(model.pdaId)
+                                                profileViewModel.updateProfile(model.id)
                                             }
 
                                             override fun onFailure(
-                                                call: Call<Status?>,
+                                                call: Call<StatusModel?>,
                                                 throwable: Throwable
                                             ) {
                                             }
@@ -178,11 +172,11 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                 pdaAlertDialog.setPositiveButton(
                                     R.string.okay
                                 ) { dialogInterface, _ ->
-                                    App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
-                                        .enqueue(object : Callback<Status?> {
+                                    App.getRetrofitService().get.requestFriend(model.pdaId)
+                                        .enqueue(object : Callback<StatusModel?> {
                                             override fun onResponse(
-                                                call: Call<Status?>,
-                                                response: Response<Status?>
+                                                call: Call<StatusModel?>,
+                                                response: Response<StatusModel?>
                                             ) {
                                                 val status = response.body()
                                                 if (status != null) Toast.makeText(
@@ -190,11 +184,11 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                                     status.description,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                                profileViewModel.updateProfile(model.pdaId)
+                                                profileViewModel.updateProfile(model.id)
                                             }
 
                                             override fun onFailure(
-                                                call: Call<Status?>,
+                                                call: Call<StatusModel?>,
                                                 throwable: Throwable
                                             ) {
                                             }
@@ -216,10 +210,10 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                     R.string.okay
                                 ) { dialogInterface, _ ->
                                     App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
-                                        .enqueue(object : Callback<Status?> {
+                                        .enqueue(object : Callback<StatusModel?> {
                                             override fun onResponse(
-                                                call: Call<Status?>,
-                                                response: Response<Status?>
+                                                call: Call<StatusModel?>,
+                                                response: Response<StatusModel?>
                                             ) {
                                                 val status = response.body()
                                                 if (status != null) Toast.makeText(
@@ -227,11 +221,11 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                                                     status.description,
                                                     Toast.LENGTH_SHORT
                                                 ).show()
-                                                profileViewModel.updateProfile(model.pdaId)
+                                                profileViewModel.updateProfile(model.id)
                                             }
 
                                             override fun onFailure(
-                                                call: Call<Status?>,
+                                                call: Call<StatusModel?>,
                                                 throwable: Throwable
                                             ) {
                                             }
@@ -251,7 +245,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                     friendButton.visibility = View.GONE
                     messageButton.visibility = View.GONE
                     subsButton.visibility = View.VISIBLE
-                }
+                }*/
             }
         }
         /*if (arguments != null)

@@ -18,17 +18,17 @@ import com.bumptech.glide.Glide;
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.App;
-import net.artux.pda.models.profile.Seller;
-import net.artux.pda.models.user.UserModel;
+import net.artux.pda.model.profile.Seller;
+import net.artux.pda.model.user.UserModel;
 import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
 import net.artux.pda.ui.viewmodels.UserViewModel;
 
+import okhttp3.internal.annotations.EverythingIsNonNull;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.internal.EverythingIsNonNull;
 import timber.log.Timber;
 
 public class SellerActivity extends AppCompatActivity implements View.OnClickListener {
@@ -64,11 +64,12 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
 
         sellerAdapter = new ItemsAdapter();
         sellerAdapter.setOnClickListener(pos -> {
+            //todo
             /*Item item = sellerAdapter.getItems().get(pos);
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
             builder.setTitle("Вы хотите купить " + item.title + " за " + item.price + "?");
 
-            builder.setPositiveButton(R.string.yes, (dialogInterface, i) -> App.getRetrofitService().getPdaAPI().buyItem(sellerId, sellerAdapter.getItems().get(pos).hashCode()).enqueue(new Callback<Status>() {
+            builder.setPositiveButton(R.string.yes, (dialogInterface, i) ->((App)getApplication()).getRetrofitService().getPdaAPI().buyItem(sellerId, sellerAdapter.getItems().get(pos).hashCode()).enqueue(new Callback<Status>() {
                 @Override
                 @EverythingIsNonNull
                 public void onResponse(Call<Status> call, Response<Status> response) {
@@ -94,9 +95,8 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             alertDialog.show();*/
         });
 
-        App.getRetrofitService().getPdaAPI().getSeller(sellerId).enqueue(new Callback<Seller>() {
+        ((App)getApplication()).getOldApi().getSeller(sellerId).enqueue(new Callback<Seller>() {
             @Override
-            @EverythingIsNonNull
             public void onResponse(Call<Seller> call, Response<Seller> response) {
                 Seller seller = response.body();
                 if (seller!=null){
@@ -144,7 +144,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
             builder.setTitle("Вы хотите продать " + item.title + " за " + item.priceToSell() + "?");
 
-            builder.setPositiveButton(R.string.yes, (dialogInterface, i) -> App.getRetrofitService().getPdaAPI().sellItem(item.hashCode()).enqueue(new Callback<Status>() {
+            builder.setPositiveButton(R.string.yes, (dialogInterface, i) ->((App)getApplication()).getRetrofitService().getPdaAPI().sellItem(item.hashCode()).enqueue(new Callback<Status>() {
                 @Override
                 @EverythingIsNonNull
                 public void onResponse(Call<Status> call, Response<Status> response) {

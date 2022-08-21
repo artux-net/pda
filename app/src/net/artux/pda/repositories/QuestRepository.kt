@@ -1,11 +1,12 @@
 package net.artux.pda.repositories
 
-import net.artux.pda.generated.apis.DefaultApi
-import net.artux.pda.generated.models.StoryData
 import net.artux.pda.map.model.input.Map
 import net.artux.pda.repositories.util.Result
 import net.artux.pda.services.PdaAPI
 import net.artux.pda.ui.fragments.quest.models.Chapter
+import net.artux.pdanetwork.api.DefaultApi
+import net.artux.pdanetwork.model.CommandBlock
+import net.artux.pdanetwork.model.StoryData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -90,7 +91,7 @@ class QuestRepository @Inject constructor(
 
     suspend fun resetData(): Result<StoryData> {
         return suspendCoroutine {
-            defaultApi.resetDataUsingGET().enqueue(object : Callback<StoryData> {
+            defaultApi.resetData().enqueue(object : Callback<StoryData> {
                 override fun onResponse(
                     call: Call<StoryData>,
                     response: retrofit2.Response<StoryData>
@@ -110,9 +111,9 @@ class QuestRepository @Inject constructor(
         }
     }
 
-    suspend fun syncMember(map: HashMap<String, List<String>>): Result<StoryData> {
+    suspend fun syncMember(map: CommandBlock): Result<StoryData> {
         return suspendCoroutine {
-            defaultApi.doActionsUsingPUT(map).enqueue(object : Callback<StoryData> {
+            defaultApi.doActions(map).enqueue(object : Callback<StoryData> {
                 override fun onResponse(
                     call: Call<StoryData>,
                     response: Response<StoryData>
@@ -135,7 +136,7 @@ class QuestRepository @Inject constructor(
 
     suspend fun getStoryData(): Result<StoryData> {
         return suspendCoroutine {
-            defaultApi.getActualDataUsingGET().enqueue(object : Callback<StoryData>{
+            defaultApi.actualData.enqueue(object : Callback<StoryData>{
                 override fun onResponse(call: Call<StoryData>, response: Response<StoryData>) {
                     val data = response.body()
                     if (data!=null) {

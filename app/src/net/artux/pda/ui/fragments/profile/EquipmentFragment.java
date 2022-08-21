@@ -16,8 +16,8 @@ import com.bumptech.glide.signature.ObjectKey;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.models.items.ItemModel;
-import net.artux.pda.models.user.UserModel;
+import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.user.UserModel;
 import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;

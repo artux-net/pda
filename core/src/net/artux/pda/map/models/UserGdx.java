@@ -3,6 +3,7 @@ package net.artux.pda.map.models;
 import net.artux.pda.map.models.user.Gang;
 
 import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,8 +25,8 @@ public class UserGdx {
     private int money;
     private GangRelation relations;
     public List<Integer> achievements = new ArrayList<>();
-    private Long lastModified;
-    private Long registration;
+    private Instant lastModified;
+    private Instant registration;
 
     public UserGdx() {
     }
@@ -122,19 +123,19 @@ public class UserGdx {
         this.achievements = achievements;
     }
 
-    public Long getLastModified() {
+    public Instant getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Long lastModified) {
+    public void setLastModified(Instant lastModified) {
         this.lastModified = lastModified;
     }
 
-    public Long getRegistration() {
+    public Instant getRegistration() {
         return registration;
     }
 
-    public void setRegistration(Long registration) {
+    public void setRegistration(Instant registration) {
         this.registration = registration;
     }
 
