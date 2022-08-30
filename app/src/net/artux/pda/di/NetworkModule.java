@@ -5,22 +5,30 @@ import com.google.gson.Gson;
 import net.artux.pda.BuildConfig;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.services.PdaAPI;
+import net.artux.pdanetwork.ApiClient;
 import net.artux.pdanetwork.api.DefaultApi;
 
 import java.util.Locale;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.components.SingletonComponent;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
+@InstallIn({SingletonComponent.class})
 public class NetworkModule {
 
     @Provides
-    public Retrofit getRetrofit(GsonConverterFactory factory, DataManager dataManager){
+    @Singleton
+    public Retrofit retrofit(GsonConverterFactory factory, DataManager dataManager) {
+        //todo remove
         OkHttpClient.Builder httpClient =
                 new OkHttpClient.Builder();
 
@@ -34,21 +42,29 @@ public class NetworkModule {
             return chain.proceed(request);
         });
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BuildConfig.PROTOCOL+ "://" + BuildConfig.URL_API)
+        return new Retrofit.Builder()
+                .baseUrl(BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API)
                 .addConverterFactory(factory)
                 .client(httpClient.build())
                 .build();
-
-        return retrofit;
     }
 
     @Provides
-    public DefaultApi getDefaultApi(Retrofit retrofit) {
-        return retrofit.create(DefaultApi.class);
+    @Singleton
+    public ApiClient apiClient(DataManager dataManager){
+        String login = dataManager.getLogin();
+        String pass = dataManager.getPass();
+        return new ApiClient("basicAuth", login, pass);
     }
 
     @Provides
+    @Singleton
+    public DefaultApi getDefaultApi(ApiClient apiClient) {
+        return apiClient.createService(DefaultApi.class);
+    }
+
+    @Provides
+    @Singleton
     public PdaAPI getPdaAPI(Retrofit retrofit){
         return retrofit.create(PdaAPI.class);
     }

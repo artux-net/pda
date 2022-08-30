@@ -48,7 +48,7 @@ public class NotificationService extends Service {
         OkHttpClient client = new OkHttpClient();
 
         Request.Builder builder = new Request.Builder();
-        builder.addHeader("t",((App)getApplication()).getDataManager().getAuthToken());
+        builder.addHeader("t",((PDAApplication)getApplication()).getDataManager().getAuthToken());
 
         builder.url("wss://" + BuildConfig.URL_API + "dialogs/*");
 

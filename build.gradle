@@ -1,33 +1,32 @@
 buildscript {
-    ext.kotlin_version = '1.5.30'
+    ext.kotlin_version = '1.7.10'
+    ext.dagger_version = "2.43.2"
 
     repositories {
         mavenLocal()
         mavenCentral()
+        maven { url "https://jitpack.io" }
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         google()
     }
-    dependencies {
 
-        classpath 'com.android.tools.build:gradle:7.0.4'
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath 'com.google.gms:google-services:4.3.10'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.8.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'org.projectlombok:lombok:1.18.0'
         classpath "com.badlogicgames.gdx:gdx-ai:1.8.1"
-        classpath "com.yelp.codegen:plugin:1.4.1"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$dagger_version"
     }
+
 }
 
 allprojects {
-    apply plugin: "eclipse"
-
     version = '1.0'
     ext {
-        appName = "test"
+        kotlin_version = '1.7.0'
+        appName = "PDA"
         gdxVersion = '1.9.10'
         roboVMVersion = '2.3.8'
         box2DLightsVersion = '1.4'
@@ -52,7 +51,7 @@ project(":app") {
 
     dependencies {
         implementation project(":core")
-        implementation project(":pdanetworklib")
+        implementation project(":model")
 
         api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
@@ -73,12 +72,6 @@ project(":app") {
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
         natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
-
-    }
-}
-
-project(":pdanetworklib") {
-    dependencies {
     }
 }
 
@@ -88,7 +81,6 @@ project(":core") {
     configurations { natives }
 
     dependencies {
-        implementation project(":pdanetworklib")
         implementation 'com.google.code.gson:gson:2.8.9'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
@@ -97,22 +89,6 @@ project(":core") {
         implementation "com.badlogicgames.gdx:gdx-ai:1.8.1"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-controllers-android:$gdxVersion"
-    }
-}
-
-project(":tests") {
-    apply plugin: "java-library"
-
-    configurations { natives }
-
-    dependencies {
-        implementation project(":core")
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-
-        implementation "com.badlogicgames.gdx:gdx-ai:1.8.1"
-        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
 }
 

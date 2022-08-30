@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.GangRelation;
 
@@ -88,7 +88,7 @@ public class GroupRelationsAdapter extends RecyclerView.Adapter<GroupRelationsAd
 
         void bind(int key, int relation) {
             title.setText(title.getContext().getResources().getStringArray(R.array.groups)[key]);
-            avatar.setImageDrawable(avatar.getContext().getResources().getDrawable(App.group_avatars[key]));
+            avatar.setImageDrawable(avatar.getContext().getResources().getDrawable(PDAApplication.group_avatars[key]));
 
             if (relation < 0) {
                 if (relation < -5) relation = -5;

@@ -44,8 +44,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class MainActivity extends FragmentActivity implements MainContract.View, View.OnClickListener {
 
     private ActivityMainBinding binding;
@@ -53,8 +55,6 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     private BroadcastReceiver timeReceiver;
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm dd/MM/yy", Locale.US);
     private UserViewModel viewModel;
-
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

@@ -30,7 +30,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.model.StatusModel;
 import net.artux.pda.model.user.LoginUser;
 import net.artux.pda.model.user.UserModel;
@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                 builder.setView(input);
 
-                builder.setPositiveButton("OK", (dialog, which) -> ((App)getApplication()).getOldApi().resetPassword(input.getText().toString()).enqueue(new Callback<StatusModel>() {
+                builder.setPositiveButton("OK", (dialog, which) -> ((PDAApplication)getApplication()).getOldApi().resetPassword(input.getText().toString()).enqueue(new Callback<StatusModel>() {
                     @Override
                     public void onResponse(Call<StatusModel> call, Response<StatusModel> response) {
                         StatusModel status = response.body();

@@ -11,7 +11,8 @@ import androidx.annotation.Nullable;
 import com.google.gson.reflect.TypeToken;
 
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.app.DataManager;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.model.ResponsePage;
 import net.artux.pda.model.news.Article;
@@ -48,16 +49,18 @@ public class NewsFragment extends BaseFragment {
 
         adapter = new NewsAdapter(navigationPresenter);
         binding.list.setAdapter(adapter);
+        PDAApplication application = (PDAApplication) requireActivity().getApplication();
+        DataManager dataManager = application.getDataManager();
 
         Type listType = new TypeToken<List<Article>>(){}.getType();
-        List<Article> news = GsonProvider.getInstance().fromJson(App.getDataManager().getString("news"), listType);
+        List<Article> news = GsonProvider.getInstance().fromJson(dataManager.getString("news"), listType);
         if(news!=null && !news.isEmpty()){
             binding.list.setVisibility(View.VISIBLE);
             binding.viewMessage.setVisibility(View.GONE);
             adapter.setNews(news);
         }
 
-        ((App)getActivity().getApplication()).getOldApi().getFeed().enqueue(new Callback<ResponsePage<Article>>() {
+        ((PDAApplication)getActivity().getApplication()).getOldApi().getFeed().enqueue(new Callback<ResponsePage<Article>>() {
             @Override
             public void onResponse(Call<ResponsePage<Article>> call, Response<ResponsePage<Article>> response) {
                 ResponsePage<Article> page = response.body();
@@ -67,7 +70,8 @@ public class NewsFragment extends BaseFragment {
                         binding.list.setVisibility(View.VISIBLE);
                         binding.viewMessage.setVisibility(View.GONE);
                         adapter.setNews(list);
-                        App.getDataManager().setString("news", GsonProvider.getInstance().toJson(list));
+                        PDAApplication application = (PDAApplication) requireActivity().getApplication();
+                        application.getDataManager().setString("news", GsonProvider.getInstance().toJson(list));
                     }
                 }
 

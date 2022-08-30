@@ -8,6 +8,11 @@ import net.artux.pda.map.models.items.Artifact;
 import net.artux.pda.map.models.items.Detector;
 import net.artux.pda.map.models.items.Item;
 import net.artux.pda.map.models.items.Weapon;
+import net.artux.pda.model.items.ArmorModel;
+import net.artux.pda.model.items.ArtifactModel;
+import net.artux.pda.model.items.DetectorModel;
+import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.items.WeaponModel;
 
 import java.text.DecimalFormat;
 
@@ -15,17 +20,17 @@ public class ItemsHelper {
 
     private static DecimalFormat decimalFormat = new DecimalFormat("###.##");
 
-    private static String getDefault(Item item, Context context){
+    private static String getDefault(ItemModel item, Context context){
         return context.getString(R.string.item_desc, String.valueOf(item.getPrice()),
                 String.valueOf(item.getWeight()), String.valueOf(item.getQuantity()),
                 decimalFormat.format(item.getQuantity()*item.getWeight()));
     }
 
-    public static String getDesc(Item item, Context context) {
+    public static String getDesc(ItemModel item, Context context) {
         String result = getDefault(item, context);
 
-        if (item instanceof Armor){
-            Armor armor = (Armor) item;
+        if (item instanceof ArmorModel){
+            ArmorModel armor = (ArmorModel) item;
             result += context.getString(R.string.armor_desc,
                     String.valueOf(armor.getThermal_pr()),
                     String.valueOf(armor.getElectric_pr()),
@@ -34,8 +39,8 @@ public class ItemsHelper {
                     String.valueOf(armor.getPsy_pr()),
                     String.valueOf(armor.getDamage_pr()),
                     String.valueOf(armor.getCondition()));
-        }else if(item instanceof Artifact){
-            Artifact artifact = (Artifact) item;
+        }else if(item instanceof ArtifactModel){
+            ArtifactModel artifact = (ArtifactModel) item;
             context.getString(R.string.artifact_desc,
                     String.valueOf(artifact.getHealth()),
                     String.valueOf(artifact.getRadio()),
@@ -45,10 +50,10 @@ public class ItemsHelper {
                     String.valueOf(artifact.getChemical()),
                     String.valueOf(artifact.getEndurance()),
                     String.valueOf(artifact.getElectric()));
-        }else if (item instanceof Detector){
+        }else if (item instanceof DetectorModel){
             //TODO
-        }else if (item instanceof Weapon){
-            Weapon weapon = (Weapon) item;
+        }else if (item instanceof WeaponModel){
+            WeaponModel weapon = (WeaponModel) item;
             context.getString(R.string.weapon_desc,
                     String.valueOf(weapon.getPrecision()),
                     String.valueOf(weapon.getSpeed()),

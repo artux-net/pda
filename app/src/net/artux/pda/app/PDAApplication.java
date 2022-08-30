@@ -7,33 +7,37 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.google.gson.Gson;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.di.AppComponent;
-import net.artux.pda.di.ContextModule;
-import net.artux.pda.di.DaggerAppComponent;
 import net.artux.pda.repositories.QuestRepository;
 import net.artux.pda.repositories.SummaryRepository;
 import net.artux.pda.repositories.UserRepository;
 import net.artux.pda.services.PdaAPI;
-import net.artux.pda.ui.util.GsonProvider;
 import net.artux.pdanetwork.api.DefaultApi;
 
-import org.jetbrains.annotations.NotNull;
+import javax.inject.Inject;
 
-import dagger.Module;
+import dagger.hilt.android.HiltAndroidApp;
 import timber.log.Timber;
 
+@HiltAndroidApp
+public class PDAApplication extends Application {
 
-@Module
-public class App extends Application {
+    @Inject
+    protected DataManager dataManager;
+    @Inject
+    protected UserRepository userRepository;
+    @Inject
+    protected SummaryRepository summaryRepository;
+    @Inject
+    protected QuestRepository questRepository;
 
-    private AppComponent daggerAppComponent;
-    static Gson gson;
+    @Inject
+    protected DefaultApi defaultApi;
+    @Inject
+    protected PdaAPI pdaAPI;
 
-    static DataManager sDataManager;
 
     public static int[] group_avatars = {
             R.drawable.g0,
@@ -52,14 +56,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        sDataManager = new DataManager(getApplicationContext());
-        //mRetrofitService.getRetrofit(sDataManager);
-        daggerAppComponent = DaggerAppComponent.builder()
-                .contextModule(new ContextModule(this))
-                .build();
-
-        gson = GsonProvider.getInstance();
 
         /*userRepository = new UserRepository(mRetrofitService.getDefaultApi(), profileCache, memberCache);
         questRepository = new QuestRepository(mRetrofitService.getPdaAPI(), mRetrofitService.getDefaultApi(),
@@ -86,18 +82,16 @@ public class App extends Application {
         super.onTerminate();
     }
 
-    @NotNull
     public UserRepository getUserRepository() {
-        return daggerAppComponent.userRepository();
+        return userRepository;
     }
 
-    @NotNull
     public QuestRepository getQuestRepository() {
-        return daggerAppComponent.questRepository();
+        return questRepository;
     }
 
     public SummaryRepository getSummaryRepository() {
-        return daggerAppComponent.summaryRepository();
+        return summaryRepository;
     }
 
     /**
@@ -121,15 +115,15 @@ public class App extends Application {
         }
     }
 
-    public static DataManager getDataManager() {
-        return sDataManager;
+    public DataManager getDataManager() {
+        return dataManager;
     }
 
     public DefaultApi getDefaultApi() {
-        return daggerAppComponent.defaultApi();
+        return defaultApi;
     }
 
     public PdaAPI getOldApi() {
-        return daggerAppComponent.oldApi();
+        return pdaAPI;
     }
 }

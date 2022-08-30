@@ -24,15 +24,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.savedstate.SavedStateRegistryOwner
-import net.artux.pda.app.App
+import net.artux.pda.app.PDAApplication
 import net.artux.pda.gdx.MapEngine
 
 
 fun getViewModelFactory(context: Context, owner: SavedStateRegistryOwner): ViewModelFactory{
-    val userRepository = (context as App).userRepository
-    val questRepository = context.questRepository
-    val summaryRepository = context.summaryRepository
-    return ViewModelFactory(userRepository, questRepository, summaryRepository, owner)
+    val component = (context as PDAApplication)
+    val userRepository = component.userRepository
+    val questRepository = component.questRepository
+    val summaryRepository = component.summaryRepository
+    return ViewModelFactory(userRepository, questRepository, summaryRepository, component.dataManager, owner)
 }
 
 fun Fragment.getViewModelFactory(): ViewModelFactory {

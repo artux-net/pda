@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
 import java.util.ArrayList;
@@ -21,10 +20,10 @@ import java.util.UUID;
 public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder> {
 
     List<UserInfo> list = new ArrayList<>();
-    ItemsAdapter.OnClickListener clickListener;
+    OnClickListener clickListener;
     UUID ownerId;
 
-    RatingAdapter(ItemsAdapter.OnClickListener clickListener, UUID ownerId){
+    RatingAdapter(OnClickListener clickListener, UUID ownerId){
         this.clickListener = clickListener;
         this.ownerId = ownerId;
     }
@@ -77,10 +76,14 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    clickListener.onClick(userInfo.pdaId);
+                    clickListener.onClick(userInfo);
                 }
             });
         }
+    }
+
+    interface OnClickListener{
+        void onClick(UserInfo userInfo);
     }
 
 }

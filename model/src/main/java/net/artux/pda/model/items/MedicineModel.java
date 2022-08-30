@@ -1,5 +1,11 @@
 package net.artux.pda.model.items;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class MedicineModel extends ItemModel {
 
     private float stamina;

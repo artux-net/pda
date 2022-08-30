@@ -17,10 +17,9 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.quest.models.Stories;
@@ -51,14 +50,12 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
 
         questViewModel.getStoryData().observe(getViewLifecycleOwner(), memberResult -> {
-            if (memberResult instanceof Result.Success) {
-                StoryDataModel model = memberResult.getOrThrow();
-                if (model.getCurrent() != null) {
-                    Intent intent = new Intent(getActivity(), QuestActivity.class);
-                    requireActivity().startActivity(intent);
-                    requireActivity().finish();
-                } else loadStories();
-            } else questViewModel.updateData();
+            StoryDataModel model = memberResult;
+            if (model.getCurrent() != null) {
+                Intent intent = new Intent(getActivity(), QuestActivity.class);
+                requireActivity().startActivity(intent);
+                requireActivity().finish();
+            } else loadStories();
         });
     }
 
@@ -70,14 +67,17 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
         StoriesAdapter adapter = new StoriesAdapter(StoriesFragment.this);
         binding.list.setAdapter(adapter);
 
-        Stories cacheStories = GsonProvider.getInstance().fromJson(App.getDataManager().getString("stories"), Stories.class);
+        PDAApplication application = (PDAApplication) requireActivity().getApplication();
+
+
+        Stories cacheStories = GsonProvider.getInstance().fromJson(application.getDataManager().getString("stories"), Stories.class);
         if (cacheStories != null) {
             binding.list.setVisibility(View.VISIBLE);
             binding.viewMessage.setVisibility(View.GONE);
             adapter.setStories(cacheStories.get());
         }
 
-        ((App) getActivity().getApplication()).getOldApi().getStories().enqueue(new Callback<Stories>() {
+        ((PDAApplication) getActivity().getApplication()).getOldApi().getStories().enqueue(new Callback<Stories>() {
             @Override
             public void onResponse(Call<Stories> call, Response<Stories> response) {
                 Stories stories = response.body();
@@ -87,7 +87,8 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                         && binding != null) {
                     binding.list.setVisibility(View.VISIBLE);
                     binding.viewMessage.setVisibility(View.GONE);
-                    App.getDataManager().setString("stories", GsonProvider.getInstance().toJson(stories));
+                    PDAApplication application = (PDAApplication) requireActivity().getApplication();
+                    application.getDataManager().setString("stories", GsonProvider.getInstance().toJson(stories));
                     adapter.setStories(stories.get());
                 }
             }

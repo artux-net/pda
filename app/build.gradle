@@ -1,7 +1,31 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
+plugins{
+    id 'org.hidetake.swagger.generator' version '2.19.2'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
+
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+swaggerSources {
+    pdanetwork {
+        inputFile = file('api.json')
+        code {
+            language = 'java'
+            configFile = file('apiconfig.json')
+        }
+    }
+}
+
+gradle.projectsEvaluated {
+    preBuild.dependsOn swaggerSources.pdanetwork.code
+}
 
 android {
     signingConfigs {
@@ -17,7 +41,7 @@ android {
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src']
+            java.srcDirs = ['src', "${swaggerSources.pdanetwork.code.outputDir}/src/main/java"]
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
@@ -31,10 +55,10 @@ android {
     }
     defaultConfig {
         applicationId "net.artux.pda"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 32
         versionCode 32
-        versionName "0.06"
+        versionName "0.1"
         signingConfig signingConfigs.release
     }
     buildTypes {
@@ -43,18 +67,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
-            buildConfigField("String", "URL_API", "\"app.artux.net/pdanetwork/\"")
+            buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
             buildConfigField("String", "URL", "\"api.artux.net/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-4707001480680280/1079779549\"")
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-4707001480680280/2723145658\"")
+
         }
         debug {
             debuggable true
             buildConfigField("String", "PROTOCOL", "\"https\"")
             //buildConfigField("String", "WS_PROTOCOL", "\"ws\"")
-            //buildConfigField("String", "URL_API", "\"192.168.1.104:8080/pdanetwork/\"")
+            buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
-            buildConfigField("String", "URL_API", "\"app.artux.net/pdanetwork/\"")
+            //buildConfigField("String", "URL_API", "\"app.artux.net/pdanetwork/\"")
             buildConfigField("String", "URL", "\"api.artux.net/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-3940256099942544/1033173712\"")
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-3940256099942544/2247696110\"")
@@ -64,66 +89,94 @@ android {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding true
+    }
+    lint {
+        abortOnError false
     }
 }
 
-dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.squareup.moshi:moshi:1.12.0"
-    implementation "com.squareup.moshi:moshi-adapters:1.12.0"
-    implementation "com.squareup.okhttp3:okhttp:3.14.9"
-    implementation "com.squareup.retrofit2:retrofit:2.9.0"
-    implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
-    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:1.1.5"
+ext {
+    oltu_version = "1.0.2"
+    retrofit_version = "2.3.0"
+    swagger_annotations_version = "2.0.0"
+    junit_version = "4.12"
+    threetenbp_version = "1.3.5"
+    json_fire_version = "1.8.0"
+    mapstruct_version = "1.5.2.Final"
+    glide_version = "4.12.0"
+    dagger_version = "2.43.2"
+    retrofit_version = "2.9.0"
+    androidx_version = "2.5.1"
+}
 
+dependencies {
     implementation 'com.android.support:multidex:1.0.3'
+    //mapstruct
+    implementation 'org.mapstruct:mapstruct:1.5.2.Final'
+    kapt 'org.mapstruct:mapstruct-processor:1.5.2.Final'
+
+    //for api code gen
+    swaggerCodegen 'io.swagger.codegen.v3:swagger-codegen-cli:3.0.34'  // or Swagger Codegen V3
+    implementation "io.swagger.core.v3:swagger-annotations:$swagger_annotations_version"
+    implementation ("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:$oltu_version"){
+        exclude group:'org.apache.oltu.oauth2' , module: 'org.apache.oltu.oauth2.common'
+    }
+    implementation "io.gsonfire:gson-fire:$json_fire_version"
+    implementation "org.threeten:threetenbp:$threetenbp_version"
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+
 
     implementation 'com.google.android.exoplayer:exoplayer:2.16.1'
     implementation 'com.google.firebase:firebase-ads:20.5.0'
 
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.1'
+    //androidx
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$androidx_version"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$androidx_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_version"
 
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    //retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-scalars:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
     implementation 'me.grantland:autofittextview:0.2.1'
-    implementation 'androidx.annotation:annotation:1.3.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'org.aviran.cookiebar2:cookiebar2:1.1.4'
+
+    implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'com.google.android.material:material:1.4.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1'
+
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    implementation 'joda-time:joda-time:2.10.8'
     implementation 'com.jakewharton.timber:timber:4.7.1'
-
 
     implementation platform('com.google.firebase:firebase-bom:26.0.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics'
 
-    implementation "androidx.core:core-ktx:1.7.0"
-    implementation("androidx.fragment:fragment-ktx:1.4.0")
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    //ktx
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "androidx.core:core-ktx:1.8.0"
+    implementation "androidx.fragment:fragment-ktx:1.4.1"
 
-    //dagger2
-    implementation 'com.google.dagger:dagger-android:2.35.1'
-    implementation 'com.google.dagger:dagger-android-support:2.35.1' // if you use the support libraries
-    annotationProcessor 'com.google.dagger:dagger-android-processor:2.35.1'
-    annotationProcessor 'com.google.dagger:dagger-compiler:2.35.1'
 
-    annotationProcessor 'org.projectlombok:lombok:1.18.22'
-
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+
+    //dagger
+    implementation "com.google.dagger:dagger:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+    kapt "com.google.dagger:dagger-android-processor:$dagger_version"
+    implementation "com.google.dagger:hilt-android:$dagger_version"
+    kapt "com.google.dagger:hilt-compiler:$dagger_version"
 }
 
 task copyAndroidNatives {
@@ -138,10 +191,10 @@ task copyAndroidNatives {
             def outputDir = null
             if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
             if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-            if(jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
-            if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
-            if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-            if(outputDir != null) {
+            if (jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
+            if (jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
+            if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+            if (outputDir != null) {
                 copy {
                     from zipTree(jar)
                     into outputDir
@@ -157,29 +210,3 @@ tasks.whenTaskAdded { packageTask ->
         packageTask.dependsOn 'copyAndroidNatives'
     }
 }
-
-task run(type: Exec) {
-    def path
-    def localProperties = project.file("../local.properties")
-    if (localProperties.exists()) {
-        Properties properties = new Properties()
-        localProperties.withInputStream { instr ->
-            properties.load(instr)
-        }
-        def sdkDir = properties.getProperty('sdk.dir')
-        if (sdkDir) {
-            path = sdkDir
-        } else {
-            path = "$System.env.ANDROID_HOME"
-        }
-    } else {
-        path = "$System.env.ANDROID_HOME"
-    }
-
-    def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.mygdx.game/com.mygdx.game.AndroidLauncher'
-}
-repositories {
-    mavenCentral()
-}
-

@@ -20,7 +20,7 @@ import com.google.gson.reflect.TypeToken;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.FragmentChatBinding;
 import net.artux.pda.model.UserMessage;
 import net.artux.pda.ui.PdaAlertDialog;
@@ -81,7 +81,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         OkHttpClient client = new OkHttpClient();
 
         Request.Builder builder = new Request.Builder();
-        builder.addHeader("Authorization",((App)getActivity().getApplication()).getDataManager().getAuthToken());
+        builder.addHeader("Authorization",((PDAApplication)getActivity().getApplication()).getDataManager().getAuthToken());
         Bundle args = getArguments();
         String path = BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API + "pdanetwork/";
         navigationPresenter.setLoadingState(true);

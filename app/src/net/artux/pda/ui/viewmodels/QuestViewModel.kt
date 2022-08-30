@@ -5,23 +5,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import net.artux.pda.map.model.input.Map
+import net.artux.pda.model.items.WearableModel
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
 import net.artux.pda.repositories.util.Result
 import net.artux.pda.ui.fragments.quest.models.Chapter
 import net.artux.pdanetwork.model.CommandBlock
+import net.artux.pdanetwork.model.Status
 import javax.inject.Inject
 
 class QuestViewModel @Inject constructor(
     var repository: QuestRepository,
     var mapper: StoryMapper
 ) : ViewModel() {
+
     var chapter: MutableLiveData<Chapter> = MutableLiveData()
     var map: MutableLiveData<Map> = MutableLiveData()
-
-    var storyData: MutableLiveData<Result<StoryDataModel>> =
-        MutableLiveData(repository.getCachedStoryData().map { mapper.dataModel(it) })
+    var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
+    var status: MutableLiveData<Status> = MutableLiveData()
 
     private fun getCachedChapter(storyId: Int, chapterId: Int): Chapter? {
         val response = repository.getCachedChapter(storyId, chapterId)
@@ -39,7 +41,10 @@ class QuestViewModel @Inject constructor(
 
     fun applyActions(map: HashMap<String, List<String>>) {
         viewModelScope.launch {
-            storyData.postValue(repository.syncMember(CommandBlock().actions(map)).map { mapper.dataModel(it) })
+            val result = repository.syncMember(CommandBlock().actions(map))
+            if (result is Result.Success) {
+                storyData.postValue(result.map { mapper.dataModel(it) }.getOrThrow())
+            }
         }
     }
 
@@ -74,7 +79,7 @@ class QuestViewModel @Inject constructor(
 
     fun resetData() {
         viewModelScope.launch {
-            storyData.postValue(repository.resetData().map { mapper.dataModel(it) })
+            storyData.postValue(repository.resetData().map { mapper.dataModel(it) }.getOrThrow())
         }
     }
 
@@ -84,7 +89,16 @@ class QuestViewModel @Inject constructor(
 
     fun updateData() {
         viewModelScope.launch {
-            storyData.postValue(repository.getStoryData().map { mapper.dataModel(it) })
+            storyData.postValue(repository.getStoryData().map { mapper.dataModel(it) }.getOrThrow())
+        }
+    }
+
+    fun setWearable(wearable: WearableModel) {
+        viewModelScope.launch {
+            val result = repository.setWearableItem(wearable.id, wearable.type.toString())
+            if (result is Result.Success) {
+                status.postValue(result.data)
+            }
         }
     }
 }

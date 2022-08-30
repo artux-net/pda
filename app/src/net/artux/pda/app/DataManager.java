@@ -15,7 +15,7 @@ public class DataManager {
         mSharedPreferences = context.getSharedPreferences("prefs", Context.MODE_PRIVATE);
     }
 
-    public String getString(String name){
+    public String getString(String name) {
         return mSharedPreferences.getString(name, "");
     }
 
@@ -25,15 +25,23 @@ public class DataManager {
         editor.commit();
     }
 
-    public void setLoginUser(LoginUser user){
+    public void setLoginUser(LoginUser user) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putString("login", user.getEmailOrLogin());
         editor.putString("pass", user.getPassword());
         editor.commit();
     }
 
-    public boolean isAuthenticated(){
+    public boolean isAuthenticated() {
         return mSharedPreferences.contains("login") && mSharedPreferences.contains("pass");
+    }
+
+    public String getLogin() {
+        return mSharedPreferences.getString("login", "");
+    }
+
+    public String getPass() {
+        return mSharedPreferences.getString("pass", "");
     }
 
     public String getAuthToken() {
@@ -42,7 +50,7 @@ public class DataManager {
         else return "";
     }
 
-    public void removeAllData(){
+    public void removeAllData() {
         mSharedPreferences.edit().clear().commit();
     }
 

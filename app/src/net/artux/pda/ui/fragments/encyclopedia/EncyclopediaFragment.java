@@ -21,10 +21,18 @@ import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 
 public class EncyclopediaFragment extends BaseFragment {
 
+    private static final String BASE_ID = "baseId";
     private String lastUrl;
     private WebView webView;
     {
         defaultAdditionalFragment = AdditionalFragment.class;
+    }
+
+    public static EncyclopediaFragment of(int baseId){
+        EncyclopediaFragment encyclopediaFragment = new EncyclopediaFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt(BASE_ID, baseId);
+        return encyclopediaFragment;
     }
 
     OnBackPressedCallback callback = new OnBackPressedCallback(false) {

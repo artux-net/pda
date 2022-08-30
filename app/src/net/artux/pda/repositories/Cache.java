@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class Cache<T> {
 
     private final Class<T> typeParameterClass;
@@ -19,29 +22,38 @@ public class Cache<T> {
     }
 
     @SuppressLint("ApplySharedPref")
-    public void put(String id, T object){
+    public void put(String id, T object) {
         mSharedPreferences.edit().putString(id, gson.toJson(object)).commit();
     }
 
-    public T get(String id){
-        if(!mSharedPreferences.contains(id))
+    public T get(String id) {
+        if (!mSharedPreferences.contains(id))
             return null;
         return gson.fromJson(mSharedPreferences.getString(id, ""), typeParameterClass);
     }
 
-    public boolean remove(String id){
-        if(!mSharedPreferences.contains(id))
+    public boolean remove(String id) {
+        if (!mSharedPreferences.contains(id))
             return false;
 
         return mSharedPreferences.edit().remove(id).commit();
     }
 
-    public String[] getIds(){
+    public String[] getIds() {
         return mSharedPreferences.getAll().keySet().toArray(new String[0]);
     }
 
+    public List<T> getAll() {
+        List<T> result = new LinkedList<>();
+        for (String id :
+                getIds()) {
+            result.add(get(id));
+        }
+        return result;
+    }
+
     @SuppressLint("ApplySharedPref")
-    public void clear(){
+    public void clear() {
         mSharedPreferences.edit().clear().commit();
     }
 }

@@ -6,10 +6,12 @@ import net.artux.pda.services.PdaAPI
 import net.artux.pda.ui.fragments.quest.models.Chapter
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.CommandBlock
+import net.artux.pdanetwork.model.Status
 import net.artux.pdanetwork.model.StoryData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -21,7 +23,8 @@ class QuestRepository @Inject constructor(
     private val defaultApi: DefaultApi,
     private val storyCache: Cache<StoryData>,
     private val questCache: Cache<Chapter>,
-    private val mapCache: Cache<Map>) {
+    private val mapCache: Cache<Map>
+) {
 
     fun clearCache() {
         mapCache.clear()
@@ -52,13 +55,13 @@ class QuestRepository @Inject constructor(
 
     suspend fun getChapter(storyId: Int, chapterId: Int): Result<Chapter> {
         return suspendCoroutine {
-            webservice.getQuest(storyId, chapterId).enqueue(object : Callback<Chapter>{
+            webservice.getQuest(storyId, chapterId).enqueue(object : Callback<Chapter> {
                 override fun onResponse(call: Call<Chapter>, response: Response<Chapter>) {
                     val data = response.body()
-                    if (data!=null) {
+                    if (data != null) {
                         questCache.put(("$storyId:$chapterId").toString(), data)
                         it.resume(Result.Success(data))
-                    }else
+                    } else
                         it.resume(Result.Error(Exception("Chapter null")))
                 }
 
@@ -71,13 +74,13 @@ class QuestRepository @Inject constructor(
 
     suspend fun getMap(storyId: Int, mapId: Int): Result<Map> {
         return suspendCoroutine {
-            webservice.getMap(storyId, mapId).enqueue(object : Callback<Map>{
+            webservice.getMap(storyId, mapId).enqueue(object : Callback<Map> {
                 override fun onResponse(call: Call<Map>, response: Response<Map>) {
                     val data = response.body()
-                    if (data!=null) {
+                    if (data != null) {
                         mapCache.put(("$storyId:$mapId").toString(), data)
                         it.resume(Result.Success(data))
-                    }else
+                    } else
                         it.resume(Result.Error(Exception("Chapter null")))
                 }
 
@@ -111,6 +114,27 @@ class QuestRepository @Inject constructor(
         }
     }
 
+    suspend fun setWearableItem(id: UUID, type: String): Result<Status> {
+        return suspendCoroutine {
+            defaultApi.setItem(id, type).enqueue(object : Callback<Status> {
+                override fun onResponse(
+                    call: Call<Status>,
+                    response: Response<Status>
+                ) {
+                    val data = response.body()
+                    if (data != null) {
+                        it.resume(Result.Success(data))
+                    } else
+                        it.resume(Result.Error(Exception("Status null")))
+                }
+
+                override fun onFailure(call: Call<Status>, t: Throwable) {
+                    it.resume(Result.Error(java.lang.Exception(t)))
+                }
+            })
+        }
+    }
+
     suspend fun syncMember(map: CommandBlock): Result<StoryData> {
         return suspendCoroutine {
             defaultApi.doActions(map).enqueue(object : Callback<StoryData> {
@@ -136,13 +160,13 @@ class QuestRepository @Inject constructor(
 
     suspend fun getStoryData(): Result<StoryData> {
         return suspendCoroutine {
-            defaultApi.actualData.enqueue(object : Callback<StoryData>{
+            defaultApi.actualData.enqueue(object : Callback<StoryData> {
                 override fun onResponse(call: Call<StoryData>, response: Response<StoryData>) {
                     val data = response.body()
-                    if (data!=null) {
+                    if (data != null) {
                         storyCache.put("story", data)
                         it.resume(Result.Success(data))
-                    }else
+                    } else
                         it.resume(Result.Error(Exception("Story null")))
                 }
 

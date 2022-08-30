@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import net.artux.pda.model.mapper.UserMapper
+import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.model.user.UserModel
 import net.artux.pda.repositories.UserRepository
 import net.artux.pda.repositories.util.Result
@@ -17,6 +18,8 @@ class UserViewModel @Inject constructor(
 
     var member: MutableLiveData<Result<UserModel>> =
         MutableLiveData(userRepository.getCachedMember().map { userMapper.dto(it) })
+
+    var storyData: MutableLiveData<Result<StoryDataModel>> = MutableLiveData()
 
 
 

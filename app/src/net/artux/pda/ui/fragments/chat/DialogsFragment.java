@@ -15,7 +15,8 @@ import com.google.gson.reflect.TypeToken;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.app.DataManager;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.model.StatusModel;
 import net.artux.pda.model.UserMessage;
@@ -41,6 +42,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
     private WebSocket ws;
     private final Gson gson = GsonProvider.getInstance();
     private EchoWebSocketListener listener;
+    private DataManager dataManager;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -56,7 +58,9 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
 
         dialogsAdapter = new DialogsAdapter((MainActivity) getActivity(), navigationPresenter);
         Type listType = new TypeToken<List<Dialog>>(){}.getType();
-        List<Dialog> dialogs = gson.fromJson(App.getDataManager().getString("dialogs"), listType);
+        PDAApplication application = (PDAApplication) requireActivity().getApplication();
+        dataManager = application.getDataManager();
+        List<Dialog> dialogs = gson.fromJson(dataManager.getString("dialogs"), listType);
         if(dialogs!=null){
             binding.list.setVisibility(View.VISIBLE);
             binding.viewMessage.setVisibility(View.GONE);
@@ -73,7 +77,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
         OkHttpClient client = new OkHttpClient();
 
         Request.Builder builder = new Request.Builder();
-        builder.addHeader("Authorization",((App)getActivity().getApplication()).getDataManager().getAuthToken());
+        builder.addHeader("Authorization",((PDAApplication)getActivity().getApplication()).getDataManager().getAuthToken());
         navigationPresenter.setLoadingState(true);
 
         builder.url(BuildConfig.WS_PROTOCOL +"://" + BuildConfig.URL_API + "dialogs ");
@@ -135,7 +139,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
 
                             Timber.d("Set dialogs");
                             dialogsAdapter.setDialogs(list);
-                            App.getDataManager().setString("dialogs",gson.toJson(list));
+                            dataManager.setString("dialogs",gson.toJson(list));
                         }
                     }catch (JsonSyntaxException e1){
                         Timber.d("Unable to parse: " + text);

@@ -1,37 +1,34 @@
 package net.artux.pda.ui.fragments.notes;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.graphics.Color;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.databinding.ItemNoteBinding;
 import net.artux.pda.model.profile.NoteModel;
-import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHolder> {
 
-    List<NoteModel> notes = new ArrayList<>();
+    List<NoteModel> notes = new LinkedList<>();
+    DateTimeFormatter timeFormatter =
+            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+                    .withLocale(Locale.UK)
+                    .withZone(ZoneId.systemDefault());
     OnNoteClickListener onNoteClickListener;
-    FragmentNavigation.Presenter presenter;
 
-    NotesAdapter(OnNoteClickListener onNoteClickListener, FragmentNavigation.Presenter presenter){
+    NotesAdapter(OnNoteClickListener onNoteClickListener) {
         this.onNoteClickListener = onNoteClickListener;
-        this.presenter = presenter;
     }
 
     @NonNull
@@ -43,51 +40,12 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
 
     @Override
     public void onBindViewHolder(@NonNull NoteViewHolder holder, int position) {
-       if (position==0){
-            holder.binding.noteTitle.setText("Добавить заметку");
-            holder.binding.getRoot().setBackgroundColor(Color.rgb(5, 20, 13));
-            holder.binding.getRoot().setOnClickListener(view -> {
-                Context context = holder.binding.getRoot().getContext();
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Создание заметки..");
-
-                final EditText input = new EditText(context);
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                input.setHint("Введите заголовок..");
-                builder.setView(input);
-                /*builder.setPositiveButton("Создать", (dialog, which) -> {
-                            String title = input.getText().toString();
-                            App.getRetrofitService().getPdaAPI().createNote(title).enqueue(new Callback<NoteModel>() {
-                                @Override
-                                @EverythingIsNonNull
-                                public void onResponse(Call<NoteModel> call, Response<NoteModel> response) {
-                                    NoteModel note = response.body();
-                                    if (note != null) {
-                                        Bundle bundle = new Bundle();
-                                        bundle.putInt("updated", 0);
-                                        presenter.passData(bundle);
-                                    }
-                                }
-
-                                @Override
-                                @EverythingIsNonNull
-                                public void onFailure(Call<NoteModel> call, Throwable t) {
-
-                                }
-                            });
-                        });*/
-                builder.setNegativeButton("Отмена", (dialog, which) -> dialog.cancel());
-                builder.show();
-                //(App)get.getRetrofitService().getPdaAPI().createNote("");
-                //todo
-            });
-        }else
-            holder.bind(notes.get(position-1));
+        holder.bind(notes.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return notes.size()+1;
+        return notes.size();
     }
 
     public void setNotes(List<NoteModel> notes) {
@@ -95,7 +53,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         notifyDataSetChanged();
     }
 
-    static class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public ItemNoteBinding binding;
         OnNoteClickListener listener;
@@ -107,15 +65,10 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
             this.listener = listener;
         }
 
-        void bind(NoteModel note){
+        void bind(NoteModel note) {
             this.note = note;
             binding.noteTitle.setText(note.getTitle());
-
-            SimpleDateFormat outputFormat =
-                    new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            outputFormat.setTimeZone(TimeZone.getDefault());
-
-            binding.noteTime.setText(outputFormat.format(note.getTime()));
+            binding.noteTime.setText(timeFormatter.format(note.getTime()));
             binding.getRoot().setOnClickListener(this);
         }
 
@@ -125,7 +78,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NoteViewHold
         }
     }
 
-    public interface OnNoteClickListener{
+    public interface OnNoteClickListener {
         void onClick(NoteModel note);
     }
 }

@@ -2,6 +2,9 @@ package net.artux.pda.model.news;
 
 import java.util.List;
 
+import lombok.Data;
+
+@Data
 public class Article {
 
     public String id;

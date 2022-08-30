@@ -113,13 +113,11 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         switcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
         switcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
 
-        questViewModel.getStoryData().observe(this, new Observer<Result<StoryDataModel>>() {
+        questViewModel.getStoryData().observe(this, new Observer<StoryDataModel>() {
             @Override
-            public void onChanged(Result<StoryDataModel> memberResult) {
-                if (memberResult instanceof Result.Success) {
-                    startLoading(memberResult.getOrThrow().getCurrent());
-                    questViewModel.getStoryData().removeObserver(this);
-                } else questViewModel.updateData();
+            public void onChanged(StoryDataModel memberResult) {
+                startLoading(memberResult.getCurrent());
+                questViewModel.getStoryData().removeObserver(this);
             }
         });
 
@@ -293,7 +291,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private UserDataCompanion getActualDataCompanion() {
-        StoryDataModel storyDataModel = questViewModel.getStoryData().getValue().getOrThrow();
+        StoryDataModel storyDataModel = questViewModel.getStoryData().getValue();
 
 
         return UserDataCompanion.of(userModel, storyDataModel);

@@ -27,7 +27,6 @@ public abstract class AdditionalBaseFragment extends Fragment implements Fragmen
     public void attachPresenter(
             FragmentNavigation.Presenter presenter) {
         navigationPresenter = presenter;
-
     }
 
     @Override

@@ -21,7 +21,7 @@ import com.google.gson.GsonBuilder;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.ActivitySettingsBinding;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.repositories.util.Result;
@@ -125,7 +125,8 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.signOut:
-                App.getDataManager().removeAllData();
+                PDAApplication application = (PDAApplication) requireActivity().getApplication();
+                application.getDataManager().removeAllData();
                 viewModel.clearCache();
                 questViewModel.clear();
                 startActivity(new Intent(getActivity(), LoginActivity.class));

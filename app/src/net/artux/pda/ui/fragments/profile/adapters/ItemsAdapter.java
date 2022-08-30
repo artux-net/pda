@@ -16,7 +16,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.items.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +37,10 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                switch(getItemViewType(position)){
-                    default:
-                        return 1;
-                    case 1:
-                        return 2;
+                if (getItemViewType(position) == 1) {
+                    return 2;
                 }
+                return 1;
             }
         });
         return gridLayoutManager;
@@ -102,7 +100,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
             title.setText(item.getTitle());
 
             itemView.setOnClickListener(view -> {
-                onClickListener.onClick(getPosition());
+                onClickListener.onClick(item);
             });
 
             RequestOptions options = new RequestOptions()
@@ -121,6 +119,6 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
     }
 
     public interface OnClickListener{
-        void onClick(int pos);
+        void onClick(ItemModel item);
     }
 }

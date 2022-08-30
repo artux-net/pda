@@ -18,6 +18,7 @@ import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper
 import net.artux.pda.ui.util.getViewModelFactory
 import net.artux.pda.ui.viewmodels.ProfileViewModel
 import net.artux.pda.utils.GroupHelper
+import java.util.*
 
 class UserProfileFragment : BaseFragment(), View.OnClickListener {
 
@@ -39,6 +40,17 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
     ): View {
         binding = FragmentProfileBinding.inflate(inflater)
         return binding!!.root
+    }
+
+    companion object{
+        @JvmStatic
+        fun of(uuid: UUID):UserProfileFragment{
+            val profileFragment = UserProfileFragment()
+            val bundle = Bundle()
+            bundle.putSerializable("pdaId", uuid)
+            profileFragment.arguments = bundle
+            return profileFragment;
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -248,10 +260,10 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 }*/
             }
         }
-        /*if (arguments != null)
-            profileViewModel.updateProfile(requireArguments().getInt("pdaId", viewModel.getId()))
+        if (arguments != null)
+            profileViewModel.updateProfile(requireArguments().getSerializable("pdaId") as UUID)
         else
-            profileViewModel.updateProfile(viewModel.getId())*/
+            profileViewModel.updateProfile(viewModel.getId())
     }
 
     override fun onClick(p0: View?) {
@@ -292,7 +304,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
     }
 
     override fun onDestroyView() {
-        recyclerView!!.adapter = null
+        recyclerView?.adapter = null
         recyclerView = null
         binding = null
         super.onDestroyView()

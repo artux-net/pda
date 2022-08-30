@@ -17,7 +17,7 @@ import com.bumptech.glide.Glide;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.model.profile.Seller;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.repositories.util.Result;
@@ -95,7 +95,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             alertDialog.show();*/
         });
 
-        ((App)getApplication()).getOldApi().getSeller(sellerId).enqueue(new Callback<Seller>() {
+        ((PDAApplication)getApplication()).getOldApi().getSeller(sellerId).enqueue(new Callback<Seller>() {
             @Override
             public void onResponse(Call<Seller> call, Response<Seller> response) {
                 Seller seller = response.body();

@@ -18,11 +18,10 @@ import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
-import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
 
 import java.util.List;
 
-public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClickListener {
+public class RatingFragment extends BaseFragment implements RatingAdapter.OnClickListener {
 
     {
         defaultAdditionalFragment = AdditionalFragment.class;
@@ -75,13 +74,9 @@ public class RatingFragment extends BaseFragment implements ItemsAdapter.OnClick
     }
 
     @Override
-    public void onClick(int pos) {
-        UserProfileFragment profileFragment = new UserProfileFragment();
-        Bundle bundle = new Bundle();
-        bundle.putInt("pdaId", pos);
-        profileFragment.setArguments(bundle);
+    public void onClick(UserInfo userInfo) {
         if (navigationPresenter != null) {
-            navigationPresenter.addFragment(profileFragment, true);
+            navigationPresenter.addFragment(UserProfileFragment.of(userInfo.id), true);
         }
     }
 }

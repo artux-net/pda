@@ -67,7 +67,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
         String pos = getIntent().getStringExtra("pos");
 
         UserModel member = userMapper.dto(viewModel.getUserRepository().getCachedMember().getOrThrow());
-        StoryDataModel dataModel = questViewModel.getStoryData().getValue().getOrThrow();
+        StoryDataModel dataModel = questViewModel.getStoryData().getValue();
         Map map = gson.fromJson(getIntent().getStringExtra("map"), Map.class);
         map.setPlayerPos(pos);
         GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
@@ -140,7 +140,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
                     if (mapIdObject != null) {
                         int mapId = Integer.parseInt(mapIdObject);
                         String pos = data.get("pos");
-                        StoryStateModel memberResult = questViewModel.getStoryData().getValue().getOrThrow().getCurrent();
+                        StoryStateModel memberResult = questViewModel.getStoryData().getValue().getCurrent();
                         MapHelper.prepareAndLoadMap(questViewModel, this, memberResult.getStoryId(), mapId, pos);
                     }
                     Timber.d("Start map - %s, position: %s", data.get("map"), data.get("pos"));

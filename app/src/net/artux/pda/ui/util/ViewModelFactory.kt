@@ -20,7 +20,7 @@ import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
-import net.artux.pda.app.App
+import net.artux.pda.app.DataManager
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.mapper.UserMapper
@@ -38,6 +38,7 @@ class ViewModelFactory constructor(
     private val usersRepository: UserRepository,
     private val questRepository: QuestRepository,
     private val summaryRepository: SummaryRepository,
+    val dataManager: DataManager,
     owner: SavedStateRegistryOwner,
     defaultArgs: Bundle? = null
 ) : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
@@ -60,7 +61,7 @@ class ViewModelFactory constructor(
             isAssignableFrom(RatingViewModel::class.java) ->
                 RatingViewModel(usersRepository, UserMapper.INSTANCE)
             isAssignableFrom(AuthViewModel::class.java) ->
-                AuthViewModel(usersRepository, UserMapper.INSTANCE, StatusMapper.INSTANCE, App.getDataManager())
+                AuthViewModel(usersRepository, UserMapper.INSTANCE, StatusMapper.INSTANCE, dataManager)
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

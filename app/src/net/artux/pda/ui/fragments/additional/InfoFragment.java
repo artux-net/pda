@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.artux.pda.R;
-import net.artux.pda.app.App;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.model.user.ProfileModel;
 import net.artux.pda.model.user.UserModel;
@@ -43,7 +43,8 @@ public class InfoFragment extends AdditionalBaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mDataManager = App.getDataManager();
+        PDAApplication application = (PDAApplication) requireActivity().getApplication();
+        mDataManager = application.getDataManager();
 
         mAvatarView = view.findViewById(R.id.avatar);
         mLoginView = view.findViewById(R.id.loginView);

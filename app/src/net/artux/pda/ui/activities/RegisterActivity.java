@@ -115,7 +115,7 @@ public class RegisterActivity extends AppCompatActivity {
             showProgress(false);
             if (statusResult instanceof Result.Success) {
                 StatusModel status = statusResult.getOrNull();
-                if (status.getSuccess()) {
+                if (status.isSuccess()) {
                     Intent intent = new Intent(RegisterActivity.this, FinishRegistrationActivity.class);
                     intent.putExtra("email", mRegisterUser.getEmail());
                     startActivity(intent);
@@ -124,7 +124,9 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, status.getDescription(), Toast.LENGTH_LONG)
                             .show();
                 }
-            }
+            }else if (statusResult instanceof Result.Error)
+                Toast.makeText(RegisterActivity.this, ((Result.Error) statusResult).getException().getMessage(), Toast.LENGTH_LONG)
+                        .show();
         });
     }
 

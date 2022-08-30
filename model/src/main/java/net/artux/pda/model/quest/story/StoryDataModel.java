@@ -7,6 +7,7 @@ import net.artux.pda.model.items.WeaponModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class StoryDataModel {
@@ -18,9 +19,18 @@ public class StoryDataModel {
     private List<WeaponModel> weapons = new ArrayList<>();
     private List<ArtifactModel> artifacts = new ArrayList<>();
     private List<ItemModel> items = new ArrayList<>();
+    private int money;
 
     public List<StoryStateModel> getStoryStates() {
         return storyStates;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
     }
 
     public boolean containsCurrent() {
@@ -45,12 +55,20 @@ public class StoryDataModel {
     }
 
     public List<ItemModel> getAllItems() {
-        List<ItemModel> items = new ArrayList<>();
+        List<ItemModel> items = new LinkedList<>();
         items.addAll(weapons);
         items.addAll(armors);
         items.addAll(artifacts);
         items.addAll(this.items);
+
         return items;
+    }
+
+    public float getTotalWeight() {
+        float weight = 0;
+        for (ItemModel item : getAllItems())
+            weight += item.getWeight() * item.getQuantity();
+        return weight;
     }
 
     public void setParameters(List<ParameterModel> parameters) {

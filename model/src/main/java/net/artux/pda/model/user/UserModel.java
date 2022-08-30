@@ -22,7 +22,6 @@ public class UserModel {
     private int xp;
     private int money;
     private GangRelation relations;
-    public List<NoteModel> notes = new ArrayList<>();
     public List<Integer> achievements = new ArrayList<>();
     private Instant lastModified;
     private Instant registration;
@@ -133,14 +132,6 @@ public class UserModel {
 
     public void setMoney(int money) {
         this.money = money;
-    }
-
-    public List<NoteModel> getNotes() {
-        return notes;
-    }
-
-    public void setNotes(List<NoteModel> notes) {
-        this.notes = notes;
     }
 
     public List<Integer> getAchievements() {

@@ -1,5 +1,10 @@
 package net.artux.pda.model.items;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class ArmorModel extends WearableModel {
 
     private float thermal_pr;
@@ -9,7 +14,5 @@ public class ArmorModel extends WearableModel {
     private float psy_pr;
     private float damage_pr;
     private float condition;
-
-
 
 }
