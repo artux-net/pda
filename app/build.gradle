@@ -4,6 +4,7 @@ plugins{
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
 
+    id 'com.android.application'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
 }
@@ -86,8 +87,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
+        sourceCompatibility = "1.9"
+        targetCompatibility = "1.9"
     }
     buildFeatures {
         viewBinding true
@@ -154,8 +155,10 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
-    implementation platform('com.google.firebase:firebase-bom:26.0.0')
+    //firebase
+    implementation platform('com.google.firebase:firebase-bom:30.3.2')
     implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-config'
     implementation 'com.google.firebase:firebase-crashlytics'
 
     //ktx

@@ -5,9 +5,10 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.map.model.Spawn;
 import net.artux.pda.map.model.Transfer;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Map {
+public class Map implements Serializable {
 
     private int id;
     private String title;

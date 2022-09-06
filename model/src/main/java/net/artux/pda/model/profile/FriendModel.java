@@ -1,10 +1,13 @@
 package net.artux.pda.model.profile;
 
+import lombok.Data;
+
+@Data
 public class FriendModel{
 
-    public int pdaId;
-    public int group;
-    public String login;
-    public String avatar;
+    private int pdaId;
+    private int group;
+    private String login;
+    private String avatar;
 
 }

@@ -16,12 +16,12 @@ import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.model.Transfer;
 import net.artux.pda.map.model.input.Map;
 import net.artux.pda.map.model.input.Point;
-import net.artux.pda.map.models.Checker;
-import net.artux.pda.map.models.UserGdx;
-import net.artux.pda.map.models.user.GdxData;
-import net.artux.pda.map.models.user.StoryStateGdx;
 import net.artux.pda.map.states.State;
 import net.artux.pda.map.ui.UserInterface;
+import net.artux.pda.model.Checker;
+import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.model.quest.story.StoryStateModel;
+import net.artux.pda.model.user.UserModel;
 
 import java.util.HashMap;
 
@@ -30,12 +30,12 @@ public class QuestPointsHelper {
 
     public static void createQuestPointsEntities(Engine engine, AssetManager assetManager) {
         Map map = engine.getSystem(DataSystem.class).getMap();
-        UserGdx userModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().userModel;
-        GdxData dataModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().gdxData;
-        StoryStateGdx storyStateModel = dataModel.getCurrent();
+        UserModel userModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().userModel;
+        StoryDataModel dataModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().gdxData;
+        StoryStateModel storyStateModel = dataModel.getCurrent();
         for (Point point : map.getPoints()) {
             //TODO sync with ui
-            if (Checker.check(point.getCondition(), dataModel, userModel.getMoney()))
+            if (Checker.check(point.getCondition(), dataModel))
                 if (point.getData().containsKey("chapter")) {
                     if ((Integer.parseInt(point.getData().get("chapter")) == storyStateModel.getChapterId()
                             || Integer.parseInt(point.getData().get("chapter")) == 0))
@@ -44,7 +44,7 @@ public class QuestPointsHelper {
         }
 
         for (Transfer transfer : map.getTransfers()) {
-            if (userModel != null && Checker.check(transfer.condition, dataModel, userModel.getMoney()))
+            if (userModel != null && Checker.check(transfer.condition, dataModel))
                 addTransferPoint(engine, assetManager, transfer);
         }
     }

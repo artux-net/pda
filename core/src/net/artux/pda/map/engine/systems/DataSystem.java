@@ -4,14 +4,14 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 
 import net.artux.pda.map.model.input.Map;
-import net.artux.pda.map.models.UserGdx;
+import net.artux.pda.model.user.UserModel;
 
 public class DataSystem extends EntitySystem {
 
     private final Map map;
-    private final UserGdx userModel;
+    private final UserModel userModel;
 
-    public DataSystem(Map map, UserGdx userModel) {
+    public DataSystem(Map map, UserModel userModel) {
         this.map = map;
         this.userModel = userModel;
     }
@@ -30,7 +30,7 @@ public class DataSystem extends EntitySystem {
         return map;
     }
 
-    public UserGdx getMember() {
+    public UserModel getMember() {
         return userModel;
     }
 }

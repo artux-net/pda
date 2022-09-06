@@ -2,10 +2,11 @@ package net.artux.pda.map.model;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-public class Transfer {
+public class Transfer implements Serializable {
     public String pos;
     private String toPos;
     private String message;

@@ -3,27 +3,39 @@ package net.artux.pda.ui.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.map.model.input.Map
+import net.artux.pda.model.StatusModel
 import net.artux.pda.model.items.WearableModel
+import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
 import net.artux.pda.repositories.util.Result
 import net.artux.pda.ui.fragments.quest.models.Chapter
 import net.artux.pdanetwork.model.CommandBlock
-import net.artux.pdanetwork.model.Status
 import javax.inject.Inject
 
+@HiltViewModel
 class QuestViewModel @Inject constructor(
     var repository: QuestRepository,
-    var mapper: StoryMapper
+    var mapper: StoryMapper,
+    var statusMapper: StatusMapper
 ) : ViewModel() {
 
     var chapter: MutableLiveData<Chapter> = MutableLiveData()
     var map: MutableLiveData<Map> = MutableLiveData()
     var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
-    var status: MutableLiveData<Status> = MutableLiveData()
+    var status: MutableLiveData<StatusModel> = MutableLiveData()
+
+
+    fun getCachedData(): MutableLiveData<StoryDataModel>{
+        storyData.value = repository.getCachedStoryData()
+            .map { mapper.dataModel(it) }
+            .getOrNull()
+        return storyData
+    }
 
     private fun getCachedChapter(storyId: Int, chapterId: Int): Chapter? {
         val response = repository.getCachedChapter(storyId, chapterId)
@@ -51,17 +63,21 @@ class QuestViewModel @Inject constructor(
 
     fun updateChapter(storyId: Int, chapterId: Int) {
         viewModelScope.launch {
-            /*val response = repository.getChapter(storyId, chapterId)
+            val response = repository.getChapter(storyId, chapterId)
             if (response is Result.Success)
-                chapter.postValue(response.data!!) TODO*/
+                chapter.postValue(response.data)
+            else if (response is Result.Error)
+                status.postValue(StatusModel(response.exception))
         }
     }
 
     fun updateMap(storyId: Int, mapId: Int) {
         viewModelScope.launch {
             val response = repository.getMap(storyId, mapId)
-            /*if (response is Result.Success)
-                map.postValue(response.data!!) TODO*/
+            if (response is Result.Success)
+                map.postValue(response.data)
+            else if (response is Result.Error)
+                status.postValue(StatusModel(response.exception))
         }
     }
 
@@ -96,9 +112,11 @@ class QuestViewModel @Inject constructor(
     fun setWearable(wearable: WearableModel) {
         viewModelScope.launch {
             val result = repository.setWearableItem(wearable.id, wearable.type.toString())
-            if (result is Result.Success) {
-                status.postValue(result.data)
-            }
+
+            if (result is Result.Success)
+                status.postValue(statusMapper.model(result.data))
+            else if (result is Result.Error)
+                status.postValue(StatusModel(result.exception))
         }
     }
 }

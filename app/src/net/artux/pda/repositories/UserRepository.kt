@@ -1,6 +1,5 @@
 package net.artux.pda.repositories
 
-import net.artux.pda.repositories.util.Result
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.*
 import retrofit2.Call
@@ -26,8 +25,8 @@ class UserRepository @Inject constructor(
     fun getCachedProfile(userId: UUID): Result<Profile> {
         val cache = userCache.get(userId.toString())
         return if (cache != null)
-            Result.Success(cache)
-        else Result.Error(Exception("Cache isn't found"))
+            Result.success(cache)
+        else Result.failure(Exception("Cache isn't found"))
     }
 
     suspend fun getProfile(userId: UUID): Result<Profile> {
@@ -40,13 +39,35 @@ class UserRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         userCache.put(userId.toString(), data)
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Profile null")))
+                        it.resume(Result.failure(Exception("Profile null")))
                 }
 
                 override fun onFailure(call: Call<Profile>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(java.lang.Exception(t)))
+                }
+
+            })
+        }
+    }
+
+    suspend fun resetPassword(email: String): Result<Status> {
+        return suspendCoroutine {
+            webservice.sendLetter(email).enqueue(object : Callback<Status> {
+                override fun onResponse(
+                    call: Call<Status>,
+                    response: Response<Status>
+                ) {
+                    val data = response.body()
+                    if (data != null) {
+                        it.resume(Result.success(data))
+                    } else
+                        it.resume(Result.failure(Exception("Profile null")))
+                }
+
+                override fun onFailure(call: Call<Status>, t: Throwable) {
+                    it.resume(Result.failure(java.lang.Exception(t)))
                 }
 
             })
@@ -56,8 +77,8 @@ class UserRepository @Inject constructor(
     fun getCachedMember(): Result<UserDto> {
         val cache = memberCache.get("user")
         return if (cache != null)
-            Result.Success(cache)
-        else Result.Error(java.lang.Exception("Cache isn't found"))
+            Result.success(cache)
+        else Result.failure(java.lang.Exception("Cache isn't found"))
 
     }
 
@@ -71,20 +92,17 @@ class UserRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         memberCache.put("user", data)
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Profile null")))
+                        it.resume(Result.failure(Exception("Profile null")))
                 }
 
                 override fun onFailure(call: Call<UserDto>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })
         }
     }
-
-
-
 
 
     suspend fun registerUser(registerUser: RegisterUserDto): Result<Status> {
@@ -93,13 +111,13 @@ class UserRepository @Inject constructor(
                 override fun onResponse(call: Call<Status>, response: Response<Status>) {
                     val data = response.body()
                     if (data != null) {
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Status null")))
+                        it.resume(Result.failure(Exception("Status null")))
                 }
 
                 override fun onFailure(call: Call<Status>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })
         }
@@ -107,20 +125,24 @@ class UserRepository @Inject constructor(
 
     suspend fun getRatingPage(numberPage: Int): Result<List<SimpleUserDto>> {
         return suspendCoroutine {
-            webservice.getRating(numberPage, 20, "DESC", "xp").enqueue(object : Callback<ResponsePageSimpleUserDto> {
-                override fun onResponse(call: Call<ResponsePageSimpleUserDto>, response: Response<ResponsePageSimpleUserDto>) {
-                    val data = response.body()
+            webservice.getRating(numberPage, 20, "DESC", "xp")
+                .enqueue(object : Callback<ResponsePageSimpleUserDto> {
+                    override fun onResponse(
+                        call: Call<ResponsePageSimpleUserDto>,
+                        response: Response<ResponsePageSimpleUserDto>
+                    ) {
+                        val data = response.body()
 
-                    if (data?.data != null) {
-                        it.resume(Result.Success(data.data))
-                    } else
-                        it.resume(Result.Error(Exception("Не удалось загрузить больше")))
-                }
+                        if (data?.data != null) {
+                            it.resume(Result.success(data.data))
+                        } else
+                            it.resume(Result.failure(Exception("Не удалось загрузить больше")))
+                    }
 
-                override fun onFailure(call: Call<ResponsePageSimpleUserDto>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
-                }
-            })
+                    override fun onFailure(call: Call<ResponsePageSimpleUserDto>, t: Throwable) {
+                        it.resume(Result.failure(java.lang.Exception(t)))
+                    }
+                })
         }
     }
 

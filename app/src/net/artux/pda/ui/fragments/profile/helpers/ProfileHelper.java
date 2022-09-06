@@ -11,7 +11,6 @@ import net.artux.pda.R;
 import net.artux.pda.model.user.ProfileModel;
 
 import java.time.Instant;
-import java.util.Date;
 
 public class ProfileHelper {
 
@@ -88,22 +87,15 @@ public class ProfileHelper {
 
     public static String getDays(ProfileModel profileModel) {
         if (profileModel.getRegistration() != null) {
-            Date now = new Date(), past = new Date(profileModel.getRegistration().getEpochSecond());
-            int days = daysBetween(past, now);
-
-            return days + " " + getDayAddition(days);
+            return getDays(profileModel.getRegistration());
         } else return "null";
     }
 
     public static String getDays(Instant date) {
-        Date now = new Date(), past = new Date(date.getEpochSecond());
-        int days = daysBetween(past, now);
+        int days = (int) ((Instant.now().toEpochMilli() - date.toEpochMilli())
+                / (1000 * 60 * 60 * 24));
 
         return days + " " + getDayAddition(days);
-    }
-
-    private static int daysBetween(Date d1, Date d2) {
-        return (int) ((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
     }
 
     private static String getDayAddition(int num) {

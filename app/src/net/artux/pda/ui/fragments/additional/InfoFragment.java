@@ -12,11 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.artux.pda.R;
-import net.artux.pda.app.PDAApplication;
 import net.artux.pda.app.DataManager;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.model.user.ProfileModel;
-import net.artux.pda.model.user.UserModel;
-import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
@@ -54,10 +52,9 @@ public class InfoFragment extends AdditionalBaseFragment {
         mXpView = view.findViewById(R.id.ratingInfo);
 
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
-            if (memberResult instanceof Result.Success) {
-                UserModel userModel = ((Result.Success<UserModel>) memberResult).getData();
-                ProfileModel profileModel = new ProfileModel(userModel);
-                navigationPresenter.setAdditionalTitle("PDA #" + userModel.getPdaId());
+            if (memberResult != null) {
+                ProfileModel profileModel = new ProfileModel(memberResult);
+                navigationPresenter.setAdditionalTitle("PDA #" + memberResult.getPdaId());
                 ProfileHelper.setAvatar(mAvatarView, profileModel.getAvatar());
                 mLoginView.setText(profileModel.getLogin());
                 AutofitHelper.create(mLoginView);
@@ -66,8 +63,8 @@ public class InfoFragment extends AdditionalBaseFragment {
                 mGroupView.setText(ProfileHelper.getGroup(profileModel, mGroupView.getContext()));
                 mRangView.setText(ProfileHelper.getRang(profileModel, mRangView.getContext()));
                 mXpView.setText(String.valueOf(profileModel.getXp()));
-            } else viewModel.updateMember();
+            }
         });
-
+        viewModel.updateFromCache();
     }
 }

@@ -6,30 +6,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-
-import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.PDAApplication;
-import net.artux.pda.model.profile.Seller;
 import net.artux.pda.model.user.UserModel;
-import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
 import net.artux.pda.ui.viewmodels.UserViewModel;
-
-import okhttp3.internal.annotations.EverythingIsNonNull;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timber.log.Timber;
 
 public class SellerActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -56,11 +42,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
         background = findViewById(R.id.sellerBackground);
         findViewById(R.id.map).setOnClickListener(this);
 
-        viewModel.getMember().observe(this, memberResult -> {
-            if (memberResult instanceof Result.Success)
-                updateList(((Result.Success<UserModel>) memberResult).getData());
-            else viewModel.updateMember();
-        });
+        viewModel.getMember().observe(this, this::updateList);
 
         sellerAdapter = new ItemsAdapter();
         sellerAdapter.setOnClickListener(pos -> {
@@ -94,8 +76,8 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             AlertDialog alertDialog = builder.create();
             alertDialog.show();*/
         });
-
-        ((PDAApplication)getApplication()).getOldApi().getSeller(sellerId).enqueue(new Callback<Seller>() {
+        //todo
+        /*((PDAApplication)getApplication()).getOldApi().getSeller(sellerId).enqueue(new Callback<Seller>() {
             @Override
             public void onResponse(Call<Seller> call, Response<Seller> response) {
                 Seller seller = response.body();
@@ -125,7 +107,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             public void onFailure(Call<Seller> call, Throwable throwable) {
                 Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
             }
-        });
+        });*/
 
         sellerView.setLayoutManager(sellerAdapter.getLayoutManager(this,3));
         sellerView.setAdapter(sellerAdapter);

@@ -1,7 +1,5 @@
 package net.artux.pda.ui.fragments.stories;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import net.artux.pda.R;
@@ -26,11 +25,13 @@ import net.artux.pda.ui.fragments.quest.models.Stories;
 import net.artux.pda.ui.util.GsonProvider;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnStoryClickListener {
 
     private FragmentListBinding binding;
@@ -47,7 +48,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (questViewModel == null)
-            questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
+            questViewModel = new ViewModelProvider(requireActivity()).get(QuestViewModel.class);
 
         questViewModel.getStoryData().observe(getViewLifecycleOwner(), memberResult -> {
             StoryDataModel model = memberResult;
@@ -57,6 +58,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 requireActivity().finish();
             } else loadStories();
         });
+        questViewModel.updateData();
     }
 
     private void loadStories() {

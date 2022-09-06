@@ -1,7 +1,5 @@
 package net.artux.pda.ui.activities.hierarhy;
 
-import android.os.Bundle;
-
 public class MainPresenter implements MainContract.Presenter, FragmentNavigation.Presenter {
 
     private MainContract.View view;
@@ -14,10 +12,6 @@ public class MainPresenter implements MainContract.Presenter, FragmentNavigation
             mainFragment = fragment;
             updateAdditionalFragment(fragment);
             view.setFragment(fragment, addToBackStack);
-        }else if (mainFragment != null && mainFragment.getClass().isInstance(fragment)){
-            Bundle bundle = new Bundle();
-            bundle.putInt("reset", 0);
-            mainFragment.receiveData(bundle);
         }
     }
 
@@ -31,10 +25,6 @@ public class MainPresenter implements MainContract.Presenter, FragmentNavigation
             } catch (InstantiationException e) {
                 e.printStackTrace();
             }
-        }else{
-            Bundle bundle = new Bundle();
-            bundle.putString("fragment", baseFragment.getClass().getSimpleName());
-            additionalFragment.receiveData(bundle);
         }
     }
 
@@ -56,12 +46,6 @@ public class MainPresenter implements MainContract.Presenter, FragmentNavigation
     @Override
     public void setAdditionalTitle(String title) {
         view.setAdditionalTitle(title);
-    }
-
-    @Override
-    public void passData(Bundle data) {
-        mainFragment.receiveData(data);
-        additionalFragment.receiveData(data);
     }
 
     @Override

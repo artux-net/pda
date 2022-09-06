@@ -1,21 +1,12 @@
 package net.artux.pda.map.model;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import net.artux.pda.map.states.GameStateManager;
-import net.artux.pda.map.states.PlayState;
-
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 
 
-public class Spawn {
+public class Spawn implements Serializable {
 
     private int id;
     private int r;

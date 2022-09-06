@@ -2,15 +2,18 @@ package net.artux.pda.ui.viewmodels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import net.artux.pda.model.Summary
 import net.artux.pda.repositories.SummaryRepository
 import net.artux.pda.repositories.util.Result
 import javax.inject.Inject
 
+@HiltViewModel
 class SummaryViewModel @Inject constructor(
     var repository: SummaryRepository
 ) : ViewModel() {
     var summary: MutableLiveData<Summary> = MutableLiveData()
+    var summaries: MutableLiveData<List<Summary>> = MutableLiveData()
 
     fun getCachedSummary(id: String): MutableLiveData<Summary> {
         val response = repository.getCachedSummary(id)
@@ -19,16 +22,24 @@ class SummaryViewModel @Inject constructor(
         return summary
     }
 
-    fun removeSummary(id: String) {
-        repository.remove(id)
+    fun openSummary(id: String){
+        summary.postValue(repository
+            .getCachedSummary(id)
+            .getOrNull())
     }
 
-    fun getAllIds(): Array<String> {
-        return repository.getAllDates()
+    fun removeSummary(id: String) {
+        repository.remove(id)
+        updateSummaries()
     }
 
     fun putSummary(id: String, summary: Summary) {
         repository.putSummary(id, summary)
+        updateSummaries()
+    }
+
+    fun updateSummaries(){
+        summaries.postValue(repository.getAll())
     }
 
 }

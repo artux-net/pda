@@ -1,5 +1,8 @@
 package net.artux.pda.model.quest;
 
+import lombok.Data;
+
+@Data
 public class TransferModel {
 
     private int stageId;
@@ -8,13 +11,5 @@ public class TransferModel {
     public TransferModel(int stageId, String text) {
         this.stageId = stageId;
         this.text = text;
-    }
-
-    public int getStageId() {
-        return stageId;
-    }
-
-    public String getText() {
-        return text;
     }
 }

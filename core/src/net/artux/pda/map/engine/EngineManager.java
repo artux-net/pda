@@ -46,15 +46,15 @@ import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
 import net.artux.pda.map.model.input.Map;
-import net.artux.pda.map.models.UserGdx;
-import net.artux.pda.map.models.user.GdxData;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.UserInterface;
+import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.model.user.UserModel;
 
 public class EngineManager extends InputListener implements Drawable, Disposable, GestureDetector.GestureListener {
 
     private Map map;
-    private UserGdx userModel;
+    private UserModel userModel;
 
     private final Engine engine;
 
@@ -69,7 +69,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         this.engine = new Engine();
         this.map = (Map) gameStateManager.get("map");
         this.userModel = gameStateManager.getMember();
-        GdxData gdxData = (GdxData) gameStateManager.get("data");
+        StoryDataModel gdxData = (StoryDataModel) gameStateManager.get("data");
         long loadTime = TimeUtils.millis();
 
         //player

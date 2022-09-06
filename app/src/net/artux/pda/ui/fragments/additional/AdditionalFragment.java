@@ -4,13 +4,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 
 import net.artux.pda.R;
-import net.artux.pda.databinding.FragmentAddProfileBinding;
+import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.SettingsFragment;
@@ -24,13 +22,14 @@ import net.artux.pda.ui.fragments.rating.RatingFragment;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class AdditionalFragment extends AdditionalBaseFragment {
+public class AdditionalFragment extends AdditionalBaseFragment implements StringAdapter.StringListClickListener {
 
-    FragmentAddProfileBinding binding;
-    ArrayAdapter<CharSequence> adapter;
-    List<Class<? extends BaseFragment>> fragmentClasses = new ArrayList<>();
+    private FragmentListBinding binding;
+    private StringAdapter adapter;
+    private List<Class<? extends BaseFragment>> fragmentClasses = new ArrayList<>();
 
     {
         fragmentClasses.add(EquipmentFragment.class);
@@ -46,7 +45,7 @@ public class AdditionalFragment extends AdditionalBaseFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentAddProfileBinding.inflate(inflater);
+        binding = FragmentListBinding.inflate(inflater);
         return binding.getRoot();
     }
 
@@ -55,34 +54,27 @@ public class AdditionalFragment extends AdditionalBaseFragment {
         super.onViewCreated(view, savedInstanceState);
         if (navigationPresenter != null)
             navigationPresenter.setAdditionalTitle(getString(R.string.kinds));
-        if (getActivity() != null) {
-            binding.menuProfile.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-            adapter = ArrayAdapter.createFromResource(
-                    getActivity(), R.array.profile_buttons,
-                    android.R.layout.simple_list_item_1);
-            binding.menuProfile.setAdapter(adapter);
-
-            binding.menuProfile.setOnItemClickListener((parent, view1, position, id) -> {
-                if (fragmentClasses.get(position) != null)
-                    try {
-                        navigationPresenter.addFragment(fragmentClasses.get(position).newInstance(), true);
-                    } catch (IllegalAccessException | java.lang.InstantiationException e) {
-                        e.printStackTrace();
-                    }
-            });
-        }
+        adapter = new StringAdapter(this);
+        adapter.setItems(Arrays.asList(getResources().getStringArray(R.array.profile_buttons)));
+        binding.list.setVisibility(View.VISIBLE);
+        binding.viewMessage.setVisibility(View.GONE);
+        binding.list.setAdapter(adapter);
     }
-
-    @Override
-    public void receiveData(Bundle data) {
-        super.receiveData(data);
-    }
-
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         binding = null;
+    }
+
+    @Override
+    public void onClick(int position, String content) {
+        if (fragmentClasses.get(position) != null)
+            try {
+                navigationPresenter.addFragment(fragmentClasses.get(position).newInstance(), true);
+            } catch (IllegalAccessException | java.lang.InstantiationException e) {
+                e.printStackTrace();
+            }
     }
 }

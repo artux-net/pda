@@ -26,14 +26,14 @@ import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.states.BotStatesAshley;
 import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
-import net.artux.pda.map.model.input.Map;
 import net.artux.pda.map.model.MobType;
 import net.artux.pda.map.model.MobsTypes;
 import net.artux.pda.map.model.Spawn;
-import net.artux.pda.map.models.UserGdx;
-import net.artux.pda.map.models.items.Armor;
-import net.artux.pda.map.models.items.Item;
-import net.artux.pda.map.models.items.Weapon;
+import net.artux.pda.map.model.input.Map;
+import net.artux.pda.model.items.ArmorModel;
+import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.items.WeaponModel;
+import net.artux.pda.model.user.UserModel;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -47,7 +47,7 @@ public class ControlPointsHelper {
         MobsTypes mobsTypes = new Gson().fromJson(reader, MobsTypes.class);
 
         Map map = engine.getSystem(DataSystem.class).getMap();
-        UserGdx userModel = engine.getSystem(DataSystem.class).getMember();
+        UserModel userModel = engine.getSystem(DataSystem.class).getMember();
 
         for (final Spawn spawn : map.getSpawns()) {
             MobType mobType = mobsTypes.getMobType(spawn.getId());
@@ -73,8 +73,8 @@ public class ControlPointsHelper {
             for (int i = 0; i < spawn.getN(); i++) {
                 Entity entity = new Entity();
 
-                Armor armor = new Armor();
-                Weapon w = new Weapon();
+                ArmorModel armor = new ArmorModel();
+                WeaponModel w = new WeaponModel();
                 w.setSpeed(14);
                 w.setDamage(2);
                 w.setPrecision(1);
@@ -87,7 +87,7 @@ public class ControlPointsHelper {
                         .add(new VelocityComponent())
                         .add(new HealthComponent())
                         .add(moodComponent)
-                        .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<Item>()))
+                        .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<ItemModel>()))
                         .add(new WeaponComponent(armor, w, w))
                         .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
                         .add(new TargetMovingComponent(targeting));
@@ -95,11 +95,11 @@ public class ControlPointsHelper {
 
                 Texture texture;
                 if (userModel != null) {
-                    if (mobType.group < 0 || userModel.getRelation(mobType.group) < -2)
+                    /*if (mobType.group < 0 || userModel.getRelation(mobType.group) < -2)
                         texture = assetManager.get("red.png", Texture.class);
-                    else if (userModel.getRelation(mobType.group) > 2)
+                    else if (userModel.getRelation(mobType.group) > 2) //todo
                         texture = assetManager.get("green.png", Texture.class);
-                    else
+                    else*/
                         texture = assetManager.get("yellow.png", Texture.class);
                 } else texture = assetManager.get("yellow.png", Texture.class);
 

@@ -13,14 +13,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
 import net.artux.pda.model.UserMessage;
+import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
@@ -34,6 +34,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @SuppressLint("NotifyDataSetChanged")
     public void setItems(List<UserMessage> messages) {
+        clearItems();
         this.messages = messages;
         notifyDataSetChanged();
     }
@@ -83,6 +84,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             messageView = itemView.findViewById(R.id.message);
         }
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm")
+                .withZone(ZoneId.systemDefault());
+
         @SuppressLint("SetTextI18n")
         void bind(UserMessage userMessage){
             itemView.setOnLongClickListener(view -> {
@@ -90,23 +94,22 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 return false;
             });
             itemView.setOnClickListener(view -> listener.onClick(userMessage));
-            SimpleDateFormat outputFormat =
-                    new SimpleDateFormat("HH:mm", Locale.getDefault());
-            outputFormat.setTimeZone(TimeZone.getDefault());
             Instant instant = userMessage.getTimestamp();
 
-            nicknameView.setText(userMessage.getLogin());
+            UserModel userModel = userMessage.getAuthor();
+
+            nicknameView.setText(userModel.getLogin());
             messageView.setText(Html.fromHtml(userMessage.getContent()));
 
-            if (userMessage.getPdaId() < 0 || userMessage.getGang().getId() < 0){
+            if (userModel.getPdaId() < 0 || userModel.getGang().getId() < 0){
                 infoView.setText(" [PDA ###]"
-                        + " - " + outputFormat.format(instant));
+                        + " - " + formatter.format(instant));
             }else {
-                infoView.setText(" [PDA #" + userMessage.getPdaId() + "] "
-                        + infoView.getContext().getResources().getStringArray(R.array.groups)[userMessage.getGang().getId()] // группировка
-                        + " - " + outputFormat.format(instant));
+                infoView.setText(" [PDA #" + userModel.getPdaId() + "] "
+                        + infoView.getContext().getResources().getStringArray(R.array.groups)[userModel.getGang().getId()] // группировка
+                        + " - " + formatter.format(instant));
             }
-            ProfileHelper.setAvatar(avatarView, userMessage.getAvatar());
+            ProfileHelper.setAvatar(avatarView, userModel.getAvatar());
         }
     }
 

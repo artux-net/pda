@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Checker {
 
-    public static boolean check(HashMap<String, List<String>> conditions, StoryDataModel storyDataModel, int userMoney) {
+    public static boolean check(HashMap<String, List<String>> conditions, StoryDataModel storyDataModel) {
         if (conditions != null) {
             if (!conditions.keySet().isEmpty()) {
                 HashMap<String, Integer> map = storyDataModel.getParametersMap();
@@ -34,14 +34,14 @@ public class Checker {
                         case "money>=":
                             if (conditions.get(condition) != null)
                                 for (String money : conditions.get(condition)) {
-                                    if (userMoney < Integer.parseInt(money))
+                                    if (storyDataModel.getMoney() < Integer.parseInt(money))
                                         return false;
                                 }
                             break;
                         case "money<":
                             if (conditions.get(condition) != null)
                                 for (String money : conditions.get(condition)) {
-                                    if (userMoney >= Integer.parseInt(money))
+                                    if (storyDataModel.getMoney() >= Integer.parseInt(money))
                                         return false;
                                 }
                             break;

@@ -2,10 +2,11 @@ package net.artux.pda.map.model.input;
 
 import com.badlogic.gdx.math.Vector2;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-public class Point {
+public class Point implements Serializable {
     public int type;
     private String name;
     private String pos;

@@ -6,8 +6,8 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.models.UserGdx;
 import net.artux.pda.map.platform.PlatformInterface;
+import net.artux.pda.model.user.UserModel;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -78,8 +78,8 @@ public class GameStateManager {
             states.peek().render();
     }
 
-    public UserGdx getMember() {
-        return (UserGdx) bundle.get("user");
+    public UserModel getMember() {
+        return (UserModel) bundle.get("user");
     }
 
     public void addInputProcessor(InputProcessor inputProcessor){

@@ -51,7 +51,7 @@ class NoteViewModel @Inject constructor(
         }
     }
 
-    fun updateNotesFromCache() {
+    private fun updateNotesFromCache() {
         notes.postValue(repository.getCachedNotes().map { noteMapper.model(it) }
             .getOrDefault(Collections.emptyList()))
     }

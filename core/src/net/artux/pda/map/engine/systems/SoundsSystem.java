@@ -3,21 +3,17 @@ package net.artux.pda.map.engine.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SoundComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -42,7 +38,7 @@ public class SoundsSystem extends BaseSystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
+        //super.addedToEngine(engine);
         detections.add(assetManager.get("sounds/contact_0.ogg", Music.class));
         detections.add(assetManager.get("sounds/contact_1.ogg", Music.class));
 

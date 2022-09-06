@@ -9,8 +9,6 @@ import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 
-import com.google.gson.Gson;
-
 import net.artux.pda.map.model.input.Map;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 
@@ -45,7 +43,7 @@ public class MapHelper {
     static void startMap(Activity context, Map map) {
         Intent intent = new Intent(context, MapEngine.class);
         intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK);
-        intent.putExtra("map", new Gson().toJson(map));
+        intent.putExtra("map", map);
         context.startActivityForResult(intent, 2);
         context.finish();
     }

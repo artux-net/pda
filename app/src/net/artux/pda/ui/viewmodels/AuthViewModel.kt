@@ -3,6 +3,7 @@ package net.artux.pda.ui.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.app.DataManager
 import net.artux.pda.model.StatusModel
@@ -12,9 +13,9 @@ import net.artux.pda.model.user.LoginUser
 import net.artux.pda.model.user.RegisterUserModel
 import net.artux.pda.model.user.UserModel
 import net.artux.pda.repositories.UserRepository
-import net.artux.pda.repositories.util.Result
 import javax.inject.Inject
 
+@HiltViewModel
 class AuthViewModel @Inject constructor(
     private var userRepository: UserRepository,
     var userMapper: UserMapper,
@@ -22,25 +23,46 @@ class AuthViewModel @Inject constructor(
     var dataManager: DataManager
 ) : ViewModel() {
 
-    var member: MutableLiveData<Result<UserModel>> =
-        MutableLiveData(userRepository.getCachedMember().map { userMapper.dto(it) })
-
-    var status: MutableLiveData<Result<StatusModel>> = MutableLiveData()
+    var member: MutableLiveData<UserModel> = MutableLiveData()
+    var status: MutableLiveData<StatusModel> = MutableLiveData()
 
     fun isLoggedIn(): Boolean {
-        return member.value!!.isSuccess()
+        return dataManager.isAuthenticated
+    }
+
+    fun login() {
+        viewModelScope.launch {
+            userRepository.getMember()
+                .onSuccess { member.postValue(userMapper.model(it)) }
+                .onFailure { status.postValue(StatusModel(it)) }
+        }
     }
 
     fun login(loginUser: LoginUser) {
         dataManager.setLoginUser(loginUser)
-        viewModelScope.launch {
-            member.postValue(userRepository.getMember().map { userMapper.dto(it) })
-        }
+        login()
     }
 
     fun registerUser(registerUserDto: RegisterUserModel) {
         viewModelScope.launch {
-            status.postValue(userRepository.registerUser(userMapper.dto(registerUserDto)).map { statusMapper.model(it) })
+            userRepository
+                .registerUser(userMapper.model(registerUserDto))
+                .onSuccess {
+                    status.postValue(statusMapper.model(it))
+                }.onFailure {
+                    status.postValue(StatusModel(it))
+                }
+        }
+    }
+
+    fun resetPassword(email: String) {
+        viewModelScope.launch {
+            userRepository.resetPassword(email)
+                .onSuccess {
+                    status.postValue(statusMapper.model(it))
+                }.onFailure {
+                    status.postValue(StatusModel(it))
+                }
         }
     }
 }

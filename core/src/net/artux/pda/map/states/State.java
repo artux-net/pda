@@ -2,7 +2,8 @@ package net.artux.pda.map.states;
 
 import com.badlogic.gdx.Gdx;
 
-import net.artux.pda.map.models.UserGdx;
+import net.artux.pda.model.user.UserModel;
+
 
 public abstract class State {
 
@@ -27,7 +28,7 @@ public abstract class State {
 
     public abstract void dispose();
 
-    public UserGdx getMember() {
-        return (UserGdx) gsm.get("member");
+    public UserModel getMember() {
+        return (UserModel) gsm.get("member");
     }
 }

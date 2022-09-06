@@ -1,2 +1,1 @@
-include ':app', 'core'
-include ':model'
+include ':app', 'core', ':model'

@@ -28,9 +28,9 @@ import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.states.BotStatesAshley;
-import net.artux.pda.map.models.items.Armor;
-import net.artux.pda.map.models.items.Item;
-import net.artux.pda.map.models.items.Weapon;
+import net.artux.pda.model.items.ArmorModel;
+import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.items.WeaponModel;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -122,8 +122,8 @@ public class WorldSystem extends EntitySystem implements Disposable {
             public void run() {
                 Entity entity = new Entity();
 
-                Armor armor = new Armor();
-                Weapon w = new Weapon();
+                ArmorModel armor = new ArmorModel();
+                WeaponModel w = new WeaponModel();
                 w.setSpeed(30);
                 w.setDamage(1);
                 w.setPrecision(1);
@@ -134,7 +134,7 @@ public class WorldSystem extends EntitySystem implements Disposable {
                         .add(new VelocityComponent())
                         .add(new HealthComponent())
                         .add(new WeaponComponent(armor, w, w))
-                        .add(new StalkerComponent("Мутант", new ArrayList<Item>()))
+                        .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
                         .add(new StatesComponent<>(entity, BotStatesAshley.FIND_TARGET, BotStatesAshley.GUARDING))
                         .add(new MoodComponent(-1, null, true))
                         .add(new TargetMovingComponent(new TargetMovingComponent.Targeting() {

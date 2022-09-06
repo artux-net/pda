@@ -1,7 +1,5 @@
 package net.artux.pda.gdx;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
@@ -11,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStore;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.savedstate.SavedStateRegistry;
@@ -19,20 +18,18 @@ import androidx.savedstate.SavedStateRegistryOwner;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.google.gson.Gson;
 
 import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.input.Map;
 import net.artux.pda.map.platform.PlatformInterface;
-import net.artux.pda.model.mapper.UserMapper;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
-import net.artux.pda.ui.viewmodels.ProfileViewModel;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
+import net.artux.pda.ui.viewmodels.UserViewModel;
 
 import java.util.HashMap;
 
@@ -40,16 +37,12 @@ import timber.log.Timber;
 
 public class MapEngine extends AndroidApplication implements PlatformInterface, LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner {
 
-    private final Gson gson = new Gson();
-    private GdxMapper mapper = GdxMapper.INSTANCE;
-    private ProfileViewModel viewModel;
+    private UserViewModel viewModel;
     private LifecycleRegistry lifecycleRegistry;
     private final SavedStateRegistryController mSavedStateRegistryController = SavedStateRegistryController.create(this);
-
     private QuestViewModel questViewModel;
 
-    ViewModelStore viewModelStore = new ViewModelStore();
-    UserMapper userMapper = UserMapper.INSTANCE;
+    private ViewModelStore viewModelStore = new ViewModelStore();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,20 +53,18 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
         mSavedStateRegistryController.performRestore(savedInstanceState);
 
         if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(ProfileViewModel.class);
+            viewModel = new ViewModelProvider(this).get(UserViewModel.class);
         if (questViewModel == null)
-            questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
+            questViewModel = new ViewModelProvider(this).get(QuestViewModel.class);
 
-        String pos = getIntent().getStringExtra("pos");
+        UserModel member = viewModel.getFromCache();
+        StoryDataModel dataModel = questViewModel.getCachedData().getValue();
+        Map map = (Map) getIntent().getSerializableExtra("map");
 
-        UserModel member = userMapper.dto(viewModel.getUserRepository().getCachedMember().getOrThrow());
-        StoryDataModel dataModel = questViewModel.getStoryData().getValue();
-        Map map = gson.fromJson(getIntent().getStringExtra("map"), Map.class);
-        map.setPlayerPos(pos);
         GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
                 .map(map)
-                .user(mapper.user(member))
-                .storyData(mapper.data(dataModel));
+                .user(member)
+                .storyData(dataModel);
 
         initialize(builder.build(), config);
     }

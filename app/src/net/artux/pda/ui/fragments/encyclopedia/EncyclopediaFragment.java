@@ -107,9 +107,7 @@ public class EncyclopediaFragment extends BaseFragment {
 
     }
 
-    @Override
     public void receiveData(Bundle data) {
-        super.receiveData(data);
         if (data.containsKey("load"))
             webView.loadUrl(data.getString("load"));
         if (data.containsKey("reset")){

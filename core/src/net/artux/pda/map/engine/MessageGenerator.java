@@ -2,8 +2,8 @@ package net.artux.pda.map.engine;
 
 
 import static com.badlogic.gdx.math.MathUtils.random;
+import net.artux.pda.model.UserMessage;
 
-import net.artux.pda.map.models.UserMessage;
 
 public class MessageGenerator {
 

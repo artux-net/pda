@@ -47,7 +47,6 @@ import net.artux.pda.model.quest.UserDataCompanion;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 import net.artux.pda.model.user.UserModel;
-import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.fragments.quest.QuestController;
 import net.artux.pda.ui.fragments.quest.SceneQuestController;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
@@ -121,11 +120,22 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             }
         });
 
+
+        questViewModel.getStatus().observe(this, status -> {
+            if (!status.isSuccess()) {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.putExtra("status", status);
+                startActivity(intent);
+                finish();
+            }else
+                Toast.makeText(getApplicationContext(), status.getDescription(), Toast.LENGTH_LONG).show();
+        });
         summary = summaryViewModel.getCachedSummary(Summary.getCurrentId()).getValue();
-        userModel = viewModel.getMember().getValue().getOrThrow();
+        userModel = viewModel.getMember().getValue();
 
         if (summary == null)
             summary = new Summary();
+        questViewModel.updateData();
     }
 
     public void sync(Stage stage, int id) {
@@ -164,8 +174,6 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         int[] keys = getIntent().getIntArrayExtra("keys");
         // keys for loading specific stage
         if (keys == null) {
-
-
             int storyId = getIntent().getIntExtra("story", -1);
             if (storyId < 0) {
                 // если нет номера истории в намерении
@@ -401,12 +409,12 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                 viewModel.getMember().observe(this, memberResult -> {
                     if (isFirst)
                         isFirst = false;
-                    else if (memberResult instanceof Result.Success) {
+                    else {
                         Intent intent = new Intent(QuestActivity.this, MainActivity.class);
                         intent.putExtra("section", "stories");
                         startActivity(intent);
                         finish();
-                    } else questViewModel.applyActions(actions);
+                    }
                 });
                 break;
             case R.id.log:

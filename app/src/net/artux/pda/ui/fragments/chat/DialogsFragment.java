@@ -128,8 +128,7 @@ public class DialogsFragment extends BaseFragment implements MessageListener {
                 Type listType = new TypeToken<ArrayList<Dialog>>(){}.getType();
 
                 try {
-                    UserMessage userMessage = new Gson().fromJson(text,UserMessage.class);
-                    if (userMessage.getId() == -1) throw new JsonSyntaxException("");
+                    UserMessage userMessage = gson.fromJson(text,UserMessage.class);
                     dialogsAdapter.updateDialog(userMessage);
                     Timber.d("Dialogs, new message: " + userMessage.toString());
                 }catch (JsonSyntaxException e){

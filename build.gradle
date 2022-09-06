@@ -3,18 +3,18 @@ buildscript {
     ext.dagger_version = "2.43.2"
 
     repositories {
+        google()
         mavenLocal()
         mavenCentral()
         maven { url "https://jitpack.io" }
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        google()
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:7.2.2'
-        classpath 'com.google.gms:google-services:4.3.10'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.8.1'
+        classpath 'com.google.gms:google-services:4.3.13'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.badlogicgames.gdx:gdx-ai:1.8.1"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$dagger_version"
@@ -35,9 +35,9 @@ allprojects {
     }
 
     repositories {
+        google()
         mavenLocal()
         mavenCentral()
-        google()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
@@ -81,6 +81,8 @@ project(":core") {
     configurations { natives }
 
     dependencies {
+        implementation project(":model")
+
         implementation 'com.google.code.gson:gson:2.8.9'
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"

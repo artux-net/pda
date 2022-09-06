@@ -1,35 +1,38 @@
 package net.artux.pda.ui.fragments.additional;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.lifecycle.ViewModelProvider;
 
 import net.artux.pda.R;
-import net.artux.pda.databinding.FragmentAddProfileBinding;
+import net.artux.pda.databinding.FragmentListBinding;
+import net.artux.pda.model.Summary;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.viewmodels.SummaryViewModel;
 
 import org.jetbrains.annotations.Nullable;
 
-public class SummaryAdditionalFragment extends AdditionalBaseFragment {
+import java.util.List;
+import java.util.stream.Collectors;
 
-    FragmentAddProfileBinding binding;
-    ArrayAdapter<String> adapter;
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
+public class SummaryAdditionalFragment extends AdditionalBaseFragment implements StringAdapter.StringListClickListener {
+
+    private FragmentListBinding binding;
+    private StringAdapter adapter;
     private SummaryViewModel summaryViewModel;
-    private String[] ids;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentAddProfileBinding.inflate(inflater);
+        binding = FragmentListBinding.inflate(inflater);
         return binding.getRoot();
     }
 
@@ -38,64 +41,47 @@ public class SummaryAdditionalFragment extends AdditionalBaseFragment {
         super.onViewCreated(view, savedInstanceState);
         if (navigationPresenter != null)
             navigationPresenter.setAdditionalTitle(getString(R.string.kinds));
-        if (getActivity() != null) {
-            binding.menuProfile.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        if (summaryViewModel == null)
+            summaryViewModel = new ViewModelProvider(this).get(SummaryViewModel.class);
 
-            if (summaryViewModel == null)
-                summaryViewModel = getViewModelFactory(this).create(SummaryViewModel.class);
+        adapter = new StringAdapter(this);
 
-            ids = summaryViewModel.getAllIds();
-
-            updateAdapter();
-
-            binding.menuProfile.setOnItemClickListener((parent, view1, position, id) -> {
-                Bundle bundle = new Bundle();
-                bundle.putString("loadSummary", ids[position]);
-                navigationPresenter.passData(bundle);
-            });
-            binding.menuProfile.setOnItemLongClickListener((parent, view12, position, id) -> {
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
-                builder.setTitle("Удалить сводку от " + ids[position] + "?");
-
-                builder.setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        summaryViewModel.removeSummary(ids[position]);
-                        updateAdapter();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("reset", "");
-                        navigationPresenter.passData(bundle);
-                    }
-                });
-                builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-                builder.show();
-
-                return false;
-            });
-        }
+        summaryViewModel.getSummaries().observe(getViewLifecycleOwner(), summaries -> {
+            if (summaries.size() > 0) {
+                binding.list.setVisibility(View.VISIBLE);
+                binding.viewMessage.setVisibility(View.GONE);
+                List<String> content = summaries.stream()
+                        .map(Summary::getTitle)
+                        .collect(Collectors.toList());
+                adapter.setItems(content);
+            } else {
+                binding.viewMessage.setVisibility(View.VISIBLE);
+                binding.list.setVisibility(View.GONE);
+            }
+        });
     }
-
-    void updateAdapter(){
-        ids = summaryViewModel.getAllIds();
-
-        adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_list_item_1, ids);
-        binding.menuProfile.setAdapter(adapter);
-    }
-
-    @Override
-    public void receiveData(Bundle data) {
-        super.receiveData(data);
-    }
-
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         binding = null;
+    }
+
+    @Override
+    public void onClick(int pos, String content) {
+        summaryViewModel.openSummary(content);
+    }
+
+    @Override
+    public boolean onLongClick(int pos, String content) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+        builder.setTitle("Удалить сводку от " + content + "?");
+        builder.setPositiveButton("Да", (dialog, which) -> {
+            summaryViewModel.removeSummary(content);
+        });
+        builder.setNegativeButton("Нет", (dialog, which) -> {
+        });
+        builder.show();
+        return true;
     }
 }

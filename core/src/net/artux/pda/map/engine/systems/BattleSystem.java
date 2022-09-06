@@ -24,10 +24,10 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
-import net.artux.pda.map.models.items.Item;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.Slot;
+import net.artux.pda.model.items.ItemModel;
 
 import java.util.Random;
 
@@ -96,7 +96,7 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
                 weaponSlot.setText(entityWeapon.resource.getQuantity() + "/" + entityWeapon.getMagazine());
             }else{
                 StringBuilder stringBuilder = new StringBuilder();
-                for (Item i:
+                for (ItemModel i:
                         getEngine().getSystem(PlayerSystem.class).getPlayerComponent().gdxData.getAllItems()) {
                     stringBuilder.append("{").append(i.getId()).append("}").append(" ");
                 }

@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.Array;
 
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -25,7 +26,12 @@ public class BaseSystem extends EntitySystem {
         super.addedToEngine(engine);
         player = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get()).get(0);
         if (family!=null) {
-            entities = new Array<>(engine.getEntitiesFor(family).toArray());
+            ImmutableArray<Entity> immutableArray = engine.getEntitiesFor(family);
+            entities = new Array<>();
+            for (Entity entity : immutableArray) {
+                entities.add(entity);
+            }
+
 
             engine.addEntityListener(family, new EntityListener() {
                 @Override
@@ -45,7 +51,7 @@ public class BaseSystem extends EntitySystem {
         return getEngine().getEntities().contains(player, true);
     }
 
-    public Array<Entity> listenEntities(Family family){
+    public final Array<Entity> listenEntities(Family family){
         final Array<Entity> entities = new Array<>(getEngine().getEntitiesFor(family).toArray());
 
         getEngine().addEntityListener(family, new EntityListener() {

@@ -1,16 +1,14 @@
 package net.artux.pda.ui.activities;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat;
 
 import com.bumptech.glide.Glide;
@@ -22,11 +20,12 @@ import com.bumptech.glide.request.target.Target;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.viewmodels.UserViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class LoadingActivity extends AppCompatActivity {
 
     private boolean loaded, gifEnd, afterClearCache = false;
@@ -38,7 +37,7 @@ public class LoadingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_loading);
 
         if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(UserViewModel.class);
+            viewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
         Glide.with(this)
                 .asGif()
@@ -67,29 +66,17 @@ public class LoadingActivity extends AppCompatActivity {
 
 
         viewModel.getMember().observe(this, memberResult -> {
-            if(memberResult instanceof Result.Success){
-                if (afterClearCache){
-                    loaded = true;
-                    Timber.i("User information loaded from cache, try to start...");
-                    start();
-                }else {
-                    afterClearCache = true;
-                    Timber.i("Clear cache, update info from server...");
-                    viewModel.updateMemberWithReset();
-                }
-            }else{
-                Timber.i("User information loaded, try to start...");
-                Toast.makeText(getApplicationContext(), "Данные не найдены, попробуйте ввойти снова", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(LoadingActivity.this, LoginActivity.class));
-                LoadingActivity.this.finish();
-            }
+                loaded = true;
+                Timber.i("User information loaded from cache, try to start...");
+                start();
         });
+        viewModel.updateMember();
     }
 
     public static boolean TESTING_MAP = false;
 
-    void start(){
-        if (loaded && (gifEnd || BuildConfig.DEBUG)){
+    void start() {
+        if (loaded && (gifEnd || BuildConfig.DEBUG)) {
             if (TESTING_MAP)
                 startActivity(new Intent(this, QuestActivity.class));
             else

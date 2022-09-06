@@ -1,7 +1,5 @@
 package net.artux.pda.map.ui.blocks;
 
-import static net.artux.pda.map.models.Checker.isInteger;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
@@ -21,7 +19,7 @@ import com.badlogic.gdx.utils.Scaling;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.MessageGenerator;
-import net.artux.pda.map.models.UserMessage;
+import net.artux.pda.model.UserMessage;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -60,14 +58,16 @@ public class MessagesBlock extends ScrollPane implements Disposable {
     }
 
     public void addMessage(UserMessage message) {
-        addMessage(message.avatarId, message.message, simpleDateFormat.format(new Date(message.time)) + " " + message.senderLogin);
+        addMessage(message.getAuthor().getAvatar(),
+                message.getContent(),
+                simpleDateFormat.format(new Date(message.getTimestamp().toEpochMilli())) + " " + message.getAuthor().getLogin());
     }
 
     public void addMessage(String icon, String content, String title) {
         final Table mainGroup = new Table().left();
 
         Image image;
-        if (isInteger(icon))
+        if (icon.matches("^\\d*$"))
             image = new Image(assetManager
                     .get("avatars/a" + (Integer.parseInt(icon)) + ".png", Texture.class));
         else

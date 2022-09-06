@@ -1,7 +1,5 @@
 package net.artux.pda.ui.activities;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -27,26 +25,21 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import net.artux.pda.R;
-import net.artux.pda.app.PDAApplication;
-import net.artux.pda.model.StatusModel;
 import net.artux.pda.model.user.LoginUser;
-import net.artux.pda.model.user.UserModel;
-import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.viewmodels.AuthViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import dagger.hilt.android.AndroidEntryPoint;
 
+@AndroidEntryPoint
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    LoginUser loginUser;
+    private LoginUser loginUser;
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -61,7 +54,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
 
         if (authViewModel == null)
-            authViewModel = getViewModelFactory(this).create(AuthViewModel.class);
+            authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
         if (authViewModel.isLoggedIn()) {
             startActivity(new Intent(this, LoadingActivity.class));
@@ -78,19 +71,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                 builder.setView(input);
 
-                builder.setPositiveButton("OK", (dialog, which) -> ((PDAApplication)getApplication()).getOldApi().resetPassword(input.getText().toString()).enqueue(new Callback<StatusModel>() {
-                    @Override
-                    public void onResponse(Call<StatusModel> call, Response<StatusModel> response) {
-                        StatusModel status = response.body();
-                        if (status != null)
-                            Toast.makeText(LoginActivity.this, status.getDescription(), Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onFailure(Call<StatusModel> call, Throwable t) {
-
-                    }
-                }));
+                builder.setPositiveButton("OK", (dialog, which) -> {
+                    authViewModel.resetPassword(input.getText().toString());
+                });
                 builder.setNegativeButton(R.string.action_cancel, (dialog, which) -> dialog.cancel());
 
                 builder.show();
@@ -115,18 +98,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mLoginFormView = findViewById(R.id.login_form);
             mProgressView = findViewById(R.id.login_progress);
         }
-        authViewModel.getMember().observe(this, new Observer<Result<UserModel>>() {
-            @Override
-            public void onChanged(Result<UserModel> userModelResult) {
-                showProgress(false);
-                if (userModelResult instanceof Result.Success) {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    finish();
-                } else {
-                    Toast.makeText(LoginActivity.this, "Неправильный логин или пароль", Toast.LENGTH_LONG).show();
-                }
-            }
+        authViewModel.getMember().observe(this, userModelResult -> {
+            showProgress(false);
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
         });
+        authViewModel.getStatus().observe(this, statusModel -> {
+            showProgress(false);
+            Toast.makeText(LoginActivity.this, statusModel.getDescription(), Toast.LENGTH_LONG).show();
+        });
+        authViewModel.login();
     }
 
     private void attemptLogin() {

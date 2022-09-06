@@ -49,19 +49,23 @@ class ViewModelFactory constructor(
         handle: SavedStateHandle
     ) = with(modelClass) {
         when {
-            //todo another view models
             isAssignableFrom(ProfileViewModel::class.java) ->
                 ProfileViewModel(usersRepository, UserMapper.INSTANCE)
             isAssignableFrom(UserViewModel::class.java) ->
-                UserViewModel(usersRepository, UserMapper.INSTANCE)
+                UserViewModel(usersRepository, UserMapper.INSTANCE, StatusMapper.INSTANCE)
             isAssignableFrom(QuestViewModel::class.java) ->
-                QuestViewModel(questRepository, StoryMapper.INSTANCE)
+                QuestViewModel(questRepository, StoryMapper.INSTANCE, StatusMapper.INSTANCE)
             isAssignableFrom(SummaryViewModel::class.java) ->
                 SummaryViewModel(summaryRepository)
             isAssignableFrom(RatingViewModel::class.java) ->
                 RatingViewModel(usersRepository, UserMapper.INSTANCE)
             isAssignableFrom(AuthViewModel::class.java) ->
-                AuthViewModel(usersRepository, UserMapper.INSTANCE, StatusMapper.INSTANCE, dataManager)
+                AuthViewModel(
+                    usersRepository,
+                    UserMapper.INSTANCE,
+                    StatusMapper.INSTANCE,
+                    dataManager
+                )
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

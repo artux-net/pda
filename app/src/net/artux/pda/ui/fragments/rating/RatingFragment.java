@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
@@ -52,17 +51,14 @@ public class RatingFragment extends BaseFragment implements RatingAdapter.OnClic
         RatingAdapter ratingAdapter = new RatingAdapter(this, viewModel.getId());
         recyclerView.setAdapter(ratingAdapter);
 
-        ratingViewModel.getList().observe(getViewLifecycleOwner(), new Observer<Result<List<UserInfo>>>() {
+        ratingViewModel.getList().observe(getViewLifecycleOwner(), new Observer<List<UserInfo>>() {
             @Override
-            public void onChanged(Result<List<UserInfo>> listResult) {
-                if (listResult.isSuccess()) {
-                    List<UserInfo> list = ((Result.Success<List<UserInfo>>) listResult).getData();
-                    if (navigationPresenter != null)
-                        navigationPresenter.setLoadingState(false);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    v.setVisibility(View.GONE);
-                    ratingAdapter.addData(list);
-                }
+            public void onChanged(List<UserInfo> listResult) {
+                if (navigationPresenter != null)
+                    navigationPresenter.setLoadingState(false);
+                recyclerView.setVisibility(View.VISIBLE);
+                v.setVisibility(View.GONE);
+                ratingAdapter.addData(listResult);
             }
         });
 

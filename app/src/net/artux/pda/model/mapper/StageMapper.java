@@ -40,7 +40,7 @@ public interface StageMapper {
     default String getText(Stage stage, UserDataCompanion dataCompanion, Context context) {
         List<Text> contentVariants = new ArrayList<>();
         for (Text text : stage.getText())
-            if (Checker.check(text.condition, dataCompanion.getStoryData(), dataCompanion.getUser().getMoney())) {
+            if (Checker.check(text.condition, dataCompanion.getStoryData())) {
                 text.text = formatText(text.text, dataCompanion.getUser(), context);
                 contentVariants.add(text);
             }
@@ -50,7 +50,7 @@ public interface StageMapper {
     default List<TransferModel> getTransfers(Stage stage, UserDataCompanion dataCompanion, Context context) {
         List<TransferModel> transfers = new ArrayList<>();
         for (Transfer transfer : stage.getTransfers())
-            if (Checker.check(transfer.condition, dataCompanion.getStoryData(), dataCompanion.getUser().getMoney())) {
+            if (Checker.check(transfer.condition, dataCompanion.getStoryData())) {
                 transfer.text = formatText(transfer.text, dataCompanion.getUser(), context);
                 transfers.add(new TransferModel(transfer.stage_id, transfer.text));
             }

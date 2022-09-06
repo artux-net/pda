@@ -1,5 +1,8 @@
 package net.artux.pda.model.user;
 
+import lombok.Data;
+
+@Data
 public class GangRelation {
 
     private int bandits;
@@ -12,75 +15,27 @@ public class GangRelation {
     private int monolith;
     private int scientists;
 
-    public int getBandits() {
-        return bandits;
+    public int getFor(Gang gang) {
+        switch (gang) {
+            case DUTY:
+                return duty;
+            case LONERS:
+                return loners;
+            case BANDITS:
+                return bandits;
+            case CLEARSKY:
+                return clearSky;
+            case LIBERTY:
+                return liberty;
+            case MERCENARIES:
+                return mercenaries;
+            case MILITARY:
+                return military;
+            case MONOLITH:
+                return monolith;
+            default:
+                return scientists;
+        }
     }
 
-    public void setBandits(int bandits) {
-        this.bandits = bandits;
-    }
-
-    public int getClearSky() {
-        return clearSky;
-    }
-
-    public void setClearSky(int clearSky) {
-        this.clearSky = clearSky;
-    }
-
-    public int getDuty() {
-        return duty;
-    }
-
-    public void setDuty(int duty) {
-        this.duty = duty;
-    }
-
-    public int getLiberty() {
-        return liberty;
-    }
-
-    public void setLiberty(int liberty) {
-        this.liberty = liberty;
-    }
-
-    public int getLoners() {
-        return loners;
-    }
-
-    public void setLoners(int loners) {
-        this.loners = loners;
-    }
-
-    public int getMercenaries() {
-        return mercenaries;
-    }
-
-    public void setMercenaries(int mercenaries) {
-        this.mercenaries = mercenaries;
-    }
-
-    public int getMilitary() {
-        return military;
-    }
-
-    public void setMilitary(int military) {
-        this.military = military;
-    }
-
-    public int getMonolith() {
-        return monolith;
-    }
-
-    public void setMonolith(int monolith) {
-        this.monolith = monolith;
-    }
-
-    public int getScientists() {
-        return scientists;
-    }
-
-    public void setScientists(int scientists) {
-        this.scientists = scientists;
-    }
 }

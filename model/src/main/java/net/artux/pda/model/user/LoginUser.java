@@ -1,5 +1,8 @@
 package net.artux.pda.model.user;
 
+import lombok.Data;
+
+@Data
 public class LoginUser {
 
     private final String emailOrLogin;
@@ -10,11 +13,4 @@ public class LoginUser {
         this.password = password;
     }
 
-    public String getEmailOrLogin() {
-        return emailOrLogin;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 }

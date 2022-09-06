@@ -4,7 +4,7 @@ import static com.badlogic.gdx.math.MathUtils.random;
 
 import com.badlogic.ashley.core.Component;
 
-import net.artux.pda.map.models.items.Item;
+import net.artux.pda.model.items.ItemModel;
 
 import java.util.List;
 
@@ -13,9 +13,9 @@ public class StalkerComponent implements Component {
     private String name;
     public String group;
     public int avatar;
-    private List<Item> inventory;
+    private List<ItemModel> inventory;
 
-    public StalkerComponent(String name, List<Item> inventory) {
+    public StalkerComponent(String name, List<ItemModel> inventory) {
         this.name = name;
         this.inventory = inventory;
         avatar = random(0, 30);

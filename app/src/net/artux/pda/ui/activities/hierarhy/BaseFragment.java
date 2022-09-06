@@ -73,9 +73,4 @@ public abstract class BaseFragment extends Fragment implements FragmentNavigatio
         navigationPresenter = presenter;
     }
 
-    @Override
-    public void receiveData(Bundle data) {
-
-    }
-
 }

@@ -18,7 +18,6 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.user.UserModel;
-import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 
@@ -41,20 +40,15 @@ public class EquipmentFragment extends BaseFragment {
             navigationPresenter.setTitle("Снаряжение");
 
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
-            if(memberResult instanceof Result.Success){
-                UserModel userModel = ((Result.Success<UserModel>) memberResult).getData();
-                //TODO
-               /* Equipment equipment = userModel
-                        .getData()
-                        .getEquipment();
+                UserModel userModel = memberResult;
 
-                if (equipment.getArmor()!=null)
+                //todo
+                /*if (equipment.getArmor()!=null)
                     defineSlot(view, R.id.mainSlot, equipment.getArmor());
                 if (equipment.getFirstWeapon()!=null)
                     defineSlot(view, R.id.slot2, equipment.getFirstWeapon());
                 if (equipment.getSecondWeapon()!=null)
                     defineSlot(view, R.id.slot1, equipment.getSecondWeapon());*/
-            }else viewModel.updateMember();
         });
 
 

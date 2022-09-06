@@ -45,8 +45,9 @@ public class DialogsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void updateDialog(UserMessage message) {
         for (Dialog d :
                 mDialogList) {
-            if (d.id == message.getId())
-                d.lastMessage = message.getLogin() + ": " + message.getContent();
+            //todo
+            if (d.id == message.getAuthor().getPdaId())
+                d.lastMessage = message.getAuthor().getLogin() + ": " + message.getContent();
         }
     }
 

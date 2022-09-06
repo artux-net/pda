@@ -7,11 +7,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.model.input.Map;
-import net.artux.pda.map.models.UserGdx;
-import net.artux.pda.map.models.user.GdxData;
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.PreloadState;
+import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.model.user.UserModel;
 
 public class GdxAdapter extends ApplicationAdapter {
 
@@ -23,6 +23,8 @@ public class GdxAdapter extends ApplicationAdapter {
     }
 
     public void put(String key, Object o) {
+        if (o == null)
+            throw new RuntimeException(key + " - null object!");
         gsm.put(key, o);
     }
 
@@ -82,12 +84,12 @@ public class GdxAdapter extends ApplicationAdapter {
             gdxAdapter = new GdxAdapter(platformInterface);
         }
 
-        public Builder user(UserGdx userModel) {
+        public Builder user(UserModel userModel) {
             gdxAdapter.put("user", userModel);
             return this;
         }
 
-        public Builder storyData(GdxData dataModel) {
+        public Builder storyData(StoryDataModel dataModel) {
             gdxAdapter.put("data", dataModel);
             return this;
         }

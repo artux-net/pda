@@ -1,5 +1,8 @@
 package net.artux.pda.model.quest.story;
 
+import lombok.Data;
+
+@Data
 public class ParameterModel {
 
     private String key;

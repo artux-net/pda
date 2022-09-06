@@ -1,9 +1,11 @@
 package net.artux.pda.model;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class StatusModel {
+public class StatusModel implements Serializable {
 
     private boolean success;
     private String description;

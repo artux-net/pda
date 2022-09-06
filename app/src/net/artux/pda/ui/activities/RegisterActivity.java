@@ -1,38 +1,36 @@
 package net.artux.pda.ui.activities;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.model.StatusModel;
 import net.artux.pda.model.user.RegisterUserModel;
-import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.adapters.AvatarsAdapter;
 import net.artux.pda.ui.viewmodels.AuthViewModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class RegisterActivity extends AppCompatActivity {
 
-    RegisterUserModel mRegisterUser;
+    private RegisterUserModel registerUserModel;
 
     // UI references.
     private EditText mLoginView;
@@ -43,8 +41,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mRepeatPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
-    AvatarsAdapter avatarsAdapter = new AvatarsAdapter();
+    private AvatarsAdapter avatarsAdapter;
 
     private static final String EMAIL_VALIDATION_REGEX = "^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
     private static final String LOGIN_VALIDATION_REGEX = "^[a-zA-Z0-9-_.]+$";
@@ -58,8 +55,10 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        avatarsAdapter = new AvatarsAdapter();
+
         if (authViewModel == null)
-            authViewModel = getViewModelFactory(this).create(AuthViewModel.class);
+            authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
         if (authViewModel.isLoggedIn()) {
             startActivity(new Intent(this, LoadingActivity.class));
@@ -72,14 +71,11 @@ public class RegisterActivity extends AppCompatActivity {
         mEmailView = findViewById(R.id.email);
         mPasswordView = findViewById(R.id.password);
         mRepeatPasswordView = findViewById(R.id.repeat_password);
-        findViewById(R.id.agreement).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String url = "https://www.artux.net/privacy";
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(url));
-                startActivity(i);
-            }
+        findViewById(R.id.agreement).setOnClickListener(view -> {
+            String url = "https://www.artux.net/privacy";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
         });
 
         RecyclerView recyclerView = findViewById(R.id.avatars);
@@ -89,44 +85,31 @@ public class RegisterActivity extends AppCompatActivity {
         recyclerView.setAdapter(avatarsAdapter);
 
 
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                    attemptRegister();
-                    return true;
-                }
-                return false;
+        mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
+            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                attemptRegister();
+                return true;
             }
+            return false;
         });
 
         Button mRegisterBtn = findViewById(R.id.registerBtn);
-        mRegisterBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptRegister();
-            }
-        });
+        mRegisterBtn.setOnClickListener(view -> attemptRegister());
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.register_progress);
 
-        authViewModel.getStatus().observe(this, statusResult -> {
+        authViewModel.getStatus().observe(this, status -> {
             showProgress(false);
-            if (statusResult instanceof Result.Success) {
-                StatusModel status = statusResult.getOrNull();
-                if (status.isSuccess()) {
-                    Intent intent = new Intent(RegisterActivity.this, FinishRegistrationActivity.class);
-                    intent.putExtra("email", mRegisterUser.getEmail());
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(RegisterActivity.this, status.getDescription(), Toast.LENGTH_LONG)
-                            .show();
-                }
-            }else if (statusResult instanceof Result.Error)
-                Toast.makeText(RegisterActivity.this, ((Result.Error) statusResult).getException().getMessage(), Toast.LENGTH_LONG)
+            if (status.isSuccess()) {
+                Intent intent = new Intent(RegisterActivity.this, FinishRegistrationActivity.class);
+                intent.putExtra("email", registerUserModel.getEmail());
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(RegisterActivity.this, status.getDescription(), Toast.LENGTH_LONG)
                         .show();
+            }
         });
     }
 
@@ -200,7 +183,7 @@ public class RegisterActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            mRegisterUser = new RegisterUserModel(mLoginView.getText().toString(),
+            registerUserModel = new RegisterUserModel(mLoginView.getText().toString(),
                     mNameView.getText().toString(),
                     mNicknameView.getText().toString(),
                     mEmailView.getText().toString(),
@@ -208,7 +191,7 @@ public class RegisterActivity extends AppCompatActivity {
                     String.valueOf(avatarsAdapter.getSelected()));
 
             showProgress(true);
-            authViewModel.registerUser(mRegisterUser);
+            authViewModel.registerUser(registerUserModel);
         }
     }
 

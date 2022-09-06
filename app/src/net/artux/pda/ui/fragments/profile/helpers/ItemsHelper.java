@@ -3,11 +3,6 @@ package net.artux.pda.ui.fragments.profile.helpers;
 import android.content.Context;
 
 import net.artux.pda.R;
-import net.artux.pda.map.models.items.Armor;
-import net.artux.pda.map.models.items.Artifact;
-import net.artux.pda.map.models.items.Detector;
-import net.artux.pda.map.models.items.Item;
-import net.artux.pda.map.models.items.Weapon;
 import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ArtifactModel;
 import net.artux.pda.model.items.DetectorModel;

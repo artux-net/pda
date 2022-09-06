@@ -14,18 +14,12 @@ import net.artux.pda.R;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.model.ResponsePage;
 import net.artux.pda.model.news.Article;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.util.GsonProvider;
 
 import java.lang.reflect.Type;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timber.log.Timber;
 
 public class NewsFragment extends BaseFragment {
 
@@ -60,7 +54,8 @@ public class NewsFragment extends BaseFragment {
             adapter.setNews(news);
         }
 
-        ((PDAApplication)getActivity().getApplication()).getOldApi().getFeed().enqueue(new Callback<ResponsePage<Article>>() {
+        //todo
+       /* ((PDAApplication)getActivity().getApplication()).getOldApi().getFeed().enqueue(new Callback<ResponsePage<Article>>() {
             @Override
             public void onResponse(Call<ResponsePage<Article>> call, Response<ResponsePage<Article>> response) {
                 ResponsePage<Article> page = response.body();
@@ -81,7 +76,7 @@ public class NewsFragment extends BaseFragment {
             public void onFailure(Call<ResponsePage<Article>> call, Throwable t) {
                 Timber.tag("News").e(t);
             }
-        });
+        });*/
     }
 
     @Override

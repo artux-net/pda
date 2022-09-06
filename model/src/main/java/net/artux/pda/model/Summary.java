@@ -1,10 +1,14 @@
 package net.artux.pda.model;
 
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
+import lombok.Data;
+
+@Data
 public class Summary {
 
     private final String title;
@@ -16,19 +20,13 @@ public class Summary {
     }
 
     public static String getCurrentId() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-        return sdf.format(new Date());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+                .withZone(ZoneId.systemDefault());
+        return formatter.format(Instant.now());
     }
 
     public void addMessage(UserMessage message) {
         messages.add(message);
     }
 
-    public List<UserMessage> getMessages() {
-        return messages;
-    }
-
-    public String getTitle() {
-        return title;
-    }
 }

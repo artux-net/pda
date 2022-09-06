@@ -23,7 +23,7 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    UserModel dto(UserDto dto);
+    UserModel model(UserDto dto);
 
     UserInfo ratingModel(SimpleUserDto dto);
 
@@ -32,7 +32,7 @@ public interface UserMapper {
     ProfileModel model(Profile profile);
 
     RegisterUserModel model(RegisterUserDto dto);
-    RegisterUserDto dto(RegisterUserModel model);
+    RegisterUserDto model(RegisterUserModel model);
 
 
     GangRelation relation(GangRelationDto dto);

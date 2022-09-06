@@ -17,11 +17,11 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.QuestComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
-import net.artux.pda.map.models.UserGdx;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
+import net.artux.pda.model.user.UserModel;
 
 public class PlayerSystem extends BaseSystem {
 
@@ -135,7 +135,7 @@ public class PlayerSystem extends BaseSystem {
         this.radiationCount += radiationCount;
     }
 
-    public UserGdx getPlayerMember() {
+    public UserModel getPlayerMember() {
         PlayerComponent playerComponent = pmm.get(player);
         return playerComponent.userModel;
     }

@@ -60,6 +60,8 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
                     recyclerView.setVisibility(View.GONE);
                     view.findViewById(R.id.viewMessage).setVisibility(View.VISIBLE);
                 }
+            }else {
+                reset();
             }
         });
 
@@ -78,16 +80,5 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
     void reset(){
         navigationPresenter.setTitle("Выберете сводку в меню справа..");
         mChatAdapter.clearItems();
-    }
-
-    @Override
-    public void receiveData(Bundle data) {
-        super.receiveData(data);
-        if (data.containsKey("loadSummary")){
-            summaryViewModel.getCachedSummary(data.getString("loadSummary"));
-        }
-        if (data.containsKey("reset")){
-            reset();
-        }
     }
 }

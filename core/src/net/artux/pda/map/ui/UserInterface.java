@@ -32,15 +32,15 @@ import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.model.input.Map;
 import net.artux.pda.map.model.input.Point;
-import net.artux.pda.map.models.Checker;
-import net.artux.pda.map.models.UserGdx;
-import net.artux.pda.map.models.user.GdxData;
-import net.artux.pda.map.models.user.StoryStateGdx;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.bars.Utils;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
 import net.artux.pda.map.ui.blocks.ControlBlock;
 import net.artux.pda.map.ui.blocks.MessagesBlock;
+import net.artux.pda.model.Checker;
+import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.model.quest.story.StoryStateModel;
+import net.artux.pda.model.user.UserModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -226,7 +226,7 @@ public class UserInterface extends Group implements Disposable {
         return touchpad;
     }
 
-    public UserGdx getMember() {
+    public UserModel getMember() {
         return gsm.getMember();
     }
 
@@ -273,15 +273,15 @@ public class UserInterface extends Group implements Disposable {
         menuTable.setFillParent(true);
         menuTable.align(Align.top);
 
-        UserGdx userModel = gsm.getMember();
+        UserModel userModel = gsm.getMember();
         Map map = (Map) gsm.get("map");
-        GdxData dataModel = (GdxData) gsm.get("data");
-        StoryStateGdx storyStateModel = dataModel.getCurrent();
+        StoryDataModel dataModel = (StoryDataModel) gsm.get("data");
+        StoryStateModel storyStateModel = dataModel.getCurrent();
 
         if (map != null)
             for (final Point point : map.getPoints()) {
                 if (point.type < 2 || point.type > 3)
-                    if (userModel != null && Checker.check(point.getCondition(), dataModel, userModel.getMoney())) {
+                    if (userModel != null && Checker.check(point.getCondition(), dataModel)) {
                         if (point.getData().containsKey("chapter")) {
                             int chapterId = storyStateModel.getChapterId();
                             if ((Integer.parseInt(point.getData().get("chapter")) == chapterId

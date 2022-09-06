@@ -23,8 +23,6 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.ActivitySettingsBinding;
-import net.artux.pda.model.user.UserModel;
-import net.artux.pda.repositories.util.Result;
 import net.artux.pda.ui.activities.LoginActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
@@ -41,9 +39,11 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     private ActivitySettingsBinding binding;
     private File cacheDirectory;
+
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
+
     private QuestViewModel questViewModel;
 
     @Nullable
@@ -57,10 +57,10 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setOnClickListener(binding.getRoot());
-        if (questViewModel == null){
+        if (questViewModel == null) {
             questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
         }
-        if (navigationPresenter!=null) {
+        if (navigationPresenter != null) {
             navigationPresenter.setTitle(getString(R.string.settings));
         }
         binding.version.setText(getResources().getString(R.string.version, BuildConfig.VERSION_NAME));
@@ -68,11 +68,8 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
-            if (memberResult instanceof Result.Success){
-                UserModel userModel = ((Result.Success<UserModel>) memberResult).getData();
-                String json = gson.toJson(userModel);
-                binding.debugMember.setText(json);
-            }
+            String json = gson.toJson(memberResult);
+            binding.debugMember.setText(json);
         });
 
         PackageManager m = requireActivity().getPackageManager();
@@ -89,7 +86,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         cacheDirectory = new File(s + "/cache");
         Timber.d(Arrays.toString(cacheDirectory.list()));
 
-        binding.mapCache.setText("Сохраненные карты: " + ((float)(dirSize(cacheDirectory) / (1024*1024))) + " мб");
+        binding.mapCache.setText("Сохраненные карты: " + ((float) (dirSize(cacheDirectory) / (1024 * 1024))) + " мб");
     }
 
     private static long dirSize(File dir) {
@@ -112,9 +109,9 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         return 0;
     }
 
-    void setOnClickListener(ViewGroup view){
+    void setOnClickListener(ViewGroup view) {
         for (int i = 0; i < view.getChildCount(); i++) {
-            if(view.getChildAt(i) instanceof ViewGroup)
+            if (view.getChildAt(i) instanceof ViewGroup)
                 setOnClickListener((ViewGroup) view.getChildAt(i));
             else
                 view.getChildAt(i).setOnClickListener(this);
@@ -123,7 +120,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.signOut:
                 PDAApplication application = (PDAApplication) requireActivity().getApplication();
                 application.getDataManager().removeAllData();
@@ -137,7 +134,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
             case R.id.imagesResetButton:
                 new Thread(() -> {
-                    if (getContext()!=null) {
+                    if (getContext() != null) {
                         Glide.get(getContext()).clearDiskCache();
                         Looper.prepare();
                         Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
@@ -145,7 +142,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 }).start();
                 break;
             case R.id.showDebug:
-                if (binding.debugMember.getVisibility()==View.VISIBLE)
+                if (binding.debugMember.getVisibility() == View.VISIBLE)
                     binding.debugMember.setVisibility(View.GONE);
                 else
                     binding.debugMember.setVisibility(View.VISIBLE);
@@ -156,8 +153,8 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                 Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.mapCacheResetButton:
-                if(cacheDirectory.delete()){
-                    binding.mapCache.setText("Сохраненные карты: " + (dirSize(cacheDirectory) / (1024*1024)) + " мб");
+                if (cacheDirectory.delete()) {
+                    binding.mapCache.setText("Сохраненные карты: " + (dirSize(cacheDirectory) / (1024 * 1024)) + " мб");
                     Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
                 }
                 break;

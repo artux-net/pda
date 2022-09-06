@@ -70,15 +70,15 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
         }
 
         public void bind(FriendModel friendModel){
-            title.setText(friendModel.login + " [PDA #" + friendModel.pdaId +"]");
-            desc.setText(ProfileHelper.getGroup(desc.getContext(), friendModel.group));
-            ProfileHelper.setAvatar(avatar, friendModel.avatar);
+            title.setText(friendModel.getLogin() + " [PDA #" + friendModel.getPdaId() +"]");
+            desc.setText(ProfileHelper.getGroup(desc.getContext(), friendModel.getGroup()));
+            ProfileHelper.setAvatar(avatar, friendModel.getAvatar());
             avatar.getRootView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     UserProfileFragment profileFragment = new UserProfileFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putInt("pdaId", friendModel.pdaId);
+                    bundle.putInt("pdaId", friendModel.getPdaId());
                     profileFragment.setArguments(bundle);
                     fragmentNavigation.addFragment(profileFragment, true);
                 }

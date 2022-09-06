@@ -28,8 +28,8 @@ class SummaryRepository @Inject constructor(
         summaryCache.put(id, summary)
     }
 
-    fun getAllDates(): Array<String> {
-        return summaryCache.ids
+    fun getAll(): List<Summary> {
+        return summaryCache.all
     }
 
 }
