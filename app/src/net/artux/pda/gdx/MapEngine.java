@@ -1,5 +1,7 @@
 package net.artux.pda.gdx;
 
+import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
@@ -9,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStore;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.savedstate.SavedStateRegistry;
@@ -53,9 +54,9 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
         mSavedStateRegistryController.performRestore(savedInstanceState);
 
         if (viewModel == null)
-            viewModel = new ViewModelProvider(this).get(UserViewModel.class);
+            viewModel = getViewModelFactory(this).create(UserViewModel.class);
         if (questViewModel == null)
-            questViewModel = new ViewModelProvider(this).get(QuestViewModel.class);
+            questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
 
         UserModel member = viewModel.getFromCache();
         StoryDataModel dataModel = questViewModel.getCachedData().getValue();

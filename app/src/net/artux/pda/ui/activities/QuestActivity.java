@@ -131,7 +131,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(getApplicationContext(), status.getDescription(), Toast.LENGTH_LONG).show();
         });
         summary = summaryViewModel.getCachedSummary(Summary.getCurrentId()).getValue();
-        userModel = viewModel.getMember().getValue();
+        userModel = viewModel.getFromCache();
 
         if (summary == null)
             summary = new Summary();
@@ -299,7 +299,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private UserDataCompanion getActualDataCompanion() {
-        StoryDataModel storyDataModel = questViewModel.getStoryData().getValue();
+        StoryDataModel storyDataModel = questViewModel.getCachedData().getValue();
 
 
         return UserDataCompanion.of(userModel, storyDataModel);

@@ -28,7 +28,10 @@ import net.artux.pda.repositories.QuestRepository
 import net.artux.pda.repositories.SummaryRepository
 import net.artux.pda.repositories.UserRepository
 import net.artux.pda.ui.fragments.rating.RatingViewModel
-import net.artux.pda.ui.viewmodels.*
+import net.artux.pda.ui.viewmodels.ProfileViewModel
+import net.artux.pda.ui.viewmodels.QuestViewModel
+import net.artux.pda.ui.viewmodels.SummaryViewModel
+import net.artux.pda.ui.viewmodels.UserViewModel
 
 /**
  * Factory for all ViewModels.
@@ -52,20 +55,13 @@ class ViewModelFactory constructor(
             isAssignableFrom(ProfileViewModel::class.java) ->
                 ProfileViewModel(usersRepository, UserMapper.INSTANCE)
             isAssignableFrom(UserViewModel::class.java) ->
-                UserViewModel(usersRepository, UserMapper.INSTANCE, StatusMapper.INSTANCE)
+                UserViewModel(usersRepository, dataManager, UserMapper.INSTANCE, StatusMapper.INSTANCE)
             isAssignableFrom(QuestViewModel::class.java) ->
                 QuestViewModel(questRepository, StoryMapper.INSTANCE, StatusMapper.INSTANCE)
             isAssignableFrom(SummaryViewModel::class.java) ->
                 SummaryViewModel(summaryRepository)
             isAssignableFrom(RatingViewModel::class.java) ->
                 RatingViewModel(usersRepository, UserMapper.INSTANCE)
-            isAssignableFrom(AuthViewModel::class.java) ->
-                AuthViewModel(
-                    usersRepository,
-                    UserMapper.INSTANCE,
-                    StatusMapper.INSTANCE,
-                    dataManager
-                )
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

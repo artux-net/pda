@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -21,8 +22,8 @@ import com.google.gson.GsonBuilder;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.ActivitySettingsBinding;
+import net.artux.pda.model.StatusModel;
 import net.artux.pda.ui.activities.LoginActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
@@ -70,6 +71,12 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
             String json = gson.toJson(memberResult);
             binding.debugMember.setText(json);
+        });
+        questViewModel.getStatus().observe(getViewLifecycleOwner(), new Observer<StatusModel>() {
+            @Override
+            public void onChanged(StatusModel statusModel) {
+                Toast.makeText(requireContext(), statusModel.getDescription(), Toast.LENGTH_LONG).show();
+            }
         });
 
         PackageManager m = requireActivity().getPackageManager();
@@ -122,9 +129,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.signOut:
-                PDAApplication application = (PDAApplication) requireActivity().getApplication();
-                application.getDataManager().removeAllData();
-                viewModel.clearCache();
+                viewModel.signOut();
                 questViewModel.clear();
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 requireActivity().finish();
@@ -150,7 +155,6 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
             case R.id.resetData:
                 questViewModel.resetData();
                 questViewModel.clear();
-                Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.mapCacheResetButton:
                 if (cacheDirectory.delete()) {

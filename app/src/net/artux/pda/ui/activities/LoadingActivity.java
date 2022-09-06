@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,9 +67,17 @@ public class LoadingActivity extends AppCompatActivity {
 
 
         viewModel.getMember().observe(this, memberResult -> {
-                loaded = true;
-                Timber.i("User information loaded from cache, try to start...");
-                start();
+            loaded = true;
+            Timber.i("User information loaded, try to start...");
+            start();
+        });
+        viewModel.getStatus().observe(this, statusModel -> {
+            Toast.makeText(getApplicationContext(), statusModel.getDescription(), Toast.LENGTH_LONG).show();
+
+            if (!statusModel.isSuccess()) {
+                viewModel.signOut();
+                startActivity(new Intent(this, LoginActivity.class));
+            }
         });
         viewModel.updateMember();
     }
@@ -77,10 +86,13 @@ public class LoadingActivity extends AppCompatActivity {
 
     void start() {
         if (loaded && (gifEnd || BuildConfig.DEBUG)) {
-            if (TESTING_MAP)
+            if (TESTING_MAP) {
+                Timber.i("Going to QuestActivity");
                 startActivity(new Intent(this, QuestActivity.class));
-            else
+            } else {
+                Timber.i("Going to MainActivity");
                 startActivity(new Intent(LoadingActivity.this, MainActivity.class));
+            }
             LoadingActivity.this.finish();
         }
     }

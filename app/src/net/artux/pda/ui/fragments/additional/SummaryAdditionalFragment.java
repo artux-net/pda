@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentListBinding;
@@ -42,9 +43,11 @@ public class SummaryAdditionalFragment extends AdditionalBaseFragment implements
         if (navigationPresenter != null)
             navigationPresenter.setAdditionalTitle(getString(R.string.kinds));
         if (summaryViewModel == null)
-            summaryViewModel = new ViewModelProvider(this).get(SummaryViewModel.class);
+            summaryViewModel = new ViewModelProvider(requireActivity()).get(SummaryViewModel.class);
 
         adapter = new StringAdapter(this);
+        binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.list.setAdapter(adapter);
 
         summaryViewModel.getSummaries().observe(getViewLifecycleOwner(), summaries -> {
             if (summaries.size() > 0) {
@@ -59,6 +62,7 @@ public class SummaryAdditionalFragment extends AdditionalBaseFragment implements
                 binding.list.setVisibility(View.GONE);
             }
         });
+        summaryViewModel.updateSummaries();
     }
 
     @Override

@@ -12,7 +12,6 @@ import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
-import net.artux.pda.repositories.util.Result
 import net.artux.pda.ui.fragments.quest.models.Chapter
 import net.artux.pdanetwork.model.CommandBlock
 import javax.inject.Inject
@@ -30,7 +29,12 @@ class QuestViewModel @Inject constructor(
     var status: MutableLiveData<StatusModel> = MutableLiveData()
 
 
-    fun getCachedData(): MutableLiveData<StoryDataModel>{
+    fun updateDataFromCache() {
+        repository.getCachedStoryData()
+            .onSuccess { storyData.postValue(mapper.dataModel(it)) }
+    }
+
+    fun getCachedData(): MutableLiveData<StoryDataModel> {
         storyData.value = repository.getCachedStoryData()
             .map { mapper.dataModel(it) }
             .getOrNull()
@@ -38,24 +42,17 @@ class QuestViewModel @Inject constructor(
     }
 
     private fun getCachedChapter(storyId: Int, chapterId: Int): Chapter? {
-        val response = repository.getCachedChapter(storyId, chapterId)
-        return if (response is Result.Success)
-            response.data
-        else null
+        return repository.getCachedChapter(storyId, chapterId).getOrNull()
     }
 
     private fun getCachedMap(storyId: Int, chapterId: Int): Map? {
-        val response = repository.getCachedMap(storyId, chapterId)
-        return if (response is Result.Success)
-            response.data
-        else null
+        return repository.getCachedMap(storyId, chapterId).getOrNull()
     }
 
     fun applyActions(map: HashMap<String, List<String>>) {
         viewModelScope.launch {
-            val result = repository.syncMember(CommandBlock().actions(map))
-            if (result is Result.Success) {
-                storyData.postValue(result.map { mapper.dataModel(it) }.getOrThrow())
+            repository.syncMember(CommandBlock().actions(map)).onSuccess {
+                storyData.postValue(mapper.dataModel(it))
             }
         }
     }
@@ -63,21 +60,18 @@ class QuestViewModel @Inject constructor(
 
     fun updateChapter(storyId: Int, chapterId: Int) {
         viewModelScope.launch {
-            val response = repository.getChapter(storyId, chapterId)
-            if (response is Result.Success)
-                chapter.postValue(response.data)
-            else if (response is Result.Error)
-                status.postValue(StatusModel(response.exception))
+            repository.getChapter(storyId, chapterId)
+                .onSuccess { chapter.postValue(it) }
+                .onFailure { status.postValue(StatusModel(it)) }
         }
     }
 
     fun updateMap(storyId: Int, mapId: Int) {
         viewModelScope.launch {
-            val response = repository.getMap(storyId, mapId)
-            if (response is Result.Success)
-                map.postValue(response.data)
-            else if (response is Result.Error)
-                status.postValue(StatusModel(response.exception))
+            repository.getMap(storyId, mapId)
+                .onSuccess { map.postValue(it) }
+                .onFailure { status.postValue(StatusModel(it)) }
+
         }
     }
 
@@ -95,7 +89,12 @@ class QuestViewModel @Inject constructor(
 
     fun resetData() {
         viewModelScope.launch {
-            storyData.postValue(repository.resetData().map { mapper.dataModel(it) }.getOrThrow())
+            repository.resetData()
+                .onSuccess {
+                    storyData.postValue(mapper.dataModel(it))
+                    status.postValue(StatusModel("Ok!"))
+                }
+                .onFailure { status.postValue(StatusModel(it)) }
         }
     }
 
@@ -105,18 +104,17 @@ class QuestViewModel @Inject constructor(
 
     fun updateData() {
         viewModelScope.launch {
-            storyData.postValue(repository.getStoryData().map { mapper.dataModel(it) }.getOrThrow())
+            repository.getStoryData()
+                .onSuccess { storyData.postValue(mapper.dataModel(it)) }
+                .onFailure { status.postValue(StatusModel(it)) }
         }
     }
 
     fun setWearable(wearable: WearableModel) {
         viewModelScope.launch {
-            val result = repository.setWearableItem(wearable.id, wearable.type.toString())
-
-            if (result is Result.Success)
-                status.postValue(statusMapper.model(result.data))
-            else if (result is Result.Error)
-                status.postValue(StatusModel(result.exception))
+            repository.setWearableItem(wearable.id, wearable.type.toString())
+                .onSuccess { status.postValue(statusMapper.model(it)) }
+                .onFailure { status.postValue(StatusModel(it)) }
         }
     }
 }

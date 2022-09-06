@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import net.artux.pda.app.DataManager
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.UserMapper
@@ -18,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UserViewModel @Inject constructor(
     private var userRepository: UserRepository,
+    var dataManager: DataManager,
     var userMapper: UserMapper,
     var statusMapper: StatusMapper
 ) : ViewModel() {
@@ -42,7 +44,10 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.getMember()
                 .onSuccess { member.postValue(userMapper.model(it)) }
-                .onFailure { status.postValue(StatusModel(it)) }
+                .onFailure {
+                    it.printStackTrace()
+                    status.postValue(StatusModel(it))
+                }
         }
     }
 
@@ -58,10 +63,14 @@ class UserViewModel @Inject constructor(
         return userRepository.getCachedMember().getOrThrow().id!!
     }
 
-    fun clearCache() {
-        viewModelScope.launch {
-            userRepository.clearMemberCache()
-        }
+    fun signOut() {
+        dataManager.removeAllData()
+        userRepository.clearMemberCache()
+    }
+
+    fun requestFriend(pdaId: UUID) {
+
+
     }
 
 }

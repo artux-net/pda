@@ -1,7 +1,6 @@
 package net.artux.pda.repositories
 
 import net.artux.pda.map.model.input.Map
-import net.artux.pda.repositories.util.Result
 import net.artux.pda.services.PdaAPI
 import net.artux.pda.ui.fragments.quest.models.Chapter
 import net.artux.pdanetwork.api.DefaultApi
@@ -35,22 +34,22 @@ class QuestRepository @Inject constructor(
     fun getCachedStoryData(): Result<StoryData> {
         val cache = storyCache.get("story")
         return if (cache != null)
-            Result.Success(cache)
-        else Result.Error(java.lang.Exception("Cache isn't found"))
+            Result.success(cache)
+        else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
     fun getCachedChapter(storyId: Int, chapterId: Int): Result<Chapter> {
         val cache = questCache.get("$storyId:$chapterId")
         return if (cache != null)
-            Result.Success(cache)
-        else Result.Error(java.lang.Exception("Cache isn't found"))
+            Result.success(cache)
+        else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
     fun getCachedMap(storyId: Int, mapId: Int): Result<Map> {
         val cache = mapCache.get("$storyId:$mapId")
         return if (cache != null)
-            Result.Success(cache)
-        else Result.Error(java.lang.Exception("Cache isn't found"))
+            Result.success(cache)
+        else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
     suspend fun getChapter(storyId: Int, chapterId: Int): Result<Chapter> {
@@ -60,13 +59,13 @@ class QuestRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         questCache.put(("$storyId:$chapterId").toString(), data)
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Chapter null")))
+                        it.resume(Result.failure(Exception("Chapter null")))
                 }
 
                 override fun onFailure(call: Call<Chapter>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })
         }
@@ -79,13 +78,13 @@ class QuestRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         mapCache.put(("$storyId:$mapId").toString(), data)
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Chapter null")))
+                        it.resume(Result.failure(Exception("Chapter null")))
                 }
 
                 override fun onFailure(call: Call<Map>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })
         }
@@ -102,13 +101,13 @@ class QuestRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         storyCache.put("story", data)
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Status null")))
+                        it.resume(Result.failure(Exception(response.errorBody().toString())))
                 }
 
                 override fun onFailure(call: Call<StoryData>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })
         }
@@ -123,13 +122,13 @@ class QuestRepository @Inject constructor(
                 ) {
                     val data = response.body()
                     if (data != null) {
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Status null")))
+                        it.resume(Result.failure(Exception("Status null")))
                 }
 
                 override fun onFailure(call: Call<Status>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })
         }
@@ -145,13 +144,13 @@ class QuestRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         storyCache.put("story", data)
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Story null")))
+                        it.resume(Result.failure(Exception("Story null")))
                 }
 
                 override fun onFailure(call: Call<StoryData>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })
         }
@@ -165,13 +164,13 @@ class QuestRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         storyCache.put("story", data)
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Story null")))
+                        it.resume(Result.failure(Exception("Story null")))
                 }
 
                 override fun onFailure(call: Call<StoryData>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })
         }

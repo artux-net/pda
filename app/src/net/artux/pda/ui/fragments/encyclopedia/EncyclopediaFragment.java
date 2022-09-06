@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
+import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 
@@ -28,10 +29,10 @@ public class EncyclopediaFragment extends BaseFragment {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
 
-    public static EncyclopediaFragment of(int baseId){
+    public static EncyclopediaFragment of(ItemModel model){
         EncyclopediaFragment encyclopediaFragment = new EncyclopediaFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt(BASE_ID, baseId);
+        bundle.putInt(BASE_ID, model.getBaseId());
         return encyclopediaFragment;
     }
 

@@ -11,8 +11,8 @@ import lombok.Data;
 @Data
 public class Summary {
 
-    private final String title;
-    private final List<UserMessage> messages;
+    private String title;
+    private List<UserMessage> messages;
 
     public Summary() {
         this.title = getCurrentId();

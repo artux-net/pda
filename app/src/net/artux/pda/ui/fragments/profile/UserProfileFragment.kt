@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import net.artux.pda.R
 import net.artux.pda.databinding.FragmentProfileBinding
+import net.artux.pda.ui.PdaAlertDialog
 import net.artux.pda.ui.activities.hierarhy.BaseFragment
 import net.artux.pda.ui.fragments.additional.AdditionalFragment
 import net.artux.pda.ui.fragments.chat.ChatFragment
@@ -93,161 +94,29 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             val subsButton: Button = binding.requests
             val messageButton: Button = binding.writeMessage
             messageButton.setOnClickListener(this)
-            /*if (viewModel.getId() != model.id) {
-                when (model.friendStatus) {
-                    0 -> {
-                        friendButton.setText(R.string.add_friend)
-                        friendButton.setOnClickListener { view1: View? ->
-                            val pdaAlertDialog = PdaAlertDialog(
-                                context,
-                                view as ViewGroup?,
-                                R.style.AlertDialogStyle
-                            )
-                            pdaAlertDialog.setTitle(R.string.add_friend_q)
-                            pdaAlertDialog.setPositiveButton(
-                                R.string.okay
-                            ) { _, _ ->
-                                App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
-                                    .enqueue(object : Callback<StatusModel?> {
-                                        override fun onResponse(
-                                            call: Call<StatusModel?>,
-                                            response: Response<StatusModel?>
-                                        ) {
-                                            val status = response.body()
-                                            if (status != null) Toast.makeText(
-                                                context,
-                                                status.description,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            profileViewModel.updateProfile(model.id)
-                                        }
-
-                                        override fun onFailure(
-                                            call: Call<StatusModel?>,
-                                            throwable: Throwable
-                                        ) {
-                                        }
-                                    })
-                            }
-                            pdaAlertDialog.setNegativeButton(
-                                "No"
-                            ) { _, _ -> }
-                            pdaAlertDialog.show()
-                        }
+            if (viewModel.getId() != model.id) {
+                friendButton.setText(R.string.add_friend)
+                friendButton.text = getString(R.string.is_friend, model.name)
+                friendButton.text = getString(R.string.is_sub,model.name)
+                friendButton.text = getString(R.string.requested)
+                friendButton.setOnClickListener { view1: View? ->
+                    val pdaAlertDialog = PdaAlertDialog(
+                        requireContext(),
+                        view as ViewGroup?,
+                        R.style.AlertDialogStyle
+                    )
+                    pdaAlertDialog.setTitle(R.string.add_friend_q)
+                    pdaAlertDialog.setPositiveButton(
+                        R.string.okay
+                    ) { _, _ ->
+                        viewModel.requestFriend(model.id)
                     }
-                    1 -> {
-                        friendButton.text = getString(R.string.is_friend,model.name)
-                        friendButton.setOnClickListener { view: View? ->
-                            val pdaAlertDialog =
-                                AlertDialog.Builder(context, R.style.AlertDialogStyle)
-                            pdaAlertDialog.setTitle(R.string.remove_friend_q)
-                            pdaAlertDialog.setPositiveButton(
-                                R.string.okay
-                            ) { dialogInterface, _ ->
-                                //todo
-                                App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
-                                    .enqueue(object : Callback<StatusModel?> {
-                                        override fun onResponse(
-                                            call: Call<StatusModel?>,
-                                            response: Response<StatusModel?>
-                                        ) {
-                                            val status = response.body()
-                                            if (status != null) Toast.makeText(
-                                                context,
-                                                status.description,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            profileViewModel.updateProfile(model.id)
-                                        }
-
-                                        override fun onFailure(
-                                            call: Call<StatusModel?>,
-                                            throwable: Throwable
-                                        ) {
-                                        }
-                                    })
-                            }
-                            pdaAlertDialog.setNegativeButton(
-                                "No"
-                            ) { _, _ -> }
-                            pdaAlertDialog.show()
-                        }
-                    }
-                    2 -> {
-                        friendButton.text = getString(R.string.is_sub,model.name)
-                        friendButton.setOnClickListener { view: View? ->
-                            val pdaAlertDialog =
-                                AlertDialog.Builder(context, R.style.AlertDialogStyle)
-                            pdaAlertDialog.setTitle(R.string.add_friend_q)
-                            pdaAlertDialog.setPositiveButton(
-                                R.string.okay
-                            ) { dialogInterface, _ ->
-                                App.getRetrofitService().get.requestFriend(model.pdaId)
-                                    .enqueue(object : Callback<StatusModel?> {
-                                        override fun onResponse(
-                                            call: Call<StatusModel?>,
-                                            response: Response<StatusModel?>
-                                        ) {
-                                            val status = response.body()
-                                            if (status != null) Toast.makeText(
-                                                context,
-                                                status.description,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            profileViewModel.updateProfile(model.id)
-                                        }
-
-                                        override fun onFailure(
-                                            call: Call<StatusModel?>,
-                                            throwable: Throwable
-                                        ) {
-                                        }
-                                    })
-                            }
-                            pdaAlertDialog.setNegativeButton(
-                                "No"
-                            ) { _, _ -> }
-                            pdaAlertDialog.show()
-                        }
-                    }
-                    3 -> {
-                        friendButton.text = getString(R.string.requested)
-                        friendButton.setOnClickListener { view: View? ->
-                            val pdaAlertDialog =
-                                AlertDialog.Builder(context, R.style.AlertDialogStyle)
-                            pdaAlertDialog.setTitle(R.string.cancel_friend_q)
-                            pdaAlertDialog.setPositiveButton(
-                                R.string.okay
-                            ) { dialogInterface, _ ->
-                                App.getRetrofitService().pdaAPI.requestFriend(model.pdaId)
-                                    .enqueue(object : Callback<StatusModel?> {
-                                        override fun onResponse(
-                                            call: Call<StatusModel?>,
-                                            response: Response<StatusModel?>
-                                        ) {
-                                            val status = response.body()
-                                            if (status != null) Toast.makeText(
-                                                context,
-                                                status.description,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            profileViewModel.updateProfile(model.id)
-                                        }
-
-                                        override fun onFailure(
-                                            call: Call<StatusModel?>,
-                                            throwable: Throwable
-                                        ) {
-                                        }
-                                    })
-                            }
-                            pdaAlertDialog.setNegativeButton(
-                                "No"
-                            ) { _, _ -> }
-                            pdaAlertDialog.show()
-                        }
-                    }
+                    pdaAlertDialog.setNegativeButton(
+                        "No"
+                    ) { _, _ -> }
+                    pdaAlertDialog.show()
                 }
+
                 friendButton.visibility = View.VISIBLE
                 messageButton.visibility = View.VISIBLE
                 subsButton.visibility = View.GONE
@@ -255,7 +124,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 friendButton.visibility = View.GONE
                 messageButton.visibility = View.GONE
                 subsButton.visibility = View.VISIBLE
-            }*/
+            }
         }
         if (arguments != null)
             profileViewModel.updateProfile(requireArguments().getSerializable("pdaId") as UUID)

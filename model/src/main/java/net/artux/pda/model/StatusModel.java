@@ -13,6 +13,11 @@ public class StatusModel implements Serializable {
     public StatusModel() {
     }
 
+    public StatusModel(String message) {
+        success = true;
+        description = message;
+    }
+
     public StatusModel(Throwable throwable) {
         success = false;
         description = throwable.getMessage();

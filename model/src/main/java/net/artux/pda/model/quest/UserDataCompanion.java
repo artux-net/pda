@@ -3,6 +3,9 @@ package net.artux.pda.model.quest;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
+import lombok.Data;
+
+@Data
 public class UserDataCompanion {
 
     private UserModel user;
@@ -17,11 +20,4 @@ public class UserDataCompanion {
         return new UserDataCompanion(userModel, storyDataModel);
     }
 
-    public UserModel getUser() {
-        return user;
-    }
-
-    public StoryDataModel getStoryData() {
-        return storyData;
-    }
 }

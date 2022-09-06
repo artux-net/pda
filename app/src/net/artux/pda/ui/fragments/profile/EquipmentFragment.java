@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -17,11 +18,14 @@ import com.bumptech.glide.signature.ObjectKey;
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.model.items.ItemModel;
-import net.artux.pda.model.user.UserModel;
+import net.artux.pda.model.items.ItemType;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
 
 public class EquipmentFragment extends BaseFragment {
+
+    private QuestViewModel questViewModel;
 
     {
         defaultAdditionalFragment = AdditionalFragment.class;
@@ -36,44 +40,40 @@ public class EquipmentFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (navigationPresenter!=null)
+        if (navigationPresenter != null)
             navigationPresenter.setTitle("Снаряжение");
 
-        viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
-                UserModel userModel = memberResult;
+        if (questViewModel == null)
+            questViewModel = new ViewModelProvider(requireActivity()).get(QuestViewModel.class);
 
-                //todo
-                /*if (equipment.getArmor()!=null)
-                    defineSlot(view, R.id.mainSlot, equipment.getArmor());
-                if (equipment.getFirstWeapon()!=null)
-                    defineSlot(view, R.id.slot2, equipment.getFirstWeapon());
-                if (equipment.getSecondWeapon()!=null)
-                    defineSlot(view, R.id.slot1, equipment.getSecondWeapon());*/
+        questViewModel.getStoryData().observe(getViewLifecycleOwner(), dataModel -> {
+            defineSlot(view, R.id.mainSlot, dataModel.getCurrentWearable(ItemType.ARMOR));
+            defineSlot(view, R.id.slot2, dataModel.getCurrentWearable(ItemType.RIFLE));
+            defineSlot(view, R.id.slot1, dataModel.getCurrentWearable(ItemType.PISTOL));
         });
-
-
+        questViewModel.updateDataFromCache();
     }
 
-    private void defineSlot(View view, int slotId, ItemModel item){
-        View slot = view.findViewById(slotId);
-        TextView title = slot.findViewById(R.id.itemTitle);
-        ImageView imageView = slot.findViewById(R.id.itemImage);
+    private void defineSlot(View view, int slotId, ItemModel item) {
+        if (item != null) {
+            View slot = view.findViewById(slotId);
+            TextView title = slot.findViewById(R.id.itemTitle);
+            ImageView imageView = slot.findViewById(R.id.itemImage);
 
-        title.setText(item.getTitle());
+            title.setText(item.getTitle());
 
-        RequestOptions options = new RequestOptions()
-                .placeholder(R.mipmap.ic_launcher)
-                .error(R.mipmap.ic_launcher);
+            RequestOptions options = new RequestOptions()
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher);
 
-        String link = BuildConfig.PROTOCOL + "://"+ BuildConfig.URL+"base/items/icons/"+item.getIcon();
+            String link = BuildConfig.PROTOCOL + "://" + BuildConfig.URL + "base/items/icons/" + item.getIcon();
 
-        //String cached = GlideUtil.sha256BytesToHex(link.getBytes(StandardCharsets.UTF_8));
-
-        Glide.with(title.getContext())
-                .asGif()
-                .load(link)
-                .apply(options)
-                .signature(new ObjectKey(link))
-                .into(imageView);
+            Glide.with(title.getContext())
+                    .asGif()
+                    .load(link)
+                    .apply(options)
+                    .signature(new ObjectKey(link))
+                    .into(imageView);
+        }
     }
 }

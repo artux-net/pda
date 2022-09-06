@@ -31,11 +31,11 @@ class SummaryViewModel @Inject constructor(
     fun removeSummary(id: String) {
         repository.remove(id)
         updateSummaries()
+        summary.postValue(null)
     }
 
     fun putSummary(id: String, summary: Summary) {
         repository.putSummary(id, summary)
-        updateSummaries()
     }
 
     fun updateSummaries(){

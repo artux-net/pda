@@ -5,6 +5,7 @@ import net.artux.pdanetwork.model.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -84,20 +85,27 @@ class UserRepository @Inject constructor(
 
     suspend fun getMember(): Result<UserDto> {
         return suspendCoroutine {
+            Timber.i("Request server for userDto")
             webservice.loginUser().enqueue(object : Callback<UserDto> {
                 override fun onResponse(
                     call: Call<UserDto>,
                     response: Response<UserDto>
                 ) {
                     val data = response.body()
+                    Timber.i("Got response")
                     if (data != null) {
                         memberCache.put("user", data)
                         it.resume(Result.success(data))
-                    } else
-                        it.resume(Result.failure(Exception("Profile null")))
+                    } else {
+                        val error = response.toString()
+                        Timber.i(error)
+                        it.resume(Result.failure(Exception(error)))
+                    }
+
                 }
 
                 override fun onFailure(call: Call<UserDto>, t: Throwable) {
+                    Timber.e("Got error")
                     it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })

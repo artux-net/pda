@@ -13,6 +13,7 @@ import net.artux.pda.model.user.LoginUser
 import net.artux.pda.model.user.RegisterUserModel
 import net.artux.pda.model.user.UserModel
 import net.artux.pda.repositories.UserRepository
+import net.artux.pdanetwork.ApiClient
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,7 +21,8 @@ class AuthViewModel @Inject constructor(
     private var userRepository: UserRepository,
     var userMapper: UserMapper,
     var statusMapper: StatusMapper,
-    var dataManager: DataManager
+    var dataManager: DataManager,
+    val apiClient: ApiClient
 ) : ViewModel() {
 
     var member: MutableLiveData<UserModel> = MutableLiveData()
@@ -39,7 +41,8 @@ class AuthViewModel @Inject constructor(
     }
 
     fun login(loginUser: LoginUser) {
-        dataManager.setLoginUser(loginUser)
+        apiClient.setCredentials(loginUser.emailOrLogin, loginUser.password)
+        dataManager.setLoginUser(loginUser) // todo remove
         login()
     }
 

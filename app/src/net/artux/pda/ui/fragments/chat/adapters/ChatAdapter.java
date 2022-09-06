@@ -101,7 +101,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             nicknameView.setText(userModel.getLogin());
             messageView.setText(Html.fromHtml(userMessage.getContent()));
 
-            if (userModel.getPdaId() < 0 || userModel.getGang().getId() < 0){
+            if (userModel.getPdaId() < 0 || userModel.getGang() == null){
                 infoView.setText(" [PDA ###]"
                         + " - " + formatter.format(instant));
             }else {

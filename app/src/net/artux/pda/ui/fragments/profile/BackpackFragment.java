@@ -1,7 +1,5 @@
 package net.artux.pda.ui.fragments.profile;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
@@ -26,14 +25,17 @@ import net.artux.pda.ui.viewmodels.QuestViewModel;
 import java.text.DecimalFormat;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnClickListener {
 
 
-    private final ItemsAdapter itemsAdapter = new ItemsAdapter( this);
+    private final ItemsAdapter itemsAdapter = new ItemsAdapter(this);
     private final DecimalFormat formater = new DecimalFormat("##.##");
     private QuestViewModel questViewModel;
+
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
@@ -47,9 +49,13 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
+        if (questViewModel == null)
+            questViewModel = new ViewModelProvider(requireActivity()).get(QuestViewModel.class);
+
         RecyclerView recyclerView = view.findViewById(R.id.list);
         recyclerView.setVisibility(View.VISIBLE);
+        recyclerView.setAdapter(itemsAdapter);
+        recyclerView.setLayoutManager(itemsAdapter.getLayoutManager(getContext(), 3));
         view.findViewById(R.id.viewMessage).setVisibility(View.GONE);
 
         questViewModel.getStoryData().observe(getViewLifecycleOwner(), storyDataModel -> {
@@ -63,8 +69,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
             viewModel.updateMember();
         });
 
-        recyclerView.setAdapter(itemsAdapter);
-        recyclerView.setLayoutManager(itemsAdapter.getLayoutManager(getContext(),3));
+        questViewModel.updateDataFromCache();
     }
 
     @Override
@@ -75,9 +80,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
         builder.setMessage(ItemsHelper.getDesc(item, getContext()));
 
         builder.setPositiveButton(R.string.enc, (dialogInterface, i) -> {
-            navigationPresenter.addFragment(EncyclopediaFragment.of(item.getBaseId()), true);
-            //todo check
-            //navigationPresenter.addAdditionalFragment(additionalFragment);
+            navigationPresenter.addFragment(EncyclopediaFragment.of(item), true);
         });
 
         if (item instanceof WearableModel)
