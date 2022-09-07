@@ -5,8 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import net.artux.pda.model.StatusModel
 import net.artux.pda.model.mapper.UserMapper
 import net.artux.pda.model.user.ProfileModel
+import net.artux.pda.model.user.SimpleUserModel
+import net.artux.pda.model.user.UserRelation
 import net.artux.pda.repositories.UserRepository
 import java.util.*
 import javax.inject.Inject
@@ -17,6 +20,8 @@ class ProfileViewModel @Inject constructor(
     var userMapper: UserMapper
 ) : ViewModel() {
     var profile: MutableLiveData<ProfileModel> = MutableLiveData()
+    var friends: MutableLiveData<List<SimpleUserModel>> = MutableLiveData()
+    var status: MutableLiveData<StatusModel> = MutableLiveData()
 
     private fun getCachedProfile(pdaId: UUID): Result<ProfileModel> {
         val response = userRepository.getCachedProfile(pdaId)
@@ -37,4 +42,19 @@ class ProfileViewModel @Inject constructor(
         return userRepository.getCachedMember().getOrThrow().id!!
     }
 
+    fun updateFriends(uuid: UUID, userRelation: UserRelation) {
+        viewModelScope.launch {
+            userRepository.getFriends(uuid, userRelation)
+                .onSuccess { friends.postValue(userMapper.simple(it)) }
+                .onFailure { status.postValue(StatusModel(it)) }
+        }
+    }
+
+    fun updateMyRequests() {
+        viewModelScope.launch {
+            userRepository.getUserRequests()
+                .onSuccess { friends.postValue(userMapper.simple(it)) }
+                .onFailure { status.postValue(StatusModel(it)) }
+        }
+    }
 }

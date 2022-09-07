@@ -133,22 +133,15 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
     }
 
     override fun onClick(p0: View?) {
-        val friendsFragment = FriendsFragment()
+
         val bundle = Bundle()
         val result = profileViewModel.profile.value
-
         when (p0!!.id) {
             R.id.profile_friends -> {
-                bundle.putInt("type", 0)
-                bundle.putInt("pdaId", result!!.pdaId)
-                friendsFragment.arguments = bundle
-                navigationPresenter.addFragment(friendsFragment, true)
+                navigationPresenter.addFragment(FriendsFragment.of(result, FriendsFragment.ListType.FRIENDS), true)
             }
             R.id.profile_requests -> {
-                bundle.putInt("type", 1)
-                bundle.putInt("pdaId", result!!.pdaId)
-                friendsFragment.arguments = bundle
-                navigationPresenter.addFragment(friendsFragment, true)
+                navigationPresenter.addFragment(FriendsFragment.of(result, FriendsFragment.ListType.SUBS), true)
             }
             R.id.write_message -> {
                 bundle.putInt("to", result!!.pdaId)

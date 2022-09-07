@@ -1,4 +1,4 @@
-plugins{
+plugins {
     id 'org.hidetake.swagger.generator' version '2.19.2'
     id 'kotlin-android'
     id 'kotlin-kapt'
@@ -14,6 +14,12 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+task downloadAPI {
+    def f = new File('app/api.json')
+    new URL('https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest')
+            .withInputStream { i -> f.withOutputStream { it << i } }
+}
+
 swaggerSources {
     pdanetwork {
         inputFile = file('api.json')
@@ -24,7 +30,9 @@ swaggerSources {
     }
 }
 
+
 gradle.projectsEvaluated {
+    preBuild.dependsOn downloadAPI
     preBuild.dependsOn swaggerSources.pdanetwork.code
 }
 
@@ -121,8 +129,8 @@ dependencies {
     //for api code gen
     swaggerCodegen 'io.swagger.codegen.v3:swagger-codegen-cli:3.0.34'  // or Swagger Codegen V3
     implementation "io.swagger.core.v3:swagger-annotations:$swagger_annotations_version"
-    implementation ("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:$oltu_version"){
-        exclude group:'org.apache.oltu.oauth2' , module: 'org.apache.oltu.oauth2.common'
+    implementation("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:$oltu_version") {
+        exclude group: 'org.apache.oltu.oauth2', module: 'org.apache.oltu.oauth2.common'
     }
     implementation "io.gsonfire:gson-fire:$json_fire_version"
     implementation "org.threeten:threetenbp:$threetenbp_version"

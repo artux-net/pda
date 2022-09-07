@@ -5,6 +5,7 @@ import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.GangRelation;
 import net.artux.pda.model.user.ProfileModel;
 import net.artux.pda.model.user.RegisterUserModel;
+import net.artux.pda.model.user.SimpleUserModel;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.fragments.rating.UserInfo;
 import net.artux.pdanetwork.model.GangRelationDto;
@@ -32,6 +33,7 @@ public interface UserMapper {
     ProfileModel model(Profile profile);
 
     RegisterUserModel model(RegisterUserDto dto);
+
     RegisterUserDto model(RegisterUserModel model);
 
 
@@ -45,10 +47,17 @@ public interface UserMapper {
         return Enum.valueOf(Gang.class, gang.getValue());
     }
 
+    default Gang get(SimpleUserDto.GangEnum gang) {
+        return Enum.valueOf(Gang.class, gang.getValue());
+    }
+
     default FriendRelation get(Profile.FriendRelationEnum relation) {
         if (relation != null)
             return Enum.valueOf(FriendRelation.class, relation.getValue());
         else return null;
     }
 
+    SimpleUserModel simple(SimpleUserDto dto);
+
+    List<SimpleUserModel> simple(List<SimpleUserDto> dtos);
 }

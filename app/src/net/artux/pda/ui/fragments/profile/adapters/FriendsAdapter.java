@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.model.profile.FriendModel;
+import net.artux.pda.model.user.SimpleUserModel;
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
@@ -21,11 +21,12 @@ import java.util.List;
 
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHolder> {
 
-    List<FriendModel> friends = new ArrayList<>();
+    private List<SimpleUserModel> friends;
 
     public FragmentNavigation.Presenter fragmentNavigation;
 
     public FriendsAdapter(FragmentNavigation.Presenter fragmentNavigation){
+        friends = new ArrayList<>();
         this.fragmentNavigation = fragmentNavigation;
     }
 
@@ -46,12 +47,12 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
         return friends.size();
     }
 
-    public void addData(List<FriendModel> friends){
+    public void addData(List<SimpleUserModel> friends){
         this.friends.addAll(friends);
         notifyDataSetChanged();
     }
 
-    public void setData(List<FriendModel> friends){
+    public void setData(List<SimpleUserModel> friends){
         this.friends = friends;
         notifyDataSetChanged();
     }
@@ -69,9 +70,9 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.FriendHo
             desc = itemView.findViewById(R.id.lastMessage);
         }
 
-        public void bind(FriendModel friendModel){
+        public void bind(SimpleUserModel friendModel){
             title.setText(friendModel.getLogin() + " [PDA #" + friendModel.getPdaId() +"]");
-            desc.setText(ProfileHelper.getGroup(desc.getContext(), friendModel.getGroup()));
+            desc.setText(ProfileHelper.getGroup(desc.getContext(), friendModel.getGang().getId()));
             ProfileHelper.setAvatar(avatar, friendModel.getAvatar());
             avatar.getRootView().setOnClickListener(new View.OnClickListener() {
                 @Override

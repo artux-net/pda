@@ -1,5 +1,6 @@
 package net.artux.pda.repositories
 
+import net.artux.pda.model.user.UserRelation
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.*
 import retrofit2.Call
@@ -148,6 +149,52 @@ class UserRepository @Inject constructor(
                     }
 
                     override fun onFailure(call: Call<ResponsePageSimpleUserDto>, t: Throwable) {
+                        it.resume(Result.failure(java.lang.Exception(t)))
+                    }
+                })
+        }
+    }
+
+    suspend fun getFriends(uuid: UUID, userRelation: UserRelation) : Result<List<SimpleUserDto>> {
+        return suspendCoroutine {
+            webservice.getFriends(uuid, userRelation.name)
+                .enqueue(object : Callback<List<SimpleUserDto>> {
+                    override fun onResponse(
+                        call: Call<List<SimpleUserDto>>,
+                        response: Response<List<SimpleUserDto>>
+                    ) {
+                        val data = response.body()
+
+                        if (data != null) {
+                            it.resume(Result.success(data))
+                        } else
+                            it.resume(Result.failure(Exception("Не удалось загрузить")))
+                    }
+
+                    override fun onFailure(call: Call<List<SimpleUserDto>>, t: Throwable) {
+                        it.resume(Result.failure(java.lang.Exception(t)))
+                    }
+                })
+        }
+    }
+
+    suspend fun getUserRequests() : Result<List<SimpleUserDto>> {
+        return suspendCoroutine {
+            webservice.friendsRequests
+                .enqueue(object : Callback<List<SimpleUserDto>> {
+                    override fun onResponse(
+                        call: Call<List<SimpleUserDto>>,
+                        response: Response<List<SimpleUserDto>>
+                    ) {
+                        val data = response.body()
+
+                        if (data != null) {
+                            it.resume(Result.success(data))
+                        } else
+                            it.resume(Result.failure(Exception("Не удалось загрузить")))
+                    }
+
+                    override fun onFailure(call: Call<List<SimpleUserDto>>, t: Throwable) {
                         it.resume(Result.failure(java.lang.Exception(t)))
                     }
                 })
