@@ -1,0 +1,39 @@
+package net.artux.pda.ui.viewmodels
+
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import net.artux.pda.model.StatusModel
+import net.artux.pda.model.mapper.ArticleMapper
+import net.artux.pda.model.news.ArticleModel
+import net.artux.pda.repositories.NewsRepository
+import net.artux.pdanetwork.model.QueryPage
+import java.util.*
+import javax.inject.Inject
+
+@HiltViewModel
+class NewsViewModel @Inject constructor(
+    var repository: NewsRepository
+) : ViewModel() {
+    var articles: MutableLiveData<List<ArticleModel>> = MutableLiveData()
+    var status: MutableLiveData<StatusModel> = MutableLiveData()
+    var articleMapper: ArticleMapper = ArticleMapper.INSTANCE
+
+    fun update() {
+        viewModelScope.launch {
+            repository.getArticles(QueryPage())
+                .onSuccess { articles.postValue(articleMapper.model(it)) }
+                .onFailure { status.postValue(StatusModel(it)) }
+        }
+    }
+
+    fun updateFromCache() {
+        articles.postValue(
+            repository.getCachedArticles()
+            .map { articleMapper.model(it) }
+            .getOrDefault(Collections.emptyList()))
+    }
+
+}

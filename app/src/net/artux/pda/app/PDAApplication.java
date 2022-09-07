@@ -6,7 +6,7 @@ import net.artux.pda.R;
 import net.artux.pda.repositories.QuestRepository;
 import net.artux.pda.repositories.SummaryRepository;
 import net.artux.pda.repositories.UserRepository;
-import net.artux.pda.services.PdaAPI;
+import net.artux.pda.api.PdaAPI;
 import net.artux.pdanetwork.api.DefaultApi;
 
 import javax.inject.Inject;

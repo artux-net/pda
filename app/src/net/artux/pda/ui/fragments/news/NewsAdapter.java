@@ -13,28 +13,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import net.artux.pda.R;
-import net.artux.pda.model.news.Article;
-import net.artux.pda.ui.activities.hierarhy.FragmentNavigation;
+import net.artux.pda.model.news.ArticleModel;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
-public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
+public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
 
-    private List<Article> mArticles = new ArrayList<>();
+    private List<ArticleModel> mArticleModels;
+    private final OnClickListener clickListener;
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter
+            .ofPattern("dd.MM")
+            .withZone(ZoneId.systemDefault());
 
-    FragmentNavigation.Presenter presenter;
-
-    NewsAdapter(FragmentNavigation.Presenter presenter ){
-        this.presenter = presenter;
+    public NewsAdapter(OnClickListener onClickListener) {
+        this.clickListener = onClickListener;
     }
 
-    public void setNews(List<Article> articles) {
-        mArticles = articles;
+    public void setNews(List<ArticleModel> articleModels) {
+        mArticleModels = articleModels;
         notifyDataSetChanged();
     }
 
@@ -47,21 +46,22 @@ public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(NewsAdapter.ViewHolder holder, int position) {
-        holder.bind(holder.mainView,mArticles.get(position));
+        holder.bind(holder.mainView, mArticleModels.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mArticles.size();
+        return mArticleModels.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements NewsClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         View mainView;
         ImageView imageView;
         TextView titleView;
         TextView contentView;
         TextView dateView;
+
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -73,31 +73,22 @@ public class NewsAdapter extends  RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         }
 
         @SuppressLint("SetTextI18n")
-        public void bind(View mainView, final Article article){
-            titleView.setText(Html.fromHtml(article.title));
-            contentView.setText(Html.fromHtml(article.description));
+        public void bind(View mainView, final ArticleModel articleModel) {
+            titleView.setText(Html.fromHtml(articleModel.getTitle()));
+            contentView.setText(Html.fromHtml(articleModel.getDescription()));
 
-            SimpleDateFormat outputFormat =
-                    new SimpleDateFormat("dd.MM", Locale.getDefault());
-
-            dateView.setText(outputFormat.format(new Date(article.published)));
-            mainView.setOnClickListener(v -> ViewHolder.this.onClick(article));
+            dateView.setText(dateTimeFormatter.format(articleModel.getPublished()));
+            mainView.setOnClickListener(v -> clickListener.onClick(articleModel));
             Glide
                     .with(imageView.getContext())
-                    .load(article.image)
+                    .load(articleModel.getImage())
                     .into(imageView);
         }
 
-        @Override
-        public void onClick(Article article) {
-            OpenNewsFragment openNewsFragment = new OpenNewsFragment();
-            openNewsFragment.setArticle(article);
-            if (presenter!=null) {
-                presenter.setTitle(article.title);
-                //presenter.setLoadingState(true);
-                presenter.addFragment(openNewsFragment, true);
-            }
-        }
+    }
+
+    interface OnClickListener {
+        void onClick(ArticleModel articleModel);
     }
 
 }

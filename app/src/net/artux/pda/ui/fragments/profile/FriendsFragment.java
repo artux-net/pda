@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.model.user.ProfileModel;
 import net.artux.pda.model.user.SimpleUserModel;
@@ -77,7 +78,7 @@ public class FriendsFragment extends BaseFragment {
             UUID pdaId = (UUID) getArguments().getSerializable("id");
             ListType type = (ListType) getArguments().getSerializable("type");
             String title = getArguments().getString("nickname");
-            navigationPresenter.setTitle("Friends of " + title);//todo locale
+            navigationPresenter.setTitle(getString(R.string.friends_of, title));
             updateList(pdaId, type);
         };
 

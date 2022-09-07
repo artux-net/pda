@@ -7,24 +7,26 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.google.gson.reflect.TypeToken;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import net.artux.pda.R;
-import net.artux.pda.app.DataManager;
-import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.model.news.Article;
+import net.artux.pda.model.news.ArticleModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.util.GsonProvider;
+import net.artux.pda.ui.viewmodels.NewsViewModel;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
-public class NewsFragment extends BaseFragment {
+import dagger.hilt.android.AndroidEntryPoint;
 
-    NewsAdapter adapter;
-    FragmentListBinding binding;
+@AndroidEntryPoint
+public class NewsFragment extends BaseFragment implements NewsAdapter.OnClickListener{
+
+    private NewsAdapter adapter;
+    private FragmentListBinding binding;
+    private NewsViewModel newsViewModel;
 
     @Nullable
     @Override
@@ -40,43 +42,28 @@ public class NewsFragment extends BaseFragment {
             navigationPresenter.setTitle(getResources().getString(R.string.news));
             navigationPresenter.setLoadingState(true);
         }
+        if (newsViewModel == null)
+            newsViewModel = new ViewModelProvider(requireActivity()).get(NewsViewModel.class);
 
-        adapter = new NewsAdapter(navigationPresenter);
+        adapter = new NewsAdapter(this);
+        binding.list.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.list.setAdapter(adapter);
-        PDAApplication application = (PDAApplication) requireActivity().getApplication();
-        DataManager dataManager = application.getDataManager();
 
-        Type listType = new TypeToken<List<Article>>(){}.getType();
-        List<Article> news = GsonProvider.getInstance().fromJson(dataManager.getString("news"), listType);
-        if(news!=null && !news.isEmpty()){
-            binding.list.setVisibility(View.VISIBLE);
-            binding.viewMessage.setVisibility(View.GONE);
-            adapter.setNews(news);
-        }
-
-        //todo
-       /* ((PDAApplication)getActivity().getApplication()).getOldApi().getFeed().enqueue(new Callback<ResponsePage<Article>>() {
+        newsViewModel.getArticles().observe(getViewLifecycleOwner(), new Observer<List<ArticleModel>>() {
             @Override
-            public void onResponse(Call<ResponsePage<Article>> call, Response<ResponsePage<Article>> response) {
-                ResponsePage<Article> page = response.body();
-                if (page!=null){
-                    List<Article> list = page.getData();
-                    if (binding!=null && !list.isEmpty()) {
-                        binding.list.setVisibility(View.VISIBLE);
-                        binding.viewMessage.setVisibility(View.GONE);
-                        adapter.setNews(list);
-                        PDAApplication application = (PDAApplication) requireActivity().getApplication();
-                        application.getDataManager().setString("news", GsonProvider.getInstance().toJson(list));
-                    }
+            public void onChanged(List<ArticleModel> articleModels) {
+                if (articleModels.size() > 0){
+                    binding.list.setVisibility(View.VISIBLE);
+                    binding.viewMessage.setVisibility(View.GONE);
+                    adapter.setNews(articleModels);
+                } else {
+                    binding.list.setVisibility(View.GONE);
+                    binding.viewMessage.setVisibility(View.VISIBLE);
                 }
-
             }
-
-            @Override
-            public void onFailure(Call<ResponsePage<Article>> call, Throwable t) {
-                Timber.tag("News").e(t);
-            }
-        });*/
+        });
+        newsViewModel.updateFromCache();
+        newsViewModel.update();
     }
 
     @Override
@@ -84,5 +71,10 @@ public class NewsFragment extends BaseFragment {
         binding.list.setAdapter(null);
         binding = null;
         super.onDestroyView();
+    }
+
+    @Override
+    public void onClick(ArticleModel articleModel) {
+        navigationPresenter.addFragment(OpenNewsFragment.of(articleModel), true);
     }
 }

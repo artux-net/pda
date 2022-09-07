@@ -1,5 +1,6 @@
 package net.artux.pda.di;
 
+import net.artux.pda.model.mapper.ArticleMapper;
 import net.artux.pda.model.mapper.ItemMapper;
 import net.artux.pda.model.mapper.NoteMapper;
 import net.artux.pda.model.mapper.StageMapper;
@@ -52,6 +53,12 @@ public class MapperModule {
     @Singleton
     public StatusMapper statusMapper(){
         return StatusMapper.INSTANCE;
+    }
+
+    @Provides
+    @Singleton
+    public ArticleMapper articleMapper(){
+        return ArticleMapper.INSTANCE;
     }
 
 }

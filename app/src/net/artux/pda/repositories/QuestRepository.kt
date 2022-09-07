@@ -1,7 +1,7 @@
 package net.artux.pda.repositories
 
 import net.artux.pda.map.model.input.Map
-import net.artux.pda.services.PdaAPI
+import net.artux.pda.api.PdaAPI
 import net.artux.pda.ui.fragments.quest.models.Chapter
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.CommandBlock

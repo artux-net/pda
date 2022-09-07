@@ -13,7 +13,7 @@ import com.google.gson.JsonSerializer;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.app.DataManager;
-import net.artux.pda.services.PdaAPI;
+import net.artux.pda.api.PdaAPI;
 import net.artux.pdanetwork.ApiClient;
 import net.artux.pdanetwork.api.DefaultApi;
 

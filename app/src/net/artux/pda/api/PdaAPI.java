@@ -1,4 +1,4 @@
-package net.artux.pda.services;
+package net.artux.pda.api;
 
 
 import net.artux.pda.map.model.input.Map;
