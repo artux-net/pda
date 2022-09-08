@@ -42,7 +42,7 @@ public enum ItemType {
         }
 
     },
-    ITEM {
+    BULLET {
         @Override
         public int getTypeId() {
             return 2;
@@ -57,6 +57,6 @@ public enum ItemType {
             if (type.getTypeId() == typeId)
                 return type;
         }
-        return ItemType.ITEM;
+        return ItemType.BULLET;
     }
 }

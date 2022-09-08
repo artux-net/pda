@@ -67,7 +67,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 32
         versionCode 32
-        versionName "0.1"
+        versionName "0.1 alpha"
         signingConfig signingConfigs.release
     }
     buildTypes {

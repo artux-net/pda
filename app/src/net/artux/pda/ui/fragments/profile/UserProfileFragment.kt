@@ -99,7 +99,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 friendButton.text = getString(R.string.is_friend, model.name)
                 friendButton.text = getString(R.string.is_sub,model.name)
                 friendButton.text = getString(R.string.requested)
-                friendButton.setOnClickListener { view1: View? ->
+                friendButton.setOnClickListener {
                     val pdaAlertDialog = PdaAlertDialog(
                         requireContext(),
                         view as ViewGroup?,

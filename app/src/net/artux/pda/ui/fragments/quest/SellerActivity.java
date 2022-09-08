@@ -1,157 +1,129 @@
 package net.artux.pda.ui.fragments.quest;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
+import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.model.user.UserModel;
+import net.artux.pda.databinding.FragmentQuest3Binding;
+import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
+import net.artux.pda.ui.viewmodels.SellerViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
 
+import java.util.List;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class SellerActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ItemsAdapter sellerAdapter;
+    private ItemsAdapter userAdapter;
     private RecyclerView buyerView;
     private ImageView background;
 
-    private UserViewModel viewModel;
+    private FragmentQuest3Binding binding;
 
-    private int sellerId = 0;
+    private QuestViewModel questViewModel;
+    private SellerViewModel sellerViewModel;
+    private UserViewModel viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_quest3);
+        binding = FragmentQuest3Binding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
         if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(UserViewModel.class);
+            viewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        if (questViewModel == null)
+            questViewModel = new ViewModelProvider(this).get(QuestViewModel.class);
+        if (sellerViewModel == null)
+            sellerViewModel = new ViewModelProvider(this).get(SellerViewModel.class);
 
-        sellerId = getIntent().getIntExtra("seller", 0);
-
+        long sellerId = getIntent().getIntExtra("seller", 0);
 
         RecyclerView sellerView = findViewById(R.id.sellerList);
         buyerView = findViewById(R.id.buyerList);
         background = findViewById(R.id.sellerBackground);
-        findViewById(R.id.map).setOnClickListener(this);
+        binding.map.setOnClickListener(this);
 
-        viewModel.getMember().observe(this, this::updateList);
+        questViewModel.getStoryData().observe(this, new Observer<StoryDataModel>() {
+            @Override
+            public void onChanged(StoryDataModel dataModel) {
+                List<ItemModel> items = dataModel.getAllItems();
+                if (items.size() > 0) {
+                    userAdapter.setItems(items);
+                }
+                binding.playerMoney.setText(getString(R.string.money, String.valueOf(dataModel.getMoney())));
+            }
+        });
 
         sellerAdapter = new ItemsAdapter();
-        sellerAdapter.setOnClickListener(pos -> {
-            //todo
-            /*Item item = sellerAdapter.getItems().get(pos);
+        sellerAdapter.setOnClickListener(item -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
-            builder.setTitle("Вы хотите купить " + item.title + " за " + item.price + "?");
+            builder.setTitle("Вы хотите купить " + item.getTitle() + " за " + item.getPrice() + "?");
 
-            builder.setPositiveButton(R.string.yes, (dialogInterface, i) ->((App)getApplication()).getRetrofitService().getPdaAPI().buyItem(sellerId, sellerAdapter.getItems().get(pos).hashCode()).enqueue(new Callback<Status>() {
-                @Override
-                @EverythingIsNonNull
-                public void onResponse(Call<Status> call, Response<Status> response) {
-                    Status status = response.body();
-                    if (status != null){
-                        Toast.makeText(SellerActivity.this, status.getDescription(), Toast.LENGTH_LONG).show();
-                        viewModel.updateMember();
-                    }else {
-                        System.out.println(response.toString());
-                        Toast.makeText(SellerActivity.this, "err", Toast.LENGTH_LONG).show();
-                    }
-                }
 
-                @Override
-                @EverythingIsNonNull
-                public void onFailure(Call<Status> call, Throwable throwable) {
-                    Toast.makeText(SellerActivity.this, throwable.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            }));
-            builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {});
-
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();*/
-        });
-        //todo
-        /*((PDAApplication)getApplication()).getOldApi().getSeller(sellerId).enqueue(new Callback<Seller>() {
-            @Override
-            public void onResponse(Call<Seller> call, Response<Seller> response) {
-                Seller seller = response.body();
-                if (seller!=null){
-                    Timber.d(seller.toString());
-                    sellerAdapter.setItems(seller.getAllItems());
-                    ((TextView)findViewById(R.id.sellerName)).setText(seller.name);
-                    if (seller.avatar.contains("http"))
-                        Glide.with(getApplicationContext())
-                                .asDrawable()
-                                .centerCrop()
-                                .load(seller.avatar)
-                                .into(background);
-                    else
-                        Glide.with(getApplicationContext())
-                                .asDrawable()
-                                .centerCrop()
-                                .load("https://" + BuildConfig.URL + "/" + seller.avatar)
-                                .into(background);
-
-                }else
-                    Timber.d(response.toString());
-            }
-
-            @Override
-            @EverythingIsNonNull
-            public void onFailure(Call<Seller> call, Throwable throwable) {
-                Toast.makeText(getApplicationContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });*/
-
-        sellerView.setLayoutManager(sellerAdapter.getLayoutManager(this,3));
-        sellerView.setAdapter(sellerAdapter);
-    }
-
-    void updateList(UserModel userModel){
-        //TODO
-        /*Data data = userModel.getData();//
-        ((TextView)findViewById(R.id.playerName)).setText(userModel.getName());
-        ((TextView)findViewById(R.id.playerMoney)).setText(getString(R.string.money, String.valueOf(userModel.getMoney())));
-        List<Item> buyerList = data.getAllItems();
-        ItemsAdapter buyerAdapter = new ItemsAdapter();
-        buyerAdapter.setOnClickListener(pos -> {
-            Item item = buyerAdapter.getItems().get(pos);
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
-            builder.setTitle("Вы хотите продать " + item.title + " за " + item.priceToSell() + "?");
-
-            builder.setPositiveButton(R.string.yes, (dialogInterface, i) ->((App)getApplication()).getRetrofitService().getPdaAPI().sellItem(item.hashCode()).enqueue(new Callback<Status>() {
-                @Override
-                @EverythingIsNonNull
-                public void onResponse(Call<Status> call, Response<Status> response) {
-                    Status status = response.body();
-                    if (status != null){
-                        Toast.makeText(SellerActivity.this, status.getDescription(), Toast.LENGTH_LONG).show();
-                        viewModel.updateMember();
-                    }
-                }
-
-                @Override
-                @EverythingIsNonNull
-                public void onFailure(Call<Status> call, Throwable throwable) {
-
-                }
-            }));
-            builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {});
+            builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {
+            });
 
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
-
         });
-        buyerAdapter.setItems(buyerList);
-        buyerView.setAdapter(buyerAdapter);
-        buyerView.setLayoutManager(buyerAdapter.getLayoutManager(this,3));*/
+        binding.sellerList.setAdapter(sellerAdapter);
+        userAdapter = new ItemsAdapter();
+        userAdapter.setOnClickListener(item -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
+            builder.setTitle("Вы хотите продать " + item.getTitle() + " за " + item.getPrice() + "?");
+            builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {
+            });
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        });
+
+        sellerViewModel.getSeller().observe(this, sellerModel -> {
+            List<ItemModel> items = sellerModel.getAllItems();
+
+            binding.sellerName.setText(sellerModel.getName());
+            if (sellerModel.getImage().contains("http"))
+                Glide.with(getApplicationContext())
+                        .asDrawable()
+                        .centerCrop()
+                        .load(sellerModel.getImage())
+                        .into(background);
+            else
+                Glide.with(getApplicationContext())
+                        .asDrawable()
+                        .centerCrop()
+                        .load("https://" + BuildConfig.URL + "/" + sellerModel.getImage())
+                        .into(background);
+
+            if (items.size() > 0) {
+                sellerAdapter.setItems(items);
+            }
+        });
+        sellerViewModel.updateFromCache(sellerId);
+        sellerViewModel.update(sellerId);
+
+        sellerView.setLayoutManager(sellerAdapter.getLayoutManager(this, 3));
+        sellerView.setAdapter(sellerAdapter);
     }
 
     @Override

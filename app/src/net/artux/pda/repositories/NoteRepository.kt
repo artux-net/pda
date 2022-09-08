@@ -25,9 +25,9 @@ class NoteRepository @Inject constructor(
     }
 
     fun getCachedNotes(): Result<List<NoteDto>> {
-        return if (cache != null)
+        return if (cache.all.size > 0)
             Result.Success(cache.all)
-        else Result.Error(Exception("Note isn't found"))
+        else Result.Error(Exception("Notes isn't found"))
     }
 
     fun getCachedNote(id: UUID): Result<NoteDto> {

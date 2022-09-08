@@ -25,14 +25,16 @@ public class EncyclopediaFragment extends BaseFragment {
     private static final String BASE_ID = "baseId";
     private String lastUrl;
     private WebView webView;
+
     {
         defaultAdditionalFragment = AdditionalFragment.class;
     }
 
-    public static EncyclopediaFragment of(ItemModel model){
+    public static EncyclopediaFragment of(ItemModel model) {
         EncyclopediaFragment encyclopediaFragment = new EncyclopediaFragment();
         Bundle bundle = new Bundle();
         bundle.putInt(BASE_ID, model.getBaseId());
+        encyclopediaFragment.setArguments(bundle);
         return encyclopediaFragment;
     }
 
@@ -57,16 +59,16 @@ public class EncyclopediaFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (navigationPresenter!=null) {
+        if (navigationPresenter != null) {
             navigationPresenter.setTitle(getString(R.string.enc));
         }
 
         webView = view.findViewById(R.id.webview);
         webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         webView.setBackgroundColor(Color.TRANSPARENT);
-        webView.setWebViewClient(new WebViewClient(){
+        webView.setWebViewClient(new WebViewClient() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url){
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.loadUrl(url);
                 return true;
             }
@@ -74,44 +76,39 @@ public class EncyclopediaFragment extends BaseFragment {
 
 
         webView.loadUrl("about:blank");
-        if(getArguments()!=null){
-            int id = getArguments().getInt("id");
-            int type = getArguments().getInt("type");
-
-            webView.loadUrl("https://" + BuildConfig.URL_API + "enc/" + type +"/"+id);
-            lastUrl = "https://" + BuildConfig.URL_API + "enc/" + type +"/"+id;
-        }else{
-            webView.loadUrl("https://" + BuildConfig.URL_API + "enc");
+        if (getArguments() != null) {
+            int id = getArguments().getInt(BASE_ID);
+            lastUrl = "https://" + BuildConfig.URL_API + "enc/item/" + id;
+        } else
             lastUrl = "https://" + BuildConfig.URL_API + "enc";
-        }
-        webView.setWebViewClient(new WebViewClient(){
+
+        webView.loadUrl(lastUrl);
+        webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                if (navigationPresenter!=null)
+                if (navigationPresenter != null)
                     navigationPresenter.setLoadingState(true);
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                if (navigationPresenter!=null)
+                if (navigationPresenter != null)
                     navigationPresenter.setLoadingState(false);
                 if (!lastUrl.equals(url))
                     callback.setEnabled(true);
             }
-
         });
         webView.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
 
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
-
     }
 
     public void receiveData(Bundle data) {
         if (data.containsKey("load"))
             webView.loadUrl(data.getString("load"));
-        if (data.containsKey("reset")){
+        if (data.containsKey("reset")) {
             webView.loadUrl("https://" + BuildConfig.URL_API + "enc");
             lastUrl = "https://" + BuildConfig.URL_API + "enc";
         }

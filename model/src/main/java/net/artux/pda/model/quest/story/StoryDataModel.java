@@ -2,12 +2,13 @@ package net.artux.pda.model.quest.story;
 
 import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ArtifactModel;
+import net.artux.pda.model.items.DetectorModel;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemType;
+import net.artux.pda.model.items.MedicineModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.items.WearableModel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,23 +21,14 @@ public class StoryDataModel {
     private List<ParameterModel> parameters;
     private List<StoryStateModel> storyStates;
 
-    private List<ArmorModel> armors = new ArrayList<>();
-    private List<WeaponModel> weapons = new ArrayList<>();
-    private List<ArtifactModel> artifacts = new ArrayList<>();
-    private List<ItemModel> items = new ArrayList<>();
+    private List<ArmorModel> armors;
+    private List<WeaponModel> weapons;
+    private List<MedicineModel> medicines;
+    private List<DetectorModel> detectors;
+    private List<ArtifactModel> artifacts;
+    private List<ItemModel> bullets;
     private int money;
 
-    public List<StoryStateModel> getStoryStates() {
-        return storyStates;
-    }
-
-    public int getMoney() {
-        return money;
-    }
-
-    public void setMoney(int money) {
-        this.money = money;
-    }
 
     public boolean containsCurrent() {
         return getCurrent() != null;
@@ -83,7 +75,9 @@ public class StoryDataModel {
         items.addAll(weapons);
         items.addAll(armors);
         items.addAll(artifacts);
-        items.addAll(this.items);
+        items.addAll(medicines);
+        items.addAll(detectors);
+        items.addAll(this.bullets);
 
         return items;
     }
@@ -93,14 +87,6 @@ public class StoryDataModel {
         for (ItemModel item : getAllItems())
             weight += item.getWeight() * item.getQuantity();
         return weight;
-    }
-
-    public void setParameters(List<ParameterModel> parameters) {
-        this.parameters = parameters;
-    }
-
-    public void setStoryStates(List<StoryStateModel> storyStates) {
-        this.storyStates = storyStates;
     }
 
 }

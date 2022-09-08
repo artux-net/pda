@@ -69,8 +69,7 @@ class UserViewModel @Inject constructor(
     }
 
     fun requestFriend(pdaId: UUID) {
-
-
+        //todo
     }
 
 }
