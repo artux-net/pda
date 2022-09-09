@@ -33,7 +33,12 @@ public class DataManager {
     }
 
     public boolean isAuthenticated() {
-        return mSharedPreferences.contains("login") && mSharedPreferences.contains("pass");
+        if (mSharedPreferences.contains("login") && mSharedPreferences.contains("pass")){
+            String login = mSharedPreferences.getString("login", "");
+            String pass = mSharedPreferences.getString("pass", "");
+            return !login.isEmpty() && !pass.isEmpty();
+        }
+        return false;
     }
 
     public String getLogin() {

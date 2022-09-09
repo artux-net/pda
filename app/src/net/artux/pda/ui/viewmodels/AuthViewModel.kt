@@ -48,6 +48,7 @@ class AuthViewModel @Inject constructor(
 
     fun registerUser(registerUserDto: RegisterUserModel) {
         viewModelScope.launch {
+            apiClient.apiAuthorizations.clear()
             userRepository
                 .registerUser(userMapper.model(registerUserDto))
                 .onSuccess {

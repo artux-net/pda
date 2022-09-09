@@ -90,7 +90,12 @@ public class NetworkModule {
         String login = dataManager.getLogin();
         String pass = dataManager.getPass();
 
-        ApiClient apiClient = new ApiClient("basicAuth", login, pass);
+        ApiClient apiClient;
+        if (!login.isEmpty() && !pass.isEmpty())
+            apiClient = new ApiClient("basicAuth", login, pass);
+        else
+            apiClient = new ApiClient();
+
         String baseUrl = remoteConfig.getString(CONFIG_BASEURL);
         if (!baseUrl.equals(FirebaseRemoteConfig.DEFAULT_VALUE_FOR_STRING)) {
             apiClient.getAdapterBuilder().baseUrl(baseUrl);

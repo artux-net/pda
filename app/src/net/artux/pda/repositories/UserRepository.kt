@@ -122,7 +122,7 @@ class UserRepository @Inject constructor(
                     if (data != null) {
                         it.resume(Result.success(data))
                     } else
-                        it.resume(Result.failure(Exception("Status null")))
+                        it.resume(Result.failure(Exception(response.toString())))
                 }
 
                 override fun onFailure(call: Call<Status>, t: Throwable) {

@@ -10,12 +10,13 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import net.artux.pda.R;
 import net.artux.pda.model.user.RegisterUserModel;
@@ -107,7 +108,8 @@ public class RegisterActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             } else {
-                Toast.makeText(RegisterActivity.this, status.getDescription(), Toast.LENGTH_LONG)
+                Snackbar.make(mLoginFormView, status.getDescription(), Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Ok", view -> {})
                         .show();
             }
         });
