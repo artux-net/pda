@@ -19,6 +19,7 @@ import net.artux.pdanetwork.api.DefaultApi;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ import timber.log.Timber;
 public class NetworkModule {
 
     private static final String CONFIG_BASEURL = "baseUrl";
+    private static final String CONFIG_RESOURCE_URL = "resourceUrl";
 
     @Provides
     @Singleton
@@ -65,7 +67,7 @@ public class NetworkModule {
     @Singleton
     public Retrofit retrofit(OkHttpClient client, FirebaseRemoteConfig remoteConfig, Gson gson) {
         return new Retrofit.Builder()
-                .baseUrl(remoteConfig.getString(CONFIG_BASEURL))
+                .baseUrl(remoteConfig.getString(CONFIG_RESOURCE_URL))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(client)
                 .build();
@@ -73,16 +75,23 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    public FirebaseRemoteConfig remoteConfig() {
+    public Map<String, Object> defaults() {
+        Map<String, Object> defaults = new HashMap<>();
+        defaults.put(CONFIG_BASEURL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);
+        defaults.put(CONFIG_RESOURCE_URL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL);
+        return defaults;
+    }
+
+    @Provides
+    @Singleton
+    public FirebaseRemoteConfig remoteConfig(Map<String, Object> defaults) {
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
                 .setMinimumFetchIntervalInSeconds(3600)
                 .build();
         remoteConfig.setConfigSettingsAsync(configSettings);
-        Map<String, Object> defaults =
-                Map.of(CONFIG_BASEURL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);
-
         remoteConfig.setDefaultsAsync(defaults);
+
         remoteConfig.fetch().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 remoteConfig.activate();

@@ -1,5 +1,7 @@
 package net.artux.pda.map.ui.bars;
 
+import static net.artux.pda.model.Checker.isInteger;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,6 +29,7 @@ public class HealthBar extends VerticalGroup implements Disposable {
 
     UserInterface userInterface;
     Texture image;
+
     public HealthBar(UserInterface userInterface, AssetManager assetManager) {
         super();
         this.userInterface = userInterface;
@@ -41,22 +44,22 @@ public class HealthBar extends VerticalGroup implements Disposable {
         horizontalGroup.space(20);
         horizontalGroup.setFillParent(true);
 
-        /*if(isInteger(userInterface.getMember().getAvatar()))
+        if (isInteger(userInterface.getMember().getAvatar()))
             image = assetManager
-                    .get("avatars/a"+(Integer.parseInt(userInterface.getMember().getAvatar())+1)+".png", Texture.class);
+                    .get("avatars/a" + (Integer.parseInt(userInterface.getMember().getAvatar()) + 1) + ".png", Texture.class);
         else
             image = assetManager
-                    .get("avatars/a0.jpg", Texture.class);*/
+                    .get("avatars/a0.jpg", Texture.class);
 
         horizontalGroup.addActor(new Image(image));
 
         VerticalGroup labelsTable = new VerticalGroup();
-        labelsTable.align(Align.left|Align.top);
+        labelsTable.align(Align.left | Align.top);
         labelsTable.fill();
         Label.LabelStyle style = userInterface.getLabelStyle();
 
         labelsTable.addActor(new Label(userInterface.getMember().getName() + " " + userInterface.getMember().getNickname()
-                + " [PDA #"+ userInterface.getMember().getPdaId()+"]", style));
+                + " [PDA #" + userInterface.getMember().getPdaId() + "]", style));
         labelsTable.addActor(new Label("Денег: " + userInterface.getMember().getMoney(), style));
 
         horizontalGroup.addActor(labelsTable);
@@ -73,9 +76,9 @@ public class HealthBar extends VerticalGroup implements Disposable {
         float w = getWidth() * getScaleX();
         float h = getHeight() * getScaleY();
 
-        barBackground.draw(batch, getX() - padding, getY() - padding, w + padding*2, h + padding*2);
+        barBackground.draw(batch, getX() - padding, getY() - padding, w + padding * 2, h + padding * 2);
         healthBarBackground.draw(batch, getX(), getY(), w, 0.1f * h);
-        healthBar.draw(batch, getX(), getY(), progress * w , 0.1f * h);
+        healthBar.draw(batch, getX(), getY(), progress * w, 0.1f * h);
         super.draw(batch, parentAlpha);
     }
 

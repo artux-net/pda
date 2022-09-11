@@ -33,6 +33,7 @@ import net.artux.pda.map.model.input.Map;
 import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
+import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.UserModel;
 
 import java.util.ArrayList;
@@ -95,11 +96,11 @@ public class ControlPointsHelper {
 
                 Texture texture;
                 if (userModel != null) {
-                    /*if (mobType.group < 0 || userModel.getRelation(mobType.group) < -2)
+                    if (mobType.group < 0 || userModel.getRelations().getFor(Gang.ofId(mobType.group)) < -2)
                         texture = assetManager.get("red.png", Texture.class);
-                    else if (userModel.getRelation(mobType.group) > 2) //todo
+                    else if (userModel.getRelations().getFor(Gang.ofId(mobType.group)) > 2) //todo
                         texture = assetManager.get("green.png", Texture.class);
-                    else*/
+                    else
                         texture = assetManager.get("yellow.png", Texture.class);
                 } else texture = assetManager.get("yellow.png", Texture.class);
 

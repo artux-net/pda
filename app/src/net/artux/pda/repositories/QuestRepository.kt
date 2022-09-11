@@ -1,7 +1,7 @@
 package net.artux.pda.repositories
 
-import net.artux.pda.map.model.input.Map
 import net.artux.pda.api.PdaAPI
+import net.artux.pda.map.model.input.Map
 import net.artux.pda.ui.fragments.quest.models.Chapter
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.CommandBlock
@@ -61,7 +61,7 @@ class QuestRepository @Inject constructor(
                         questCache.put(("$storyId:$chapterId").toString(), data)
                         it.resume(Result.success(data))
                     } else
-                        it.resume(Result.failure(Exception("Chapter null")))
+                        it.resume(Result.failure(Exception("Chapter null: $response")))
                 }
 
                 override fun onFailure(call: Call<Chapter>, t: Throwable) {
@@ -80,7 +80,7 @@ class QuestRepository @Inject constructor(
                         mapCache.put(("$storyId:$mapId").toString(), data)
                         it.resume(Result.success(data))
                     } else
-                        it.resume(Result.failure(Exception("Chapter null")))
+                        it.resume(Result.failure(Exception("Map null $response")))
                 }
 
                 override fun onFailure(call: Call<Map>, t: Throwable) {
@@ -96,14 +96,14 @@ class QuestRepository @Inject constructor(
             defaultApi.resetData().enqueue(object : Callback<StoryData> {
                 override fun onResponse(
                     call: Call<StoryData>,
-                    response: retrofit2.Response<StoryData>
+                    response: Response<StoryData>
                 ) {
                     val data = response.body()
                     if (data != null) {
                         storyCache.put("story", data)
                         it.resume(Result.success(data))
                     } else
-                        it.resume(Result.failure(Exception(response.errorBody().toString())))
+                        it.resume(Result.failure(Exception(response.toString())))
                 }
 
                 override fun onFailure(call: Call<StoryData>, t: Throwable) {

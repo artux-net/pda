@@ -21,4 +21,12 @@ public enum Gang {
         return id;
     }
 
+    public static Gang ofId(int id){
+        for (Gang g : Gang.values()){
+            if (g.getId() == id)
+                return g;
+        }
+        return LONERS;
+    }
+
 }
