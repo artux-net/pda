@@ -12,8 +12,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import net.artux.pda.BuildConfig;
-import net.artux.pda.app.DataManager;
 import net.artux.pda.api.PdaAPI;
+import net.artux.pda.app.DataManager;
 import net.artux.pdanetwork.ApiClient;
 import net.artux.pdanetwork.api.DefaultApi;
 
@@ -42,23 +42,32 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    public Retrofit retrofit(GsonConverterFactory factory) {
-        OkHttpClient.Builder httpClient =
-                new OkHttpClient.Builder();
+    public OkHttpClient httpClient(DataManager dataManager) {
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
         httpClient.addInterceptor(chain -> {
             Request original = chain.request();
+            Request.Builder requestBuilder = original
+                    .newBuilder()
+                    .addHeader("locale", Locale.getDefault().getLanguage());
 
-            Request.Builder requestBuilder = original.newBuilder()
-                    .addHeader("ui", Locale.getDefault().getLanguage());
-            Request request = requestBuilder.build();
-            return chain.proceed(request);
+            if (dataManager.isAuthenticated()) {
+                requestBuilder.addHeader("Authorization", dataManager.getAuthToken());
+            }
+
+            return chain.proceed(requestBuilder.build());
         });
 
+        return httpClient.build();
+    }
+
+    @Provides
+    @Singleton
+    public Retrofit retrofit(OkHttpClient client, FirebaseRemoteConfig remoteConfig, Gson gson) {
         return new Retrofit.Builder()
-                .baseUrl(BuildConfig.PROTOCOL + "://" + BuildConfig.URL)
-                .addConverterFactory(factory)
-                .client(httpClient.build())
+                .baseUrl(remoteConfig.getString(CONFIG_BASEURL))
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(client)
                 .build();
     }
 
@@ -67,7 +76,7 @@ public class NetworkModule {
     public FirebaseRemoteConfig remoteConfig() {
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(0)
+                .setMinimumFetchIntervalInSeconds(3600)
                 .build();
         remoteConfig.setConfigSettingsAsync(configSettings);
         Map<String, Object> defaults =
@@ -86,15 +95,9 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    public ApiClient apiClient(FirebaseRemoteConfig remoteConfig, DataManager dataManager) {
-        String login = dataManager.getLogin();
-        String pass = dataManager.getPass();
-
-        ApiClient apiClient;
-        if (!login.isEmpty() && !pass.isEmpty())
-            apiClient = new ApiClient("basicAuth", login, pass);
-        else
-            apiClient = new ApiClient();
+    public ApiClient apiClient(OkHttpClient okHttpClient, FirebaseRemoteConfig remoteConfig) {
+        ApiClient apiClient = new ApiClient();
+        apiClient.configureFromOkclient(okHttpClient);
 
         String baseUrl = remoteConfig.getString(CONFIG_BASEURL);
         if (!baseUrl.equals(FirebaseRemoteConfig.DEFAULT_VALUE_FOR_STRING)) {
@@ -140,11 +143,5 @@ public class NetworkModule {
                 })
                 .create();
     }
-
-    @Provides
-    public GsonConverterFactory getGsonFactory(Gson gson) {
-        return GsonConverterFactory.create(gson);
-    }
-
 
 }

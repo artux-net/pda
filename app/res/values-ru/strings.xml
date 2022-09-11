@@ -36,7 +36,7 @@
     <string name="action_clear_saved_images">Очистить кеш изображений</string>
     <string name="action_input_login_or_email">Введите логин или почту..</string>
     <string name="action_cancel">Закрыть</string>
-    <string name="group_chat">Чат группировки</string>
+    <string name="group_chat_channel">Чат группировки</string>
 
     <!-- Strings related to statistic view -->
     <string name="profile_inventory">Инвентарь</string>

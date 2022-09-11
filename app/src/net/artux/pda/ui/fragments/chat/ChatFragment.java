@@ -14,34 +14,28 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.databinding.FragmentChatBinding;
+import net.artux.pda.model.ConversationModel;
 import net.artux.pda.model.UserMessage;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.PdaAlertDialog;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
+import net.artux.pda.ui.util.ObjectWebSocketListener;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-import okio.ByteString;
 import timber.log.Timber;
 
 @AndroidEntryPoint
@@ -51,20 +45,43 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     protected DataManager dataManager;
     @Inject
     protected Gson gson;
+    @Inject
+    protected OkHttpClient client;
 
     private RecyclerView mRecyclerView;
     private ChatAdapter mChatAdapter;
     private TextInputEditText mInputEditText;
     private WebSocket ws;
     private FragmentChatBinding binding;
-    private final Type listType = new TypeToken<ArrayList<UserMessage>>() {}.getType();
+    private ObjectWebSocketListener<UserMessage> userMessageObjectWebSocketListener;
 
     static ChatFragment with(UserModel userModel) {
         ChatFragment chatFragment1 = new ChatFragment();
         Bundle bundle1 = new Bundle();
-        bundle1.putSerializable("to", userModel.getId());
+        bundle1.putSerializable("user", userModel.getId());
         chatFragment1.setArguments(bundle1);
         return chatFragment1;
+    }
+
+    public static ChatFragment asCommonChat() {
+        return new ChatFragment();
+    }
+
+    public static ChatFragment asGroupChat() {
+        ChatFragment chatFragment1 = new ChatFragment();
+        Bundle bundle1 = new Bundle();
+        bundle1.putBoolean("group", true);
+        chatFragment1.setArguments(bundle1);
+        return new ChatFragment();
+    }
+
+
+    public static ChatFragment withConversation(ConversationModel conversation) {
+        ChatFragment chatFragment1 = new ChatFragment();
+        Bundle bundle1 = new Bundle();
+        bundle1.putSerializable("conversation", conversation.getId());
+        chatFragment1.setArguments(bundle1);
+        return new ChatFragment();
     }
 
     @Nullable
@@ -78,6 +95,36 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
+
+        userMessageObjectWebSocketListener = new ObjectWebSocketListener<>(UserMessage.class, gson, new ObjectWebSocketListener.OnUpdateListener<UserMessage>() {
+            @Override
+            public void onOpen() {
+                navigationPresenter.setLoadingState(false);
+            }
+
+            @Override
+            public void onMessage(UserMessage userMessage) {
+                requireActivity().runOnUiThread(() -> {
+                    mChatAdapter.addMessage(userMessage);
+                    mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount() - 1);
+                });
+
+            }
+
+            @Override
+            public void onList(List<UserMessage> list) {
+                requireActivity().runOnUiThread(() -> {
+                    mChatAdapter.setItems(list);
+                });
+            }
+
+            @Override
+            public void onClose() {
+                navigationPresenter.setLoadingState(false);
+            }
+        });
+
         mRecyclerView = view.findViewById(R.id.recycleView);
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         manager.setStackFromEnd(true);
@@ -90,11 +137,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         Button sendButton = view.findViewById(R.id.sendButton);
         sendButton.setOnClickListener(this);
 
-        OkHttpClient client = new OkHttpClient();
 
-        Request.Builder builder = new Request.Builder();
-        builder.addHeader("Authorization", dataManager.getAuthToken());
         Bundle args = getArguments();
+        Request.Builder builder = new Request.Builder();
         String path = BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API;
         navigationPresenter.setLoadingState(true);
         if (args != null) {
@@ -121,10 +166,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
             navigationPresenter.setTitle("Chat");
         }
 
-        EchoWebSocketListener listener = new EchoWebSocketListener();
-        ws = client.newWebSocket(builder.build(), listener);
+        ws = client.newWebSocket(builder.build(), userMessageObjectWebSocketListener);
 
-        client.dispatcher().executorService().shutdown();
+
     }
 
     @Override
@@ -143,28 +187,10 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         }
     }
 
-    private void updateAdapter(String text) {
-        if (getActivity() != null)
-            getActivity().runOnUiThread(() -> {
-                try {
-                    JsonElement element = JsonParser.parseString(text);
-                    if (element.isJsonArray()) {
-                        ArrayList<UserMessage> list = gson.fromJson(text, listType);
-                        mChatAdapter.setItems(list);
-                    } else {
-                        UserMessage userMessage = gson.fromJson(text, UserMessage.class);
-                        mChatAdapter.addMessage(userMessage);
-                        mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount() - 1);
-                    }
-                } catch (JsonSyntaxException e) {
-                    e.printStackTrace();
-                }
-            });
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
+        client.dispatcher().executorService().shutdown();
         mRecyclerView.setAdapter(null);
         ws.close(1000, "Closed by user");
     }
@@ -186,62 +212,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
             navigationPresenter.addFragment(UserProfileFragment.of(message.getAuthor().getId()), true);
         });
         builder.show();
-    }
-
-    private final class EchoWebSocketListener extends WebSocketListener {
-        private static final int NORMAL_CLOSURE_STATUS = 1000;
-
-        @Override
-        public void onOpen(WebSocket webSocket, Response response) {
-            Timber.d(webSocket.request().toString());
-            Timber.d(response.toString());
-            if (getActivity() != null)
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (navigationPresenter != null)
-                            navigationPresenter.setLoadingState(false);
-                    }
-                });
-        }
-
-        @Override
-        public void onMessage(WebSocket webSocket, String text) {
-            updateAdapter(text);
-        }
-
-        @Override
-        public void onMessage(WebSocket webSocket, ByteString bytes) {
-            super.onMessage(webSocket, bytes);
-        }
-
-        @Override
-        public void onClosing(WebSocket webSocket, int code, String reason) {
-            Timber.d("WS - closing: %s", reason);
-            if (getActivity() != null)
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (navigationPresenter != null)
-                            navigationPresenter.setLoadingState(false);
-                    }
-                });
-            webSocket.close(NORMAL_CLOSURE_STATUS, reason);
-        }
-
-        @Override
-        public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-            if (getActivity() != null)
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (navigationPresenter != null)
-                            navigationPresenter.setLoadingState(false);
-                    }
-                });
-
-            Timber.e(t);
-        }
     }
 
 }

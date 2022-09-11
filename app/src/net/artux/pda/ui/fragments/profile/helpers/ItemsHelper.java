@@ -13,7 +13,7 @@ import java.text.DecimalFormat;
 
 public class ItemsHelper {
 
-    private static DecimalFormat decimalFormat = new DecimalFormat("###.##");
+    private static final DecimalFormat decimalFormat = new DecimalFormat("###.##");
 
     private static String getDefault(ItemModel item, Context context){
         return context.getString(R.string.item_desc, String.valueOf(item.getPrice()),

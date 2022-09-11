@@ -45,7 +45,7 @@
     <string name="action_input_login_or_email">Input your Login or Email..</string>
     <string name="action_cancel">Cancel</string>
     <string name="unable_connect">Unable to connect server</string>
-    <string name="group_chat">Group Chat channel</string>
+    <string name="group_chat_channel">Group Chat channel</string>
     <string name="profile_inventory">Inventory</string>
     <string name="profile_equipment">Equipment</string>
     <string name="profile_achievements">Achievements</string>

@@ -29,7 +29,7 @@ import timber.log.Timber;
 @AndroidEntryPoint
 public class LoadingActivity extends AppCompatActivity {
 
-    private boolean loaded, gifEnd, afterClearCache = false;
+    private boolean loaded, gifEnd;
     private UserViewModel viewModel;
 
     @Override
@@ -72,9 +72,8 @@ public class LoadingActivity extends AppCompatActivity {
             start();
         });
         viewModel.getStatus().observe(this, statusModel -> {
-            Toast.makeText(getApplicationContext(), statusModel.getDescription(), Toast.LENGTH_LONG).show();
-
             if (!statusModel.isSuccess()) {
+                Toast.makeText(getApplicationContext(), statusModel.getDescription(), Toast.LENGTH_LONG).show();
                 viewModel.signOut();
                 startActivity(new Intent(this, LoginActivity.class));
             }

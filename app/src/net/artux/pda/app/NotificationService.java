@@ -11,9 +11,8 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import net.artux.pda.BuildConfig;
+import net.artux.pda.model.ConversationModel;
 import net.artux.pda.model.StatusModel;
-import net.artux.pda.ui.fragments.chat.Dialog;
-import net.artux.pda.ui.fragments.chat.MessageListener;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -26,11 +25,9 @@ import timber.log.Timber;
 
 public class NotificationService extends Service {
 
-    WebSocket ws;
     Gson gson = new Gson();
-    MessageListener listener = null;
     MyBinder binder = new MyBinder();
-    ArrayList<Dialog> list = new ArrayList<>();
+    ArrayList<ConversationModel> list = new ArrayList<>();
 
     public void onCreate() {
         super.onCreate();
@@ -69,12 +66,8 @@ public class NotificationService extends Service {
         return super.onUnbind(intent);
     }
 
-    public void setListener(MessageListener listener) {
-        this.listener = listener;
-    }
-
     public void parseResponse(final String text) {
-        Type listType = new TypeToken<ArrayList<Dialog>>() {
+        Type listType = new TypeToken<ArrayList<ConversationModel>>() {
         }.getType();
 
         try {
@@ -87,7 +80,7 @@ public class NotificationService extends Service {
             Timber.d("Dialogs, new message: " + userMessage.toString());*/
         } catch (JsonSyntaxException e) {
             try {
-                ArrayList<Dialog> list = gson.fromJson(text, listType);
+                ArrayList<ConversationModel> list = gson.fromJson(text, listType);
                 Timber.d("Set dialogs");
                 this.list = list; //dialogsAdapter.setDialogs(list);
             } catch (JsonSyntaxException e1) {

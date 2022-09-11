@@ -1,216 +1,145 @@
 package net.artux.pda.ui.fragments.chat;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.app.DataManager;
-import net.artux.pda.app.PDAApplication;
+import net.artux.pda.databinding.FragmentDialogsBinding;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.model.StatusModel;
-import net.artux.pda.model.UserMessage;
-import net.artux.pda.ui.activities.MainActivity;
+import net.artux.pda.model.ConversationModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
-import net.artux.pda.ui.util.GsonProvider;
+import net.artux.pda.ui.util.ObjectWebSocketListener;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
-import okhttp3.WebSocketListener;
-import timber.log.Timber;
 
-public class DialogsFragment extends BaseFragment implements MessageListener {
+@AndroidEntryPoint
+public class DialogsFragment extends BaseFragment implements DialogsAdapter.OnClickListener {
 
+    @Inject
+    protected Gson gson;
+    @Inject
+    protected OkHttpClient client;
     private DialogsAdapter dialogsAdapter;
-    private FragmentListBinding binding;
+    private FragmentListBinding listBinding;
+    private FragmentDialogsBinding binding;
     private WebSocket ws;
-    private final Gson gson = GsonProvider.getInstance();
-    private EchoWebSocketListener listener;
-    private DataManager dataManager;
+    private ObjectWebSocketListener<ConversationModel> listener;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentListBinding.inflate(inflater);
+        binding = FragmentDialogsBinding.inflate(inflater);
+        listBinding = binding.listContainer;
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (navigationPresenter!=null)
+        if (navigationPresenter != null)
             navigationPresenter.setTitle(getResources().getString(R.string.chat));
 
-        dialogsAdapter = new DialogsAdapter((MainActivity) getActivity(), navigationPresenter);
-        Type listType = new TypeToken<List<Dialog>>(){}.getType();
-        PDAApplication application = (PDAApplication) requireActivity().getApplication();
-        dataManager = application.getDataManager();
-        List<Dialog> dialogs = gson.fromJson(dataManager.getString("dialogs"), listType);
-        if(dialogs!=null){
-            binding.list.setVisibility(View.VISIBLE);
-            binding.viewMessage.setVisibility(View.GONE);
-            dialogsAdapter.setDialogs(dialogs);
-        }
+        listener = new ObjectWebSocketListener<>(ConversationModel.class, gson, new ObjectWebSocketListener.OnUpdateListener<>() {
+            @Override
+            public void onOpen() {
+                navigationPresenter.setLoadingState(false);
+            }
 
-        binding.list.setAdapter(dialogsAdapter);
-        binding.list.setVisibility(View.VISIBLE);
-        binding.viewMessage.setVisibility(View.GONE);
+            @Override
+            public void onMessage(ConversationModel conversationModel) {
 
-        /*Intent intent = new Intent(getActivity(), NotificationService.class).putExtra("t",((App)getApplication()).getDataManager().getAuthToken());
-        getActivity().startService(intent);*/
+            }
 
-        OkHttpClient client = new OkHttpClient();
+            @Override
+            public void onList(List<ConversationModel> list) {
 
-        Request.Builder builder = new Request.Builder();
-        builder.addHeader("Authorization",((PDAApplication)getActivity().getApplication()).getDataManager().getAuthToken());
+            }
+
+            @Override
+            public void onClose() {
+                navigationPresenter.setLoadingState(false);
+            }
+        });
+
+        dialogsAdapter = new DialogsAdapter(this);
+        listBinding.list.setAdapter(dialogsAdapter);
+
         navigationPresenter.setLoadingState(true);
 
-        builder.url(BuildConfig.WS_PROTOCOL +"://" + BuildConfig.URL_API + "dialogs ");
+        Request request = new Request.Builder()
+                .url(BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API + "dialogs ")
+                .build();
+
         navigationPresenter.setTitle("Chat");
 
-        listener = new EchoWebSocketListener();
-        ws = client.newWebSocket(builder.build(), listener);
+        ws = client.newWebSocket(request, listener);
 
-        client.dispatcher().executorService().shutdown();
 
-       /* Intent serviceIntent = new Intent(getActivity(), NotificationService.class);
-        ServiceConnection sConn = new ServiceConnection() {
+        binding.commonChatBtn.setOnClickListener(view1 ->
+                navigationPresenter.addFragment(ChatFragment.asCommonChat(), true));
 
-            public void onServiceConnected(ComponentName name, IBinder binder) {
-                Timber.d( "MainActivity onServiceConnected");
-                *//*myService = ((NotificationService.MyBinder) binder).getService();
-                myService.setListener(DialogsFragment.this);*//*
-                //bound = true;
-            }
+        binding.commonChatBtn.setOnClickListener(view1 ->
+                navigationPresenter.addFragment(ChatFragment.asGroupChat(), true));
 
-            public void onServiceDisconnected(ComponentName name) {
-                Timber.d( "MainActivity onServiceDisconnected");
-                //bound = false;
-            }
-        };*/
+        binding.addChatBtn.setOnClickListener(view1 -> {
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(requireContext());
+            alertBuilder.setTitle("Input PdaID.. | Create a conversation");
 
+            final EditText input = new EditText(requireContext());
+            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+            alertBuilder.setView(input);
+            alertBuilder.setPositiveButton("OK", (dialog, which) -> {
+                /*ChatFragment chatFragment1 = new ChatFragment();
+                Bundle bundle1 = new Bundle();
+                if (Checker.isInteger(input.getText().toString())) {
+                    bundle1.putInt("to", Integer.parseInt(input.getText().toString()));
+                    chatFragment1.setArguments(bundle1);
+                    navigationPresenter.addFragment(ChatFragment.with(), true);
+                }*/
+            });
+            alertBuilder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+            alertBuilder.show();
+        });
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        client.dispatcher().executorService().shutdown();
         ws.close(1000, null);
 
-        binding = null;
+        listBinding = null;
         listener = null;
         ws.cancel();
     }
 
     @Override
     public void onDestroyView() {
-        binding.list.setAdapter(null);
+        listBinding.list.setAdapter(null);
         super.onDestroyView();
     }
 
-    private void updateAdapter(String text){
-        if (getActivity()!=null)
-            getActivity().runOnUiThread(() -> {
-                Type listType = new TypeToken<ArrayList<Dialog>>(){}.getType();
-
-                try {
-                    UserMessage userMessage = gson.fromJson(text,UserMessage.class);
-                    dialogsAdapter.updateDialog(userMessage);
-                    Timber.d("Dialogs, new message: " + userMessage.toString());
-                }catch (JsonSyntaxException e){
-                    try {
-                        ArrayList<Dialog> list = gson.fromJson(text, listType);
-                        if (list!=null) {
-
-                            Timber.d("Set dialogs");
-                            dialogsAdapter.setDialogs(list);
-                            dataManager.setString("dialogs",gson.toJson(list));
-                        }
-                    }catch (JsonSyntaxException e1){
-                        Timber.d("Unable to parse: " + text);
-                        StatusModel status = gson.fromJson(text, StatusModel.class);
-                        Toast.makeText(getActivity(), status.getDescription(), Toast.LENGTH_LONG).show();
-                    }
-                }
-            });
-    }
-
     @Override
-    public void newMessage(UserMessage message) {
-
+    public void onClick(ConversationModel model) {
+        navigationPresenter.addFragment(ChatFragment.withConversation(model), true);
     }
-
-    @Override
-    public void setDialogs(List<Dialog> message) {
-
-    }
-
-    @Override
-    public void newStatus(StatusModel status) {
-
-    }
-
-    private final class EchoWebSocketListener extends WebSocketListener {
-        private static final int NORMAL_CLOSURE_STATUS = 1000;
-
-        @Override
-        public void onOpen(WebSocket webSocket, okhttp3.Response response) {
-            Timber.d(response.toString());
-            if (getActivity()!=null)
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (navigationPresenter!=null)
-                            navigationPresenter.setLoadingState(false);
-                    }
-                });
-        }
-
-        @Override
-        public void onMessage(WebSocket webSocket, String text) {
-            updateAdapter(text);
-        }
-
-        @Override
-        public void onClosing(WebSocket webSocket, int code, String reason) {
-            Timber.d("WS - closing: %s", reason);
-            if (getActivity()!=null)
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (navigationPresenter!=null)
-                            navigationPresenter.setLoadingState(false);
-                    }
-                });
-            webSocket.close(NORMAL_CLOSURE_STATUS, reason);
-        }
-
-        @Override
-        public void onFailure(WebSocket webSocket, Throwable t, okhttp3.Response response) {
-            if (getActivity()!=null)
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (navigationPresenter!=null)
-                            navigationPresenter.setLoadingState(false);
-                    }
-                });
-            Timber.d("WS - closing because throwable: %s", t.getMessage());
-        }
-    }
-
 }

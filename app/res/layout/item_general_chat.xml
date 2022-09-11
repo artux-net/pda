@@ -14,7 +14,7 @@
 
     <TextView
         android:id="@+id/chat_group"
-        android:text="@string/group_chat"
+        android:text="@string/group_chat_channel"
         android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

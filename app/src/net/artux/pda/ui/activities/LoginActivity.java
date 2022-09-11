@@ -107,7 +107,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
             Toast.makeText(LoginActivity.this, statusModel.getDescription(), Toast.LENGTH_LONG).show();
         });
-        authViewModel.login();
     }
 
     private void attemptLogin() {
