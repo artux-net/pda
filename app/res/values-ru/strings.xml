@@ -7,7 +7,7 @@
     <string name="prompt_user">Пользователь</string>
     <string name="prompt_password">Пароль</string>
     <string name="action_sign_in">ВОЙТИ</string>
-    <string name="error_incorrect_user">Такого пользователя не существует</string>
+    <string name="error_login">Такого пользователя не существует или пароль неправильный</string>
     <string name="error_invalid_password">Пароль слишком короткий</string>
     <string name="error_invalid_value">Не корректные символы: %1$s</string>
     <string name="error_incorrect_password">Не корректный пароль</string>

@@ -1,15 +1,13 @@
 package net.artux.pda.ui.fragments.chat;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.gson.Gson;
 
@@ -90,34 +88,23 @@ public class DialogsFragment extends BaseFragment implements DialogsAdapter.OnCl
 
         navigationPresenter.setTitle("Chat");
 
-        ws = client.newWebSocket(request, listener);
+        //ws = client.newWebSocket(request, listener);
 
 
         binding.commonChatBtn.setOnClickListener(view1 ->
                 navigationPresenter.addFragment(ChatFragment.asCommonChat(), true));
 
-        binding.commonChatBtn.setOnClickListener(view1 ->
+        binding.groupChatBtn.setOnClickListener(view1 ->
                 navigationPresenter.addFragment(ChatFragment.asGroupChat(), true));
 
         binding.addChatBtn.setOnClickListener(view1 -> {
-            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(requireContext());
-            alertBuilder.setTitle("Input PdaID.. | Create a conversation");
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+            builder.setTitle("Выберете действие");
+            //todo
+            builder.setItems(new String[]{"Перейти к диалогу", "Посмотреть профиль"}, (dialogInterface, i) -> {
 
-            final EditText input = new EditText(requireContext());
-            input.setInputType(InputType.TYPE_CLASS_NUMBER);
-            alertBuilder.setView(input);
-            alertBuilder.setPositiveButton("OK", (dialog, which) -> {
-                /*ChatFragment chatFragment1 = new ChatFragment();
-                Bundle bundle1 = new Bundle();
-                if (Checker.isInteger(input.getText().toString())) {
-                    bundle1.putInt("to", Integer.parseInt(input.getText().toString()));
-                    chatFragment1.setArguments(bundle1);
-                    navigationPresenter.addFragment(ChatFragment.with(), true);
-                }*/
             });
-            alertBuilder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-
-            alertBuilder.show();
+            builder.show();
         });
     }
 
@@ -125,11 +112,11 @@ public class DialogsFragment extends BaseFragment implements DialogsAdapter.OnCl
     public void onDestroy() {
         super.onDestroy();
         client.dispatcher().executorService().shutdown();
-        ws.close(1000, null);
+        //ws.close(1000, null);
 
         listBinding = null;
         listener = null;
-        ws.cancel();
+//        ws.cancel();
     }
 
     @Override

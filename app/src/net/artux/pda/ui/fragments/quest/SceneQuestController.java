@@ -30,8 +30,7 @@ public class SceneQuestController implements Serializable, QuestController {
     }
 
     public void beginWithStage(int stageId) {
-        listener.setTitle("Глава " + chapterId);
-        loadStage(stageId, false);
+        beginWithStage(stageId, false);
     }
 
     @Override

@@ -3,9 +3,11 @@
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowBackground">@color/background</item>
+        <item name="android:dialogTheme">@style/AlertDialogStyle</item>
     </style>
 
     <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:dialogTheme">@style/AlertDialogStyle</item>
         <item name="android:windowBackground">@drawable/border_background_black</item>
         <item name="android:colorAccent">#f3f3f3</item>
         <item name="android:textColor">#f3f3f3</item>

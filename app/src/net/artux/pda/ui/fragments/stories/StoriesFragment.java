@@ -15,31 +15,19 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.gson.Gson;
-
 import net.artux.pda.R;
-import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.model.quest.StoriesContainer;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 
-import javax.inject.Inject;
-
 import dagger.hilt.android.AndroidEntryPoint;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import timber.log.Timber;
 
 @AndroidEntryPoint
 public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnStoryClickListener {
 
     private FragmentListBinding binding;
     private QuestViewModel questViewModel;
-    @Inject
-    protected Gson gson;
 
     @Nullable
     @Override
@@ -51,6 +39,13 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        navigationPresenter.setTitle(getResources().getString(R.string.map));
+
+
+        StoriesAdapter adapter = new StoriesAdapter(StoriesFragment.this);
+        binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.list.setAdapter(adapter);
+
         if (questViewModel == null)
             questViewModel = new ViewModelProvider(requireActivity()).get(QuestViewModel.class);
 
@@ -59,52 +54,24 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 Intent intent = new Intent(getActivity(), QuestActivity.class);
                 requireActivity().startActivity(intent);
                 requireActivity().finish();
-            } else loadStories();
+            } else questViewModel.updateStories();
         });
+
+        questViewModel.getStoriesContainer().observe(getViewLifecycleOwner(), storiesContainer -> {
+            navigationPresenter.setLoadingState(false);
+            if (storiesContainer.getStories().size() > 0) {
+                binding.list.setVisibility(View.VISIBLE);
+                binding.viewMessage.setVisibility(View.GONE);
+                adapter.setStories(storiesContainer.getStories());
+            } else {
+                binding.list.setVisibility(View.GONE);
+                binding.viewMessage.setVisibility(View.VISIBLE);
+            }
+        });
+        navigationPresenter.setLoadingState(true);
         questViewModel.updateData();
     }
 
-    private void loadStories() {
-        navigationPresenter.setTitle(getResources().getString(R.string.map));
-        navigationPresenter.setLoadingState(true);
-        binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        StoriesAdapter adapter = new StoriesAdapter(StoriesFragment.this);
-        binding.list.setAdapter(adapter);
-
-        PDAApplication application = (PDAApplication) requireActivity().getApplication();
-
-        //todo
-        StoriesContainer cacheStoriesContainer = gson.fromJson(application.getDataManager().getString("stories"), StoriesContainer.class);
-        if (cacheStoriesContainer != null) {
-            binding.list.setVisibility(View.VISIBLE);
-            binding.viewMessage.setVisibility(View.GONE);
-            adapter.setStories(cacheStoriesContainer.getStories());
-        }
-
-        ((PDAApplication) getActivity().getApplication()).getOldApi().getStories().enqueue(new Callback<StoriesContainer>() {
-            @Override
-            public void onResponse(Call<StoriesContainer> call, Response<StoriesContainer> response) {
-                StoriesContainer storiesContainer = response.body();
-                navigationPresenter.setLoadingState(false);
-                if (((storiesContainer != null && cacheStoriesContainer != null && storiesContainer.hashCode() != cacheStoriesContainer.hashCode())
-                        || (cacheStoriesContainer == null && storiesContainer != null))
-                        && binding != null) {
-                    binding.list.setVisibility(View.VISIBLE);
-                    binding.viewMessage.setVisibility(View.GONE);
-                    PDAApplication application = (PDAApplication) requireActivity().getApplication();
-                    application.getDataManager().setString("stories", gson.toJson(storiesContainer));
-                    adapter.setStories(storiesContainer.getStories());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<StoriesContainer> call, Throwable throwable) {
-                navigationPresenter.setLoadingState(false);
-                Timber.e(throwable);
-            }
-        });
-    }
 
     @Override
     public void onClick(int id) {

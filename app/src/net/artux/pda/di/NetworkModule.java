@@ -83,9 +83,16 @@ public class NetworkModule {
     @Singleton
     public FirebaseRemoteConfig remoteConfig(Map<String, Object> defaults) {
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
-        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+        FirebaseRemoteConfigSettings configSettings;
+        if(BuildConfig.DEBUG)
+            configSettings = new FirebaseRemoteConfigSettings.Builder()
+                    .setMinimumFetchIntervalInSeconds(0)
+                    .build();
+        else
+            configSettings = new FirebaseRemoteConfigSettings.Builder()
                 .setMinimumFetchIntervalInSeconds(3600)
                 .build();
+
         remoteConfig.setConfigSettingsAsync(configSettings);
         remoteConfig.setDefaultsAsync(defaults);
 

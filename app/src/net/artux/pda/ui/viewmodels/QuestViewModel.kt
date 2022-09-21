@@ -11,6 +11,7 @@ import net.artux.pda.model.items.WearableModel
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.quest.Chapter
+import net.artux.pda.model.quest.StoriesContainer
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
 import net.artux.pdanetwork.model.CommandBlock
@@ -26,8 +27,17 @@ class QuestViewModel @Inject constructor(
     var chapter: MutableLiveData<Chapter> = MutableLiveData()
     var map: MutableLiveData<Map> = MutableLiveData()
     var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
+    var storiesContainer: MutableLiveData<StoriesContainer> = MutableLiveData()
     var status: MutableLiveData<StatusModel> = MutableLiveData()
 
+
+    fun updateStories() {
+        viewModelScope.launch {
+            repository.updateStories()
+                .onSuccess { storiesContainer.postValue(it) }
+                .onFailure { status.postValue(StatusModel(it)) }
+        }
+    }
 
     fun updateDataFromCache() {
         repository.getCachedStoryData()
@@ -51,7 +61,8 @@ class QuestViewModel @Inject constructor(
 
     fun applyActions(map: HashMap<String, List<String>>) {
         viewModelScope.launch {
-            repository.syncMember(CommandBlock().actions(map)).onSuccess {
+            repository.syncMember(CommandBlock().actions(map))
+                .onSuccess {
                 storyData.postValue(mapper.dataModel(it))
             }
         }

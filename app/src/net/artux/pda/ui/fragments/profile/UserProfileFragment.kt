@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import net.artux.pda.R
 import net.artux.pda.databinding.FragmentListBinding
 import net.artux.pda.databinding.FragmentProfileBinding
-import net.artux.pda.ui.PdaAlertDialog
 import net.artux.pda.ui.activities.hierarhy.BaseFragment
 import net.artux.pda.ui.fragments.additional.AdditionalFragment
 import net.artux.pda.ui.fragments.chat.ChatFragment
@@ -102,9 +102,8 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 friendButton.text = getString(R.string.is_sub, model.name)
                 friendButton.text = getString(R.string.requested)
                 friendButton.setOnClickListener {
-                    val pdaAlertDialog = PdaAlertDialog(
+                    val pdaAlertDialog = AlertDialog.Builder(
                         requireContext(),
-                        view as ViewGroup?,
                         R.style.AlertDialogStyle
                     )
                     pdaAlertDialog.setTitle(R.string.add_friend_q)

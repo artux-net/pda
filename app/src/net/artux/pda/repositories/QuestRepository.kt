@@ -3,6 +3,7 @@ package net.artux.pda.repositories
 import net.artux.pda.api.PdaAPI
 import net.artux.pda.map.model.input.Map
 import net.artux.pda.model.quest.Chapter
+import net.artux.pda.model.quest.StoriesContainer
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.CommandBlock
 import net.artux.pdanetwork.model.Status
@@ -20,19 +21,28 @@ import kotlin.coroutines.suspendCoroutine
 class QuestRepository @Inject constructor(
     private val webservice: PdaAPI,
     private val defaultApi: DefaultApi,
-    private val storyCache: Cache<StoryData>,
+    private val storyDataCache: Cache<StoryData>,
+    private val storyCache: Cache<StoriesContainer>,
     private val questCache: Cache<Chapter>,
     private val mapCache: Cache<Map>
 ) {
 
     fun clearCache() {
         mapCache.clear()
-        storyCache.clear()
+        storyDataCache.clear()
         questCache.clear()
+        storyCache.clear()
     }
 
     fun getCachedStoryData(): Result<StoryData> {
-        val cache = storyCache.get("story")
+        val cache = storyDataCache.get("story")
+        return if (cache != null)
+            Result.success(cache)
+        else Result.failure(java.lang.Exception("Cache isn't found"))
+    }
+
+    fun getCachedStories(): Result<StoriesContainer> {
+        val cache = storyCache.get("stories")
         return if (cache != null)
             Result.success(cache)
         else Result.failure(java.lang.Exception("Cache isn't found"))
@@ -50,6 +60,25 @@ class QuestRepository @Inject constructor(
         return if (cache != null)
             Result.success(cache)
         else Result.failure(java.lang.Exception("Cache isn't found"))
+    }
+
+    suspend fun updateStories(): Result<StoriesContainer> {
+        return suspendCoroutine {
+            webservice.stories.enqueue(object : Callback<StoriesContainer> {
+                override fun onResponse(call: Call<StoriesContainer>, response: Response<StoriesContainer>) {
+                    val data = response.body()
+                    if (data != null) {
+                        storyCache.put(("stories").toString(), data)
+                        it.resume(Result.success(data))
+                    } else
+                        it.resume(Result.failure(Exception("Chapter null: $response")))
+                }
+
+                override fun onFailure(call: Call<StoriesContainer>, t: Throwable) {
+                    it.resume(Result.failure(java.lang.Exception(t)))
+                }
+            })
+        }
     }
 
     suspend fun getChapter(storyId: Int, chapterId: Int): Result<Chapter> {
@@ -100,7 +129,7 @@ class QuestRepository @Inject constructor(
                 ) {
                     val data = response.body()
                     if (data != null) {
-                        storyCache.put("story", data)
+                        storyDataCache.put("story", data)
                         it.resume(Result.success(data))
                     } else
                         it.resume(Result.failure(Exception(response.toString())))
@@ -143,7 +172,7 @@ class QuestRepository @Inject constructor(
                 ) {
                     val data = response.body()
                     if (data != null) {
-                        storyCache.put("story", data)
+                        storyDataCache.put("story", data)
                         it.resume(Result.success(data))
                     } else
                         it.resume(Result.failure(Exception("Story null")))
@@ -163,7 +192,7 @@ class QuestRepository @Inject constructor(
                 override fun onResponse(call: Call<StoryData>, response: Response<StoryData>) {
                     val data = response.body()
                     if (data != null) {
-                        storyCache.put("story", data)
+                        storyDataCache.put("story", data)
                         it.resume(Result.success(data))
                     } else
                         it.resume(Result.failure(Exception("Story null")))

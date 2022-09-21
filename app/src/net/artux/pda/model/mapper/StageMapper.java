@@ -27,7 +27,7 @@ public interface StageMapper {
     default StageModel model(Stage stage, UserDataCompanion dataCompanion, Context context) {
         StageModel stageModel = new StageModel();
         stageModel.setTitle(stage.getTitle());
-        if (stage.getTypeStage() == 1)
+        if (stage.getType_stage() == 1)
             stageModel.setType(StageType.CHAPTER_OVER);
         else
             stageModel.setType(StageType.USUAL);

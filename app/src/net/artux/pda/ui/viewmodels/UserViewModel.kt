@@ -78,7 +78,7 @@ class UserViewModel @Inject constructor(
     fun isChatAllowed(): Boolean {
         val userModel: UserModel? = getFromCache()
         val xpChatLimit = firebaseRemoteConfig.getLong(RemoteValue.XP_CHAT_LIMIT)
-        return !(userModel != null && xpChatLimit < userModel.xp)
+        return (userModel != null && xpChatLimit < userModel.xp)
     }
 
 }

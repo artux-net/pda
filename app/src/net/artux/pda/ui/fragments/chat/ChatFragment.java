@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,7 +23,6 @@ import net.artux.pda.databinding.FragmentChatBinding;
 import net.artux.pda.model.ConversationModel;
 import net.artux.pda.model.UserMessage;
 import net.artux.pda.model.user.UserModel;
-import net.artux.pda.ui.PdaAlertDialog;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
@@ -97,10 +97,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         super.onViewCreated(view, savedInstanceState);
 
         if (!viewModel.isChatAllowed()) {
-            PdaAlertDialog builder = new PdaAlertDialog(requireContext(), binding.getRoot());
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
             builder.setMessage("Чтобы получить доступ к чату, нужно пройти один из сюжетов.");
-            builder.addButton(getString(R.string.okay), view12 ->{
-                navigationPresenter.addFragment(new StoriesFragment(), true);});
+            builder.setNegativeButton(R.string.okay, (dialogInterface, i) -> navigationPresenter.addFragment(new StoriesFragment(), true));
             builder.setOnCancelListener(dialogInterface ->
                     navigationPresenter.addFragment(new StoriesFragment(), true));
             builder.show();
@@ -209,12 +208,16 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
 
     @Override
     public void onLongClick(UserMessage message) {
-        PdaAlertDialog builder = new PdaAlertDialog(requireContext(), binding.getRoot());
-        builder.addButton("Перейти к диалогу", view12 -> {
-            navigationPresenter.addFragment(ChatFragment.with(message.getAuthor()), true);
-        });
-        builder.addButton("Посмотреть профиль", view1 -> {
-            navigationPresenter.addFragment(UserProfileFragment.of(message.getAuthor().getId()), true);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+        builder.setTitle("Выберете действие");
+        //todo
+        builder.setItems(new String[]{"Перейти к диалогу", "Посмотреть профиль"}, (dialogInterface, i) -> {
+            switch (i){
+                default:
+                    navigationPresenter.addFragment(ChatFragment.with(message.getAuthor()), true);
+                case 1:
+                    navigationPresenter.addFragment(UserProfileFragment.of(message.getAuthor().getId()), true);
+            }
         });
         builder.show();
     }

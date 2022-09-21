@@ -168,7 +168,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             dialog.show();
         }
 
-        setBackground(actualStage.getBackgroundUrl());
+        setBackground(actualStage.getBackground_url());
     }
 
     private void startLoading(StoryStateModel currentState) {
@@ -211,12 +211,12 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                     questViewModel.getChapter().removeObserver(this);
                     multiExoPlayer = new MultiExoPlayer(QuestActivity.this, chapter.getMusic());
                     for (Stage stage : chapter.getStages()) {
-                        if (stage.getBackgroundUrl() != null && !stage.getBackgroundUrl().equals("")) {
+                        if (stage.getBackground_url() != null && !stage.getBackground_url().equals("")) {
                             String background_url;
-                            if (!stage.getBackgroundUrl().contains("http")) {
-                                background_url = "https://" + BuildConfig.URL + "/" + stage.getBackgroundUrl();
+                            if (!stage.getBackground_url().contains("http")) {
+                                background_url = "https://" + BuildConfig.URL + "/" + stage.getBackground_url();
                             } else
-                                background_url = stage.getBackgroundUrl();
+                                background_url = stage.getBackground_url();
 
                             Glide.with(QuestActivity.this)
                                     .downloadOnly()
@@ -248,7 +248,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void processTransfer(TransferModel transfer) {
-        if (sceneController.getActualStage().getTypeStage() == 7) {
+        if (sceneController.getActualStage().getType_stage() == 7) {
             summary.addMessage(new UserMessage(userModel, transfer.getText()));
         }
     }
@@ -314,7 +314,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     public void setStage(Stage stage, boolean processSummary) {
         FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
         try {
-            switch (stage.getTypeStage()) {
+            switch (stage.getType_stage()) {
                 default:
                     StageModel stageModel = StageMapper.INSTANCE.model(stage, getActualDataCompanion(), this);
                     StageFragment stageFragment = StageFragment.createInstance(stageModel, sceneController);
@@ -354,8 +354,8 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             Toast.makeText(this, "Can not load stage, error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
-        if (processSummary && stage.getTypeStage() == 7 && stage.getTexts() != null)
-            summary.addMessage(new UserMessage(stage.getTitle(), stage.getTexts().get(0).getText(), stage.getBackgroundUrl()));
+        if (processSummary && stage.getType_stage() == 7 && stage.getTexts() != null)
+            summary.addMessage(new UserMessage(stage.getTitle(), stage.getTexts().get(0).getText(), stage.getBackground_url()));
 
         mFragmentTransaction.commitAllowingStateLoss();
     }
