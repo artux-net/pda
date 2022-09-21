@@ -5,9 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.ViewModelProvider
+import dagger.hilt.android.AndroidEntryPoint
 import net.artux.pda.R
+import net.artux.pda.databinding.FragmentListBinding
 import net.artux.pda.databinding.FragmentProfileBinding
 import net.artux.pda.ui.PdaAlertDialog
 import net.artux.pda.ui.activities.hierarhy.BaseFragment
@@ -15,19 +16,18 @@ import net.artux.pda.ui.fragments.additional.AdditionalFragment
 import net.artux.pda.ui.fragments.chat.ChatFragment
 import net.artux.pda.ui.fragments.profile.adapters.GroupRelationsAdapter
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper
-import net.artux.pda.ui.util.getViewModelFactory
 import net.artux.pda.ui.viewmodels.ProfileViewModel
 import net.artux.pda.utils.GroupHelper
 import java.util.*
 
+@AndroidEntryPoint
 class UserProfileFragment : BaseFragment(), View.OnClickListener {
 
-    private var binding: FragmentProfileBinding? = null
-    private var groupRelationsAdapter =
-        GroupRelationsAdapter()
-    private var recyclerView: RecyclerView? = null
+    private lateinit var binding: FragmentProfileBinding
+    private lateinit var listBinding: FragmentListBinding
+    private lateinit var groupRelationsAdapter: GroupRelationsAdapter
 
-    private val profileViewModel: ProfileViewModel by viewModels { getViewModelFactory() }
+    private lateinit var profileViewModel: ProfileViewModel
 
     init {
         defaultAdditionalFragment = AdditionalFragment::class.java
@@ -39,7 +39,8 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentProfileBinding.inflate(inflater)
-        return binding!!.root
+        listBinding = binding.listContainer
+        return binding.root
     }
 
     companion object {
@@ -56,6 +57,8 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        profileViewModel = ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
+        groupRelationsAdapter = GroupRelationsAdapter()
         if (navigationPresenter != null) {
             navigationPresenter.setTitle(getString(R.string.profileModel))
             navigationPresenter.setLoadingState(true)
@@ -64,7 +67,6 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
         profileViewModel.profile.observe(viewLifecycleOwner) {
             val model = it
 
-            val binding = this.binding!!
             ProfileHelper.setAvatar(binding.profileAvatar, model.avatar)
             binding.profileLogin.text = model.login
             binding.profileGroup.text = GroupHelper.getTitle(model.gang, context)
@@ -84,10 +86,10 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
 
 
             groupRelationsAdapter.setRelations(model.relations)
-            recyclerView = view.findViewById(R.id.list)
-            recyclerView!!.adapter = groupRelationsAdapter
+            val recyclerView = listBinding.list
+            recyclerView.adapter = groupRelationsAdapter
 
-            recyclerView!!.visibility = View.VISIBLE
+            recyclerView.visibility = View.VISIBLE
             view.findViewById<View>(R.id.viewMessage).visibility = View.GONE
 
             val friendButton: Button = binding.profileFriend
@@ -97,7 +99,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             if (viewModel.getId() != model.id) {
                 friendButton.setText(R.string.add_friend)
                 friendButton.text = getString(R.string.is_friend, model.name)
-                friendButton.text = getString(R.string.is_sub,model.name)
+                friendButton.text = getString(R.string.is_sub, model.name)
                 friendButton.text = getString(R.string.requested)
                 friendButton.setOnClickListener {
                     val pdaAlertDialog = PdaAlertDialog(
@@ -138,10 +140,20 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
         val result = profileViewModel.profile.value
         when (p0!!.id) {
             R.id.profile_friends -> {
-                navigationPresenter.addFragment(FriendsFragment.of(result, FriendsFragment.ListType.FRIENDS), true)
+                navigationPresenter.addFragment(
+                    FriendsFragment.of(
+                        result,
+                        FriendsFragment.ListType.FRIENDS
+                    ), true
+                )
             }
             R.id.profile_requests -> {
-                navigationPresenter.addFragment(FriendsFragment.of(result, FriendsFragment.ListType.SUBS), true)
+                navigationPresenter.addFragment(
+                    FriendsFragment.of(
+                        result,
+                        FriendsFragment.ListType.SUBS
+                    ), true
+                )
             }
             R.id.write_message -> {
                 bundle.putInt("to", result!!.pdaId)
@@ -150,13 +162,6 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 navigationPresenter.addFragment(chatFragment, true)
             }
         }
-    }
-
-    override fun onDestroyView() {
-        recyclerView?.adapter = null
-        recyclerView = null
-        binding = null
-        super.onDestroyView()
     }
 
 }

@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-import net.artux.pda.BuildConfig;
 import net.artux.pda.model.ConversationModel;
 import net.artux.pda.model.StatusModel;
 
@@ -18,7 +17,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 import timber.log.Timber;
@@ -44,10 +42,10 @@ public class NotificationService extends Service {
 
         OkHttpClient client = new OkHttpClient();
 
-        Request.Builder builder = new Request.Builder();
+        /*Request.Builder builder = new Request.Builder();
         builder.addHeader("t",((PDAApplication)getApplication()).getDataManager().getAuthToken());
 
-        builder.url("wss://" + BuildConfig.URL_API + "dialogs/*");
+        builder.url("wss://" + BuildConfig.URL_API + "dialogs/*");*/
 
         EchoWebSocketListener listener = new EchoWebSocketListener();
         //ws = client.newWebSocket(builder.build(), listener);

@@ -7,8 +7,9 @@ import com.google.gson.Gson;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.map.model.input.Map;
 import net.artux.pda.model.Summary;
+import net.artux.pda.model.quest.Chapter;
+import net.artux.pda.model.quest.StoriesContainer;
 import net.artux.pda.repositories.Cache;
-import net.artux.pda.ui.fragments.quest.models.Chapter;
 import net.artux.pdanetwork.model.ArticleDto;
 import net.artux.pdanetwork.model.NoteDto;
 import net.artux.pdanetwork.model.Profile;
@@ -24,7 +25,7 @@ import dagger.hilt.components.SingletonComponent;
 
 @InstallIn(SingletonComponent.class)
 @Module
-public class CacheModuleImpl{
+public class CacheModule {
 
     @Provides
     public DataManager dataManager(@ApplicationContext Context context){
@@ -74,5 +75,10 @@ public class CacheModuleImpl{
     @Provides
     public Cache<SellerDto> getSellerCache(@ApplicationContext Context context, Gson gson) {
         return new Cache<>(SellerDto.class, context, gson);
+    }
+
+    @Provides
+    public Cache<StoriesContainer> getStoriesCache(@ApplicationContext Context context, Gson gson) {
+        return new Cache<>(StoriesContainer.class, context, gson);
     }
 }

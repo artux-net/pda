@@ -1,6 +1,5 @@
 package net.artux.pda.ui.fragments.additional;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.artux.pda.R;
-import net.artux.pda.app.DataManager;
-import net.artux.pda.app.PDAApplication;
 import net.artux.pda.model.user.ProfileModel;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
@@ -29,10 +26,6 @@ public class InfoFragment extends AdditionalBaseFragment {
     TextView mXpView;
     ImageView mAvatarView;
 
-    DataManager mDataManager;
-
-    @SuppressLint("SetTextI18n")
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_info, container, false);
@@ -41,8 +34,6 @@ public class InfoFragment extends AdditionalBaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        PDAApplication application = (PDAApplication) requireActivity().getApplication();
-        mDataManager = application.getDataManager();
 
         mAvatarView = view.findViewById(R.id.avatar);
         mLoginView = view.findViewById(R.id.loginView);

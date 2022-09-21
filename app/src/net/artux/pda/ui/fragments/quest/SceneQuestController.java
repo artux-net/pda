@@ -1,9 +1,9 @@
 package net.artux.pda.ui.fragments.quest;
 
+import net.artux.pda.model.quest.Chapter;
+import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.TransferModel;
 import net.artux.pda.ui.activities.StageListener;
-import net.artux.pda.ui.fragments.quest.models.Chapter;
-import net.artux.pda.ui.fragments.quest.models.Stage;
 
 import java.io.Serializable;
 import java.util.Iterator;

@@ -15,15 +15,17 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.gson.Gson;
+
 import net.artux.pda.R;
 import net.artux.pda.app.PDAApplication;
 import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.model.quest.StoriesContainer;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.fragments.quest.models.Stories;
-import net.artux.pda.ui.util.GsonProvider;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import retrofit2.Call;
@@ -36,6 +38,8 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
 
     private FragmentListBinding binding;
     private QuestViewModel questViewModel;
+    @Inject
+    protected Gson gson;
 
     @Nullable
     @Override
@@ -51,8 +55,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             questViewModel = new ViewModelProvider(requireActivity()).get(QuestViewModel.class);
 
         questViewModel.getStoryData().observe(getViewLifecycleOwner(), memberResult -> {
-            StoryDataModel model = memberResult;
-            if (model.getCurrent() != null) {
+            if (memberResult.getCurrent() != null) {
                 Intent intent = new Intent(getActivity(), QuestActivity.class);
                 requireActivity().startActivity(intent);
                 requireActivity().finish();
@@ -71,32 +74,32 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
 
         PDAApplication application = (PDAApplication) requireActivity().getApplication();
 
-
-        Stories cacheStories = GsonProvider.getInstance().fromJson(application.getDataManager().getString("stories"), Stories.class);
-        if (cacheStories != null) {
+        //todo
+        StoriesContainer cacheStoriesContainer = gson.fromJson(application.getDataManager().getString("stories"), StoriesContainer.class);
+        if (cacheStoriesContainer != null) {
             binding.list.setVisibility(View.VISIBLE);
             binding.viewMessage.setVisibility(View.GONE);
-            adapter.setStories(cacheStories.get());
+            adapter.setStories(cacheStoriesContainer.getStories());
         }
 
-        ((PDAApplication) getActivity().getApplication()).getOldApi().getStories().enqueue(new Callback<Stories>() {
+        ((PDAApplication) getActivity().getApplication()).getOldApi().getStories().enqueue(new Callback<StoriesContainer>() {
             @Override
-            public void onResponse(Call<Stories> call, Response<Stories> response) {
-                Stories stories = response.body();
+            public void onResponse(Call<StoriesContainer> call, Response<StoriesContainer> response) {
+                StoriesContainer storiesContainer = response.body();
                 navigationPresenter.setLoadingState(false);
-                if (((stories != null && cacheStories != null && stories.hashCode() != cacheStories.hashCode())
-                        || (cacheStories == null && stories != null))
+                if (((storiesContainer != null && cacheStoriesContainer != null && storiesContainer.hashCode() != cacheStoriesContainer.hashCode())
+                        || (cacheStoriesContainer == null && storiesContainer != null))
                         && binding != null) {
                     binding.list.setVisibility(View.VISIBLE);
                     binding.viewMessage.setVisibility(View.GONE);
                     PDAApplication application = (PDAApplication) requireActivity().getApplication();
-                    application.getDataManager().setString("stories", GsonProvider.getInstance().toJson(stories));
-                    adapter.setStories(stories.get());
+                    application.getDataManager().setString("stories", gson.toJson(storiesContainer));
+                    adapter.setStories(storiesContainer.getStories());
                 }
             }
 
             @Override
-            public void onFailure(Call<Stories> call, Throwable throwable) {
+            public void onFailure(Call<StoriesContainer> call, Throwable throwable) {
                 navigationPresenter.setLoadingState(false);
                 Timber.e(throwable);
             }

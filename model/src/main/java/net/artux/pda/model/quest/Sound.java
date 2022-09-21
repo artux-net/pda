@@ -1,4 +1,4 @@
-package net.artux.pda.ui.fragments.quest.models;
+package net.artux.pda.model.quest;
 
 public class Sound {
 

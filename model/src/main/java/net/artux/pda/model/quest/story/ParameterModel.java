@@ -1,9 +1,11 @@
 package net.artux.pda.model.quest.story;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class ParameterModel {
+public class ParameterModel implements Serializable {
 
     private String key;
     private int value;

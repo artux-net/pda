@@ -1,7 +1,5 @@
 package net.artux.pda.ui.fragments.rating;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +19,9 @@ import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class RatingFragment extends BaseFragment implements RatingAdapter.OnClickListener {
 
     {
@@ -43,7 +45,7 @@ public class RatingFragment extends BaseFragment implements RatingAdapter.OnClic
         }
 
         if (ratingViewModel == null)
-            ratingViewModel = getViewModelFactory(this).create(RatingViewModel.class);
+            ratingViewModel = new ViewModelProvider(requireActivity()).get(RatingViewModel.class);
 
         RecyclerView recyclerView = view.findViewById(R.id.list);
         View v = view.findViewById(R.id.viewMessage);

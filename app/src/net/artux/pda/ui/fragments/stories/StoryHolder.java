@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.ui.fragments.quest.models.StoryItem;
+import net.artux.pda.model.quest.StoryItem;
 
 public class StoryHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -23,24 +23,24 @@ public class StoryHolder extends RecyclerView.ViewHolder implements View.OnClick
         this.listener = listener;
     }
 
-    public void bind(StoryItem storyItem){
+    public void bind(StoryItem storyItem) {
         this.storyItem = storyItem;
-        ((TextView)itemView.findViewById(R.id.storyTitle)).setText(storyItem.title);
-        ((TextView)itemView.findViewById(R.id.storyDesc)).setText(storyItem.desc);
-        if (storyItem.iconUrl != null)
-        if (storyItem.iconUrl.contains("http"))
-        Glide.with(itemView)
-                .load(storyItem.iconUrl)
-                .into((ImageView) itemView.findViewById(R.id.storyIcon));
-        else
-            Glide.with(itemView)
-                    .load("https://" + BuildConfig.URL + "/" + storyItem.iconUrl)
-                    .into((ImageView) itemView.findViewById(R.id.storyIcon));
+        ((TextView) itemView.findViewById(R.id.storyTitle)).setText(storyItem.getTitle());
+        ((TextView) itemView.findViewById(R.id.storyDesc)).setText(storyItem.getDesc());
+        if (storyItem.getIconUrl() != null)
+            if (storyItem.getIconUrl().contains("http"))
+                Glide.with(itemView)
+                        .load(storyItem.getIconUrl())
+                        .into((ImageView) itemView.findViewById(R.id.storyIcon));
+            else
+                Glide.with(itemView)
+                        .load("https://" + BuildConfig.URL + "/" + storyItem.getIconUrl())
+                        .into((ImageView) itemView.findViewById(R.id.storyIcon));
         itemView.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        listener.onClick(storyItem.id);
+        listener.onClick(storyItem.getId());
     }
 }

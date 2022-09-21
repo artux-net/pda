@@ -10,9 +10,9 @@ import net.artux.pda.model.StatusModel
 import net.artux.pda.model.items.WearableModel
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
+import net.artux.pda.model.quest.Chapter
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
-import net.artux.pda.ui.fragments.quest.models.Chapter
 import net.artux.pdanetwork.model.CommandBlock
 import javax.inject.Inject
 
@@ -34,12 +34,12 @@ class QuestViewModel @Inject constructor(
             .onSuccess { storyData.postValue(mapper.dataModel(it)) }
     }
 
-    fun getCachedData(): MutableLiveData<StoryDataModel> {
-        storyData.value = repository.getCachedStoryData()
+    fun getCachedData(): StoryDataModel? {
+        return repository.getCachedStoryData()
             .map { mapper.dataModel(it) }
             .getOrNull()
-        return storyData
     }
+
 
     private fun getCachedChapter(storyId: Int, chapterId: Int): Chapter? {
         return repository.getCachedChapter(storyId, chapterId).getOrNull()

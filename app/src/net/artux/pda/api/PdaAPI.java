@@ -2,8 +2,8 @@ package net.artux.pda.api;
 
 
 import net.artux.pda.map.model.input.Map;
-import net.artux.pda.ui.fragments.quest.models.Chapter;
-import net.artux.pda.ui.fragments.quest.models.Stories;
+import net.artux.pda.model.quest.Chapter;
+import net.artux.pda.model.quest.StoriesContainer;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -18,6 +18,6 @@ public interface PdaAPI {
     Call<Map> getMap(@Path("story") int story, @Path("map") int map);
 
     @GET("stories")
-    Call<Stories> getStories();
+    Call<StoriesContainer> getStories();
 
 }

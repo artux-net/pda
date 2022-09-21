@@ -1,9 +1,11 @@
 package net.artux.pda.model.user;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class GangRelation {
+public class GangRelation implements Serializable {
 
     private int bandits;
     private int clearSky;

@@ -3,9 +3,11 @@ package net.artux.pda.ui.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.app.DataManager
+import net.artux.pda.di.RemoteValue
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.UserMapper
@@ -21,7 +23,8 @@ class UserViewModel @Inject constructor(
     private var userRepository: UserRepository,
     var dataManager: DataManager,
     var userMapper: UserMapper,
-    var statusMapper: StatusMapper
+    var statusMapper: StatusMapper,
+    var firebaseRemoteConfig: FirebaseRemoteConfig
 ) : ViewModel() {
 
     var member: MutableLiveData<UserModel> = MutableLiveData()
@@ -68,8 +71,14 @@ class UserViewModel @Inject constructor(
         userRepository.clearMemberCache()
     }
 
-    fun requestFriend(pdaId: UUID) {
+    fun requestFriend(uid: UUID) {
         //todo
+    }
+
+    fun isChatAllowed(): Boolean {
+        val userModel: UserModel? = getFromCache()
+        val xpChatLimit = firebaseRemoteConfig.getLong(RemoteValue.XP_CHAT_LIMIT)
+        return !(userModel != null && xpChatLimit < userModel.xp)
     }
 
 }

@@ -1,9 +1,11 @@
 package net.artux.pda.model.quest.story;
 
+import java.io.Serializable;
+
 import lombok.Data;
 
 @Data
-public class StoryStateModel {
+public class StoryStateModel implements Serializable {
 
     private boolean current;
     private boolean over;

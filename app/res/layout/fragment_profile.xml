@@ -173,6 +173,7 @@
                 android:text="Отношение группировок"/>
 
             <include
+                android:id="@id/listContainer"
                 layout="@layout/fragment_list"/>
 
 

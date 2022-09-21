@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.ui.fragments.quest.models.StoryItem;
+import net.artux.pda.model.quest.StoryItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +24,9 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoryHolder> {
     public void setStories(List<StoryItem> stories) {
         this.stories = stories;
         StoryItem item = new StoryItem();
-        item.id = -1;
-        item.title = "Загрузка стадии на выбор";
-        item.desc = "..";
+        item.setId(-1);
+        item.setTitle("Загрузка стадии на выбор");
+        item.setDesc("..");
 
         this.stories.add(item);
 

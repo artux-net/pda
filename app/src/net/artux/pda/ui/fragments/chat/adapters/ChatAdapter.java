@@ -19,7 +19,7 @@ import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
@@ -29,7 +29,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     public ChatAdapter(MessageClickListener listener){
         this.listener = listener;
-        messages = new ArrayList<>();
+        messages = new LinkedList<>();
     }
 
     @SuppressLint("NotifyDataSetChanged")

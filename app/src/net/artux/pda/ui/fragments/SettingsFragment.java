@@ -1,7 +1,5 @@
 package net.artux.pda.ui.fragments;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -15,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -33,10 +32,11 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
+@AndroidEntryPoint
 public class SettingsFragment extends BaseFragment implements View.OnClickListener {
-
 
     private ActivitySettingsBinding binding;
     private File cacheDirectory;
@@ -59,7 +59,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         super.onViewCreated(view, savedInstanceState);
         setOnClickListener(binding.getRoot());
         if (questViewModel == null) {
-            questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
+            questViewModel = new ViewModelProvider(requireActivity()).get(QuestViewModel.class);
         }
         if (navigationPresenter != null) {
             navigationPresenter.setTitle(getString(R.string.settings));

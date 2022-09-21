@@ -9,6 +9,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.WebSocket;
@@ -26,8 +27,7 @@ public class ObjectWebSocketListener<T> extends okhttp3.WebSocketListener {
         this.gson = gson;
         this.onUpdateListener = onUpdateListener;
         this.clazz = clazz;
-        listType = new TypeToken<List<T>>() {
-        }.getType();
+        listType = new TypeToken<T[]>() {}.getType();
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ObjectWebSocketListener<T> extends okhttp3.WebSocketListener {
         try {
             JsonElement element = JsonParser.parseString(text);
             if (element.isJsonArray()) {
-                List<T> list = gson.fromJson(text, listType);
+                List<T> list = Arrays.asList(gson.fromJson(text, listType));
                 onUpdateListener.onList(list);
             } else {
                 T t = gson.fromJson(text, clazz);

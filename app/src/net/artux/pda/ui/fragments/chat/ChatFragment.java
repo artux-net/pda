@@ -26,6 +26,7 @@ import net.artux.pda.ui.PdaAlertDialog;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
+import net.artux.pda.ui.fragments.stories.StoriesFragment;
 import net.artux.pda.ui.util.ObjectWebSocketListener;
 
 import java.util.List;
@@ -95,9 +96,17 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (!viewModel.isChatAllowed()) {
+            PdaAlertDialog builder = new PdaAlertDialog(requireContext(), binding.getRoot());
+            builder.setMessage("Чтобы получить доступ к чату, нужно пройти один из сюжетов.");
+            builder.addButton(getString(R.string.okay), view12 ->{
+                navigationPresenter.addFragment(new StoriesFragment(), true);});
+            builder.setOnCancelListener(dialogInterface ->
+                    navigationPresenter.addFragment(new StoriesFragment(), true));
+            builder.show();
+        }
 
-
-        userMessageObjectWebSocketListener = new ObjectWebSocketListener<>(UserMessage.class, gson, new ObjectWebSocketListener.OnUpdateListener<UserMessage>() {
+        userMessageObjectWebSocketListener = new ObjectWebSocketListener<>(UserMessage.class, gson, new ObjectWebSocketListener.OnUpdateListener<>() {
             @Override
             public void onOpen() {
                 navigationPresenter.setLoadingState(false);
@@ -114,9 +123,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
 
             @Override
             public void onList(List<UserMessage> list) {
-                requireActivity().runOnUiThread(() -> {
-                    mChatAdapter.setItems(list);
-                });
+                requireActivity().runOnUiThread(() -> mChatAdapter.setItems(list));
             }
 
             @Override
@@ -167,8 +174,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         }
 
         ws = client.newWebSocket(builder.build(), userMessageObjectWebSocketListener);
-
-
     }
 
     @Override

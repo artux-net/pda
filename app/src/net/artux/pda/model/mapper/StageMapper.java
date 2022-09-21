@@ -3,14 +3,14 @@ package net.artux.pda.model.mapper;
 import android.content.Context;
 
 import net.artux.pda.model.Checker;
+import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.StageModel;
 import net.artux.pda.model.quest.StageType;
+import net.artux.pda.model.quest.Text;
+import net.artux.pda.model.quest.Transfer;
 import net.artux.pda.model.quest.TransferModel;
 import net.artux.pda.model.quest.UserDataCompanion;
 import net.artux.pda.model.user.UserModel;
-import net.artux.pda.ui.fragments.quest.models.Stage;
-import net.artux.pda.ui.fragments.quest.models.Text;
-import net.artux.pda.ui.fragments.quest.models.Transfer;
 import net.artux.pda.utils.GroupHelper;
 
 import org.mapstruct.Mapper;
@@ -39,20 +39,20 @@ public interface StageMapper {
 
     default String getText(Stage stage, UserDataCompanion dataCompanion, Context context) {
         List<Text> contentVariants = new ArrayList<>();
-        for (Text text : stage.getText())
-            if (Checker.check(text.condition, dataCompanion.getStoryData())) {
-                text.text = formatText(text.text, dataCompanion.getUser(), context);
+        for (Text text : stage.getTexts())
+            if (Checker.check(text.getCondition(), dataCompanion.getStoryData())) {
+                text.setText(formatText(text.getText(), dataCompanion.getUser(), context));
                 contentVariants.add(text);
             }
-        return contentVariants.get(0).text;
+        return contentVariants.get(0).getText();
     }
 
     default List<TransferModel> getTransfers(Stage stage, UserDataCompanion dataCompanion, Context context) {
         List<TransferModel> transfers = new ArrayList<>();
         for (Transfer transfer : stage.getTransfers())
-            if (Checker.check(transfer.condition, dataCompanion.getStoryData())) {
-                transfer.text = formatText(transfer.text, dataCompanion.getUser(), context);
-                transfers.add(new TransferModel(transfer.stage_id, transfer.text));
+            if (Checker.check(transfer.getCondition(), dataCompanion.getStoryData())) {
+                transfer.setText(formatText(transfer.getText(), dataCompanion.getUser(), context));
+                transfers.add(new TransferModel(transfer.getStage_id(), transfer.getText()));
             }
         return transfers;
     }

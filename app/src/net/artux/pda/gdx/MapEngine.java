@@ -1,21 +1,9 @@
 package net.artux.pda.gdx;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LifecycleRegistry;
-import androidx.lifecycle.ViewModelStore;
-import androidx.lifecycle.ViewModelStoreOwner;
-import androidx.savedstate.SavedStateRegistry;
-import androidx.savedstate.SavedStateRegistryController;
-import androidx.savedstate.SavedStateRegistryOwner;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -24,42 +12,22 @@ import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.input.Map;
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pda.model.quest.story.StoryStateModel;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
-import net.artux.pda.ui.viewmodels.QuestViewModel;
-import net.artux.pda.ui.viewmodels.UserViewModel;
 
 import java.util.HashMap;
 
 import timber.log.Timber;
 
-public class MapEngine extends AndroidApplication implements PlatformInterface, LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner {
-
-    private UserViewModel viewModel;
-    private LifecycleRegistry lifecycleRegistry;
-    private final SavedStateRegistryController mSavedStateRegistryController = SavedStateRegistryController.create(this);
-    private QuestViewModel questViewModel;
-
-    private ViewModelStore viewModelStore = new ViewModelStore();
+public class MapEngine extends AndroidApplication implements PlatformInterface {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-
-        lifecycleRegistry = new LifecycleRegistry(this);
-        mSavedStateRegistryController.performRestore(savedInstanceState);
-
-        if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(UserViewModel.class);
-        if (questViewModel == null)
-            questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
-
-        UserModel member = viewModel.getFromCache();
-        StoryDataModel dataModel = questViewModel.getCachedData().getValue();
+        UserModel member = (UserModel) getIntent().getSerializableExtra("user");
+        StoryDataModel dataModel = (StoryDataModel) getIntent().getSerializableExtra("data");
         Map map = (Map) getIntent().getSerializableExtra("map");
 
         GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
@@ -67,31 +35,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
                 .user(member)
                 .storyData(dataModel);
 
-        initialize(builder.build(), config);
-    }
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        lifecycleRegistry.setCurrentState(Lifecycle.State.STARTED);
-    }
-
-    @NonNull
-    public Lifecycle getLifecycle() {
-        return lifecycleRegistry;
-    }
-
-    @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mSavedStateRegistryController.performSave(outState);
-    }
-
-    @NonNull
-    @Override
-    public final SavedStateRegistry getSavedStateRegistry() {
-        return mSavedStateRegistryController.getSavedStateRegistry();
+        initialize(builder.build(), new AndroidApplicationConfiguration());
     }
 
     @Override
@@ -127,15 +71,6 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
                         intent.putExtra("pos", data.get("pos"));
                         Timber.d("Start seller activity - %s", data.get("seller"));
                     }
-                } else if (data.containsKey("map")) {
-                    String mapIdObject = data.get("map");
-                    if (mapIdObject != null) {
-                        int mapId = Integer.parseInt(mapIdObject);
-                        String pos = data.get("pos");
-                        StoryStateModel memberResult = questViewModel.getStoryData().getValue().getCurrent();
-                        MapHelper.prepareAndLoadMap(questViewModel, this, memberResult.getStoryId(), mapId, pos);
-                    }
-                    Timber.d("Start map - %s, position: %s", data.get("map"), data.get("pos"));
                 } else if (data.containsKey("openPda")) {
                     Timber.d("Start MainActivity");
                     intent = new Intent(this, MainActivity.class);
@@ -183,9 +118,4 @@ public class MapEngine extends AndroidApplication implements PlatformInterface, 
         super.onDestroy();
     }
 
-    @NonNull
-    @Override
-    public ViewModelStore getViewModelStore() {
-        return viewModelStore;
-    }
 }

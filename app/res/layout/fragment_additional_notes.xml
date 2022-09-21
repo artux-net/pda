@@ -14,7 +14,9 @@
            android:layout_height="wrap_content"
            android:text="Create note" />
 
-       <include layout="@layout/fragment_list"/>
+       <include
+           android:id="@id/listContainer"
+           layout="@layout/fragment_list"/>
 
    </LinearLayout>
 

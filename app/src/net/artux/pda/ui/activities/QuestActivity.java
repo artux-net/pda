@@ -1,7 +1,5 @@
 package net.artux.pda.ui.activities;
 
-import static net.artux.pda.ui.util.FragmentExtKt.getViewModelFactory;
-
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,6 +20,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -41,6 +40,8 @@ import net.artux.pda.gdx.MapHelper;
 import net.artux.pda.model.Summary;
 import net.artux.pda.model.UserMessage;
 import net.artux.pda.model.mapper.StageMapper;
+import net.artux.pda.model.quest.Chapter;
+import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.StageModel;
 import net.artux.pda.model.quest.TransferModel;
 import net.artux.pda.model.quest.UserDataCompanion;
@@ -51,8 +52,6 @@ import net.artux.pda.ui.fragments.quest.QuestController;
 import net.artux.pda.ui.fragments.quest.SceneQuestController;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
 import net.artux.pda.ui.fragments.quest.StageFragment;
-import net.artux.pda.ui.fragments.quest.models.Chapter;
-import net.artux.pda.ui.fragments.quest.models.Stage;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.ui.viewmodels.SummaryViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
@@ -65,9 +64,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
 
 
+@AndroidEntryPoint
 public class QuestActivity extends AppCompatActivity implements View.OnClickListener, StageListener {
 
     private QuestController sceneController;
@@ -96,11 +97,11 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_quest);
 
         if (viewModel == null)
-            viewModel = getViewModelFactory(this).create(UserViewModel.class);
+            viewModel = new ViewModelProvider(this).get(UserViewModel.class);
         if (questViewModel == null)
-            questViewModel = getViewModelFactory(this).create(QuestViewModel.class);
+            questViewModel = new ViewModelProvider(this).get(QuestViewModel.class);
         if (summaryViewModel == null)
-            summaryViewModel = getViewModelFactory(this).create(SummaryViewModel.class);
+            summaryViewModel = new ViewModelProvider(this).get(SummaryViewModel.class);
 
         tvTime = findViewById(R.id.sceneTime);
         ImageView musicImage = findViewById(R.id.musicSetup);
@@ -127,7 +128,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                 intent.putExtra("status", status);
                 startActivity(intent);
                 finish();
-            }else
+            } else
                 Toast.makeText(getApplicationContext(), status.getDescription(), Toast.LENGTH_LONG).show();
         });
         summary = summaryViewModel.getCachedSummary(Summary.getCurrentId()).getValue();
@@ -208,7 +209,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                     sceneController.beginWithStage(stageId, sync);
 
                     questViewModel.getChapter().removeObserver(this);
-                    multiExoPlayer = new MultiExoPlayer(QuestActivity.this, chapter.getMusics());
+                    multiExoPlayer = new MultiExoPlayer(QuestActivity.this, chapter.getMusic());
                     for (Stage stage : chapter.getStages()) {
                         if (stage.getBackgroundUrl() != null && !stage.getBackgroundUrl().equals("")) {
                             String background_url;
@@ -231,7 +232,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     }
 
     void loadMap(int storyId, int mapId, String pos) {
-        MapHelper.prepareAndLoadMap(questViewModel, this, storyId, mapId, pos);
+        MapHelper.prepareAndLoadMap(new ViewModelProvider(this), this, storyId, mapId, pos);
     }
 
     public void setTitle(String title) {
@@ -299,9 +300,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private UserDataCompanion getActualDataCompanion() {
-        StoryDataModel storyDataModel = questViewModel.getCachedData().getValue();
-
-
+        StoryDataModel storyDataModel = questViewModel.getCachedData();
         return UserDataCompanion.of(userModel, storyDataModel);
     }
 
@@ -355,8 +354,8 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             Toast.makeText(this, "Can not load stage, error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
-        if (processSummary && stage.getTypeStage() == 7 && stage.getText() != null)
-            summary.addMessage(new UserMessage(stage.getTitle(), stage.getText().get(0).text, stage.getBackgroundUrl()));
+        if (processSummary && stage.getTypeStage() == 7 && stage.getTexts() != null)
+            summary.addMessage(new UserMessage(stage.getTitle(), stage.getTexts().get(0).getText(), stage.getBackgroundUrl()));
 
         mFragmentTransaction.commitAllowingStateLoss();
     }

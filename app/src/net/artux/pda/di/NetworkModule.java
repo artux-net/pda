@@ -39,9 +39,6 @@ import timber.log.Timber;
 @InstallIn({SingletonComponent.class})
 public class NetworkModule {
 
-    private static final String CONFIG_BASEURL = "baseUrl";
-    private static final String CONFIG_RESOURCE_URL = "resourceUrl";
-
     @Provides
     @Singleton
     public OkHttpClient httpClient(DataManager dataManager) {
@@ -67,7 +64,7 @@ public class NetworkModule {
     @Singleton
     public Retrofit retrofit(OkHttpClient client, FirebaseRemoteConfig remoteConfig, Gson gson) {
         return new Retrofit.Builder()
-                .baseUrl(remoteConfig.getString(CONFIG_RESOURCE_URL))
+                .baseUrl(remoteConfig.getString(RemoteValue.RESOURCE_URL))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(client)
                 .build();
@@ -77,8 +74,8 @@ public class NetworkModule {
     @Singleton
     public Map<String, Object> defaults() {
         Map<String, Object> defaults = new HashMap<>();
-        defaults.put(CONFIG_BASEURL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);
-        defaults.put(CONFIG_RESOURCE_URL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL);
+        defaults.put(RemoteValue.BASEURL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);
+        defaults.put(RemoteValue.RESOURCE_URL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL);
         return defaults;
     }
 
@@ -108,7 +105,7 @@ public class NetworkModule {
         ApiClient apiClient = new ApiClient();
         apiClient.configureFromOkclient(okHttpClient);
 
-        String baseUrl = remoteConfig.getString(CONFIG_BASEURL);
+        String baseUrl = remoteConfig.getString(RemoteValue.BASEURL);
         if (!baseUrl.equals(FirebaseRemoteConfig.DEFAULT_VALUE_FOR_STRING)) {
             apiClient.getAdapterBuilder().baseUrl(baseUrl);
             Timber.d("BaseUrl was changed: %s", baseUrl);

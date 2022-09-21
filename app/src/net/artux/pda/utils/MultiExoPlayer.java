@@ -7,7 +7,7 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 
 import net.artux.pda.BuildConfig;
-import net.artux.pda.ui.fragments.quest.models.Sound;
+import net.artux.pda.model.quest.Sound;
 
 import java.util.ArrayList;
 import java.util.HashMap;

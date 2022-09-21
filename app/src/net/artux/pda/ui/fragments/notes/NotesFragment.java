@@ -30,7 +30,7 @@ public class NotesFragment extends AdditionalBaseFragment implements NotesAdapte
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentAdditionalNotesBinding.inflate(inflater, container, false);
-        listBinding = FragmentListBinding.bind(binding.getRoot().findViewById(net.artux.pda.R.id.listContainer));
+        listBinding = binding.listContainer;
         return binding.getRoot();
     }
 

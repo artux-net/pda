@@ -1,7 +1,7 @@
 package net.artux.pda.ui.fragments.quest;
 
+import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.TransferModel;
-import net.artux.pda.ui.fragments.quest.models.Stage;
 
 public interface QuestController {
 

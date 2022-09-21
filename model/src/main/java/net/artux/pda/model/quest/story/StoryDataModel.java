@@ -9,6 +9,7 @@ import net.artux.pda.model.items.MedicineModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.items.WearableModel;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class StoryDataModel {
+public class StoryDataModel implements Serializable {
 
     private List<ParameterModel> parameters;
     private List<StoryStateModel> storyStates;
