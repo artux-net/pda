@@ -83,13 +83,13 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 getActivity().finish();
             }
         } else if (id == -1) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Input like that {story}:{chapter}:{stage}.");
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
+            builder.setTitle("Формат ввода {storyId}:{chapterId}:{stageId}");
 
             EditText input = new EditText(getActivity());
             input.setInputType(InputType.TYPE_CLASS_TEXT);
             builder.setView(input);
-            builder.setPositiveButton("Load", (dialog, which) -> {
+            builder.setPositiveButton("Загрузить", (dialog, which) -> {
                 String[] keys = input.getText().toString().split(":");
                 if (keys.length == 3) {
                     try {
@@ -105,7 +105,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                     Toast.makeText(getActivity(), "Error, must be 3 keys", Toast.LENGTH_SHORT).show();
 
             });
-            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+            builder.setNegativeButton("Закрыть", (dialog, which) -> dialog.cancel());
             builder.show();
         }
     }

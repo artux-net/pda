@@ -145,6 +145,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
 
 
         Bundle args = getArguments();
+        client = new OkHttpClient();
         Request.Builder builder = new Request.Builder();
         String path = BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API;
         navigationPresenter.setLoadingState(true);
@@ -194,7 +195,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        client.dispatcher().executorService().shutdown();
         mRecyclerView.setAdapter(null);
         ws.close(1000, "Closed by user");
     }
@@ -219,7 +219,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
                     navigationPresenter.addFragment(UserProfileFragment.of(message.getAuthor().getId()), true);
             }
         });
-        builder.show();
+        builder.create().show();
     }
 
 }

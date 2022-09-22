@@ -3,11 +3,13 @@ package net.artux.pda.ui.fragments.rating
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.model.mapper.UserMapper
 import net.artux.pda.repositories.UserRepository
 import javax.inject.Inject
 
+@HiltViewModel
 class RatingViewModel @Inject constructor(
     var userRepository: UserRepository, var userMapper: UserMapper
 ) : ViewModel() {

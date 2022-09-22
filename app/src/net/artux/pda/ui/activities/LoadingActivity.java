@@ -76,7 +76,7 @@ public class LoadingActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), statusModel.getDescription(), Toast.LENGTH_LONG).show();
                 viewModel.signOut();
                 startActivity(new Intent(this, LoginActivity.class));
-            }
+            }else Toast.makeText(getApplicationContext(), statusModel.getDescription(), Toast.LENGTH_LONG).show();
         });
         viewModel.updateMember();
     }

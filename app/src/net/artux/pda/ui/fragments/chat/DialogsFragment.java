@@ -25,7 +25,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.WebSocket;
 
@@ -34,8 +33,6 @@ public class DialogsFragment extends BaseFragment implements DialogsAdapter.OnCl
 
     @Inject
     protected Gson gson;
-    @Inject
-    protected OkHttpClient client;
     private DialogsAdapter dialogsAdapter;
     private FragmentListBinding listBinding;
     private FragmentDialogsBinding binding;
@@ -111,12 +108,8 @@ public class DialogsFragment extends BaseFragment implements DialogsAdapter.OnCl
     @Override
     public void onDestroy() {
         super.onDestroy();
-        client.dispatcher().executorService().shutdown();
-        //ws.close(1000, null);
-
         listBinding = null;
         listener = null;
-//        ws.cancel();
     }
 
     @Override

@@ -35,6 +35,7 @@ class ProfileViewModel @Inject constructor(
                 .onSuccess {
                     profile.postValue(it)
                 }
+                .onFailure { status.postValue(StatusModel(it)) }
         }
     }
 

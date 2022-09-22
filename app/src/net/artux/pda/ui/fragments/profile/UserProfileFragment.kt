@@ -50,7 +50,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             val bundle = Bundle()
             bundle.putSerializable("pdaId", uuid)
             profileFragment.arguments = bundle
-            return profileFragment;
+            return profileFragment
         }
     }
 

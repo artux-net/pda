@@ -1,20 +1,21 @@
 package net.artux.pda.ui.fragments.news;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import com.google.android.gms.ads.nativead.NativeAd;
 
 import net.artux.pda.R;
 import net.artux.pda.model.news.ArticleModel;
@@ -23,7 +24,6 @@ import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 public class OpenNewsFragment extends BaseFragment {
 
     private WebView content;
-    private NativeAd oldAd;
 
     public static OpenNewsFragment of(ArticleModel articleModel) {
         OpenNewsFragment openNewsFragment = new OpenNewsFragment();
@@ -61,6 +61,21 @@ public class OpenNewsFragment extends BaseFragment {
         content.setBackgroundColor(Color.TRANSPARENT);
 
         content.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (request != null) {
+                    String url = request.getUrl().toString();
+                    if (!url.startsWith("http")) {
+                        return false;
+                    } else {
+                        view.getContext().startActivity(
+                                new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                        return true;
+                    }
+                }
+                return false;
+            }
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {

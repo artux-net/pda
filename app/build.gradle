@@ -65,9 +65,9 @@ android {
     defaultConfig {
         applicationId "net.artux.pda"
         minSdkVersion 26
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionCode 34
-        versionName "0.1.2"
+        versionName "0.1.2 stable not sync"
         signingConfig signingConfigs.release
     }
     buildTypes {

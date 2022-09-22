@@ -5,10 +5,8 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import net.artux.pda.BuildConfig;
@@ -17,7 +15,6 @@ import net.artux.pda.app.DataManager;
 import net.artux.pdanetwork.ApiClient;
 import net.artux.pdanetwork.api.DefaultApi;
 
-import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Locale;
@@ -148,12 +145,8 @@ public class NetworkModule {
                                 return Instant.parse(primitive.getAsString());
                             }
                         })
-                .registerTypeAdapter(Instant.class, new JsonSerializer<>() {
-                    @Override
-                    public JsonElement serialize(Object src, Type typeOfSrc, JsonSerializationContext context) {
-                        return context.serialize(src.toString());
-                    }
-                })
+                .registerTypeAdapter(Instant.class, (JsonSerializer<Object>)
+                        (src, typeOfSrc, context) -> context.serialize(src.toString()))
                 .create();
     }
 
