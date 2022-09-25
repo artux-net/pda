@@ -12,6 +12,7 @@ import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.input.Map;
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.model.quest.story.StoryStateModel;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.QuestActivity;
@@ -23,12 +24,15 @@ import timber.log.Timber;
 
 public class MapEngine extends AndroidApplication implements PlatformInterface {
 
+    private StoryStateModel lastStoryState;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         UserModel member = (UserModel) getIntent().getSerializableExtra("user");
         StoryDataModel dataModel = (StoryDataModel) getIntent().getSerializableExtra("data");
         Map map = (Map) getIntent().getSerializableExtra("map");
+        lastStoryState = dataModel.getCurrentState();
 
         GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
                 .map(map)
@@ -52,12 +56,14 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
                 Timber.d("Got command: %s", data.toString());
                 Intent intent = null;
                 if (data.containsKey("chapter")) {
+                    Integer storyId = lastStoryState.getStoryId();
                     String chapterId = data.get("chapter");
                     String stageId = data.get("stage");
                     if (chapterId != null && stageId != null) {
                         intent = new Intent(this, QuestActivity.class);
-                        intent.putExtra("chapter", Integer.parseInt(chapterId));
-                        intent.putExtra("stage", Integer.parseInt(stageId));
+                        intent.putExtra("storyId", storyId);
+                        intent.putExtra("chapterId", Integer.parseInt(chapterId));
+                        intent.putExtra("stageId", Integer.parseInt(stageId));
                         Timber.d("Start QuestActivity - %s - %s", data.get("chapter"), data.get("stage"));
                     }
                 } else if (data.containsKey("seller")) {

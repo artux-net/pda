@@ -32,7 +32,7 @@ public class QuestPointsHelper {
         Map map = engine.getSystem(DataSystem.class).getMap();
         UserModel userModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().userModel;
         StoryDataModel dataModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().gdxData;
-        StoryStateModel storyStateModel = dataModel.getCurrent();
+        StoryStateModel storyStateModel = dataModel.getCurrentState();
         for (Point point : map.getPoints()) {
             //TODO sync with ui
             if (Checker.check(point.getCondition(), dataModel))

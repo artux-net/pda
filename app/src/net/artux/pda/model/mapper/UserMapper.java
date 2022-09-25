@@ -12,6 +12,7 @@ import net.artux.pdanetwork.model.GangRelationDto;
 import net.artux.pdanetwork.model.Profile;
 import net.artux.pdanetwork.model.RegisterUserDto;
 import net.artux.pdanetwork.model.SimpleUserDto;
+import net.artux.pdanetwork.model.StoryData;
 import net.artux.pdanetwork.model.UserDto;
 
 import org.mapstruct.Mapper;
@@ -48,6 +49,10 @@ public interface UserMapper {
     }
 
     default Gang get(SimpleUserDto.GangEnum gang) {
+        return Enum.valueOf(Gang.class, gang.getValue());
+    }
+
+    default Gang get(StoryData.GangEnum gang) {
         return Enum.valueOf(Gang.class, gang.getValue());
     }
 

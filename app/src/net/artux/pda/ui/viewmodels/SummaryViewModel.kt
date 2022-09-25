@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import net.artux.pda.model.Summary
 import net.artux.pda.repositories.SummaryRepository
-import net.artux.pda.repositories.util.Result
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,28 +16,31 @@ class SummaryViewModel @Inject constructor(
 
     fun getCachedSummary(id: String): MutableLiveData<Summary> {
         val response = repository.getCachedSummary(id)
-        if (response is Result.Success)
-            summary.postValue(response.data)
+        response.onSuccess {
+            summary.postValue(it)
+        }
         return summary
     }
 
-    fun openSummary(id: String){
-        summary.postValue(repository
-            .getCachedSummary(id)
-            .getOrNull())
+    fun openSummary(id: String) {
+        summary.postValue(
+            repository
+                .getCachedSummary(id)
+                .getOrNull()
+        )
     }
 
     fun removeSummary(id: String) {
         repository.remove(id)
         updateSummaries()
-        summary.postValue(null)
+        summary.postValue(Summary())
     }
 
     fun putSummary(id: String, summary: Summary) {
         repository.putSummary(id, summary)
     }
 
-    fun updateSummaries(){
+    fun updateSummaries() {
         summaries.postValue(repository.getAll())
     }
 

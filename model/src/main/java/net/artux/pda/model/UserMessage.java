@@ -1,5 +1,6 @@
 package net.artux.pda.model;
 
+import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
 import java.io.Serializable;
@@ -20,6 +21,17 @@ public class UserMessage implements Serializable {
         timestamp = Instant.now();
     }
 
+    public UserMessage(StoryDataModel storyDataModel, String message) {
+        author = new UserModel();
+        author.setLogin(storyDataModel.getLogin());
+        author.setAvatar(storyDataModel.getAvatar());
+        author.setPdaId(storyDataModel.getPdaId());
+        author.setNickname(storyDataModel.getNickname());
+        author.setGang(storyDataModel.getGang());
+
+        content = message;
+        timestamp = Instant.now();
+    }
 
     public UserMessage(String senderLogin, String message, String avatarId) {
         author = new UserModel();

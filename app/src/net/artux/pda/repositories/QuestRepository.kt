@@ -2,7 +2,7 @@ package net.artux.pda.repositories
 
 import net.artux.pda.api.PdaAPI
 import net.artux.pda.map.model.input.Map
-import net.artux.pda.model.quest.Chapter
+import net.artux.pda.model.quest.ChapterModel
 import net.artux.pda.model.quest.StoriesContainer
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.CommandBlock
@@ -23,7 +23,7 @@ class QuestRepository @Inject constructor(
     private val defaultApi: DefaultApi,
     private val storyDataCache: Cache<StoryData>,
     private val storyCache: Cache<StoriesContainer>,
-    private val questCache: Cache<Chapter>,
+    private val questCache: Cache<ChapterModel>,
     private val mapCache: Cache<Map>
 ) {
 
@@ -48,7 +48,7 @@ class QuestRepository @Inject constructor(
         else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
-    fun getCachedChapter(storyId: Int, chapterId: Int): Result<Chapter> {
+    fun getCachedChapter(storyId: Int, chapterId: Int): Result<ChapterModel> {
         val cache = questCache.get("$storyId:$chapterId")
         return if (cache != null)
             Result.success(cache)
@@ -81,10 +81,10 @@ class QuestRepository @Inject constructor(
         }
     }
 
-    suspend fun getChapter(storyId: Int, chapterId: Int): Result<Chapter> {
+    suspend fun getChapter(storyId: Int, chapterId: Int): Result<ChapterModel> {
         return suspendCoroutine {
-            webservice.getQuest(storyId, chapterId).enqueue(object : Callback<Chapter> {
-                override fun onResponse(call: Call<Chapter>, response: Response<Chapter>) {
+            webservice.getQuest(storyId, chapterId).enqueue(object : Callback<ChapterModel> {
+                override fun onResponse(call: Call<ChapterModel>, response: Response<ChapterModel>) {
                     val data = response.body()
                     if (data != null) {
                         questCache.put(("$storyId:$chapterId").toString(), data)
@@ -93,7 +93,7 @@ class QuestRepository @Inject constructor(
                         it.resume(Result.failure(Exception("Chapter null: $response")))
                 }
 
-                override fun onFailure(call: Call<Chapter>, t: Throwable) {
+                override fun onFailure(call: Call<ChapterModel>, t: Throwable) {
                     it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })

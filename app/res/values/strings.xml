@@ -156,9 +156,9 @@
     <string name="exitStory">Exit story</string>
     <string name="wrong_response">Wrong response from server, please update the app or try again</string>
     <string name="what_is_pda">Что такое ПДА?</string>
-    <string name="help_tab1_title">Что такое ПДА?</string>
+    <string name="help_tab1_title">What is PDA?</string>
     <string name="help_tab1_content">Сталкерский ПДА - многофункциональное приложение для Android, которое поможет тебе погрузиться в атмосферу жизни в Зоне Отчуждения. Ты сможешь приятно провести время в общем чате, посоревноваться с друзьями на онлайн арене, купить и продать снаряжение и самое главное - пройти сюжетные квесты. А после прохождения сюжета тебе будет доступен фриплей, в котором ты решишь сам свою дальнейшую судьбу!</string>
-    <string name="help_tab2_title">Что он умеет?</string>
+    <string name="help_tab2_title">How it works</string>
     <string name="help_tab2_content"><![CDATA[
 
 <h2>Новости мира Зоны</h2>
@@ -171,7 +171,6 @@
 На карте тебе доступны прохождения сюжетных линий и режима свободной игры. Ты сможешь исследовать мир Зоны, выполнять задания, покупать и продавать снаряжение, находить схроны.
 
 ]]></string>
-    <string name="help_tab3_title">Как пользоваться?</string>
     <string name="help_tab3_content"><![CDATA[
 
 <h2>Регистрация</h2>
@@ -182,4 +181,6 @@
 ]]></string>
     <string name="help_tab4_title">Как тогда поступим?</string>
     <string name="friends_of">\"Friends of %s\"</string>
+    <string name="create_note">Create note</string>
+    <string name="help_tab3_title">How to use</string>
 </resources>

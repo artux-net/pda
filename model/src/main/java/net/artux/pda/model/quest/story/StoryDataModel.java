@@ -8,6 +8,7 @@ import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.MedicineModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.items.WearableModel;
+import net.artux.pda.model.user.Gang;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -19,6 +20,15 @@ import lombok.Data;
 @Data
 public class StoryDataModel implements Serializable {
 
+    private String name;
+    private String nickname;
+    private String login;
+    private String avatar;
+    private int money;
+    private int xp;
+    private int pdaId;
+    private Gang gang;
+
     private List<ParameterModel> parameters;
     private List<StoryStateModel> storyStates;
 
@@ -28,17 +38,24 @@ public class StoryDataModel implements Serializable {
     private List<DetectorModel> detectors;
     private List<ArtifactModel> artifacts;
     private List<ItemModel> bullets;
-    private int money;
-
 
     public boolean containsCurrent() {
-        return getCurrent() != null;
+        return getCurrentState() != null;
     }
 
-    public StoryStateModel getCurrent() {
+    public StoryStateModel getCurrentState() {
         if (storyStates != null)
             for (StoryStateModel state : storyStates) {
                 if (state.isCurrent())
+                    return state;
+            }
+        return null;
+    }
+
+    public StoryStateModel getStateByStoryId(int id) {
+        if (storyStates != null)
+            for (StoryStateModel state : storyStates) {
+                if (state.getStoryId() == id)
                     return state;
             }
         return null;

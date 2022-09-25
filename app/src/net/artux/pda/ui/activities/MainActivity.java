@@ -38,10 +38,10 @@ import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.stories.StoriesFragment;
 import net.artux.pda.ui.viewmodels.UserViewModel;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;
@@ -51,8 +51,9 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
     private ActivityMainBinding binding;
     private MainPresenter presenter;
-    private BroadcastReceiver timeReceiver;
-    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm dd/MM/yy", Locale.US);
+    private BroadcastReceiver timeChangeReceiver;
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yy")
+            .withZone(ZoneId.systemDefault());
     private UserViewModel viewModel;
 
     @Override
@@ -88,6 +89,8 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
                 Snackbar.make(binding.getRoot(), statusModel.getDescription(), Snackbar.LENGTH_INDEFINITE)
                         .setAction("Ok", view -> {})
                         .show();
+                if (!statusModel.isSuccess())
+                    Timber.e(statusModel.getDescription());
             }
         }
 
@@ -165,16 +168,16 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     @Override
     public void onStart() {
         super.onStart();
-        binding.timeView.setText(timeFormat.format(new Date()));
-        timeReceiver = new BroadcastReceiver() {
+        binding.timeView.setText(timeFormatter.format(Instant.now()));
+        timeChangeReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction() != null && intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0)
-                    binding.timeView.setText(timeFormat.format(new Date()));
+                    binding.timeView.setText(timeFormatter.format(Instant.now()));
             }
         };
 
-        registerReceiver(timeReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+        registerReceiver(timeChangeReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
 
         setLoadingState(false);
     }
@@ -182,8 +185,8 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     @Override
     public void onStop() {
         super.onStop();
-        if (timeReceiver != null)
-            unregisterReceiver(timeReceiver);
+        if (timeChangeReceiver != null)
+            unregisterReceiver(timeChangeReceiver);
     }
 
     @Override

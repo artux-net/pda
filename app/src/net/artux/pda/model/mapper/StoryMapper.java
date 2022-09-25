@@ -9,7 +9,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = ItemMapper.class)
+@Mapper(uses = {ItemMapper.class, UserMapper.class})
 public interface StoryMapper {
 
     StoryMapper INSTANCE = Mappers.getMapper(StoryMapper.class);

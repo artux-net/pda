@@ -49,12 +49,10 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
         binding = FragmentQuest3Binding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        if (viewModel == null)
-            viewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        if (questViewModel == null)
-            questViewModel = new ViewModelProvider(this).get(QuestViewModel.class);
-        if (sellerViewModel == null)
-            sellerViewModel = new ViewModelProvider(this).get(SellerViewModel.class);
+        ViewModelProvider provider = new ViewModelProvider(this);
+        viewModel = provider.get(UserViewModel.class);
+        questViewModel = provider.get(QuestViewModel.class);
+        sellerViewModel = provider.get(SellerViewModel.class);
 
         long sellerId = getIntent().getIntExtra("seller", 0);
 

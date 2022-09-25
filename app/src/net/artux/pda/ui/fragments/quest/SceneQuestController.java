@@ -1,12 +1,11 @@
 package net.artux.pda.ui.fragments.quest;
 
-import net.artux.pda.model.quest.Chapter;
+import net.artux.pda.model.quest.ChapterModel;
 import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.TransferModel;
 import net.artux.pda.ui.activities.StageListener;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 public class SceneQuestController implements Serializable, QuestController {
 
@@ -14,9 +13,9 @@ public class SceneQuestController implements Serializable, QuestController {
     private final StageListener listener;
     private final int storyId;
     private final int chapterId;
-    private final Chapter chapter;
+    private final ChapterModel chapter;
 
-    public SceneQuestController(StageListener listener, int storyId, int chapterId, Chapter chapter) {
+    public SceneQuestController(StageListener listener, int storyId, int chapterId, ChapterModel chapter) {
         this.listener = listener;
         this.storyId = storyId;
         this.chapterId = chapterId;
@@ -48,22 +47,14 @@ public class SceneQuestController implements Serializable, QuestController {
     }
 
     void loadStage(int id, boolean sync) {
-        actualStage = getStage(id);
+        actualStage = chapter.getStage(id);
         if (sync)
             synchronize(actualStage, id);
         listener.prepareStage(actualStage);
         listener.setStage(actualStage, sync);
     }
 
-    private Stage getStage(int id) {
-        Iterator<Stage> iterator = chapter.getStages().iterator();
-        Stage stage = null;
-        while (iterator.hasNext()) {
-            stage = iterator.next();
-            if (stage.getId() == id) break;
-        }
-        return stage;
-    }
+
 
     public Stage getActualStage() {
         return actualStage;

@@ -101,4 +101,8 @@
     <string name="notEqualPasswords">Пароли не совпадают.</string>
     <string name="what_is_pda">Что такое ПДА?</string>
     <string name="wrong_response">Ошибка запроса, обновите приложение</string>
+    <string name="create_note">Создать заметку</string>
+    <string name="help_tab3_title">Как пользоваться?</string>
+    <string name="help_tab2_title">Что он умеет?</string>
+    <string name="help_tab1_title">Что такое ПДА?</string>
 </resources>

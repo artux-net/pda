@@ -1,17 +1,15 @@
 package net.artux.pda.model.mapper;
 
-import android.content.Context;
-
 import net.artux.pda.model.Checker;
+import net.artux.pda.model.quest.NotificationModel;
+import net.artux.pda.model.quest.NotificationType;
 import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.StageModel;
 import net.artux.pda.model.quest.StageType;
 import net.artux.pda.model.quest.Text;
 import net.artux.pda.model.quest.Transfer;
 import net.artux.pda.model.quest.TransferModel;
-import net.artux.pda.model.quest.UserDataCompanion;
-import net.artux.pda.model.user.UserModel;
-import net.artux.pda.utils.GroupHelper;
+import net.artux.pda.model.quest.story.StoryDataModel;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -24,47 +22,70 @@ public interface StageMapper {
 
     StageMapper INSTANCE = Mappers.getMapper(StageMapper.class);
 
-    default StageModel model(Stage stage, UserDataCompanion dataCompanion, Context context) {
+    default StageModel model(Stage stage, StoryDataModel dataCompanion) {
         StageModel stageModel = new StageModel();
         stageModel.setTitle(stage.getTitle());
         if (stage.getType_stage() == 1)
             stageModel.setType(StageType.CHAPTER_OVER);
+        else if (stage.getType_stage() == 7)
+            stageModel.setType(StageType.DIALOG);
         else
             stageModel.setType(StageType.USUAL);
-        stageModel.setContent(getText(stage, dataCompanion, context));
-        stageModel.setTransfers(getTransfers(stage, dataCompanion, context));
+        stageModel.setContent(getText(stage, dataCompanion));
+        stageModel.setTransfers(getTransfers(stage, dataCompanion));
         return stageModel;
     }
 
+    default NotificationModel notification(Stage stage, StoryDataModel storyDataModel) {
+        if (stage != null && stage.getMessage() != null && !stage.getMessage().trim().equals("")) {
+            NotificationModel notificationModel = new NotificationModel();
+            String title = null;
+            String message = formatText(stage.getMessage(), storyDataModel);
+            if (message.contains(":")) {
+                title = message.split(":")[0];
+                message = message.split(":")[1];
+            }
+            notificationModel.setTitle(title);
+            notificationModel.setMessage(message);
 
-    default String getText(Stage stage, UserDataCompanion dataCompanion, Context context) {
+            if (stage.getType_stage() == 0)
+                notificationModel.setType(NotificationType.ALERT);
+            else
+                notificationModel.setType(NotificationType.MESSAGE);
+
+            return notificationModel;
+        }
+        return null;
+    }
+
+
+    default String getText(Stage stage, StoryDataModel dataCompanion) {
         List<Text> contentVariants = new ArrayList<>();
         for (Text text : stage.getTexts())
-            if (Checker.check(text.getCondition(), dataCompanion.getStoryData())) {
-                text.setText(formatText(text.getText(), dataCompanion.getUser(), context));
+            if (Checker.check(text.getCondition(), dataCompanion)) {
+                text.setText(formatText(text.getText(), dataCompanion));
                 contentVariants.add(text);
             }
         return contentVariants.get(0).getText();
     }
 
-    default List<TransferModel> getTransfers(Stage stage, UserDataCompanion dataCompanion, Context context) {
+    default List<TransferModel> getTransfers(Stage stage, StoryDataModel dataCompanion) {
         List<TransferModel> transfers = new ArrayList<>();
         for (Transfer transfer : stage.getTransfers())
-            if (Checker.check(transfer.getCondition(), dataCompanion.getStoryData())) {
-                transfer.setText(formatText(transfer.getText(), dataCompanion.getUser(), context));
+            if (Checker.check(transfer.getCondition(), dataCompanion)) {
+                transfer.setText(formatText(transfer.getText(), dataCompanion));
                 transfers.add(new TransferModel(transfer.getStage_id(), transfer.getText()));
             }
         return transfers;
     }
 
 
-    default String formatText(String text, UserModel userModel, Context context) {
+    default String formatText(String text, StoryDataModel userModel) {
         return text.replaceAll("@name", userModel.getName())
                 .replaceAll("@nickname", userModel.getNickname())
                 .replaceAll("@money", String.valueOf(userModel.getMoney()))
                 .replaceAll("@xp", String.valueOf(userModel.getXp()))
                 .replaceAll("@login", userModel.getLogin())
-                .replaceAll("@group", GroupHelper.getTitle(userModel.getGang(), context))
                 .replaceAll("@pdaId", String.valueOf(userModel.getPdaId()));
     }
 

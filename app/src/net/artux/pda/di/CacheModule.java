@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.map.model.input.Map;
 import net.artux.pda.model.Summary;
-import net.artux.pda.model.quest.Chapter;
+import net.artux.pda.model.quest.ChapterModel;
 import net.artux.pda.model.quest.StoriesContainer;
 import net.artux.pda.repositories.Cache;
 import net.artux.pdanetwork.model.ArticleDto;
@@ -43,8 +43,8 @@ public class CacheModule {
     }
 
     @Provides
-    public Cache<Chapter> getChapterCache(@ApplicationContext Context context, Gson gson) {
-        return new Cache<>(Chapter.class, context, gson);
+    public Cache<ChapterModel> getChapterCache(@ApplicationContext Context context, Gson gson) {
+        return new Cache<>(ChapterModel.class, context, gson);
     }
 
     @Provides

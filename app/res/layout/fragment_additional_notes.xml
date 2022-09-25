@@ -12,7 +12,7 @@
            android:id="@+id/noteCreateBtn"
            android:layout_width="match_parent"
            android:layout_height="wrap_content"
-           android:text="Create note" />
+           android:text="@string/create_note" />
 
        <include
            android:id="@id/listContainer"

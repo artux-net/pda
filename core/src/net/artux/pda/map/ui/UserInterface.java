@@ -276,7 +276,7 @@ public class UserInterface extends Group implements Disposable {
         UserModel userModel = gsm.getMember();
         Map map = (Map) gsm.get("map");
         StoryDataModel dataModel = (StoryDataModel) gsm.get("data");
-        StoryStateModel storyStateModel = dataModel.getCurrent();
+        StoryStateModel storyStateModel = dataModel.getCurrentState();
 
         if (map != null)
             for (final Point point : map.getPoints()) {

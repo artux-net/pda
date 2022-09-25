@@ -10,7 +10,7 @@ import net.artux.pda.model.StatusModel
 import net.artux.pda.model.items.WearableModel
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
-import net.artux.pda.model.quest.Chapter
+import net.artux.pda.model.quest.ChapterModel
 import net.artux.pda.model.quest.StoriesContainer
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
@@ -24,7 +24,7 @@ class QuestViewModel @Inject constructor(
     var statusMapper: StatusMapper
 ) : ViewModel() {
 
-    var chapter: MutableLiveData<Chapter> = MutableLiveData()
+    var chapter: MutableLiveData<ChapterModel> = MutableLiveData()
     var map: MutableLiveData<Map> = MutableLiveData()
     var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
     var storiesContainer: MutableLiveData<StoriesContainer> = MutableLiveData()
@@ -51,7 +51,7 @@ class QuestViewModel @Inject constructor(
     }
 
 
-    private fun getCachedChapter(storyId: Int, chapterId: Int): Chapter? {
+    private fun getCachedChapter(storyId: Int, chapterId: Int): ChapterModel? {
         return repository.getCachedChapter(storyId, chapterId).getOrNull()
     }
 
@@ -86,7 +86,7 @@ class QuestViewModel @Inject constructor(
         }
     }
 
-    fun getChapter(storyId: Int, chapterId: Int): MutableLiveData<Chapter> {
+    fun getChapter(storyId: Int, chapterId: Int): MutableLiveData<ChapterModel> {
         chapter.value = getCachedChapter(storyId, chapterId)
         updateChapter(storyId, chapterId)
         return chapter

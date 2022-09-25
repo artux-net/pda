@@ -14,12 +14,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import net.artux.pda.R;
 import net.artux.pda.model.quest.StageModel;
 import net.artux.pda.model.quest.StageType;
 import net.artux.pda.model.quest.TransferModel;
-import net.artux.pda.ui.activities.QuestActivity;
+import net.artux.pda.ui.viewmodels.StoryViewModel;
 
 import java.util.List;
 
@@ -29,12 +30,11 @@ public class StageFragment extends Fragment {
     private ColorStateList colorStateList;
 
     private StageModel stage;
-    private QuestController controller;
+    private StoryViewModel storyViewModel;
 
-    public static StageFragment createInstance(StageModel stage, QuestController questController) {
+    public static StageFragment createInstance(StageModel stage) {
         StageFragment stageFragment = new StageFragment();
         stageFragment.setStage(stage);
-        stageFragment.setController(questController);
         return stageFragment;
     }
 
@@ -42,34 +42,27 @@ public class StageFragment extends Fragment {
         this.stage = stage;
     }
 
-    public void setController(QuestController controller) {
-        this.controller = controller;
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        if (stage.getType() == StageType.USUAL)
-            return inflater.inflate(R.layout.fragment_quest0, container, false);
-        else
+        if (stage.getType() == StageType.CHAPTER_OVER)
             return inflater.inflate(R.layout.fragment_quest1, container, false);
+        else
+            return inflater.inflate(R.layout.fragment_quest0, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        storyViewModel = new ViewModelProvider(requireActivity()).get(StoryViewModel.class);
+
         TextView mainText = view.findViewById(R.id.sceneText);
         colorStateList = mainText.getTextColors();
         sceneResponses = view.findViewById(R.id.sceneResponses);
 
         mainText.setText(stage.getContent());
 
-        if (getActivity() != null) {
-            ((QuestActivity) getActivity()).setTitle(stage.getTitle());
-
-        }
-
-        if (stage.getType() != StageType.USUAL) {
+        if (stage.getType() == StageType.CHAPTER_OVER) {
             TextView title = view.findViewById(R.id.sceneTitle);
             title.setText(stage.getTitle());
 
@@ -83,7 +76,7 @@ public class StageFragment extends Fragment {
                 else
                     button.setText(getActivity().getString(R.string.okay));
 
-                button.setOnClickListener(v -> controller.chooseTransfer((transfers.get(0))));
+                button.setOnClickListener(v -> storyViewModel.chooseTransfer((transfers.get(0))));
             }
         } else {
             setSceneResponses(stage.getTransfers());
@@ -103,7 +96,7 @@ public class StageFragment extends Fragment {
             if (getActivity() != null) {
                 button.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.black_overlay));
                 button.setOnClickListener(v ->
-                        controller.chooseTransfer(transfer));
+                        storyViewModel.chooseTransfer(transfer));
             }
             sceneResponses.addView(button);
         }
