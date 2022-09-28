@@ -38,7 +38,6 @@ import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.StageModel;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
 import net.artux.pda.ui.fragments.quest.StageFragment;
-import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.ui.viewmodels.StoryViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
 import net.artux.pda.utils.MultiExoPlayer;
@@ -69,9 +68,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             .withZone(ZoneId.systemDefault());
     private MultiExoPlayer multiExoPlayer;
 
-    private QuestViewModel questViewModel;
     private StoryViewModel storyViewModel;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +76,6 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_quest);
 
         ViewModelProvider provider = new ViewModelProvider(this);
-        questViewModel = provider.get(QuestViewModel.class);
         storyViewModel = provider.get(StoryViewModel.class);
 
         storyViewModel.getChapter().observe(this, chapter -> {
@@ -116,7 +112,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             Intent intent = new Intent(QuestActivity.this, MapEngine.class);
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK);
             intent.putExtra("map", map);
-            intent.putExtra("data", questViewModel.getCachedData());
+            intent.putExtra("data", storyViewModel.storyDataModel);
             intent.putExtra("user", provider.get(UserViewModel.class).getFromCache());
             QuestActivity.this.startActivity(intent);
             QuestActivity.this.finish();
@@ -195,16 +191,6 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         switcher = findViewById(R.id.switcher);
         switcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
         switcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
-
-        questViewModel.getStatus().observe(this, status -> {
-            if (!status.isSuccess()) {
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.putExtra("status", status);
-                startActivity(intent);
-                finish();
-            } else
-                Toast.makeText(getApplicationContext(), status.getDescription(), Toast.LENGTH_LONG).show();
-        });
 
         startLoading();
     }

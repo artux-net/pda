@@ -107,9 +107,10 @@ public class NetworkModule {
     public ApiClient apiClient(OkHttpClient okHttpClient, FirebaseRemoteConfig remoteConfig) {
         ApiClient apiClient = new ApiClient();
         apiClient.configureFromOkclient(okHttpClient);
-
         String baseUrl = remoteConfig.getString(RemoteValue.BASEURL);
-        if (!baseUrl.equals(FirebaseRemoteConfig.DEFAULT_VALUE_FOR_STRING)) {
+        if (BuildConfig.DEBUG)
+            apiClient.getAdapterBuilder().baseUrl(BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);
+        else if (!baseUrl.equals(FirebaseRemoteConfig.DEFAULT_VALUE_FOR_STRING)) {
             apiClient.getAdapterBuilder().baseUrl(baseUrl);
             Timber.d("BaseUrl was changed: %s", baseUrl);
         } else
