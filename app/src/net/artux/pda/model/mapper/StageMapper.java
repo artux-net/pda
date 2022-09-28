@@ -24,10 +24,11 @@ public interface StageMapper {
 
     default StageModel model(Stage stage, StoryDataModel dataCompanion) {
         StageModel stageModel = new StageModel();
+        stageModel.setId(stage.getId());
         stageModel.setTitle(stage.getTitle());
-        if (stage.getType_stage() == 1)
+        if (stage.getTypeStage() == 1)
             stageModel.setType(StageType.CHAPTER_OVER);
-        else if (stage.getType_stage() == 7)
+        else if (stage.getTypeStage() == 7)
             stageModel.setType(StageType.DIALOG);
         else
             stageModel.setType(StageType.USUAL);
@@ -48,7 +49,7 @@ public interface StageMapper {
             notificationModel.setTitle(title);
             notificationModel.setMessage(message);
 
-            if (stage.getType_stage() == 0)
+            if (stage.getTypeStage() == 0)
                 notificationModel.setType(NotificationType.ALERT);
             else
                 notificationModel.setType(NotificationType.MESSAGE);
@@ -74,7 +75,7 @@ public interface StageMapper {
         for (Transfer transfer : stage.getTransfers())
             if (Checker.check(transfer.getCondition(), dataCompanion)) {
                 transfer.setText(formatText(transfer.getText(), dataCompanion));
-                transfers.add(new TransferModel(transfer.getStage_id(), transfer.getText()));
+                transfers.add(new TransferModel(transfer.getStageId(), transfer.getText()));
             }
         return transfers;
     }

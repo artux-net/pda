@@ -43,10 +43,10 @@ public class QuestPointsHelper {
                 } else addPoint(engine, assetManager, point);
         }
 
-        for (Transfer transfer : map.getTransfers()) {
+        /*for (Transfer transfer : map.getTransfers()) {
             if (userModel != null && Checker.check(transfer.condition, dataModel))
                 addTransferPoint(engine, assetManager, transfer);
-        }
+        }*/
     }
 
     private static void addPoint(final Engine engine, AssetManager assetManager, final Point point) {

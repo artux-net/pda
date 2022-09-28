@@ -14,7 +14,7 @@ import java.util.List;
 public class PreloadState extends State {
 
     private static final String protocol = "https";
-    private static final String url = "api.artux.net/";
+    private static final String url = "files.artux.net/";
     private static final String baseUrl = protocol + "://" + url;
     String cachePath = "cache/";
     int triesLimit = 3;

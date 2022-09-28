@@ -63,12 +63,12 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             } else questViewModel.updateStories();
         });
 
-        questViewModel.getStoriesContainer().observe(getViewLifecycleOwner(), storiesContainer -> {
+        questViewModel.getStories().observe(getViewLifecycleOwner(), stories -> {
             navigationPresenter.setLoadingState(false);
-            if (storiesContainer.getStories().size() > 0) {
+            if (stories.size() > 0) {
                 binding.list.setVisibility(View.VISIBLE);
                 binding.viewMessage.setVisibility(View.GONE);
-                adapter.setStories(storiesContainer.getStories());
+                adapter.setStories(stories);
             } else {
                 binding.list.setVisibility(View.GONE);
                 binding.viewMessage.setVisibility(View.VISIBLE);
@@ -83,10 +83,13 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
     public void onClick(int id) {
         if (id > -1) {
             Intent intent = new Intent(requireContext(), QuestActivity.class);
+
             StoryStateModel storyStateModel = questViewModel.getCachedData().getStateByStoryId(id);
             intent.putExtra("storyId", id);
-            intent.putExtra("chapterId", storyStateModel.getChapterId());
-            intent.putExtra("stageId", storyStateModel.getStageId());
+            if (storyStateModel != null) {
+                intent.putExtra("chapterId", storyStateModel.getChapterId());
+                intent.putExtra("stageId", storyStateModel.getStageId());
+            }
             requireActivity().startActivity(intent);
             requireActivity().finish();
         } else if (id == -1) {

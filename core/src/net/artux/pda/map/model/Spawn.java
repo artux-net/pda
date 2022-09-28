@@ -44,4 +44,36 @@ public class Spawn implements Serializable {
     public int getId() {
         return id;
     }
+
+    public String getPos() {
+        return pos;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setR(int r) {
+        this.r = r;
+    }
+
+    public void setN(int n) {
+        this.n = n;
+    }
+
+    public void setPos(String pos) {
+        this.pos = pos;
+    }
+
+    public void setAngry(boolean angry) {
+        this.angry = angry;
+    }
+
+    public void setIgnorePlayer(boolean ignorePlayer) {
+        this.ignorePlayer = ignorePlayer;
+    }
+
+    public void setData(HashMap<String, String> data) {
+        this.data = data;
+    }
 }

@@ -65,9 +65,10 @@ class StoryViewModel @javax.inject.Inject constructor(
                 .getOrThrow()
 
             repository.getChapter(storyId, chapterId)
+                .map { mapper.chapter(it) }
                 .onSuccess {
                     chapter.postValue(it)
-                    background.postValue(it.stages[0].background_url)
+                    background.postValue(it.stages[0].backgroundUrl)
                     val chapterStage = it.getStage(stageId)
 
                     if (chapterStage != null) {
@@ -91,19 +92,19 @@ class StoryViewModel @javax.inject.Inject constructor(
         states.add("$currentStoryId:$currentChapterId:${chapterStage.id}")
         actionsMap["state"] = states
 
-        if (chapterStage.type_stage == 7 && chapterStage.texts[0].text != null)
+        if (chapterStage.typeStage == 7 && chapterStage.texts[0].text != null)
             summaryMessages.add(
                 UserMessage(
                     chapterStage.title,
                     chapterStage.texts[0].text,
-                    chapterStage.background_url
+                    chapterStage.backgroundUrl
                 )
             )
     }
 
     private fun setStage(chapterStage: Stage) {
         viewModelScope.launch {
-            when (chapterStage.type_stage) {
+            when (chapterStage.typeStage) {
                 4 -> {
                     //переход на карту
                     sync()
@@ -112,6 +113,7 @@ class StoryViewModel @javax.inject.Inject constructor(
                     if (mapId != null) {
                         if (chapterStage.data.containsKey("pos")) {
                             repository.getMap(currentStoryId, mapId.toInt())
+                                .map { mapper.map(it) }
                                 .onSuccess {
                                     if (chapterStage.data.containsKey("pos"))
                                         it.setPlayerPos(chapterStage.data["pos"])
@@ -138,7 +140,7 @@ class StoryViewModel @javax.inject.Inject constructor(
                     data.postValue(chapterStage.data)
                 }
                 else -> {
-                    background.postValue(chapterStage.background_url)
+                    background.postValue(chapterStage.backgroundUrl)
                     notification.postValue(stageMapper.notification(chapterStage, storyDataModel))
                     stage.postValue(stageMapper.model(chapterStage, storyDataModel))
                 }

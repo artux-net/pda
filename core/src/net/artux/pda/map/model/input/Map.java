@@ -3,7 +3,6 @@ package net.artux.pda.map.model.input;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.model.Spawn;
-import net.artux.pda.map.model.Transfer;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,7 +17,6 @@ public class Map implements Serializable {
     private String blurTexture;
     private String defPos;
     private List<Point> points;
-    private List<Transfer> transfers;
     private List<Spawn> spawns;
 
     public void setTexture(String texture) {
@@ -77,7 +75,43 @@ public class Map implements Serializable {
         return blurTexture;
     }
 
-    public List<Transfer> getTransfers() {
-        return transfers;
+    public String getTexture() {
+        return texture;
+    }
+
+    public String getBoundsTexture() {
+        return boundsTexture;
+    }
+
+    public String getBlurTexture() {
+        return blurTexture;
+    }
+
+    public String getDefPos() {
+        return defPos;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setTilesTexture(String tilesTexture) {
+        this.tilesTexture = tilesTexture;
+    }
+
+    public void setDefPos(String defPos) {
+        this.defPos = defPos;
+    }
+
+    public void setPoints(List<Point> points) {
+        this.points = points;
+    }
+
+    public void setSpawns(List<Spawn> spawns) {
+        this.spawns = spawns;
     }
 }

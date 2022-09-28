@@ -1,13 +1,7 @@
 package net.artux.pda.repositories
 
-import net.artux.pda.api.PdaAPI
-import net.artux.pda.map.model.input.Map
-import net.artux.pda.model.quest.ChapterModel
-import net.artux.pda.model.quest.StoriesContainer
 import net.artux.pdanetwork.api.DefaultApi
-import net.artux.pdanetwork.model.CommandBlock
-import net.artux.pdanetwork.model.Status
-import net.artux.pdanetwork.model.StoryData
+import net.artux.pdanetwork.model.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,12 +13,11 @@ import kotlin.coroutines.suspendCoroutine
 
 @Singleton
 class QuestRepository @Inject constructor(
-    private val webservice: PdaAPI,
     private val defaultApi: DefaultApi,
     private val storyDataCache: Cache<StoryData>,
-    private val storyCache: Cache<StoriesContainer>,
-    private val questCache: Cache<ChapterModel>,
-    private val mapCache: Cache<Map>
+    private val storyCache: Cache<StoryDto>,
+    private val questCache: Cache<Chapter>,
+    private val mapCache: Cache<GameMap>
 ) {
 
     fun clearCache() {
@@ -41,81 +34,94 @@ class QuestRepository @Inject constructor(
         else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
-    fun getCachedStories(): Result<StoriesContainer> {
-        val cache = storyCache.get("stories")
+    fun getCachedStories(): Result<List<StoryDto>> {
+        val cache = storyCache.all
         return if (cache != null)
             Result.success(cache)
         else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
-    fun getCachedChapter(storyId: Int, chapterId: Int): Result<ChapterModel> {
+    fun getCachedChapter(storyId: Int, chapterId: Int): Result<Chapter> {
         val cache = questCache.get("$storyId:$chapterId")
         return if (cache != null)
             Result.success(cache)
         else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
-    fun getCachedMap(storyId: Int, mapId: Int): Result<Map> {
+    fun getCachedMap(storyId: Int, mapId: Int): Result<GameMap> {
         val cache = mapCache.get("$storyId:$mapId")
         return if (cache != null)
             Result.success(cache)
         else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
-    suspend fun updateStories(): Result<StoriesContainer> {
+    suspend fun updateStories(): Result<List<StoryDto>> {
         return suspendCoroutine {
-            webservice.stories.enqueue(object : Callback<StoriesContainer> {
-                override fun onResponse(call: Call<StoriesContainer>, response: Response<StoriesContainer>) {
+            defaultApi.stories.enqueue(object : Callback<List<StoryDto>> {
+                override fun onResponse(
+                    call: Call<List<StoryDto>>,
+                    response: Response<List<StoryDto>>
+                ) {
                     val data = response.body()
                     if (data != null) {
-                        storyCache.put(("stories").toString(), data)
+                        for (story in data) {
+                            storyCache.put(story.id.toString(), story)
+                        }
                         it.resume(Result.success(data))
                     } else
                         it.resume(Result.failure(Exception("Chapter null: $response")))
                 }
 
-                override fun onFailure(call: Call<StoriesContainer>, t: Throwable) {
+                override fun onFailure(call: Call<List<StoryDto>>, t: Throwable) {
                     it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })
         }
     }
 
-    suspend fun getChapter(storyId: Int, chapterId: Int): Result<ChapterModel> {
+    suspend fun getChapter(storyId: Int, chapterId: Int): Result<Chapter> {
         return suspendCoroutine {
-            webservice.getQuest(storyId, chapterId).enqueue(object : Callback<ChapterModel> {
-                override fun onResponse(call: Call<ChapterModel>, response: Response<ChapterModel>) {
-                    val data = response.body()
-                    if (data != null) {
-                        questCache.put(("$storyId:$chapterId").toString(), data)
-                        it.resume(Result.success(data))
-                    } else
-                        it.resume(Result.failure(Exception("Chapter null: $response")))
-                }
+            defaultApi.getChapter(storyId.toLong(), chapterId.toLong())
+                .enqueue(object : Callback<Chapter> {
+                    override fun onResponse(call: Call<Chapter>, response: Response<Chapter>) {
+                        val data = response.body()
+                        if (data != null) {
+                            questCache.put(("$storyId:$chapterId").toString(), data)
+                            it.resume(Result.success(data))
+                        } else
+                            it.resume(Result.failure(Exception("Chapter null: $response")))
+                    }
 
-                override fun onFailure(call: Call<ChapterModel>, t: Throwable) {
-                    it.resume(Result.failure(java.lang.Exception(t)))
-                }
-            })
+                    override fun onFailure(call: Call<Chapter>, t: Throwable) {
+                        it.resume(Result.failure(java.lang.Exception(t)))
+                    }
+                })
         }
     }
 
-    suspend fun getMap(storyId: Int, mapId: Int): Result<Map> {
+    suspend fun getMap(storyId: Int, mapId: Int): Result<GameMap> {
         return suspendCoroutine {
-            webservice.getMap(storyId, mapId).enqueue(object : Callback<Map> {
-                override fun onResponse(call: Call<Map>, response: Response<Map>) {
-                    val data = response.body()
-                    if (data != null) {
-                        mapCache.put(("$storyId:$mapId").toString(), data)
-                        it.resume(Result.success(data))
-                    } else
-                        it.resume(Result.failure(Exception("Map null $response")))
-                }
+            defaultApi.getMap(storyId.toLong(), mapId.toLong())
+                .enqueue(object : Callback<GameMap> {
+                    override fun onResponse(
+                        call: Call<GameMap>,
+                        response: Response<GameMap>
+                    ) {
+                        val data = response.body()
+                        if (data != null) {
+                            mapCache.put(("$storyId:$mapId").toString(), data)
+                            it.resume(Result.success(data))
+                        } else
+                            it.resume(Result.failure(Exception("Map null $response")))
+                    }
 
-                override fun onFailure(call: Call<Map>, t: Throwable) {
-                    it.resume(Result.failure(java.lang.Exception(t)))
-                }
-            })
+                    override fun onFailure(
+                        call: Call<GameMap>,
+                        t: Throwable
+                    ) {
+                        it.resume(Result.failure(java.lang.Exception(t)))
+                    }
+                })
         }
     }
 
@@ -175,7 +181,7 @@ class QuestRepository @Inject constructor(
                         storyDataCache.put("story", data)
                         it.resume(Result.success(data))
                     } else
-                        it.resume(Result.failure(Exception("Story null")))
+                        it.resume(Result.failure(Exception(response.toString())))
                 }
 
                 override fun onFailure(call: Call<StoryData>, t: Throwable) {
@@ -195,7 +201,7 @@ class QuestRepository @Inject constructor(
                         storyDataCache.put("story", data)
                         it.resume(Result.success(data))
                     } else
-                        it.resume(Result.failure(Exception("Story null")))
+                        it.resume(Result.failure(Exception("Story data null")))
                 }
 
                 override fun onFailure(call: Call<StoryData>, t: Throwable) {

@@ -10,7 +10,6 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 
 import net.artux.pda.BuildConfig;
-import net.artux.pda.api.PdaAPI;
 import net.artux.pda.app.DataManager;
 import net.artux.pdanetwork.ApiClient;
 import net.artux.pdanetwork.api.DefaultApi;
@@ -81,14 +80,14 @@ public class NetworkModule {
     public FirebaseRemoteConfig remoteConfig(Map<String, Object> defaults) {
         FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
         FirebaseRemoteConfigSettings configSettings;
-        if(BuildConfig.DEBUG)
+        if (BuildConfig.DEBUG)
             configSettings = new FirebaseRemoteConfigSettings.Builder()
                     .setMinimumFetchIntervalInSeconds(0)
                     .build();
         else
             configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(3600)
-                .build();
+                    .setMinimumFetchIntervalInSeconds(3600)
+                    .build();
 
         remoteConfig.setConfigSettingsAsync(configSettings);
         remoteConfig.setDefaultsAsync(defaults);
@@ -122,12 +121,6 @@ public class NetworkModule {
     @Singleton
     public DefaultApi getDefaultApi(ApiClient apiClient) {
         return apiClient.createService(DefaultApi.class);
-    }
-
-    @Provides
-    @Singleton
-    public PdaAPI getPdaAPI(Retrofit retrofit) {
-        return retrofit.create(PdaAPI.class);
     }
 
     @Provides

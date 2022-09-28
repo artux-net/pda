@@ -28,6 +28,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
@@ -86,13 +87,13 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                 multiExoPlayer = new MultiExoPlayer(QuestActivity.this, chapter.getMusic());
                 //preload images
                 for (Stage stage : chapter.getStages()) {
-                    if (stage.getBackground_url() != null && !stage.getBackground_url().equals("")) {
+                    if (stage.getBackgroundUrl() != null && !stage.getBackgroundUrl().equals("")) {
                         String background_url;
-                        if (!stage.getBackground_url().contains("http")) {
+                        if (!stage.getBackgroundUrl().contains("http")) {
                             //todo remote url
-                            background_url = "https://" + BuildConfig.URL + "/" + stage.getBackground_url();
+                            background_url = "https://" + BuildConfig.URL + "/" + stage.getBackgroundUrl();
                         } else
-                            background_url = stage.getBackground_url();
+                            background_url = stage.getBackgroundUrl();
 
                         Glide.with(QuestActivity.this)
                                 .downloadOnly()
@@ -117,7 +118,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             intent.putExtra("map", map);
             intent.putExtra("data", questViewModel.getCachedData());
             intent.putExtra("user", provider.get(UserViewModel.class).getFromCache());
-            QuestActivity.this.startActivityForResult(intent, 2);
+            QuestActivity.this.startActivity(intent);
             QuestActivity.this.finish();
         });
 
@@ -278,9 +279,12 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         else if (id == R.id.log) {
             StageModel stage = storyViewModel.getStage().getValue();
 
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gsonBuilder.setPrettyPrinting();
+
             String logStage = "Story: " + storyViewModel.getCurrentStoryId() + "\n" +
                     "Chapter: " + storyViewModel.getCurrentChapterId() + "\n" +
-                    gson.toJson(stage);
+                    gsonBuilder.create().toJson(stage);
 
             Intent intent = new Intent(this, LogActivity.class);
             intent.putExtra("text", logStage);

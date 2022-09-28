@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class StageModel {
 
+    private int id;
     private String title;
     private String content;
     private StageType type;

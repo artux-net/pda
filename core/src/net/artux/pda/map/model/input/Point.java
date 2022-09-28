@@ -34,4 +34,27 @@ public class Point implements Serializable {
         return position;
     }
 
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPos(String pos) {
+        this.pos = pos;
+    }
+
+    public void setPosition(Vector2 position) {
+        this.position = position;
+    }
+
+    public void setData(HashMap<String, String> data) {
+        this.data = data;
+    }
+
+    public void setCondition(HashMap<String, List<String>> condition) {
+        this.condition = condition;
+    }
 }

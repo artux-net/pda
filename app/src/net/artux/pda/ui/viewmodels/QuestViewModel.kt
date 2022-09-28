@@ -11,7 +11,7 @@ import net.artux.pda.model.items.WearableModel
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.quest.ChapterModel
-import net.artux.pda.model.quest.StoriesContainer
+import net.artux.pda.model.quest.StoryItem
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
 import net.artux.pdanetwork.model.CommandBlock
@@ -27,14 +27,15 @@ class QuestViewModel @Inject constructor(
     var chapter: MutableLiveData<ChapterModel> = MutableLiveData()
     var map: MutableLiveData<Map> = MutableLiveData()
     var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
-    var storiesContainer: MutableLiveData<StoriesContainer> = MutableLiveData()
+    var stories: MutableLiveData<List<StoryItem>> = MutableLiveData()
     var status: MutableLiveData<StatusModel> = MutableLiveData()
 
 
     fun updateStories() {
         viewModelScope.launch {
             repository.updateStories()
-                .onSuccess { storiesContainer.postValue(it) }
+                .map { mapper.stories(it) }
+                .onSuccess { stories.postValue(it) }
                 .onFailure { status.postValue(StatusModel(it)) }
         }
     }
@@ -44,27 +45,28 @@ class QuestViewModel @Inject constructor(
             .onSuccess { storyData.postValue(mapper.dataModel(it)) }
     }
 
-    fun getCachedData(): StoryDataModel? {
+    fun getCachedData(): StoryDataModel {
         return repository.getCachedStoryData()
             .map { mapper.dataModel(it) }
-            .getOrNull()
+            .getOrThrow()
     }
 
 
     private fun getCachedChapter(storyId: Int, chapterId: Int): ChapterModel? {
-        return repository.getCachedChapter(storyId, chapterId).getOrNull()
+        return repository.getCachedChapter(storyId, chapterId).map { mapper.chapter(it) }
+            .getOrNull()
     }
 
     private fun getCachedMap(storyId: Int, chapterId: Int): Map? {
-        return repository.getCachedMap(storyId, chapterId).getOrNull()
+        return repository.getCachedMap(storyId, chapterId).map { mapper.map(it) }.getOrNull()
     }
 
     fun applyActions(map: HashMap<String, List<String>>) {
         viewModelScope.launch {
             repository.syncMember(CommandBlock().actions(map))
                 .onSuccess {
-                storyData.postValue(mapper.dataModel(it))
-            }
+                    storyData.postValue(mapper.dataModel(it))
+                }
         }
     }
 
@@ -72,6 +74,7 @@ class QuestViewModel @Inject constructor(
     fun updateChapter(storyId: Int, chapterId: Int) {
         viewModelScope.launch {
             repository.getChapter(storyId, chapterId)
+                .map { mapper.chapter(it) }
                 .onSuccess { chapter.postValue(it) }
                 .onFailure { status.postValue(StatusModel(it)) }
         }
@@ -80,6 +83,7 @@ class QuestViewModel @Inject constructor(
     fun updateMap(storyId: Int, mapId: Int) {
         viewModelScope.launch {
             repository.getMap(storyId, mapId)
+                .map { mapper.map(it) }
                 .onSuccess { map.postValue(it) }
                 .onFailure { status.postValue(StatusModel(it)) }
 

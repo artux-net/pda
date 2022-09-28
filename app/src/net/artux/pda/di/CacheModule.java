@@ -5,16 +5,16 @@ import android.content.Context;
 import com.google.gson.Gson;
 
 import net.artux.pda.app.DataManager;
-import net.artux.pda.map.model.input.Map;
 import net.artux.pda.model.Summary;
-import net.artux.pda.model.quest.ChapterModel;
-import net.artux.pda.model.quest.StoriesContainer;
 import net.artux.pda.repositories.Cache;
 import net.artux.pdanetwork.model.ArticleDto;
+import net.artux.pdanetwork.model.Chapter;
+import net.artux.pdanetwork.model.GameMap;
 import net.artux.pdanetwork.model.NoteDto;
 import net.artux.pdanetwork.model.Profile;
 import net.artux.pdanetwork.model.SellerDto;
 import net.artux.pdanetwork.model.StoryData;
+import net.artux.pdanetwork.model.StoryDto;
 import net.artux.pdanetwork.model.UserDto;
 
 import dagger.Module;
@@ -28,7 +28,7 @@ import dagger.hilt.components.SingletonComponent;
 public class CacheModule {
 
     @Provides
-    public DataManager dataManager(@ApplicationContext Context context){
+    public DataManager dataManager(@ApplicationContext Context context) {
         return new DataManager(context);
     }
 
@@ -43,13 +43,13 @@ public class CacheModule {
     }
 
     @Provides
-    public Cache<ChapterModel> getChapterCache(@ApplicationContext Context context, Gson gson) {
-        return new Cache<>(ChapterModel.class, context, gson);
+    public Cache<Chapter> getChapterCache(@ApplicationContext Context context, Gson gson) {
+        return new Cache<>(Chapter.class, context, gson);
     }
 
     @Provides
-    public Cache<Map> getMapCache(@ApplicationContext Context context, Gson gson) {
-        return new Cache<>(Map.class, context, gson);
+    public Cache<GameMap> getMapCache(@ApplicationContext Context context, Gson gson) {
+        return new Cache<>(GameMap.class, context, gson);
     }
 
     @Provides
@@ -78,7 +78,7 @@ public class CacheModule {
     }
 
     @Provides
-    public Cache<StoriesContainer> getStoriesCache(@ApplicationContext Context context, Gson gson) {
-        return new Cache<>(StoriesContainer.class, context, gson);
+    public Cache<StoryDto> getStoriesCache(@ApplicationContext Context context, Gson gson) {
+        return new Cache<>(StoryDto.class, context, gson);
     }
 }
