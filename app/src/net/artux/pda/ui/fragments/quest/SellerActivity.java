@@ -8,7 +8,6 @@ import android.widget.ImageView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,10 +17,9 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentQuest3Binding;
 import net.artux.pda.model.items.ItemModel;
-import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
-import net.artux.pda.ui.viewmodels.QuestViewModel;
+import net.artux.pda.ui.viewmodels.ItemsViewModel;
 import net.artux.pda.ui.viewmodels.SellerViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
 
@@ -39,7 +37,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
 
     private FragmentQuest3Binding binding;
 
-    private QuestViewModel questViewModel;
+    private ItemsViewModel itemsViewModel;
     private SellerViewModel sellerViewModel;
     private UserViewModel viewModel;
 
@@ -51,7 +49,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
 
         ViewModelProvider provider = new ViewModelProvider(this);
         viewModel = provider.get(UserViewModel.class);
-        questViewModel = provider.get(QuestViewModel.class);
+        itemsViewModel = provider.get(ItemsViewModel.class);
         sellerViewModel = provider.get(SellerViewModel.class);
 
         long sellerId = getIntent().getIntExtra("seller", 0);
@@ -61,7 +59,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
         background = findViewById(R.id.sellerBackground);
         binding.map.setOnClickListener(this);
 
-        questViewModel.getStoryData().observe(this, new Observer<StoryDataModel>() {
+       /* itemsViewModel.getStoryData().observe(this, new Observer<StoryDataModel>() {
             @Override
             public void onChanged(StoryDataModel dataModel) {
                 List<ItemModel> items = dataModel.getAllItems();
@@ -70,7 +68,7 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
                 }
                 binding.playerMoney.setText(getString(R.string.money, String.valueOf(dataModel.getMoney())));
             }
-        });
+        });*/
 
         sellerAdapter = new ItemsAdapter();
         sellerAdapter.setOnClickListener(item -> {

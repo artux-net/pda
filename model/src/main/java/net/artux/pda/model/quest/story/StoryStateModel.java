@@ -12,6 +12,16 @@ public class StoryStateModel implements Serializable {
 
     private int storyId;
     private int chapterId;
-    private int  stageId;
+    private int stageId;
 
+    @Override
+    public String toString() {
+        return "StoryStateModel{" +
+                "current=" + current +
+                ", over=" + over +
+                ", storyId=" + storyId +
+                ", chapterId=" + chapterId +
+                ", stageId=" + stageId +
+                '}';
+    }
 }

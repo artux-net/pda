@@ -30,7 +30,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.InteractiveComponent;
-import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.model.input.GameMap;
 import net.artux.pda.map.model.input.Point;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.bars.Utils;
@@ -141,7 +141,7 @@ public class UserInterface extends Group implements Disposable {
         addActor(uiFrame);
         timeLabel = new Label("00:00", getLabelStyle());
         uiFrame.getLeftHeaderTable().add(timeLabel);
-        uiFrame.getLeftHeaderTable().add(new Label(((Map) gsm.get("map")).getTitle(), getLabelStyle()));
+        uiFrame.getLeftHeaderTable().add(new Label(((GameMap) gsm.get("map")).getTitle(), getLabelStyle()));
 
         uiFrame.getRightHeaderTable().add(menuButton);
         uiFrame.getRightHeaderTable().add(pauseButton);
@@ -274,7 +274,7 @@ public class UserInterface extends Group implements Disposable {
         menuTable.align(Align.top);
 
         UserModel userModel = gsm.getMember();
-        Map map = (Map) gsm.get("map");
+        GameMap map = (GameMap) gsm.get("map");
         StoryDataModel dataModel = (StoryDataModel) gsm.get("data");
         StoryStateModel storyStateModel = dataModel.getCurrentState();
 

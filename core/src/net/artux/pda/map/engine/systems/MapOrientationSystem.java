@@ -15,7 +15,7 @@ import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.engine.pathfinding.MapBorders;
 import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 import net.artux.pda.map.engine.pathfinding.TiledRaycastCollisionDetector;
-import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.model.input.GameMap;
 
 import java.util.Random;
 
@@ -30,7 +30,7 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
     PathSmoother<FlatTiledNode, Vector2> pathSmoother;
     TiledRaycastCollisionDetector<FlatTiledNode> collisionDetector;
 
-    public MapOrientationSystem(AssetsFinder assetsFinder, Map map) {
+    public MapOrientationSystem(AssetsFinder assetsFinder, GameMap map) {
         this.mapBorders = new MapBorders(assetsFinder.getLocal(map.getTilesTexture()),
                 assetsFinder.getLocal(map.getBoundsTextureUri()));
         if (mapBorders.isMobTilesActive()) {

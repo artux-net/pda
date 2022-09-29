@@ -7,7 +7,7 @@ import net.artux.pda.map.model.Spawn;
 import java.io.Serializable;
 import java.util.List;
 
-public class Map implements Serializable {
+public class GameMap implements Serializable {
 
     private int id;
     private String title;

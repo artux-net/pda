@@ -112,7 +112,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             Intent intent = new Intent(QuestActivity.this, MapEngine.class);
             intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK);
             intent.putExtra("map", map);
-            intent.putExtra("data", storyViewModel.storyDataModel);
+            intent.putExtra("data", storyViewModel.getStoryData().getValue());
             intent.putExtra("user", provider.get(UserViewModel.class).getFromCache());
             QuestActivity.this.startActivity(intent);
             QuestActivity.this.finish();

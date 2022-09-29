@@ -1,6 +1,6 @@
 package net.artux.pda.model.mapper;
 
-import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.model.input.GameMap;
 import net.artux.pda.map.model.input.Point;
 import net.artux.pda.model.quest.ChapterModel;
 import net.artux.pda.model.quest.Sound;
@@ -9,7 +9,6 @@ import net.artux.pda.model.quest.StoryItem;
 import net.artux.pda.model.quest.story.ParameterModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pdanetwork.model.Chapter;
-import net.artux.pdanetwork.model.GameMap;
 import net.artux.pdanetwork.model.ParameterDto;
 import net.artux.pdanetwork.model.StoryData;
 import net.artux.pdanetwork.model.StoryDto;
@@ -33,7 +32,7 @@ public interface StoryMapper {
 
     List<StoryItem> stories(List<StoryDto> dtos);
 
-    Map map(GameMap map);
+    GameMap map(net.artux.pdanetwork.model.GameMap map);
 
     Point point(net.artux.pdanetwork.model.Point point);
 

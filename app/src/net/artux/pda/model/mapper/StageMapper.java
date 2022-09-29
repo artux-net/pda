@@ -15,6 +15,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Mapper
@@ -71,7 +72,7 @@ public interface StageMapper {
     }
 
     default List<TransferModel> getTransfers(Stage stage, StoryDataModel dataCompanion) {
-        List<TransferModel> transfers = new ArrayList<>();
+        List<TransferModel> transfers = new LinkedList<>();
         for (Transfer transfer : stage.getTransfers())
             if (Checker.check(transfer.getCondition(), dataCompanion)) {
                 transfer.setText(formatText(transfer.getText(), dataCompanion));

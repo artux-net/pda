@@ -14,13 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
 import net.artux.pda.model.items.ItemModel;
-import net.artux.pda.model.items.WearableModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.encyclopedia.EncyclopediaFragment;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
 import net.artux.pda.ui.fragments.profile.helpers.ItemsHelper;
-import net.artux.pda.ui.viewmodels.QuestViewModel;
+import net.artux.pda.ui.viewmodels.StoryViewModel;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -34,7 +33,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
 
     private final ItemsAdapter itemsAdapter = new ItemsAdapter(this);
     private final DecimalFormat formater = new DecimalFormat("##.##");
-    private QuestViewModel questViewModel;
+    private StoryViewModel itemsViewModel;
 
     {
         defaultAdditionalFragment = AdditionalFragment.class;
@@ -49,8 +48,8 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (questViewModel == null)
-            questViewModel = new ViewModelProvider(requireActivity()).get(QuestViewModel.class);
+        if (itemsViewModel == null)
+            itemsViewModel = new ViewModelProvider(requireActivity()).get(StoryViewModel.class);
 
         RecyclerView recyclerView = view.findViewById(R.id.list);
         recyclerView.setVisibility(View.VISIBLE);
@@ -58,18 +57,18 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
         recyclerView.setLayoutManager(itemsAdapter.getLayoutManager(getContext(), 3));
         view.findViewById(R.id.viewMessage).setVisibility(View.GONE);
 
-        questViewModel.getStoryData().observe(getViewLifecycleOwner(), storyDataModel -> {
+        itemsViewModel.getStoryData().observe(getViewLifecycleOwner(), storyDataModel -> {
             List<ItemModel> items = storyDataModel.getAllItems();
             itemsAdapter.setItems(items);
 
             navigationPresenter.setTitle("Денег: " + storyDataModel.getMoney() + ", вес рюкзака: " + formater.format(storyDataModel.getTotalWeight()) + " кг");
         });
-        questViewModel.getStatus().observe(getViewLifecycleOwner(), status -> {
+        itemsViewModel.getStatus().observe(getViewLifecycleOwner(), status -> {
             Toast.makeText(getContext(), status.getDescription(), Toast.LENGTH_LONG).show();
             viewModel.updateMember();
         });
-
-        questViewModel.updateDataFromCache();
+        itemsViewModel.updateDataFromCache();
+        itemsViewModel.updateData();
     }
 
     @Override
@@ -83,9 +82,10 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
             navigationPresenter.addFragment(EncyclopediaFragment.of(item), true);
         });
 
-        if (item instanceof WearableModel)
+        //todo
+        /*if (item instanceof WearableModel)
             builder.setNeutralButton("Сделать основным",
-                    (dialogInterface, i) -> questViewModel.setWearable((WearableModel) item));
+                    (dialogInterface, i) -> itemsViewModel.setWearable((WearableModel) item));*/
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();

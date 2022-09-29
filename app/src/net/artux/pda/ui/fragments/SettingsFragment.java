@@ -26,7 +26,7 @@ import net.artux.pda.model.StatusModel;
 import net.artux.pda.ui.activities.LoginActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
-import net.artux.pda.ui.viewmodels.QuestViewModel;
+import net.artux.pda.ui.viewmodels.StoryViewModel;
 
 import java.io.File;
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         defaultAdditionalFragment = AdditionalFragment.class;
     }
 
-    private QuestViewModel questViewModel;
+    private StoryViewModel storyViewModel;
 
     @Nullable
     @Override
@@ -58,9 +58,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setOnClickListener(binding.getRoot());
-        if (questViewModel == null) {
-            questViewModel = new ViewModelProvider(requireActivity()).get(QuestViewModel.class);
-        }
+        storyViewModel = new ViewModelProvider(requireActivity()).get(StoryViewModel.class);
         if (navigationPresenter != null) {
             navigationPresenter.setTitle(getString(R.string.settings));
         }
@@ -72,7 +70,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
             String json = gson.toJson(memberResult);
             binding.debugMember.setText(json);
         });
-        questViewModel.getStatus().observe(getViewLifecycleOwner(), new Observer<StatusModel>() {
+        storyViewModel.getStatus().observe(getViewLifecycleOwner(), new Observer<StatusModel>() {
             @Override
             public void onChanged(StatusModel statusModel) {
                 Toast.makeText(requireContext(), statusModel.getDescription(), Toast.LENGTH_LONG).show();
@@ -130,12 +128,12 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
         switch (v.getId()) {
             case R.id.signOut:
                 viewModel.signOut();
-                questViewModel.clear();
+                storyViewModel.clear();
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 requireActivity().finish();
                 break;
             case R.id.questResetButton:
-                questViewModel.clear();
+                storyViewModel.clear();
                 Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
             case R.id.imagesResetButton:
                 new Thread(() -> {
@@ -153,8 +151,8 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                     binding.debugMember.setVisibility(View.VISIBLE);
                 break;
             case R.id.resetData:
-                questViewModel.resetData();
-                questViewModel.clear();
+                storyViewModel.resetData();
+                storyViewModel.clear();
                 break;
             case R.id.mapCacheResetButton:
                 if (cacheDirectory.delete()) {

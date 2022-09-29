@@ -5,7 +5,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.model.input.GameMap;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class PreloadState extends State {
     long preloadTime;
 
     public void startLoad() {
-        Map map = (Map) gsm.get("map");
+        GameMap map = (GameMap) gsm.get("map");
         preloadTime = TimeUtils.millis();
         if (map != null) {
             Gdx.app.debug("Preload", "Checking cache for " + map.getTitle() + "{" + map.getId() + "} , load missed files.");
@@ -87,7 +87,7 @@ public class PreloadState extends State {
     }
 
     void checkForStartPlay() {
-        Map map = (Map) gsm.get("map");
+        GameMap map = (GameMap) gsm.get("map");
         if (map != null) {
             FileHandle file = Gdx.files.local(cachePath + map.getTextureUri());
 

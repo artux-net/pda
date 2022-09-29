@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import net.artux.pda.map.model.input.Map
+import net.artux.pda.map.model.input.GameMap
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.UserMessage
 import net.artux.pda.model.mapper.StageMapper
@@ -34,18 +34,44 @@ class StoryViewModel @javax.inject.Inject constructor(
     var notification: MutableLiveData<NotificationModel> = MutableLiveData()
     var background: MutableLiveData<String> = MutableLiveData()
 
+    var stories: MutableLiveData<List<StoryItem>> = MutableLiveData()
     var chapter: MutableLiveData<ChapterModel> = MutableLiveData()
-    var map: MutableLiveData<Map> = MutableLiveData()
-    var data: MutableLiveData<kotlin.collections.Map<String, String>> = MutableLiveData()
+    var map: MutableLiveData<GameMap> = MutableLiveData()
+    var data: MutableLiveData<Map<String, String>> = MutableLiveData()
     var status: MutableLiveData<StatusModel> = MutableLiveData()
 
     var summaryMessages: LinkedList<UserMessage> = LinkedList()
-    lateinit var storyDataModel: StoryDataModel
+    var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
+
 
     var actionsMap: LinkedHashMap<String, MutableList<String>> = LinkedHashMap()
 
     var currentStoryId: Int = -1
     var currentChapterId: Int = -1
+
+    fun updateStories() {
+        viewModelScope.launch {
+            repository.updateStories()
+                .map { mapper.stories(it) }
+                .onSuccess { stories.postValue(it) }
+                .onFailure { status.postValue(StatusModel(it)) }
+        }
+    }
+
+    fun updateData(): MutableLiveData<StoryDataModel>{
+        storyData = MutableLiveData()
+        viewModelScope.launch {
+            suspendUpdateData()
+        }
+        return storyData
+    }
+
+    private suspend fun suspendUpdateData() {
+        repository.getStoryData()
+            .map { mapper.dataModel(it) }
+            .onSuccess { storyData.postValue(it) }
+            .getOrThrow()
+    }
 
     fun beginWithStage(chapterId: Int, stageId: Int) {
         if (currentStoryId == -1)
@@ -60,9 +86,7 @@ class StoryViewModel @javax.inject.Inject constructor(
 
             loadingState.postValue(true)
 
-            storyDataModel = repository.getCachedStoryData()
-                .map { mapper.dataModel(it) }
-                .getOrThrow()
+            suspendUpdateData()
 
             repository.getChapter(storyId, chapterId)
                 .map { mapper.chapter(it) }
@@ -103,6 +127,7 @@ class StoryViewModel @javax.inject.Inject constructor(
     }
 
     private fun setStage(chapterStage: Stage) {
+        Timber.i("Opening stage: $chapterStage")
         viewModelScope.launch {
             when (chapterStage.typeStage) {
                 4 -> {
@@ -117,6 +142,7 @@ class StoryViewModel @javax.inject.Inject constructor(
                                 .onSuccess {
                                     if (chapterStage.data.containsKey("pos"))
                                         it.setPlayerPos(chapterStage.data["pos"])
+                                    Timber.i("${storyData.value}")
                                     map.postValue(it)
                                 }
                                 .onFailure { status.postValue(StatusModel(it)) }
@@ -141,8 +167,15 @@ class StoryViewModel @javax.inject.Inject constructor(
                 }
                 else -> {
                     background.postValue(chapterStage.backgroundUrl)
-                    notification.postValue(stageMapper.notification(chapterStage, storyDataModel))
-                    stage.postValue(stageMapper.model(chapterStage, storyDataModel))
+                    if (storyData.value != null) {
+                        notification.postValue(
+                            stageMapper.notification(
+                                chapterStage,
+                                storyData.value
+                            )
+                        )
+                        stage.postValue(stageMapper.model(chapterStage, storyData.value))
+                    }
                 }
             }
         }
@@ -153,7 +186,7 @@ class StoryViewModel @javax.inject.Inject constructor(
     fun chooseTransfer(transfer: TransferModel) {
         viewModelScope.launch {
             if (stage.value!!.type == StageType.DIALOG) {
-                summaryMessages.add(UserMessage(storyDataModel, transfer.text))
+                summaryMessages.add(UserMessage(storyData.value, transfer.text))
             }
 
             val chapterStage = chapter.value!!.getStage(transfer.stageId)
@@ -173,18 +206,18 @@ class StoryViewModel @javax.inject.Inject constructor(
         repository.syncMember(CommandBlock().actions(actionsMap))
             .map { mapper.dataModel(it) }
             .onSuccess {
-                storyDataModel = it
+                storyData.postValue(it)
                 summaryRepository.updateSummary(summaryMessages)//save summary
 
                 actionsMap = LinkedHashMap()// reset sync map
                 summaryMessages = LinkedList()//reset summary
                 loadingState.postValue(false)
-                Timber.d("Successful sync")
+                Timber.d("Successful sync, data: ${storyData.value}")
             }.onFailure {
                 loadingState.postValue(false)
                 status.postValue(StatusModel(it))
-
             }
+            .getOrNull()
     }
 
     fun exitStory() {
@@ -195,6 +228,29 @@ class StoryViewModel @javax.inject.Inject constructor(
                 .onSuccess { data.postValue(mapOf(Pair("exit", ""))) }
                 .onFailure { status.postValue(StatusModel(it)) }
         }
+    }
+
+    fun resetData() {
+        viewModelScope.launch {
+            repository.clearCache()
+            repository.resetData()
+                .map { mapper.dataModel(it) }
+                .onSuccess {
+                    storyData.postValue(it)
+                    status.postValue(StatusModel("Ok"))
+                }
+                .onFailure { status.postValue(StatusModel(it)) }
+        }
+    }
+
+    fun clear() {
+        repository.clearCache()
+    }
+
+    fun updateDataFromCache() {
+        repository.getCachedStoryData()
+            .map { mapper.dataModel(it) }
+            .onSuccess { storyData.postValue(it) }
     }
 
 }

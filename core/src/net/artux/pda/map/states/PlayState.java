@@ -16,7 +16,7 @@ import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.model.LevelBackground;
-import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.model.input.GameMap;
 import net.artux.pda.map.ui.UserInterface;
 
 
@@ -41,7 +41,7 @@ public class PlayState extends State {
         userInterface = new UserInterface(gsm, assetsFinder, stage.getCamera());
         uistage.addActor(userInterface);
 
-        Map map = (Map) gsm.get("map");
+        GameMap map = (GameMap) gsm.get("map");
         if (map != null) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             Gdx.app.debug("PlayState", gson.toJson(map));

@@ -29,7 +29,7 @@ import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.model.MobType;
 import net.artux.pda.map.model.MobsTypes;
 import net.artux.pda.map.model.Spawn;
-import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.model.input.GameMap;
 import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
@@ -47,7 +47,7 @@ public class ControlPointsHelper {
         JsonReader reader = new JsonReader(Gdx.files.internal("mobs.json").reader());
         MobsTypes mobsTypes = new Gson().fromJson(reader, MobsTypes.class);
 
-        Map map = engine.getSystem(DataSystem.class).getMap();
+        GameMap map = engine.getSystem(DataSystem.class).getMap();
         UserModel userModel = engine.getSystem(DataSystem.class).getMember();
 
         for (final Spawn spawn : map.getSpawns()) {

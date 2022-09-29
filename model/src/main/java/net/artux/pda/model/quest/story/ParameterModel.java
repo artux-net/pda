@@ -25,4 +25,12 @@ public class ParameterModel implements Serializable {
     public String getKey() {
         return key;
     }
+
+    @Override
+    public String toString() {
+        return "ParameterModel{" +
+                "key='" + key + '\'' +
+                ", value=" + value +
+                '}';
+    }
 }

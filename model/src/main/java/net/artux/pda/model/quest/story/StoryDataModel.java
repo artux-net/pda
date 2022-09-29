@@ -63,9 +63,10 @@ public class StoryDataModel implements Serializable {
 
     public HashMap<String, Integer> getParametersMap() {
         HashMap<String, Integer> map = new HashMap<>();
-        for (ParameterModel param : parameters) {
-            map.put(param.getKey(), param.getValue());
-        }
+        if (parameters != null && parameters.size() > 0)
+            for (ParameterModel param : parameters) {
+                map.put(param.getKey(), param.getValue());
+            }
         return map;
     }
 
@@ -107,4 +108,19 @@ public class StoryDataModel implements Serializable {
         return weight;
     }
 
+    @Override
+    public String toString() {
+        return "StoryDataModel{" +
+                "money=" + money +
+                ", xp=" + xp +
+                ", parameters=" + parameters +
+                ", storyStates=" + storyStates +
+                ", armors=" + armors +
+                ", weapons=" + weapons +
+                ", medicines=" + medicines +
+                ", detectors=" + detectors +
+                ", artifacts=" + artifacts +
+                ", bullets=" + bullets +
+                '}';
+    }
 }

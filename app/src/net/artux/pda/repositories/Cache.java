@@ -1,6 +1,5 @@
 package net.artux.pda.repositories;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -21,9 +20,8 @@ public class Cache<T> {
         mSharedPreferences = context.getSharedPreferences(typeParameterClass.getName(), Context.MODE_PRIVATE);
     }
 
-    @SuppressLint("ApplySharedPref")
     public void put(String id, T object) {
-        mSharedPreferences.edit().putString(id, gson.toJson(object)).commit();
+        mSharedPreferences.edit().putString(id, gson.toJson(object)).apply();
     }
 
     public T get(String id) {
@@ -36,7 +34,8 @@ public class Cache<T> {
         if (!mSharedPreferences.contains(id))
             return false;
 
-        return mSharedPreferences.edit().remove(id).commit();
+        mSharedPreferences.edit().remove(id).apply();
+        return true;
     }
 
     public String[] getIds() {
@@ -52,8 +51,7 @@ public class Cache<T> {
         return result;
     }
 
-    @SuppressLint("ApplySharedPref")
     public void clear() {
-        mSharedPreferences.edit().clear().commit();
+        mSharedPreferences.edit().clear().apply();
     }
 }

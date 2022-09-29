@@ -5,6 +5,7 @@ import net.artux.pdanetwork.model.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -179,6 +180,7 @@ class QuestRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         storyDataCache.put("story", data)
+                        Timber.d("Repository got storyData: $data")
                         it.resume(Result.success(data))
                     } else
                         it.resume(Result.failure(Exception(response.toString())))

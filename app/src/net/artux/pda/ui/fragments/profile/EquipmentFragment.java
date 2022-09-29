@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -18,14 +17,13 @@ import com.bumptech.glide.signature.ObjectKey;
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.model.items.ItemModel;
-import net.artux.pda.model.items.ItemType;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
-import net.artux.pda.ui.viewmodels.QuestViewModel;
+import net.artux.pda.ui.viewmodels.ItemsViewModel;
 
 public class EquipmentFragment extends BaseFragment {
 
-    private QuestViewModel questViewModel;
+    private ItemsViewModel itemsViewModel;
 
     {
         defaultAdditionalFragment = AdditionalFragment.class;
@@ -43,15 +41,16 @@ public class EquipmentFragment extends BaseFragment {
         if (navigationPresenter != null)
             navigationPresenter.setTitle("Снаряжение");
 
-        if (questViewModel == null)
-            questViewModel = new ViewModelProvider(requireActivity()).get(QuestViewModel.class);
+        //todo
+       /* if (itemsViewModel == null)
+            itemsViewModel = new ViewModelProvider(requireActivity()).get(ItemsViewModel.class);
 
-        questViewModel.getStoryData().observe(getViewLifecycleOwner(), dataModel -> {
+        itemsViewModel.getStoryData().observe(getViewLifecycleOwner(), dataModel -> {
             defineSlot(view, R.id.mainSlot, dataModel.getCurrentWearable(ItemType.ARMOR));
             defineSlot(view, R.id.slot2, dataModel.getCurrentWearable(ItemType.RIFLE));
             defineSlot(view, R.id.slot1, dataModel.getCurrentWearable(ItemType.PISTOL));
         });
-        questViewModel.updateDataFromCache();
+        itemsViewModel.updateDataFromCache();*/
     }
 
     private void defineSlot(View view, int slotId, ItemModel item) {

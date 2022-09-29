@@ -9,7 +9,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import net.artux.pda.map.GdxAdapter;
-import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.model.input.GameMap;
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
@@ -29,9 +29,11 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UserModel member = (UserModel) getIntent().getSerializableExtra("user");
-        StoryDataModel dataModel = (StoryDataModel) getIntent().getSerializableExtra("data");
-        Map map = (Map) getIntent().getSerializableExtra("map");
+
+        Intent intent = getIntent();
+        UserModel member = (UserModel) intent.getSerializableExtra("user");
+        StoryDataModel dataModel = (StoryDataModel) intent.getSerializableExtra("data");
+        GameMap map = (GameMap) intent.getSerializableExtra("map");
         lastStoryState = dataModel.getCurrentState();
 
         GdxAdapter.Builder builder = new GdxAdapter.Builder(this)

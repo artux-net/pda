@@ -14,7 +14,7 @@ import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.model.Transfer;
-import net.artux.pda.map.model.input.Map;
+import net.artux.pda.map.model.input.GameMap;
 import net.artux.pda.map.model.input.Point;
 import net.artux.pda.map.states.State;
 import net.artux.pda.map.ui.UserInterface;
@@ -29,7 +29,7 @@ public class QuestPointsHelper {
 
 
     public static void createQuestPointsEntities(Engine engine, AssetManager assetManager) {
-        Map map = engine.getSystem(DataSystem.class).getMap();
+        GameMap map = engine.getSystem(DataSystem.class).getMap();
         UserModel userModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().userModel;
         StoryDataModel dataModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().gdxData;
         StoryStateModel storyStateModel = dataModel.getCurrentState();
