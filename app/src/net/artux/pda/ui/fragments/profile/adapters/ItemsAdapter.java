@@ -16,7 +16,8 @@ import com.bumptech.glide.request.RequestOptions;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.model.items.*;
+import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.items.WearableModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +98,14 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
         }
 
         void bind(ItemModel item){
-            title.setText(item.getTitle());
+            if (item instanceof WearableModel){
+                WearableModel wearableModel = (WearableModel) item;
+                if (wearableModel.isEquipped())
+                    title.setText(item.getTitle() + " (надет)");
+                else
+                    title.setText(item.getTitle());
+            } else
+                title.setText(item.getTitle());
 
             itemView.setOnClickListener(view -> {
                 onClickListener.onClick(item);
@@ -109,7 +117,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
             Glide.with(title.getContext())
                     .asGif()
-                    .load(BuildConfig.PROTOCOL + "://"+ BuildConfig.URL+"/base/items/icons/"+item.getIcon())
+                    .load(BuildConfig.PROTOCOL + "://"+ BuildConfig.URL_API+"base/items/icons/"+item.getIcon())
                     .apply(options)
                     .into(image);
 

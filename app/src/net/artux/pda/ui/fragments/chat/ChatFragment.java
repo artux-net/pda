@@ -145,7 +145,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
 
 
         Bundle args = getArguments();
-        client = new OkHttpClient();
         Request.Builder builder = new Request.Builder();
         String path = BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API;
         navigationPresenter.setLoadingState(true);

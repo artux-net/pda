@@ -14,12 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
 import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.items.WearableModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.encyclopedia.EncyclopediaFragment;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
 import net.artux.pda.ui.fragments.profile.helpers.ItemsHelper;
-import net.artux.pda.ui.viewmodels.StoryViewModel;
+import net.artux.pda.ui.viewmodels.ItemsViewModel;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -33,7 +34,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
 
     private final ItemsAdapter itemsAdapter = new ItemsAdapter(this);
     private final DecimalFormat formater = new DecimalFormat("##.##");
-    private StoryViewModel itemsViewModel;
+    private ItemsViewModel itemsViewModel;
 
     {
         defaultAdditionalFragment = AdditionalFragment.class;
@@ -48,8 +49,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (itemsViewModel == null)
-            itemsViewModel = new ViewModelProvider(requireActivity()).get(StoryViewModel.class);
+        itemsViewModel = new ViewModelProvider(requireActivity()).get(ItemsViewModel.class);
 
         RecyclerView recyclerView = view.findViewById(R.id.list);
         recyclerView.setVisibility(View.VISIBLE);
@@ -82,10 +82,9 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
             navigationPresenter.addFragment(EncyclopediaFragment.of(item), true);
         });
 
-        //todo
-        /*if (item instanceof WearableModel)
-            builder.setNeutralButton("Сделать основным",
-                    (dialogInterface, i) -> itemsViewModel.setWearable((WearableModel) item));*/
+        if (item instanceof WearableModel)
+            builder.setNeutralButton(getString(R.string.item_as_main),
+                    (dialogInterface, i) -> itemsViewModel.setWearable((WearableModel) item));
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();

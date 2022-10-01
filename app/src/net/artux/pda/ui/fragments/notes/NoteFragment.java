@@ -1,6 +1,8 @@
 package net.artux.pda.ui.fragments.notes;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +33,6 @@ public class NoteFragment extends BaseFragment {
             DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
                     .withLocale(Locale.UK)
                     .withZone(ZoneId.systemDefault());
-    private NoteModel currentNoteModel;
 
     {
         defaultAdditionalFragment = NotesFragment.class;
@@ -47,18 +48,48 @@ public class NoteFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (noteViewModel == null)
-            noteViewModel = new ViewModelProvider(requireActivity()).get(NoteViewModel.class);
+        noteViewModel = new ViewModelProvider(requireActivity()).get(NoteViewModel.class);
 
         noteViewModel.getActiveNote().observe(getViewLifecycleOwner(), this::bindNote);
         binding.deleteButton.setOnClickListener(view1 -> noteViewModel.deleteNote());
+        binding.editNoteContent.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                noteViewModel.editContent(editable.toString());
+            }
+        });
+        binding.editNoteTitle.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                noteViewModel.editTitle(editable.toString());
+            }
+        });
         noteViewModel.getStatus().observe(getViewLifecycleOwner(), statusModel -> Toast.makeText(requireContext(), statusModel.getDescription(), Toast.LENGTH_SHORT).show());
+        noteViewModel.updateNotes();
     }
 
     public void bindNote(NoteModel note) {
         if (note != null) {
-            updateNote();
-            currentNoteModel = note;
             binding.viewMessage.setVisibility(View.GONE);
             binding.editNoteView.setVisibility(View.VISIBLE);
             binding.editNoteTitle.setText(note.getTitle());
@@ -70,24 +101,16 @@ public class NoteFragment extends BaseFragment {
         }
     }
 
-    public void updateNote() {
-        if (currentNoteModel!=null) {
-            String title = binding.editNoteTitle.getEditableText().toString();
-            String content = binding.editNoteContent.getEditableText().toString();
-            noteViewModel.editNote(title, content, currentNoteModel.getId());
-        }
-    }
-
     @Override
     public void onPause() {
         super.onPause();
-        updateNote();
+        noteViewModel.syncActiveNote();
     }
 
     @Override
     public void onDestroyView() {
-        binding = null;
         super.onDestroyView();
+        binding = null;
     }
 }
 

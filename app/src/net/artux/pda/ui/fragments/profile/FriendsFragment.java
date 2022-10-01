@@ -46,7 +46,7 @@ public class FriendsFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        listBinding = FragmentListBinding.inflate(inflater, container, true);
+        listBinding = FragmentListBinding.inflate(inflater, container, false);
         return listBinding.getRoot();
     }
 
@@ -54,8 +54,7 @@ public class FriendsFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if(profileViewModel==null)
-            profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+        profileViewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
 
         listBinding.list.setLayoutManager(new LinearLayoutManager(getContext()));
         friendsAdapter = new FriendsAdapter(navigationPresenter);

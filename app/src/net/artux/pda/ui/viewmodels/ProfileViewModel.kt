@@ -33,6 +33,7 @@ class ProfileViewModel @Inject constructor(
             userRepository.getProfile(pdaId)
                 .map { userMapper.model(it) }
                 .onSuccess {
+                    it.id = pdaId
                     profile.postValue(it)
                 }
                 .onFailure { status.postValue(StatusModel(it)) }

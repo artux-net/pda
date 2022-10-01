@@ -28,6 +28,7 @@ import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.items.ItemType;
 
 import java.util.Random;
 
@@ -98,7 +99,8 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
                 StringBuilder stringBuilder = new StringBuilder();
                 for (ItemModel i:
                         getEngine().getSystem(PlayerSystem.class).getPlayerComponent().gdxData.getAllItems()) {
-                    stringBuilder.append("{").append(i.getId()).append("}").append(" ");
+                    if (i.getType() == ItemType.BULLET)
+                        stringBuilder.append("{").append(i.getBaseId()).append("}").append(" ");
                 }
 
                 gsm.getPlatformInterface().toast("Патроны для "+ entityWeapon.getSelected().getTitle()

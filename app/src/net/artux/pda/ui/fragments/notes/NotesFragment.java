@@ -37,8 +37,7 @@ public class NotesFragment extends AdditionalBaseFragment implements NotesAdapte
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (noteViewModel == null)
-            noteViewModel = new ViewModelProvider(requireActivity()).get(NoteViewModel.class);
+        noteViewModel = new ViewModelProvider(requireActivity()).get(NoteViewModel.class);
 
         notesAdapter = new NotesAdapter(this);
         listBinding.list.setAdapter(notesAdapter);

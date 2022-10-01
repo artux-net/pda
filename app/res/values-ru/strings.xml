@@ -85,7 +85,7 @@
     <string name="remove_friend_q">Удалить из друзей?</string>
     <string name="add_friend_q">Добавить в друзья?</string>
     <string name="quit">Выйти</string>
-    <string name="rating_p">Рейтинг: %1$s</string>
+    <string name="rating_p">Опыт: %1$s</string>
     <string name="rang_p">Ранг: %1$s</string>
     <string name="group_p">Группировка: %1$s</string>
     <string name="in_zone_time_p">В зоне: %1$s</string>
@@ -105,4 +105,5 @@
     <string name="help_tab3_title">Как пользоваться?</string>
     <string name="help_tab2_title">Что он умеет?</string>
     <string name="help_tab1_title">Что такое ПДА?</string>
+    <string name="item_as_main">Сделать основным</string>
 </resources>

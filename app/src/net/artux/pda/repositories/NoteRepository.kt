@@ -1,6 +1,5 @@
 package net.artux.pda.repositories
 
-import net.artux.pda.repositories.util.Result
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.NoteCreateDto
 import net.artux.pdanetwork.model.NoteDto
@@ -26,15 +25,15 @@ class NoteRepository @Inject constructor(
 
     fun getCachedNotes(): Result<List<NoteDto>> {
         return if (cache.all.size > 0)
-            Result.Success(cache.all)
-        else Result.Error(Exception("Notes isn't found"))
+            Result.success(cache.all)
+        else Result.failure(Exception("Notes isn't found"))
     }
 
     fun getCachedNote(id: UUID): Result<NoteDto> {
         val cache = this.cache.get(id.toString())
         return if (cache != null)
-            Result.Success(cache)
-        else Result.Error(Exception("Note isn't found"))
+            Result.success(cache)
+        else Result.failure(Exception("Note isn't found"))
     }
 
     suspend fun getNotes(): Result<List<NoteDto>> {
@@ -50,13 +49,13 @@ class NoteRepository @Inject constructor(
                         for (note in data) {
                             cache.put(note.id.toString(), note)
                         }
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Profile null")))
+                        it.resume(Result.failure(Exception("Notes null")))
                 }
 
                 override fun onFailure(call: Call<List<NoteDto>>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(Exception(t)))
                 }
 
             })
@@ -73,13 +72,13 @@ class NoteRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         cache.put(data.id.toString(), data)
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Profile null")))
+                        it.resume(Result.failure(Exception("Notes null")))
                 }
 
                 override fun onFailure(call: Call<NoteDto>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(Exception(t)))
                 }
             })
         }
@@ -93,13 +92,13 @@ class NoteRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         cache.put(data.id.toString(), data)
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Status null")))
+                        it.resume(Result.failure(Exception("Notes null")))
                 }
 
                 override fun onFailure(call: Call<NoteDto>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(Exception(t)))
                 }
             })
         }
@@ -112,13 +111,13 @@ class NoteRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         cache.remove(uuid.toString());
-                        it.resume(Result.Success(data))
+                        it.resume(Result.success(data))
                     } else
-                        it.resume(Result.Error(Exception("Status null")))
+                        it.resume(Result.failure(Exception("Status null")))
                 }
 
                 override fun onFailure(call: Call<Status>, t: Throwable) {
-                    it.resume(Result.Error(java.lang.Exception(t)))
+                    it.resume(Result.failure(Exception(t)))
                 }
             })
         }

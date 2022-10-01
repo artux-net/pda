@@ -10,7 +10,6 @@ import net.artux.pda.model.mapper.NoteMapper
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.profile.NoteModel
 import net.artux.pda.repositories.NoteRepository
-import net.artux.pda.repositories.util.Result
 import net.artux.pdanetwork.model.NoteCreateDto
 import java.util.*
 import javax.inject.Inject
@@ -19,35 +18,48 @@ import javax.inject.Inject
 class NoteViewModel @Inject constructor(
     var repository: NoteRepository
 ) : ViewModel() {
-    var activeNote: MutableLiveData<NoteModel> = MutableLiveData()
+    var activeNote: MutableLiveData<NoteModel?> = MutableLiveData()
     var notes: MutableLiveData<List<NoteModel>> = MutableLiveData()
     var status: MutableLiveData<StatusModel> = MutableLiveData()
+
     var noteMapper: NoteMapper = NoteMapper.INSTANCE
     var statusMapper: StatusMapper = StatusMapper.INSTANCE
 
     fun openNote(uuid: UUID) {
         viewModelScope.launch {
-            val result = repository.getCachedNote(uuid)
-            if (result is Result.Success) {
-                activeNote.postValue(noteMapper.model(result.data))
-            }
-            updateNotes()
+            syncActiveNote()
+            repository.getCachedNote(uuid)
+                .onSuccess {
+                    activeNote.postValue(noteMapper.model(it))
+                    updateNotesFromCache()
+                }
+                .onFailure {
+                    updateNotes()
+                }
         }
     }
 
     fun updateNotes() {
         viewModelScope.launch {
-            val result = repository.getNotes()
-            if (result is Result.Success) {
-                notes.postValue(noteMapper.model(result.data))
-                val currentNote = activeNote.value
-                if (currentNote != null)
-                    activeNote.postValue(
-                        noteMapper
-                            .model(repository.getCachedNote(currentNote.id).getOrThrow())
-                    )
-            } else if (result is Result.Error)
-                status.postValue(StatusModel(result.exception))
+            repository.getCachedNotes()
+                .onSuccess {
+                    notes.postValue(noteMapper.model(it))
+                }
+
+            repository.getNotes()
+                .onSuccess {
+                    notes.postValue(noteMapper.model(it))
+                }
+                .onFailure {
+                    status.postValue(StatusModel(it))
+                }
+
+            val currentNote = activeNote.value
+            if (currentNote != null)
+                activeNote.postValue(
+                    noteMapper
+                        .model(repository.getCachedNote(currentNote.id).getOrNull())
+                )
         }
     }
 
@@ -61,40 +73,53 @@ class NoteViewModel @Inject constructor(
             val currentNote = NoteModel()
             currentNote.title = title
             currentNote.content = content
-            val result = repository.createNote(
-                noteMapper.createDto(currentNote)
-            )
 
-            if (result is Result.Success) {
-                currentNote.id = result.data.id
-                activeNote.postValue(noteMapper.model(result.data))
-                updateNotesFromCache()
+            repository.createNote(
+                noteMapper.createDto(currentNote)
+            ).onSuccess {
+                openNote(it.id)
+            }.onFailure {
+                status.postValue(StatusModel(it))
             }
         }
     }
 
-    fun editNote(title: String, content: String, uuid: UUID) {
+    fun syncActiveNote() {
         viewModelScope.launch {
-            val currentNote =
-                repository.getCachedNote(uuid).map { noteMapper.model(it) }.getOrNull()
-            if (currentNote != null)
-                if (!currentNote.title.equals(title) ||
-                    !currentNote.content.equals(content)
-                ) {
-                    val editedNote = NoteCreateDto()
-                        .title(title)
-                        .content(content)
+            val note = activeNote.value
+            if (note != null) {
+                val editedNote = NoteCreateDto()
+                    .title(note.title)
+                    .content(note.content)
 
-                    val result = repository.editNote(editedNote, uuid)
-
-                    if (result is Result.Success) {
+                repository.editNote(editedNote, note.id)
+                    .onSuccess {
                         val activeNoteModel = activeNote.value
-                        if (activeNoteModel != null && activeNoteModel.id.equals(result.data.id))
-                            activeNote.postValue(noteMapper.model(result.data))
+                        if (activeNoteModel != null && activeNoteModel.id.equals(it.id))
+                            activeNote.postValue(noteMapper.model(it))
 
                         updateNotesFromCache()
                     }
-                }
+            }
+        }
+    }
+
+
+    fun editTitle(title: String) {
+        if (title.isNotBlank()) {
+            val currentNote = activeNote.value
+            if (currentNote != null && !currentNote.title.equals(title)) {
+                currentNote.title = title
+            }
+        }
+    }
+
+    fun editContent(content: String) {
+        if (content.isNotBlank()) {
+            val currentNote = activeNote.value
+            if (currentNote != null && !currentNote.content.equals(content)) {
+                currentNote.content = content
+            }
         }
     }
 
@@ -102,15 +127,15 @@ class NoteViewModel @Inject constructor(
         viewModelScope.launch {
             val currentNote = activeNote.value
             if (currentNote != null) {
-                val result = repository.deleteNote(currentNote.id)
-                if (result is Result.Success) {
-                    activeNote.postValue(null)
-                    updateNotesFromCache()
-                    if (!result.data.description.isNullOrBlank())
-                        status.postValue(statusMapper.model(result.data))
-                }
+                repository.deleteNote(currentNote.id)
+                    .onSuccess {
+                        activeNote.postValue(null)
+                        updateNotesFromCache()
+                    }
+                    .onFailure {
+                        status.postValue(StatusModel(it))
+                    }
             }
         }
     }
-
 }

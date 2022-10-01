@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import net.artux.pda.R
@@ -68,7 +66,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             val model = it
 
             ProfileHelper.setAvatar(binding.profileAvatar, model.avatar)
-            binding.profileLogin.text = model.login
+            binding.profileLogin.text = "${model.name} ${model.nickname}"
             binding.profileGroup.text = GroupHelper.getTitle(model.gang, context)
             binding.profileTime.text =
                 getString(R.string.in_zone_time_p, ProfileHelper.getDays(model))
@@ -84,6 +82,9 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 view.context.getString(R.string.subscribers, model.subs.toString())
             binding.profileRequests.setOnClickListener(this)
 
+            binding.profileRequests.visibility = View.GONE
+            binding.profileFriends.visibility = View.GONE
+
 
             groupRelationsAdapter.setRelations(model.relations)
             val recyclerView = listBinding.list
@@ -92,7 +93,11 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             recyclerView.visibility = View.VISIBLE
             view.findViewById<View>(R.id.viewMessage).visibility = View.GONE
 
-            val friendButton: Button = binding.profileFriend
+            binding.profileFriend.visibility = View.GONE
+            binding.requests.visibility = View.GONE
+            binding.writeMessage.visibility = View.GONE
+
+            /*val friendButton: Button = binding.profileFriend
             val subsButton: Button = binding.requests
             val messageButton: Button = binding.writeMessage
             messageButton.setOnClickListener(this)
@@ -125,7 +130,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 friendButton.visibility = View.GONE
                 messageButton.visibility = View.GONE
                 subsButton.visibility = View.VISIBLE
-            }
+            }*/
         }
         if (arguments != null)
             profileViewModel.updateProfile(requireArguments().getSerializable("pdaId") as UUID)

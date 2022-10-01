@@ -79,7 +79,7 @@
     <string name="group_p">Group: %1$s</string>
     <string name="rang_p">Rang: %1$s</string>
     <string name="xp_p">Rating: %1$s</string>
-    <string name="rating_p">Rating: %1$s</string>
+    <string name="rating_p">XP: %1$s</string>
     <string name="location_p">Location: %1$s</string>
 
     <string name="rating_title" translatable="false">%1$s - [PDA #%2$s] %3$s</string>
@@ -183,4 +183,5 @@
     <string name="friends_of">\"Friends of %s\"</string>
     <string name="create_note">Create note</string>
     <string name="help_tab3_title">How to use</string>
+    <string name="item_as_main">Make as main</string>
 </resources>
