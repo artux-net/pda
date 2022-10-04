@@ -94,6 +94,7 @@ class QuestRepository @Inject constructor(
                     }
 
                     override fun onFailure(call: Call<Chapter>, t: Throwable) {
+                        t.printStackTrace()
                         it.resume(Result.failure(java.lang.Exception(t)))
                     }
                 })
@@ -120,6 +121,7 @@ class QuestRepository @Inject constructor(
                         call: Call<GameMap>,
                         t: Throwable
                     ) {
+                        t.printStackTrace()
                         it.resume(Result.failure(java.lang.Exception(t)))
                     }
                 })

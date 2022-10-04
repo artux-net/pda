@@ -1,6 +1,5 @@
 package net.artux.pda.model.quest;
 
-import java.util.Iterator;
 import java.util.List;
 
 import lombok.Data;
@@ -12,13 +11,11 @@ public class ChapterModel {
     private List<Sound> music;
 
     public Stage getStage(int id) {
-        Iterator<Stage> iterator = getStages().iterator();
-        Stage stage = null;
-        while (iterator.hasNext()) {
-            stage = iterator.next();
-            if (stage.getId() == id) break;
+        for (Stage stage : getStages()) {
+            if (stage.getId() == id)
+                return stage;
         }
-        return stage;
+        return null;
     }
 
 }

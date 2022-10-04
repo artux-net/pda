@@ -11,7 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.artux.pda.R;
-import net.artux.pda.model.user.ProfileModel;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
@@ -43,18 +42,18 @@ public class InfoFragment extends AdditionalBaseFragment {
         mXpView = view.findViewById(R.id.ratingInfo);
 
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
-            if (memberResult != null) {
-                ProfileModel profileModel = new ProfileModel(memberResult);
-                navigationPresenter.setAdditionalTitle("PDA #" + memberResult.getPdaId());
-                ProfileHelper.setAvatar(mAvatarView, profileModel.getAvatar());
-                mLoginView.setText(profileModel.getLogin());
-                AutofitHelper.create(mLoginView);
+            navigationPresenter.setAdditionalTitle("PDA #" + memberResult.getPdaId());
+            ProfileHelper.setAvatar(mAvatarView, memberResult.getAvatar());
+            mLoginView.setText(memberResult.getName() + " " + memberResult.getNickname());
+            AutofitHelper.create(mLoginView);
 
-                mDaysView.setText(ProfileHelper.getDays(profileModel));
-                mGroupView.setText(ProfileHelper.getGroup(profileModel, mGroupView.getContext()));
-                mRangView.setText(ProfileHelper.getRang(profileModel, mRangView.getContext()));
-                mXpView.setText(String.valueOf(profileModel.getXp()));
-            }
+            mDaysView.setText(ProfileHelper.getDays(memberResult.getRegistration()));
+        });
+
+        viewModel.getStoryData().observe(getViewLifecycleOwner(), dataModel -> {
+            mGroupView.setText(ProfileHelper.getGroup(dataModel.getGang(), mGroupView.getContext()));
+            mRangView.setText(ProfileHelper.getRang(dataModel.getXp(), mRangView.getContext()));
+            mXpView.setText(String.valueOf(dataModel.getXp()));
         });
         viewModel.updateFromCache();
     }

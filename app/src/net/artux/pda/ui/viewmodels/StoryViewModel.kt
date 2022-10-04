@@ -58,7 +58,7 @@ class StoryViewModel @javax.inject.Inject constructor(
         }
     }
 
-    fun updateData(): MutableLiveData<StoryDataModel>{
+    fun updateData(): MutableLiveData<StoryDataModel> {
         storyData = MutableLiveData()
         viewModelScope.launch {
             suspendUpdateData()
@@ -133,7 +133,7 @@ class StoryViewModel @javax.inject.Inject constructor(
                 4 -> {
                     //переход на карту
                     sync()
-                    title.postValue("Загрузка карты..")
+                    title.postValue("Loading map...")
                     val mapId: String? = chapterStage.data["map"]
                     if (mapId != null) {
                         if (chapterStage.data.containsKey("pos")) {
@@ -196,6 +196,10 @@ class StoryViewModel @javax.inject.Inject constructor(
             } else
                 status.postValue(StatusModel(Exception("Can not find stage with id: ${transfer.stageId} in chapter: $currentChapterId")))
         }
+    }
+
+    fun getCurrentStage(): Stage {
+        return chapter.value!!.getStage(stage.value!!.id)
     }
 
     private suspend fun sync() {

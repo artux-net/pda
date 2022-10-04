@@ -8,15 +8,14 @@
         android:orientation="vertical">
 
         <include
+            android:id="@id/listContainer"
             layout="@layout/fragment_list"/>
 
         <Button
             android:id="@+id/rating_more"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Загрузить ещё"/>
+            android:text="@string/loadMore"/>
     </LinearLayout>
-
-
 
 </androidx.core.widget.NestedScrollView>

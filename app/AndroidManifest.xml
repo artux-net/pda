@@ -27,6 +27,7 @@
             android:theme="@style/AppTheme.Fullscreen" />
         <activity
             android:name=".ui.activities.LogActivity"
+            android:screenOrientation="sensorLandscape"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.LoginActivity"

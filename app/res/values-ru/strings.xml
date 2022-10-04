@@ -51,18 +51,18 @@
     <string name="unable_connect">Не удалось подключится к серверу</string>
     <string name="enc">Энциклопедия</string>
     <string name="kinds">Разделы</string>
-    <string name="in_zone_time">В зоне:</string>
-    <string name="group">Группировка:</string>
-    <string name="rang">Ранг:</string>
-    <string name="jobs">Заданий:</string>
+    <string name="zoneColon">В зоне:</string>
+    <string name="groupColon">Группировка:</string>
+    <string name="rangColon">Ранг:</string>
+    <string name="jobsColon">Заданий:</string>
     <string name="friends">Друзья - %1$s</string>
     <string name="subscribers">Подписчики - %1$s</string>
     <string name="add_friend">Добавить в друзья</string>
     <string name="is_friend">" %1$s ваш друг"</string>
     <string name="is_sub">%1$s ваш подписчик</string>
     <string name="requested">Вы отправили заявку в друзья</string>
-    <string name="location">Локация:</string>
-    <string name="rating">Рейтинг</string>
+    <string name="locationColon">Локация:</string>
+    <string name="ratingTitle">Рейтинг</string>
     <string name="nickname">Прозвище</string>
     <string name="repeat_password">Повторите пароль</string>
     <string name="agreement">Нажимая кнопку \"РЕГИСТРАЦИЯ\", \nвы принимаете <font color="#f2cd34">условия пользования</font>.</string>
@@ -85,18 +85,18 @@
     <string name="remove_friend_q">Удалить из друзей?</string>
     <string name="add_friend_q">Добавить в друзья?</string>
     <string name="quit">Выйти</string>
-    <string name="rating_p">Опыт: %1$s</string>
+    <string name="rating_p">Рейтинг: %1$s</string>
     <string name="rang_p">Ранг: %1$s</string>
     <string name="group_p">Группировка: %1$s</string>
     <string name="in_zone_time_p">В зоне: %1$s</string>
     <string name="location_p">Локация: %1$s</string>
     <string name="empty">Записи отсутствуют.</string>
     <string name="note_isnt_selected">Note isn\'t selected.</string>
-    <string name="xp_p" translatable="false">Рейтинг: %1$s</string>
+    <string name="xp_p" translatable="false">Опыт: %1$s</string>
     <string name="subs">Запросы дружбы - %1$s</string>
     <string name="settings">Настройки</string>
     <string name="exitStory">Выйти из истории</string>
-    <string name="registrationEndDesc">На указанную почту %1$s было отправлено письмо с ссылкой для подтверждения регистрации в сталкерской сети, перейдеите по ней для завершения. Письмо может попасть в папку спам, советуем ее проверить.</string>
+    <string name="registrationEndDesc">На указанную почту %1$s было отправлено письмо с ссылкой для подтверждения регистрации в сталкерской сети, перейдите по ней для завершения. Письмо может попасть в папку спам, советуем ее проверить.</string>
     <string name="registrationEndConfirm">Я подтвердил аккаунт</string>
     <string name="notEqualPasswords">Пароли не совпадают.</string>
     <string name="what_is_pda">Что такое ПДА?</string>
@@ -105,5 +105,10 @@
     <string name="help_tab3_title">Как пользоваться?</string>
     <string name="help_tab2_title">Что он умеет?</string>
     <string name="help_tab1_title">Что такое ПДА?</string>
+    <string name="loadMore">Загрузить еще</string>
+    <string name="ratingColon">Опыт:</string>
+    <string name="xpColon">Опыт:</string>
+    <string name="summaryDate">Сводка от %s</string>
+    <string name="selectSummary">Выберите сводку в меню справа.</string>
     <string name="item_as_main">Сделать основным</string>
 </resources>

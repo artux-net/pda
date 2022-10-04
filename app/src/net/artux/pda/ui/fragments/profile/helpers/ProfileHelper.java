@@ -10,14 +10,15 @@ import com.bumptech.glide.Glide;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
+import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.ProfileModel;
 
 import java.time.Instant;
 
 public class ProfileHelper {
 
-    public static String getGroup(ProfileModel profileModel, Context context) {
-        return context.getResources().getStringArray(R.array.groups)[profileModel.getGroup()];
+    public static String getGroup(Gang gang, Context context) {
+        return context.getResources().getStringArray(R.array.groups)[gang.getId()];
     }
 
     public static String getGroup(Context context, int group) {
@@ -70,8 +71,8 @@ public class ProfileHelper {
         }
     }
 
-    public static String getRang(ProfileModel profileModel, Context context) {
-        return context.getResources().getStringArray(R.array.rang)[rang(profileModel.getXp())];
+    public static String getRang(int xp, Context context) {
+        return context.getResources().getStringArray(R.array.rang)[rang(xp)];
     }
 
     public static String getRang(Context context, int xp) {

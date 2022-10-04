@@ -65,6 +65,7 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
                 result = getRandomVectorWithInNode(x, y);
             } while (worldGraph.getNode(x, y).type == TILE_WALL || camera.frustum.pointInFrustum(result.x, result.y, 0));
         } else {
+            //todo map borders were null from group generation WorldSystem.java:132
             result = new Vector2(random.nextInt(mapBorders.getWidth()), random.nextInt(mapBorders.getHeight()));
         }
         return result;

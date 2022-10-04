@@ -23,7 +23,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
     OnClickListener clickListener;
     UUID ownerId;
 
-    RatingAdapter(OnClickListener clickListener, UUID ownerId){
+    RatingAdapter(OnClickListener clickListener, UUID ownerId) {
         this.clickListener = clickListener;
         this.ownerId = ownerId;
     }
@@ -36,7 +36,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.bind(list.get(position), position+1);
+        holder.bind(list.get(position), position + 1);
     }
 
     @Override
@@ -44,12 +44,12 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
         return list.size();
     }
 
-    void addData(List<UserInfo> list){
-        this.list.addAll(list);
+    void setData(List<UserInfo> list) {
+        this.list = list;
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView avatar;
         TextView title;
@@ -64,14 +64,14 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
             pos = itemView.findViewById(R.id.rating_pos);
         }
 
-        void bind(UserInfo userInfo, int pos){
+        void bind(UserInfo userInfo, int pos) {
             this.pos.setText("#" + pos);
             if (ownerId.equals(userInfo.pdaId))
                 itemView.setBackgroundColor(Color.rgb(30, 40, 50));
             ProfileHelper.setAvatar(avatar, userInfo.avatar);
-            title.setText(title.getContext().getString(R.string.rating_title,userInfo.login,
+            title.setText(title.getContext().getString(R.string.rating_title, userInfo.login,
                     String.valueOf(userInfo.pdaId), String.valueOf(ProfileHelper.getRang(title.getContext(), userInfo.xp))));
-            desc.setText(desc.getContext().getString(R.string.rating_desc,ProfileHelper.getGroup(desc.getContext(), userInfo.group),
+            desc.setText(desc.getContext().getString(R.string.rating_desc, ProfileHelper.getGroup(desc.getContext(), userInfo.group),
                     ProfileHelper.getDays(userInfo.registration), userInfo.location));
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -82,7 +82,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
         }
     }
 
-    interface OnClickListener{
+    interface OnClickListener {
         void onClick(UserInfo userInfo);
     }
 

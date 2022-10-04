@@ -11,6 +11,7 @@ import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
+import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,7 +22,7 @@ class ItemsViewModel @Inject constructor(
 ) : ViewModel() {
 
     var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
-    var status: MutableLiveData<StatusModel> = MutableLiveData()
+    var status: SingleLiveEvent<StatusModel> = SingleLiveEvent()
 
     fun setWearable(wearable: WearableModel) {
         viewModelScope.launch {

@@ -24,10 +24,12 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class SummaryFragment extends BaseFragment implements ChatAdapter.MessageClickListener {
 
     private ChatAdapter mChatAdapter;
+    protected SummaryViewModel summaryViewModel;
+
     {
         defaultAdditionalFragment = SummaryAdditionalFragment.class;
     }
-    private SummaryViewModel summaryViewModel;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -38,8 +40,7 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (summaryViewModel==null)
-            summaryViewModel = new ViewModelProvider(requireActivity()).get(SummaryViewModel.class);
+        summaryViewModel = new ViewModelProvider(requireActivity()).get(SummaryViewModel.class);
 
         RecyclerView recyclerView = view.findViewById(R.id.list);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext());
@@ -49,24 +50,23 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
 
         mChatAdapter = new ChatAdapter(this);
         recyclerView.setAdapter(mChatAdapter);
-        reset();
 
         summaryViewModel.getSummary().observe(getViewLifecycleOwner(), summary -> {
-            if (summary!=null){
-                navigationPresenter.setTitle("Сводка от " + summary.getTitle());
+            if (summary != null) {
+                navigationPresenter.setTitle(getString(R.string.summaryDate, summary.getTitle()));
                 mChatAdapter.setItems(summary.getMessages());
-                if (summary.getMessages().size()>0) {
+                if (summary.getMessages().size() > 0) {
                     recyclerView.setVisibility(View.VISIBLE);
                     view.findViewById(R.id.viewMessage).setVisibility(View.GONE);
-                }else{
+                } else {
                     recyclerView.setVisibility(View.GONE);
                     view.findViewById(R.id.viewMessage).setVisibility(View.VISIBLE);
                 }
             } else {
-                reset();
+                navigationPresenter.setTitle(getString(R.string.selectSummary));
+                mChatAdapter.clearItems();
             }
         });
-
     }
 
     @Override
@@ -79,8 +79,4 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
 
     }
 
-    void reset(){
-        navigationPresenter.setTitle("Выберете сводку в меню справа..");
-        mChatAdapter.clearItems();
-    }
 }

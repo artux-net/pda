@@ -107,20 +107,4 @@ public class StoryDataModel implements Serializable {
             weight += item.getWeight() * item.getQuantity();
         return weight;
     }
-
-    @Override
-    public String toString() {
-        return "StoryDataModel{" +
-                "money=" + money +
-                ", xp=" + xp +
-                ", parameters=" + parameters +
-                ", storyStates=" + storyStates +
-                ", armors=" + armors +
-                ", weapons=" + weapons +
-                ", medicines=" + medicines +
-                ", detectors=" + detectors +
-                ", artifacts=" + artifacts +
-                ", bullets=" + bullets +
-                '}';
-    }
 }

@@ -28,9 +28,12 @@ class NewsRepository @Inject constructor(
         else Result.failure(Exception("Note isn't found"))
     }
 
-    suspend fun getArticles(queryPage: QueryPage): Result<List<ArticleDto>> {
+    suspend fun getArticles(): Result<List<ArticleDto>> {
         return suspendCoroutine {
-            webservice.getPageArticles(queryPage).enqueue(object : Callback<ResponsePageArticleDto> {
+            webservice.getPageArticles(QueryPage()
+                .sortBy("published")
+                .sortDirection(QueryPage.SortDirectionEnum.ASC))
+                .enqueue(object : Callback<ResponsePageArticleDto> {
                 override fun onResponse(
                     call: Call<ResponsePageArticleDto>,
                     response: Response<ResponsePageArticleDto>

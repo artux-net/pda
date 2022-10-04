@@ -56,6 +56,10 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
             .withZone(ZoneId.systemDefault());
     private UserViewModel viewModel;
 
+    public MainPresenter getPresenter() {
+        return presenter;
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,7 +128,6 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
     @Override
     public void setFragment(BaseFragment fragment, boolean addToBackStack) {
-        fragment.attachPresenter(presenter);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager()
                 .beginTransaction();
         if (addToBackStack)
@@ -137,8 +140,6 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
     @Override
     public void setAdditionalFragment(AdditionalBaseFragment fragment) {
-
-        fragment.attachPresenter(presenter);
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.rightContainer, fragment)

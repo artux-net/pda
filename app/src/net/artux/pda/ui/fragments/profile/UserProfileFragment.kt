@@ -71,7 +71,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             binding.profileTime.text =
                 getString(R.string.in_zone_time_p, ProfileHelper.getDays(model))
             binding.profileRang.text =
-                getString(R.string.rang_p, ProfileHelper.getRang(model, view.context))
+                getString(R.string.rang_p, ProfileHelper.getRang(model.xp, view.context))
             binding.profileRating.text =
                 getString(R.string.rating_p, model.xp.toString())
 

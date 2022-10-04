@@ -17,6 +17,7 @@ import kotlin.coroutines.suspendCoroutine
 class UserRepository @Inject constructor(
     private val webservice: DefaultApi,
     private val userCache: Cache<Profile>,
+    private val dataCache: Cache<StoryData>,
     private val memberCache: Cache<UserDto>
 ) {
 
@@ -26,6 +27,13 @@ class UserRepository @Inject constructor(
 
     fun getCachedProfile(userId: UUID): Result<Profile> {
         val cache = userCache.get(userId.toString())
+        return if (cache != null)
+            Result.success(cache)
+        else Result.failure(Exception("Cache isn't found"))
+    }
+
+    fun getCachedData(): Result<StoryData> {
+        val cache = dataCache.get("story")
         return if (cache != null)
             Result.success(cache)
         else Result.failure(Exception("Cache isn't found"))

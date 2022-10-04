@@ -35,7 +35,7 @@ import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentNotificationBinding;
 import net.artux.pda.gdx.MapEngine;
 import net.artux.pda.model.quest.Stage;
-import net.artux.pda.model.quest.StageModel;
+import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
 import net.artux.pda.ui.fragments.quest.StageFragment;
 import net.artux.pda.ui.viewmodels.StoryViewModel;
@@ -263,14 +263,18 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         } else if (id == R.id.exitButton)
             storyViewModel.exitStory();
         else if (id == R.id.log) {
-            StageModel stage = storyViewModel.getStage().getValue();
+            Stage stage = storyViewModel.getCurrentStage();
+            StoryDataModel dataModel = storyViewModel.getStoryData().getValue();
 
             GsonBuilder gsonBuilder = new GsonBuilder();
             gsonBuilder.setPrettyPrinting();
 
+            assert dataModel != null;
             String logStage = "Story: " + storyViewModel.getCurrentStoryId() + "\n" +
-                    "Chapter: " + storyViewModel.getCurrentChapterId() + "\n" +
-                    gsonBuilder.create().toJson(stage);
+                    "Chapter: " + storyViewModel.getCurrentChapterId() + "\n \n" +
+                    "Parameters: " + gsonBuilder.create().toJson(dataModel.getParameters()) + "\n \n" +
+                    "Stage: " + gsonBuilder.create().toJson(stage);
+
 
             Intent intent = new Intent(this, LogActivity.class);
             intent.putExtra("text", logStage);

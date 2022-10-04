@@ -15,6 +15,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,7 +69,10 @@ public interface StageMapper {
                 text.setText(formatText(text.getText(), dataCompanion));
                 contentVariants.add(text);
             }
-        return contentVariants.get(0).getText();
+        if (contentVariants.size() > 0)
+            return contentVariants.get(0).getText();
+        else
+            return "Недостижимые условия текста";
     }
 
     default List<TransferModel> getTransfers(Stage stage, StoryDataModel dataCompanion) {
@@ -78,7 +82,10 @@ public interface StageMapper {
                 transfer.setText(formatText(transfer.getText(), dataCompanion));
                 transfers.add(new TransferModel(transfer.getStageId(), transfer.getText()));
             }
-        return transfers;
+        if (transfers.size() == 0)
+            return Collections.singletonList(new TransferModel(-1, "Недостижимые условия переходов."));
+        else
+            return transfers;
     }
 
 

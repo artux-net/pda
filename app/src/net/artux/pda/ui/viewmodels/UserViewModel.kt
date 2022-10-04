@@ -10,6 +10,7 @@ import net.artux.pda.app.DataManager
 import net.artux.pda.di.RemoteValue
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.mapper.StatusMapper
+import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.mapper.UserMapper
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.model.user.UserModel
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class UserViewModel @Inject constructor(
     private var userRepository: UserRepository,
     var dataManager: DataManager,
+    var storyMapper: StoryMapper,
     var userMapper: UserMapper,
     var statusMapper: StatusMapper,
     var firebaseRemoteConfig: FirebaseRemoteConfig
@@ -28,12 +30,15 @@ class UserViewModel @Inject constructor(
 
     var member: MutableLiveData<UserModel> = MutableLiveData()
     var status: MutableLiveData<StatusModel> = MutableLiveData()
-    var storyData: MutableLiveData<Result<StoryDataModel>> = MutableLiveData()
+    var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
 
     fun updateFromCache() {
-        member.postValue(userRepository.getCachedMember()
+        userRepository.getCachedMember()
             .map { userMapper.model(it) }
-            .getOrNull())
+            .onSuccess { member.postValue(it) }
+        userRepository.getCachedData()
+            .map { storyMapper.dataModel(it) }
+            .onSuccess { storyData.postValue(it) }
     }
 
     fun getFromCache(): UserModel? {
@@ -50,14 +55,6 @@ class UserViewModel @Inject constructor(
                     it.printStackTrace()
                     status.postValue(StatusModel(it))
                 }
-        }
-    }
-
-
-    fun updateMemberWithReset() {
-        viewModelScope.launch {
-            userRepository.clearMemberCache()
-            member.postValue(userRepository.getMember().map { userMapper.model(it) }.getOrNull())
         }
     }
 

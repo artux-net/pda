@@ -67,19 +67,22 @@
     <string name="is_friend">%1$s is your friend</string>
     <string name="is_sub">%1$s is your subscriber</string>
     <string name="requested">You have sent friend request.</string>
-    <string name="in_zone_time">In zone:</string>
-    <string name="group">Group:</string>
-    <string name="rang">Rang:</string>
-    <string name="jobs">Заданий:</string>
-    <string name="rating">Rating: </string>
-    <string name="location">Location:</string>
+    <string name="zoneColon">In zone:</string>
+    <string name="groupColon">Group:</string>
+    <string name="rangColon">Rang:</string>
+    <string name="jobsColon">Jobs:</string>
+    <string name="ratingColon">Rating:</string>
+    <string name="xpColon">Experience:</string>
+    <string name="locationColon">Location:</string>
+    <string name="loadMore">Load more</string>
 
+    <string name="ratingTitle">Rating</string>
 
     <string name="in_zone_time_p">In zone: %1$s</string>
     <string name="group_p">Group: %1$s</string>
     <string name="rang_p">Rang: %1$s</string>
-    <string name="xp_p">Rating: %1$s</string>
-    <string name="rating_p">XP: %1$s</string>
+    <string name="xp_p">XP: %1$s</string>
+    <string name="rating_p">Rating: %1$s</string>
     <string name="location_p">Location: %1$s</string>
 
     <string name="rating_title" translatable="false">%1$s - [PDA #%2$s] %3$s</string>
@@ -150,7 +153,7 @@
     <string name="note_isnt_selected">Note isn\'t selected.</string>
     <string name="subs">Friend requests - %1$s</string>
     <string name="settings">Settings</string>
-    <string name="registrationEndDesc">На указанную почту %1$s было отправлено письмо с ссылкой для подтверждения регистрации в сталкерской сети, перейдеите по ней для завершения.</string>
+    <string name="registrationEndDesc">На указанную почту %1$s было отправлено письмо с ссылкой для подтверждения регистрации в сталкерской сети, перейдите по ней для завершения. Письмо может попасть в папку спам, советуем ее проверить.</string>
     <string name="registrationEndConfirm">Done</string>
     <string name="notEqualPasswords">Passwords are not equal.</string>
     <string name="exitStory">Exit story</string>
@@ -183,5 +186,7 @@
     <string name="friends_of">\"Friends of %s\"</string>
     <string name="create_note">Create note</string>
     <string name="help_tab3_title">How to use</string>
+    <string name="summaryDate">Summary from %s</string>
+    <string name="selectSummary">Select summary.</string>
     <string name="item_as_main">Make as main</string>
 </resources>

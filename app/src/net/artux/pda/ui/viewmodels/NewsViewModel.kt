@@ -9,7 +9,6 @@ import net.artux.pda.model.StatusModel
 import net.artux.pda.model.mapper.ArticleMapper
 import net.artux.pda.model.news.ArticleModel
 import net.artux.pda.repositories.NewsRepository
-import net.artux.pdanetwork.model.QueryPage
 import java.util.*
 import javax.inject.Inject
 
@@ -23,8 +22,13 @@ class NewsViewModel @Inject constructor(
 
     fun update() {
         viewModelScope.launch {
-            repository.getArticles(QueryPage())
-                .onSuccess { articles.postValue(articleMapper.model(it)) }
+            repository.getArticles()
+                .map { articleMapper.model(it) }
+                .onSuccess { it ->
+                    it.sortBy { it.published }
+                    it.reverse()
+                    articles.postValue(it)
+                }
                 .onFailure { status.postValue(StatusModel(it)) }
         }
     }
@@ -32,8 +36,8 @@ class NewsViewModel @Inject constructor(
     fun updateFromCache() {
         articles.postValue(
             repository.getCachedArticles()
-            .map { articleMapper.model(it) }
-            .getOrDefault(Collections.emptyList()))
+                .map { articleMapper.model(it) }
+                .getOrDefault(Collections.emptyList()))
     }
 
 }

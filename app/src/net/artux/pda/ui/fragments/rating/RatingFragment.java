@@ -7,17 +7,15 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
+import net.artux.pda.databinding.FragmentListBinding;
+import net.artux.pda.databinding.FragmentRatingBinding;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
-
-import java.util.List;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -28,54 +26,51 @@ public class RatingFragment extends BaseFragment implements RatingAdapter.OnClic
         defaultAdditionalFragment = AdditionalFragment.class;
     }
 
-    RatingViewModel ratingViewModel;
+    protected RatingViewModel ratingViewModel;
+    protected FragmentRatingBinding binding;
+    protected FragmentListBinding listBinding;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_rating, container, false);
+        binding = FragmentRatingBinding.inflate(inflater);
+        listBinding = binding.listContainer;
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (navigationPresenter != null) {
-            navigationPresenter.setTitle(getString(R.string.rating));
-            navigationPresenter.setLoadingState(true);
-        }
+        navigationPresenter.setTitle(getString(R.string.ratingTitle));
+        ratingViewModel = new ViewModelProvider(requireActivity()).get(RatingViewModel.class);
 
-        if (ratingViewModel == null)
-            ratingViewModel = new ViewModelProvider(requireActivity()).get(RatingViewModel.class);
-
-        RecyclerView recyclerView = view.findViewById(R.id.list);
-        View v = view.findViewById(R.id.viewMessage);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         RatingAdapter ratingAdapter = new RatingAdapter(this, viewModel.getId());
-        recyclerView.setAdapter(ratingAdapter);
+        listBinding.list.setLayoutManager(new LinearLayoutManager(getContext()));
+        listBinding.list.setAdapter(ratingAdapter);
+        binding.ratingMore.setOnClickListener(view1 -> ratingViewModel.nextPage());
 
-        ratingViewModel.getList().observe(getViewLifecycleOwner(), new Observer<List<UserInfo>>() {
-            @Override
-            public void onChanged(List<UserInfo> listResult) {
-                if (navigationPresenter != null)
-                    navigationPresenter.setLoadingState(false);
-                recyclerView.setVisibility(View.VISIBLE);
-                v.setVisibility(View.GONE);
-                ratingAdapter.addData(listResult);
+        ratingViewModel.getState().observe(getViewLifecycleOwner(),
+                aBoolean -> navigationPresenter.setLoadingState(aBoolean));
+
+        ratingViewModel.getStatus().observe(getViewLifecycleOwner(),
+                statusModel -> listBinding.viewMessage.setText(statusModel.getDescription()));
+
+        ratingViewModel.getList().observe(getViewLifecycleOwner(), listResult -> {
+            if (listResult.size() > 0) {
+                listBinding.list.setVisibility(View.VISIBLE);
+                listBinding.viewMessage.setVisibility(View.GONE);
+                ratingAdapter.setData(listResult);
+            } else {
+                listBinding.list.setVisibility(View.GONE);
+                listBinding.viewMessage.setVisibility(View.VISIBLE);
             }
         });
-
-        view.findViewById(R.id.rating_more).setOnClickListener(view1 -> {
-            ratingViewModel.nextPage();
-        });
-
-        ratingViewModel.updateList();
+        ratingViewModel.updateTop();
     }
 
     @Override
     public void onClick(UserInfo userInfo) {
-        if (navigationPresenter != null) {
-            navigationPresenter.addFragment(UserProfileFragment.of(userInfo.id), true);
-        }
+        navigationPresenter.addFragment(UserProfileFragment.of(userInfo.id), true);
     }
 }
 

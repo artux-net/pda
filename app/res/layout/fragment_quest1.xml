@@ -12,7 +12,7 @@
         android:textColor="#fff"
         android:textSize="32sp" />
 
-    <TextView
+    <net.artux.pda.ui.views.TypeWriterTextView
         android:id="@+id/sceneText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

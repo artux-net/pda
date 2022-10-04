@@ -21,6 +21,7 @@ import net.artux.pda.model.quest.StageModel;
 import net.artux.pda.model.quest.StageType;
 import net.artux.pda.model.quest.TransferModel;
 import net.artux.pda.ui.viewmodels.StoryViewModel;
+import net.artux.pda.ui.views.TypeWriterTextView;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class StageFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         if (stage.getType() == StageType.CHAPTER_OVER)
             return inflater.inflate(R.layout.fragment_quest1, container, false);
         else
@@ -56,11 +57,17 @@ public class StageFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         storyViewModel = new ViewModelProvider(requireActivity()).get(StoryViewModel.class);
 
-        TextView mainText = view.findViewById(R.id.sceneText);
+        TypeWriterTextView mainText = view.findViewById(R.id.sceneText);
+
         colorStateList = mainText.getTextColors();
         sceneResponses = view.findViewById(R.id.sceneResponses);
 
-        mainText.setText(stage.getContent());
+        mainText.setmText(stage.getContent());
+        mainText.setListener(() -> {
+            setSceneResponses(stage.getTransfers());
+        });
+        if (stage.getType() != StageType.DIALOG)
+            mainText.setEffect(false);
 
         if (stage.getType() == StageType.CHAPTER_OVER) {
             TextView title = view.findViewById(R.id.sceneTitle);
@@ -79,7 +86,10 @@ public class StageFragment extends Fragment {
                 button.setOnClickListener(v -> storyViewModel.chooseTransfer((transfers.get(0))));
             }
         } else {
-            setSceneResponses(stage.getTransfers());
+            mainText.setOnClickListener(v -> mainText.setEffect(false));
+            view.findViewById(R.id.scrollScene).setOnClickListener(v -> {
+                mainText.setEffect(false);
+            });
         }
     }
 
@@ -106,4 +116,5 @@ public class StageFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
 
     }
+
 }
