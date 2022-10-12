@@ -1,13 +1,22 @@
 package net.artux.pda.gdx;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Looper;
 import android.widget.Toast;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
+import net.artux.pda.app.ForegroundService;
 import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.model.input.GameMap;
 import net.artux.pda.map.platform.PlatformInterface;
@@ -19,16 +28,48 @@ import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import timber.log.Timber;
 
 public class MapEngine extends AndroidApplication implements PlatformInterface {
 
+    public static final String RECEIVER_INTENT = "RECEIVER_INTENT";
+    public static final String RECEIVER_MESSAGE = "RECEIVER_MESSAGE";
+
     private StoryStateModel lastStoryState;
+    private ForegroundService foregroundService;
+    private boolean bound = false;
+    private GdxAdapter gdxAdapter;
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            ForegroundService.ServiceBinder binder = (ForegroundService.ServiceBinder) service;
+            foregroundService = binder.getService();
+            bound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            bound = false;
+        }
+    };
+
+    private BroadcastReceiver dataChangeReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        dataChangeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                StoryDataModel storyDataModel = (StoryDataModel) intent.getSerializableExtra(RECEIVER_MESSAGE);
+                gdxAdapter.put("data", storyDataModel);
+            }
+        };
 
         Intent intent = getIntent();
         UserModel member = (UserModel) intent.getSerializableExtra("user");
@@ -41,7 +82,8 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
                 .user(member)
                 .storyData(dataModel);
 
-        initialize(builder.build(), new AndroidApplicationConfiguration());
+        gdxAdapter = (GdxAdapter) builder.build();
+        initialize(gdxAdapter, new AndroidApplicationConfiguration());
     }
 
     @Override
@@ -93,6 +135,11 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
     }
 
     @Override
+    public void applyActions(Map<String, List<String>> actions) {
+        foregroundService.applyActions(actions);
+    }
+
+    @Override
     public void debug(String msg) {
         Timber.d(msg);
     }
@@ -118,6 +165,26 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
     public void restart() {
         startActivity(getIntent());
         finish();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, ForegroundService.class);
+        bindService(intent, connection, BIND_AUTO_CREATE);
+        LocalBroadcastManager.getInstance(this).registerReceiver((dataChangeReceiver),
+                new IntentFilter(RECEIVER_INTENT)
+        );
+    }
+
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(dataChangeReceiver);
+        super.onStop();
+        if (bound){
+            unbindService(connection);
+            bound = false;
+        }
     }
 
     @Override

@@ -20,6 +20,8 @@ import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 
+import timber.log.Timber;
+
 public class EncyclopediaFragment extends BaseFragment {
 
     private static final String BASE_ID = "baseId";
@@ -81,7 +83,9 @@ public class EncyclopediaFragment extends BaseFragment {
             lastUrl = "https://" + BuildConfig.URL_API + "enc/item/" + id;
         } else
             lastUrl = "https://" + BuildConfig.URL_API + "enc";
+        //todo remote config
 
+        Timber.i("Load enc with baseId: %s", lastUrl);
         webView.loadUrl(lastUrl);
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -104,16 +108,6 @@ public class EncyclopediaFragment extends BaseFragment {
 
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), callback);
     }
-
-    public void receiveData(Bundle data) {
-        if (data.containsKey("load"))
-            webView.loadUrl(data.getString("load"));
-        if (data.containsKey("reset")) {
-            webView.loadUrl("https://" + BuildConfig.URL_API + "enc");
-            lastUrl = "https://" + BuildConfig.URL_API + "enc";
-        }
-    }
-
 
     @Override
     public void onDestroy() {

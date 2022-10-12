@@ -95,7 +95,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
-        <service android:name=".app.NotificationService" />
+        <service android:name=".app.ForegroundService" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

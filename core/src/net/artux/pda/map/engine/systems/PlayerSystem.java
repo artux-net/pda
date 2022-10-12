@@ -80,9 +80,7 @@ public class PlayerSystem extends BaseSystem {
         hud = new HUD(assetManager, engine, userInterface);
         userInterface.getHudTable().add(hud);
 
-        ImageButton.ImageButtonStyle
-
-                style = new ImageButton.ImageButtonStyle();
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
         style.imageUp = new TextureRegionDrawable(assetManager.get("ui/bar/ic_health.png", Texture.class));
 

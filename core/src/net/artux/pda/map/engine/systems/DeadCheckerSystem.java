@@ -22,6 +22,7 @@ import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.UserInterface;
 
+import java.util.Collections;
 import java.util.Random;
 
 public class DeadCheckerSystem extends BaseSystem {
@@ -82,6 +83,7 @@ public class DeadCheckerSystem extends BaseSystem {
         }
         if (!getEngine().getEntities().contains(player, false)) {
             if (!deadMessage) {
+                gameStateManager.getPlatformInterface().applyActions(Collections.singletonMap("xp", Collections.singletonList("-5")));
                 Group deadMessageGroup = new Group();
 
                 TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
