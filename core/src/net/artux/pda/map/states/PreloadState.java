@@ -5,6 +5,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.model.input.GameMap;
 
 import java.util.LinkedList;
@@ -19,8 +20,8 @@ public class PreloadState extends State {
     String cachePath = "cache/";
     int triesLimit = 3;
 
-    public PreloadState(final GameStateManager gsm) {
-        super(gsm);
+    public PreloadState(final GameStateManager gsm, DataRepository dataRepository) {
+        super(gsm, dataRepository);
     }
 
     List<String> remoteAssets = new LinkedList<>();
@@ -102,7 +103,7 @@ public class PreloadState extends State {
             try {
                 if (!(gsm.peek() instanceof PlayState)) {
                     Gdx.app.log("Preload", "Ok, try to load Play State. Preload took " + (TimeUtils.millis() - preloadTime) + " ms.");
-                    gsm.set(new PlayState(gsm));
+                    gsm.set(new PlayState(gsm, dataRepository));
                 }
             } catch (Throwable e) {
                 gsm.getPlatformInterface().error("Can not start PlayState", e);

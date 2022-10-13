@@ -16,10 +16,12 @@ import net.artux.pda.model.user.UserModel;
 public class GdxAdapter extends ApplicationAdapter {
 
     private final GameStateManager gsm;
+    private final DataRepository dataRepository;
     private long startHeap;
 
     public GdxAdapter(PlatformInterface platformInterface) {
         gsm = new GameStateManager(platformInterface);
+        dataRepository = new DataRepository();
     }
 
     public void put(String key, Object o) {
@@ -35,7 +37,7 @@ public class GdxAdapter extends ApplicationAdapter {
         long loadMills = TimeUtils.millis();
         startHeap = Gdx.app.getNativeHeap();
         Gdx.app.debug("GDX", "Before load, heap " + startHeap);
-        PreloadState preloadState = new PreloadState(gsm);
+        PreloadState preloadState = new PreloadState(gsm, dataRepository);
         gsm.push(preloadState);
         preloadState.startLoad();
         Gdx.app.debug("GDX", "Loaded, heap " + Gdx.app.getNativeHeap());

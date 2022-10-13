@@ -36,7 +36,8 @@ import timber.log.Timber;
 public class MapEngine extends AndroidApplication implements PlatformInterface {
 
     public static final String RECEIVER_INTENT = "RECEIVER_INTENT";
-    public static final String RECEIVER_MESSAGE = "RECEIVER_MESSAGE";
+    public static final String RECEIVE_STORY_DATA = "RECEIVER_DATA";
+    public static final String RECEIVE_ERROR = "RECEIVER_ERROR";
 
     private StoryStateModel lastStoryState;
     private ForegroundService foregroundService;
@@ -59,17 +60,10 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
 
     private BroadcastReceiver dataChangeReceiver;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        dataChangeReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                StoryDataModel storyDataModel = (StoryDataModel) intent.getSerializableExtra(RECEIVER_MESSAGE);
-                gdxAdapter.put("data", storyDataModel);
-            }
-        };
 
         Intent intent = getIntent();
         UserModel member = (UserModel) intent.getSerializableExtra("user");
@@ -84,6 +78,20 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
 
         gdxAdapter = (GdxAdapter) builder.build();
         initialize(gdxAdapter, new AndroidApplicationConfiguration());
+
+        dataChangeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.hasExtra(RECEIVE_STORY_DATA)) {
+                    StoryDataModel storyDataModel = (StoryDataModel) intent.getSerializableExtra(RECEIVE_STORY_DATA);
+                    gdxAdapter.put("data", storyDataModel);
+                } else if (intent.hasExtra(RECEIVE_ERROR)) {
+                    Throwable throwable = (Throwable) intent.getSerializableExtra(RECEIVE_ERROR);
+                    Timber.e(throwable, "Sync map error");
+                }
+
+            }
+        };
     }
 
     @Override
@@ -181,7 +189,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
     protected void onStop() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(dataChangeReceiver);
         super.onStop();
-        if (bound){
+        if (bound) {
             unbindService(connection);
             bound = false;
         }

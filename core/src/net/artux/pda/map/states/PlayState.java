@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.data.GlobalData;
@@ -30,8 +31,8 @@ public class PlayState extends State {
     private final AssetsFinder assetsFinder;
     private final UserInterface userInterface;
 
-    public PlayState(final GameStateManager gsm) {
-        super(gsm);
+    public PlayState(final GameStateManager gsm, DataRepository dataRepository) {
+        super(gsm, dataRepository);
 
         assetsFinder = new AssetsFinder();
         AssetManager assetManager = assetsFinder.getManager();

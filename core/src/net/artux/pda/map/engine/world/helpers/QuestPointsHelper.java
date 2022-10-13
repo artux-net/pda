@@ -16,7 +16,6 @@ import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.model.Transfer;
 import net.artux.pda.map.model.input.GameMap;
 import net.artux.pda.map.model.input.Point;
-import net.artux.pda.map.states.State;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.model.Checker;
 import net.artux.pda.model.quest.story.StoryDataModel;
@@ -55,7 +54,7 @@ public class QuestPointsHelper {
                 .add(new InteractiveComponent(point.getTitle(), point.type, new InteractiveComponent.InteractListener() {
                     @Override
                     public void interact(UserInterface userInterface) {
-                        State.gsm.getPlatformInterface().send(point.getData());
+                        //todo State.gsm.getPlatformInterface().send(point.getData());
                     }
                 }))
                 .add(new ClickComponent(new ClickComponent.ClickListener() {
@@ -104,7 +103,7 @@ public class QuestPointsHelper {
                         HashMap<String, String> data = new HashMap<>();
                         data.put("map", String.valueOf(point.getTo()));
                         data.put("pos", point.getToPosition());
-                        State.gsm.getPlatformInterface().send(data);
+                        //todo State.gsm.getPlatformInterface().send(data);
                     }
                 }))
                 .add(new ClickComponent(new ClickComponent.ClickListener() {

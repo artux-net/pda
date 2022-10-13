@@ -2,18 +2,21 @@ package net.artux.pda.map.states;
 
 import com.badlogic.gdx.Gdx;
 
+import net.artux.pda.map.DataRepository;
 import net.artux.pda.model.user.UserModel;
 
 
 public abstract class State {
 
-    public static GameStateManager gsm;
+    protected final GameStateManager gsm;
+    protected final DataRepository dataRepository;
 
     protected float w = Gdx.graphics.getWidth();
     protected float h = Gdx.graphics.getHeight();
 
-    public State(GameStateManager gsm) {
+    public State(GameStateManager gsm, DataRepository dataRepository) {
         this.gsm = gsm;
+        this.dataRepository = dataRepository;
     }
 
     protected abstract void handleInput();
