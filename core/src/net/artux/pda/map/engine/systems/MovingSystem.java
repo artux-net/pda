@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.UserVelocityInput;
@@ -19,6 +20,7 @@ public class MovingSystem extends BaseSystem {
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
+    private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     private ComponentMapper<UserVelocityInput> uvm = ComponentMapper.getFor(UserVelocityInput.class);
 
     private MapOrientationSystem mapOrientationSystem;
@@ -58,15 +60,16 @@ public class MovingSystem extends BaseSystem {
 
             PositionComponent positionComponent = pm.get(entity);
             VelocityComponent velocityComponent = vm.get(entity);
+            HealthComponent healthComponent = hm.get(entity);
 
             Vector2 stepVector;
             float staminaDifference = 0;
-            if (velocityComponent.isRunning() && velocityComponent.stamina > 0) {
+            if (velocityComponent.isRunning() && healthComponent.stamina > 0) {
                 stepVector = velocityComponent.velocity.scl(deltaTime).scl(RUN_MOVEMENT);
                 if (!alwaysRun && entity == player)
                     staminaDifference = -0.1f;
             } else {
-                if (velocityComponent.stamina < 100)
+                if (healthComponent.stamina < 100)
                  staminaDifference = 0.06f;
                 stepVector = velocityComponent.velocity.scl(deltaTime).scl(MOVEMENT);
             }
@@ -86,7 +89,7 @@ public class MovingSystem extends BaseSystem {
                         positionComponent.getPosition().y = newY;
                 }
             }
-            velocityComponent.stamina += staminaDifference;
+            healthComponent.stamina += staminaDifference;
         }
     }
 

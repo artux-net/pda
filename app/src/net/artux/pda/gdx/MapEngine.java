@@ -44,7 +44,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
     private boolean bound = false;
     private GdxAdapter gdxAdapter;
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             ForegroundService.ServiceBinder binder = (ForegroundService.ServiceBinder) service;
@@ -84,7 +84,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
             public void onReceive(Context context, Intent intent) {
                 if (intent.hasExtra(RECEIVE_STORY_DATA)) {
                     StoryDataModel storyDataModel = (StoryDataModel) intent.getSerializableExtra(RECEIVE_STORY_DATA);
-                    gdxAdapter.put("data", storyDataModel);
+                    gdxAdapter.getDataRepository().setStoryDataModel(storyDataModel);
                 } else if (intent.hasExtra(RECEIVE_ERROR)) {
                     Throwable throwable = (Throwable) intent.getSerializableExtra(RECEIVE_ERROR);
                     Timber.e(throwable, "Sync map error");

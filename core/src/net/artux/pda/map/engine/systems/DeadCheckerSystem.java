@@ -19,7 +19,7 @@ import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
-import net.artux.pda.map.states.GameStateManager;
+import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.map.ui.UserInterface;
 
 import java.util.Collections;
@@ -30,7 +30,7 @@ public class DeadCheckerSystem extends BaseSystem {
     private UserInterface ui;
     private Label.LabelStyle labelStyle;
     private boolean deadMessage;
-    private GameStateManager gameStateManager;
+    private PlatformInterface platformInterface;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
@@ -38,11 +38,11 @@ public class DeadCheckerSystem extends BaseSystem {
     private AssetManager assetManager;
     private Random random = new Random();
 
-    public DeadCheckerSystem(UserInterface userInterface, GameStateManager gameStateManager, AssetManager assetManager) {
+    public DeadCheckerSystem(UserInterface userInterface, PlatformInterface platformInterface, AssetManager assetManager) {
         super(Family.all(HealthComponent.class, PositionComponent.class).get());
         this.ui = userInterface;
-        this.gameStateManager = gameStateManager;
         this.assetManager = assetManager;
+        this.platformInterface = platformInterface;
         labelStyle = userInterface.getLabelStyle();
         labelStyle.fontColor = Color.RED;
     }
@@ -68,8 +68,8 @@ public class DeadCheckerSystem extends BaseSystem {
                         @Override
                         public void interact(UserInterface userInterface) {
                             PlayerSystem playerSystem = getEngine().getSystem(PlayerSystem.class);
-                            playerSystem.addMedicine(random.nextInt(3));
-                            playerSystem.addRadiation(random.nextInt(2));
+                            /*playerSystem.addMedicine(random.nextInt(3));
+                            playerSystem.addRadiation(random.nextInt(2));*/
                             getEngine().removeEntity(deadEntity);//TODO
                         }
                     })).add(stalkerComponent);
@@ -83,7 +83,7 @@ public class DeadCheckerSystem extends BaseSystem {
         }
         if (!getEngine().getEntities().contains(player, false)) {
             if (!deadMessage) {
-                gameStateManager.getPlatformInterface().applyActions(Collections.singletonMap("xp", Collections.singletonList("-5")));
+                platformInterface.applyActions(Collections.singletonMap("xp", Collections.singletonList("-5")));
                 Group deadMessageGroup = new Group();
 
                 TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
@@ -98,7 +98,7 @@ public class DeadCheckerSystem extends BaseSystem {
                 deadMessageGroup.addListener(new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
-                        gameStateManager.getPlatformInterface().restart();
+                        platformInterface.restart();
                         super.clicked(event, x, y);
                     }
                 });

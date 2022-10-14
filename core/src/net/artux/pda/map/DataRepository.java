@@ -29,11 +29,11 @@ public class DataRepository {
     }
 
     public void setStoryDataModel(StoryDataModel storyDataModel) {
+        if (propertyChangeSupport == null)
+            propertyChangeSupport = new PropertyChangeSupport(storyDataModel);
         StoryDataModel oldValue = this.storyDataModel;
         this.storyDataModel = storyDataModel;
         propertyChangeSupport.firePropertyChange("storyData", oldValue, storyDataModel);
-
-
     }
 
     public GameMap getGameMap() {

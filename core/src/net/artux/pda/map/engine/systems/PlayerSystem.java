@@ -3,6 +3,8 @@ package net.artux.pda.map.engine.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -11,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -21,9 +24,9 @@ import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
-import net.artux.pda.model.user.UserModel;
+import net.artux.pda.model.quest.story.StoryStateModel;
 
-public class PlayerSystem extends BaseSystem {
+public class PlayerSystem extends BaseSystem implements Disposable {
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
@@ -34,11 +37,7 @@ public class PlayerSystem extends BaseSystem {
     private final AssetManager assetManager;
 
     private Slot medicineSlot;
-    private Slot radiationSlot;
     private HUD hud;
-
-    private int medicineCount = 0;
-    private int radiationCount = 0;
 
     public PlayerSystem(AssetManager assetManager) {
         super(Family.all(PositionComponent.class, QuestComponent.class).get());
@@ -69,8 +68,8 @@ public class PlayerSystem extends BaseSystem {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                VelocityComponent velocityComponent = vcm.get(player);
-                if (velocityComponent.stamina > 10f)
+                HealthComponent healthComponent = hm.get(player);
+                if (healthComponent.stamina > 10f)
                     vcm.get(player).running = true;
                 return super.touchDown(event, x, y, pointer, button);
             }
@@ -89,69 +88,33 @@ public class PlayerSystem extends BaseSystem {
         style = new ImageButton.ImageButtonStyle();
         style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
         style.imageUp = new TextureRegionDrawable(assetManager.get("ui/bar/ic_radiation.png", Texture.class));
-        radiationSlot = new Slot(userInterface, style);
         assistantBlock.getButtonsTable().add(medicineSlot);
         medicineSlot.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (medicineCount > 0) {
-                    medicineCount -= 1;
-                    hm.get(player).treat(15);
-                }
+                userInterface.switchBackpack();
                 super.clicked(event, x, y);
             }
         });
-        radiationSlot.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (radiationCount > 0) {
-                    radiationCount -= 1;
-                    hm.get(player).decreaseRadiation(5);
-                }
-                super.clicked(event, x, y);
-            }
-        });
-        assistantBlock.getButtonsTable().add(radiationSlot);
+
+        loadPreferences();
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        medicineSlot.setText(String.valueOf(medicineCount));
-        radiationSlot.setText(String.valueOf(radiationCount));
     }
 
     public HUD getHud() {
         return hud;
     }
 
-    public void addMedicine(int medicineCount) {
-        this.medicineCount += medicineCount;
-    }
-
-    public void addRadiation(int radiationCount) {
-        this.radiationCount += radiationCount;
-    }
-
-    public UserModel getPlayerMember() {
-        PlayerComponent playerComponent = pmm.get(player);
-        return playerComponent.userModel;
-    }
-
     public PlayerComponent getPlayerComponent() {
         return pmm.get(player);
     }
 
-    public float getHealth() {
-        return hm.get(player).value;
-    }
-
-    public float getRadiation() {
-        return hm.get(player).radiation;
-    }
-
-    public float getStamina() {
-        return vcm.get(player).stamina;
+    public HealthComponent getHealthComponent() {
+        return hm.get(player);
     }
 
     public Vector2 getPosition() {
@@ -163,5 +126,49 @@ public class PlayerSystem extends BaseSystem {
         if (entities.size > 0) {
             return (int) (getPosition().dst(pm.get(entities.get(0)).getPosition()) / pixelsPerMeter);//TODO select target
         } else return -1;
+    }
+
+    @Override
+    public void dispose() {
+        savePreferences();
+    }
+
+    private void savePreferences() {
+        if (player != null) {
+            Preferences preferences = Gdx.app.getPreferences("player");
+            PlayerComponent playerComponent = getPlayerComponent();
+            HealthComponent healthComponent = getHealthComponent();
+            PositionComponent positionComponent = pm.get(player);
+
+            StoryStateModel storyStateModel = playerComponent.gdxData.getCurrentState();
+
+            preferences.putBoolean(storyStateModel.toString(), true);
+            preferences.putFloat("x", positionComponent.getX());
+            preferences.putFloat("y", positionComponent.getY());
+            preferences.putFloat("health", healthComponent.value);
+            preferences.putFloat("stamina", healthComponent.stamina);
+            preferences.putFloat("radiation", healthComponent.radiation);
+
+            preferences.flush();
+        }
+    }
+
+    private void loadPreferences() {
+        if (player != null) {
+            Preferences preferences = Gdx.app.getPreferences("player");
+            PlayerComponent playerComponent = getPlayerComponent();
+            HealthComponent healthComponent = getHealthComponent();
+            PositionComponent positionComponent = pm.get(player);
+
+            StoryStateModel storyStateModel = playerComponent.gdxData.getCurrentState();
+            if (preferences.contains(storyStateModel.toString())) {
+                preferences.putBoolean(storyStateModel.toString(), true);
+                positionComponent.setPosition(new Vector2(preferences.getFloat("x"), preferences.getFloat("y")));
+                healthComponent.value = preferences.getFloat("health");
+                healthComponent.stamina = preferences.getFloat("stamina");
+                healthComponent.radiation = preferences.getFloat("radiation");
+            } else preferences.clear();
+            preferences.flush();
+        }
     }
 }

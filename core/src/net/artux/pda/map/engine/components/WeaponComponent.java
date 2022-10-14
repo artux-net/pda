@@ -26,6 +26,11 @@ public class WeaponComponent implements Component {
     boolean player;
 
     public WeaponComponent(StoryDataModel dataModel) {
+        updateData(dataModel);
+    }
+
+    public void updateData(StoryDataModel dataModel) {
+        this.dataModel = dataModel;
         this.armor = (ArmorModel) dataModel.getCurrentWearable(ItemType.ARMOR);
         this.weaponModel1 = (WeaponModel) dataModel.getCurrentWearable(ItemType.RIFLE);
         this.weaponModel2 = (WeaponModel) dataModel.getCurrentWearable(ItemType.PISTOL);
@@ -124,7 +129,8 @@ public class WeaponComponent implements Component {
                 timeout += 1 / weaponModel.getSpeed();
                 stack++;
                 if (player)
-                    resource.setQuantity(resource.getQuantity()-1);;
+                    resource.setQuantity(resource.getQuantity() - 1);
+                ;
                 return true;
             } else if (magazine == 0) {
                 reloading = true;

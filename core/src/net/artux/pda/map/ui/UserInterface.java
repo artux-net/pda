@@ -17,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
@@ -28,6 +27,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.model.input.GameMap;
@@ -40,7 +40,6 @@ import net.artux.pda.map.ui.blocks.MessagesBlock;
 import net.artux.pda.model.Checker;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
-import net.artux.pda.model.user.UserModel;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -72,19 +71,24 @@ public class UserInterface extends Group implements Disposable {
     private UIFrame uiFrame;
     private Label timeLabel;
     private DebugMenu debugMenu;
+    private BackpackMenu backpackMenu;
     private MessagesBlock messagesBlock;
     private AssistantBlock assistantBlock;
     private ControlBlock controlBlock;
     private Touchpad touchpad;
 
     private AssetManager assetManager;
+    private DataRepository dataRepository;
     private Timer timer = new Timer();
 
-    public UserInterface(final GameStateManager gsm, AssetsFinder assetsFinder, Camera camera) {
+    public UserInterface(final GameStateManager gsm, DataRepository dataRepository, AssetsFinder assetsFinder, Camera camera) {
         super();
         this.gsm = gsm;
+        this.dataRepository = dataRepository;
         this.assetManager = assetsFinder.getManager();
         long loadTime = TimeUtils.millis();
+
+        GameMap map = dataRepository.getGameMap();
 
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
         style.knob = new TextureRegionDrawable(assetManager.get("ui/touchpad/knob.png", Texture.class));
@@ -141,7 +145,7 @@ public class UserInterface extends Group implements Disposable {
         addActor(uiFrame);
         timeLabel = new Label("00:00", getLabelStyle());
         uiFrame.getLeftHeaderTable().add(timeLabel);
-        uiFrame.getLeftHeaderTable().add(new Label(((GameMap) gsm.get("map")).getTitle(), getLabelStyle()));
+        uiFrame.getLeftHeaderTable().add(new Label(map.getTitle(), getLabelStyle()));
 
         uiFrame.getRightHeaderTable().add(menuButton);
         uiFrame.getRightHeaderTable().add(pauseButton);
@@ -175,6 +179,10 @@ public class UserInterface extends Group implements Disposable {
         color.a = 1f;
         setColor(color);
 
+        backpackMenu = new BackpackMenu(this, assetManager.get("skins/cloud/cloud-form-ui.json"));
+        backpackMenu.setPosition(w / 4, h / 3);
+        backpackMenu.setSize(w / 2, h / 2);
+
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -205,9 +213,20 @@ public class UserInterface extends Group implements Disposable {
         });
         uiFrame.getLeftHeaderTable().add(debugButton);
 
-        debugMenu = new DebugMenu(this, engine, assetManager.<Skin>get("skins/cloud/cloud-form-ui.json"));
+        debugMenu = new DebugMenu(this, engine, assetManager.get("skins/cloud/cloud-form-ui.json"));
         debugMenu.setPosition(w / 4, h / 3);
         debugMenu.setSize(w / 2, h / 2);
+    }
+
+    public BackpackMenu getBackpackMenu() {
+        return backpackMenu;
+    }
+
+    public void switchBackpack(){
+        if (getChildren().indexOf(backpackMenu, false) == -1)
+            addActor(backpackMenu);
+        else
+            removeActor(backpackMenu);
     }
 
     public Table getHudTable() {
@@ -224,10 +243,6 @@ public class UserInterface extends Group implements Disposable {
 
     public Touchpad getTouchpad() {
         return touchpad;
-    }
-
-    public UserModel getMember() {
-        return gsm.getMember();
     }
 
     public void addInteractButton(String id, String iconPath, final InteractiveComponent.InteractListener listener) {
@@ -273,15 +288,14 @@ public class UserInterface extends Group implements Disposable {
         menuTable.setFillParent(true);
         menuTable.align(Align.top);
 
-        UserModel userModel = gsm.getMember();
-        GameMap map = (GameMap) gsm.get("map");
-        StoryDataModel dataModel = (StoryDataModel) gsm.get("data");
+        GameMap map = dataRepository.getGameMap();
+        StoryDataModel dataModel = dataRepository.getStoryDataModel();
         StoryStateModel storyStateModel = dataModel.getCurrentState();
 
         if (map != null)
             for (final Point point : map.getPoints()) {
                 if (point.type < 2 || point.type > 3)
-                    if (userModel != null && Checker.check(point.getCondition(), dataModel)) {
+                    if (storyStateModel != null && Checker.check(point.getCondition(), dataModel)) {
                         if (point.getData().containsKey("chapter")) {
                             int chapterId = storyStateModel.getChapterId();
                             if ((Integer.parseInt(point.getData().get("chapter")) == chapterId

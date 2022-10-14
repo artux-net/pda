@@ -24,10 +24,8 @@ public class GdxAdapter extends ApplicationAdapter {
         dataRepository = new DataRepository();
     }
 
-    public void put(String key, Object o) {
-        if (o == null)
-            throw new RuntimeException(key + " - null object!");
-        gsm.put(key, o);
+    public DataRepository getDataRepository() {
+        return dataRepository;
     }
 
     @Override
@@ -87,17 +85,17 @@ public class GdxAdapter extends ApplicationAdapter {
         }
 
         public Builder user(UserModel userModel) {
-            gdxAdapter.put("user", userModel);
+            gdxAdapter.dataRepository.setUserModel(userModel);
             return this;
         }
 
         public Builder storyData(StoryDataModel dataModel) {
-            gdxAdapter.put("data", dataModel);
+            gdxAdapter.dataRepository.setStoryDataModel(dataModel);
             return this;
         }
 
         public Builder map(GameMap map) {
-            gdxAdapter.put("map", map);
+            gdxAdapter.dataRepository.setGameMap(map);
             return this;
         }
 

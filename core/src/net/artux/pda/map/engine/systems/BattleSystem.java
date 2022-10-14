@@ -24,7 +24,7 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
-import net.artux.pda.map.states.GameStateManager;
+import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.model.items.ItemModel;
@@ -34,7 +34,7 @@ import java.util.Random;
 
 public class BattleSystem extends BaseSystem implements Disposable, Drawable {
 
-    private final GameStateManager gsm;
+    private final PlatformInterface platformInterface;
     private SoundsSystem soundsSystem;
     private AssetManager assetManager;
 
@@ -52,10 +52,10 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
 
     private Slot weaponSlot;
 
-    public BattleSystem(AssetManager assetManager, GameStateManager gameStateManager) {
+    public BattleSystem(AssetManager assetManager, PlatformInterface platformInterface) {
         super(Family.all(HealthComponent.class, PositionComponent.class, WeaponComponent.class).get());
         this.assetManager = assetManager;
-        this.gsm = gameStateManager;
+        this.platformInterface = platformInterface;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
                         stringBuilder.append("{").append(i.getBaseId()).append("}").append(" ");
                 }
 
-                gsm.getPlatformInterface().toast("Патроны для "+ entityWeapon.getSelected().getTitle()
+                platformInterface.toast("Патроны для "+ entityWeapon.getSelected().getTitle()
                         + " отсутсутвуют, необходим id: " + entityWeapon.getSelected().getBulletId() + ", есть " + stringBuilder.toString());
             }
 

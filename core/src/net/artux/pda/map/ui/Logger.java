@@ -47,6 +47,7 @@ public class Logger extends VerticalGroup implements Disposable {
         put("Java Heap", Gdx.app, "getJavaHeap");
         put("Player position", playerSystem, "getPosition");
         put("Здоровье", playerSystem, "getHealth");
+        put("Опыт", playerSystem.getPlayerComponent().gdxData, "getXp");
         put("Params", playerSystem.getPlayerComponent().gdxData, "getParameters");
         put("Temp", playerSystem.getPlayerComponent().gdxData.getCurrentState(), "toString");
         //put("Stories stat", Arrays.toString(playerSystem.getPlayerMember().getData().getStories().toArray()), "toString");

@@ -39,10 +39,10 @@ public class PlayState extends State {
         stage = new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
         uistage = new Stage();
 
-        userInterface = new UserInterface(gsm, assetsFinder, stage.getCamera());
+        userInterface = new UserInterface(gsm, dataRepository, assetsFinder, stage.getCamera());
         uistage.addActor(userInterface);
 
-        GameMap map = (GameMap) gsm.get("map");
+        GameMap map = dataRepository.getGameMap();
         if (map != null) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             Gdx.app.debug("PlayState", gson.toJson(map));
@@ -60,9 +60,13 @@ public class PlayState extends State {
             }
             Gdx.app.log("Main textures", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
         }
-        engineManager = new EngineManager(assetsFinder, stage, userInterface, gsm);
+        engineManager = new EngineManager(assetsFinder, stage, this);
         if (userInterface != null)
             userInterface.enableDebug(assetManager, engineManager.getEngine());
+    }
+
+    public UserInterface getUserInterface() {
+        return userInterface;
     }
 
     @Override

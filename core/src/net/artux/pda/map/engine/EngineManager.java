@@ -3,6 +3,8 @@ package net.artux.pda.map.engine;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -46,17 +49,20 @@ import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
 import net.artux.pda.map.model.input.GameMap;
-import net.artux.pda.map.states.GameStateManager;
-import net.artux.pda.map.ui.UserInterface;
+import net.artux.pda.map.platform.PlatformInterface;
+import net.artux.pda.map.states.PlayState;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
+
+import java.beans.PropertyChangeListener;
 
 public class EngineManager extends InputListener implements Drawable, Disposable, GestureDetector.GestureListener {
 
     private GameMap map;
     private UserModel userModel;
 
-    private final Engine engine;
+    private Engine engine;
+    private final DataRepository dataRepository;
 
     private final ClicksSystem clicksSystem;
     private final CameraSystem cameraSystem;
@@ -65,11 +71,29 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private boolean questPoints = true;
     private boolean anomalies = true;
 
-    public EngineManager(AssetsFinder assetsFinder, Stage stage, UserInterface userInterface, GameStateManager gameStateManager) {
+    private final PropertyChangeListener storyDataListener = propertyChangeEvent -> {
+        if (propertyChangeEvent.getPropertyName().equals("storyData") && engine != null) {
+            StoryDataModel dataModel = (StoryDataModel) propertyChangeEvent.getNewValue();
+            ImmutableArray<Entity> players = engine.getEntitiesFor(Family.one(PlayerComponent.class).get());
+            if (players.size() > 0) {
+                Entity player = players.first();
+                PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
+                WeaponComponent weaponComponent = player.getComponent(WeaponComponent.class);
+
+                playerComponent.gdxData = dataModel;
+                weaponComponent.updateData(dataModel);
+            }
+        }
+    };
+
+    public EngineManager(AssetsFinder assetsFinder, Stage stage, PlayState playState) {
         this.engine = new Engine();
-        this.map = (GameMap) gameStateManager.get("map");
-        this.userModel = gameStateManager.getMember();
-        StoryDataModel gdxData = (StoryDataModel) gameStateManager.get("data");
+        dataRepository = playState.getDataRepository();
+        PlatformInterface platformInterface = playState.getGSM().getPlatformInterface();
+        this.map = dataRepository.getGameMap();
+        this.userModel = dataRepository.getUserModel();
+        StoryDataModel gdxData = dataRepository.getStoryDataModel();
+        dataRepository.addPropertyChangeListener(storyDataListener);
         long loadTime = TimeUtils.millis();
 
         //player
@@ -93,28 +117,28 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addSystem(new SoundsSystem(assetsFinder.getManager()));
         engine.addSystem(new WorldSystem(assetsFinder.getManager()));
         engine.addSystem(new DataSystem(map, userModel));
-        engine.addSystem(new InteractionSystem(stage, userInterface));
+        engine.addSystem(new InteractionSystem(stage, playState.getUserInterface()));
         engine.addSystem(new PlayerSystem(assetsFinder.getManager()));
 
 
         if (controlPoints)
             ControlPointsHelper.createControlPointsEntities(engine, assetsFinder.getManager());
         if (questPoints)
-            QuestPointsHelper.createQuestPointsEntities(engine, assetsFinder.getManager());
+            QuestPointsHelper.createQuestPointsEntities(engine, assetsFinder.getManager(), platformInterface);
         if (anomalies)
             AnomalyHelper.createAnomalies(engine, assetsFinder.getManager());
 
-        engine.addSystem(new MessagesSystem(userInterface));
+        engine.addSystem(new MessagesSystem(playState.getUserInterface()));
         engine.addSystem(new ArtifactSystem());
         engine.addSystem(new ClicksSystem());
         engine.addSystem(new MapLoggerSystem());
         engine.addSystem(new RenderSystem(stage, assetsFinder));
-        engine.addSystem(new BattleSystem(assetsFinder.getManager(), gameStateManager));
+        engine.addSystem(new BattleSystem(assetsFinder.getManager(), platformInterface));
         engine.addSystem(new StatesSystem());
         engine.addSystem(new MovementTargetingSystem());
         engine.addSystem(new MoodSystem(assetsFinder.getManager()));
         engine.addSystem(new MovingSystem());
-        engine.addSystem(new DeadCheckerSystem(userInterface, gameStateManager, assetsFinder.getManager()));
+        engine.addSystem(new DeadCheckerSystem(playState.getUserInterface(), platformInterface, assetsFinder.getManager()));
 
         clicksSystem = engine.getSystem(ClicksSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);
@@ -139,11 +163,12 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         for (EntitySystem s : engine.getSystems()) {
             if (s instanceof Disposable) ((Disposable) s).dispose();
         }
+        dataRepository.removePropertyChangeListener(storyDataListener);
     }
 
     @Override
     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-        if(clicksSystem!=null)
+        if (clicksSystem != null)
             clicksSystem.clicked(x, y);
         return false;
     }

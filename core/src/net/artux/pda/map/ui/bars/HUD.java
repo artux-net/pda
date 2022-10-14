@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 
+import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.ui.UserInterface;
 
@@ -68,9 +69,11 @@ public class HUD extends Table {
     @Override
     public void act(float delta) {
         super.act(delta);
-        healthBar.updateValue(playerSystem.getHealth());
-        staminaBar.updateValue(playerSystem.getStamina());
-        radiationBar.updateValue(playerSystem.getRadiation());
+        HealthComponent healthComponent = playerSystem.getHealthComponent();
+
+        healthBar.updateValue(healthComponent.value);
+        staminaBar.updateValue(healthComponent.stamina);
+        radiationBar.updateValue(healthComponent.radiation);
 
         int dist = playerSystem.getDistance();
         if (dist > 5) {

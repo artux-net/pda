@@ -16,20 +16,19 @@ import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.model.Transfer;
 import net.artux.pda.map.model.input.GameMap;
 import net.artux.pda.map.model.input.Point;
+import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.model.Checker;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
-import net.artux.pda.model.user.UserModel;
 
 import java.util.HashMap;
 
 public class QuestPointsHelper {
 
 
-    public static void createQuestPointsEntities(Engine engine, AssetManager assetManager) {
+    public static void createQuestPointsEntities(Engine engine, AssetManager assetManager, PlatformInterface platformInterface) {
         GameMap map = engine.getSystem(DataSystem.class).getMap();
-        UserModel userModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().userModel;
         StoryDataModel dataModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().gdxData;
         StoryStateModel storyStateModel = dataModel.getCurrentState();
         for (Point point : map.getPoints()) {
@@ -38,32 +37,17 @@ public class QuestPointsHelper {
                 if (point.getData().containsKey("chapter")) {
                     if ((Integer.parseInt(point.getData().get("chapter")) == storyStateModel.getChapterId()
                             || Integer.parseInt(point.getData().get("chapter")) == 0))
-                        addPoint(engine, assetManager, point);
-                } else addPoint(engine, assetManager, point);
+                        addPoint(engine, assetManager, point, platformInterface);
+                } else addPoint(engine, assetManager, point, platformInterface);
         }
-
-        /*for (Transfer transfer : map.getTransfers()) {
-            if (userModel != null && Checker.check(transfer.condition, dataModel))
-                addTransferPoint(engine, assetManager, transfer);
-        }*/
     }
 
-    private static void addPoint(final Engine engine, AssetManager assetManager, final Point point) {
+    private static void addPoint(final Engine engine, AssetManager assetManager, final Point point, PlatformInterface platformInterface) {
         Entity entity = new Entity();
         entity.add(new PositionComponent(point.getPosition()))
-                .add(new InteractiveComponent(point.getTitle(), point.type, new InteractiveComponent.InteractListener() {
-                    @Override
-                    public void interact(UserInterface userInterface) {
-                        //todo State.gsm.getPlatformInterface().send(point.getData());
-                    }
-                }))
-                .add(new ClickComponent(new ClickComponent.ClickListener() {
-                    @Override
-                    public void clicked() {
-                        engine.getSystem(RenderSystem.class)
-                                .showText("Метка: " + point.getTitle(), point.getPosition());
-                    }
-                }));
+                .add(new InteractiveComponent(point.getTitle(), point.type, userInterface -> platformInterface.send(point.getData())))
+                .add(new ClickComponent(() -> engine.getSystem(RenderSystem.class)
+                        .showText("Метка: " + point.getTitle(), point.getPosition())));
 
         Texture texture = null;
         switch (point.type) {

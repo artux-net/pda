@@ -3,7 +3,6 @@ package net.artux.pda.map.states;
 import com.badlogic.gdx.Gdx;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.model.user.UserModel;
 
 
 public abstract class State {
@@ -19,6 +18,14 @@ public abstract class State {
         this.dataRepository = dataRepository;
     }
 
+    public DataRepository getDataRepository() {
+        return dataRepository;
+    }
+
+    public GameStateManager getGSM() {
+        return gsm;
+    }
+
     protected abstract void handleInput();
 
     protected abstract void stop();
@@ -31,7 +38,4 @@ public abstract class State {
 
     public abstract void dispose();
 
-    public UserModel getMember() {
-        return (UserModel) gsm.get("member");
-    }
 }

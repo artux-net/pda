@@ -29,7 +29,7 @@ public class PreloadState extends State {
     long preloadTime;
 
     public void startLoad() {
-        GameMap map = (GameMap) gsm.get("map");
+        GameMap map = dataRepository.getGameMap();
         preloadTime = TimeUtils.millis();
         if (map != null) {
             Gdx.app.debug("Preload", "Checking cache for " + map.getTitle() + "{" + map.getId() + "} , load missed files.");
@@ -88,7 +88,7 @@ public class PreloadState extends State {
     }
 
     void checkForStartPlay() {
-        GameMap map = (GameMap) gsm.get("map");
+        GameMap map = dataRepository.getGameMap();
         if (map != null) {
             FileHandle file = Gdx.files.local(cachePath + map.getTextureUri());
 

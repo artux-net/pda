@@ -7,7 +7,6 @@ public class VelocityComponent implements Component {
 
     public Vector2 velocity;
     public boolean running;
-    public float stamina = 100;
 
     public VelocityComponent() {
         velocity = new Vector2();

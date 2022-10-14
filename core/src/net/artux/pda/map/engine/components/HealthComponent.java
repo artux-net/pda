@@ -2,9 +2,12 @@ package net.artux.pda.map.engine.components;
 
 import com.badlogic.ashley.core.Component;
 
+import net.artux.pda.model.items.MedicineModel;
+
 public class HealthComponent implements Component {
 
     public float value;
+    public float stamina;
     public float radiation;
 
     public HealthComponent() {
@@ -29,6 +32,12 @@ public class HealthComponent implements Component {
         if (radiation - value > 0)
             radiation -= value;
         else radiation = 0;
+    }
+
+    public void applyMedicine(MedicineModel model){
+        radiation += model.getRadiation();
+        stamina += model.getStamina();
+        value += model.getHealth();
     }
 
 }
