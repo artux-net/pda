@@ -1,6 +1,6 @@
 package net.artux.pda.model.mapper;
 
-import net.artux.pda.model.Checker;
+import net.artux.pda.model.QuestUtil;
 import net.artux.pda.model.quest.NotificationModel;
 import net.artux.pda.model.quest.NotificationType;
 import net.artux.pda.model.quest.Stage;
@@ -65,7 +65,7 @@ public interface StageMapper {
     default String getText(Stage stage, StoryDataModel dataCompanion) {
         List<Text> contentVariants = new ArrayList<>();
         for (Text text : stage.getTexts())
-            if (Checker.check(text.getCondition(), dataCompanion)) {
+            if (QuestUtil.check(text.getCondition(), dataCompanion)) {
                 text.setText(formatText(text.getText(), dataCompanion));
                 contentVariants.add(text);
             }
@@ -78,7 +78,7 @@ public interface StageMapper {
     default List<TransferModel> getTransfers(Stage stage, StoryDataModel dataCompanion) {
         List<TransferModel> transfers = new LinkedList<>();
         for (Transfer transfer : stage.getTransfers())
-            if (Checker.check(transfer.getCondition(), dataCompanion)) {
+            if (QuestUtil.check(transfer.getCondition(), dataCompanion)) {
                 transfer.setText(formatText(transfer.getText(), dataCompanion));
                 transfers.add(new TransferModel(transfer.getStageId(), transfer.getText()));
             }

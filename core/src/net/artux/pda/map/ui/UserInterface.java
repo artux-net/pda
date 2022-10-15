@@ -37,7 +37,7 @@ import net.artux.pda.map.ui.bars.Utils;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
 import net.artux.pda.map.ui.blocks.ControlBlock;
 import net.artux.pda.map.ui.blocks.MessagesBlock;
-import net.artux.pda.model.Checker;
+import net.artux.pda.model.QuestUtil;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 
@@ -295,7 +295,7 @@ public class UserInterface extends Group implements Disposable {
         if (map != null)
             for (final Point point : map.getPoints()) {
                 if (point.type < 2 || point.type > 3)
-                    if (storyStateModel != null && Checker.check(point.getCondition(), dataModel)) {
+                    if (storyStateModel != null && QuestUtil.check(point.getCondition(), dataModel)) {
                         if (point.getData().containsKey("chapter")) {
                             int chapterId = storyStateModel.getChapterId();
                             if ((Integer.parseInt(point.getData().get("chapter")) == chapterId

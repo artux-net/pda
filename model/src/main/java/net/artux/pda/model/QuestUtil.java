@@ -3,10 +3,14 @@ package net.artux.pda.model;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-public class Checker {
+public class QuestUtil {
 
     public static boolean check(HashMap<String, List<String>> conditions, StoryDataModel storyDataModel) {
         if (conditions != null) {
@@ -88,6 +92,21 @@ public class Checker {
             }
         }
         return true;
+    }
+
+    public static Map<String, List<String>> difference(StoryDataModel oldData, StoryDataModel newData) {
+        List<String> itemDifferences = new LinkedList<>();
+        for (ItemModel newItem : newData.getAllItems()) {
+            Optional<ItemModel> difference = oldData.getAllItems()
+                    .stream()
+                    .filter(itemModel -> itemModel.getId().equals(newItem.getId()) &&
+                            itemModel.getQuantity() != newItem.getQuantity())
+                    .findFirst();
+            difference.ifPresent(itemModel -> {
+                itemDifferences.add(newItem.getId() + ":" + newItem.getQuantity());
+            });
+        }
+        return Collections.singletonMap("item", itemDifferences);
     }
 
 }

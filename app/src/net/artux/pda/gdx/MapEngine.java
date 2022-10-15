@@ -89,7 +89,6 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
                     Throwable throwable = (Throwable) intent.getSerializableExtra(RECEIVE_ERROR);
                     Timber.e(throwable, "Sync map error");
                 }
-
             }
         };
     }

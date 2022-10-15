@@ -21,7 +21,7 @@ public class GdxAdapter extends ApplicationAdapter {
 
     public GdxAdapter(PlatformInterface platformInterface) {
         gsm = new GameStateManager(platformInterface);
-        dataRepository = new DataRepository();
+        dataRepository = new DataRepository(platformInterface);
     }
 
     public DataRepository getDataRepository() {

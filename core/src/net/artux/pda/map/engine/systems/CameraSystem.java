@@ -3,6 +3,7 @@ package net.artux.pda.map.engine.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -10,9 +11,10 @@ import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.GlobalData;
 
-public class CameraSystem extends BaseSystem {
+public class CameraSystem extends BaseSystem implements GestureDetector.GestureListener {
 
     private OrthographicCamera camera;
+    private ClicksSystem clicksSystem;
 
     private ComponentMapper<PlayerComponent> cm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
@@ -40,6 +42,7 @@ public class CameraSystem extends BaseSystem {
         PlayerComponent playerComponent = cm.get(player);
         camera = (OrthographicCamera) playerComponent.camera;
         camera.zoom = initialZoom;
+        clicksSystem = engine.getSystem(ClicksSystem.class);
     }
 
     @Override
@@ -151,5 +154,83 @@ public class CameraSystem extends BaseSystem {
 
     public OrthographicCamera getCamera() {
         return camera;
+    }
+
+    @Override
+    public boolean pan(float x, float y, float deltaX, float deltaY) {
+        setDetached(true);
+        moveBy(-deltaX, deltaY);
+        return true;
+    }
+
+    @Override
+    public boolean panStop(float x, float y, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean zoom(float initialDistance, float distance) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(float x, float y, int pointer, int button) {
+        if (clicksSystem != null)
+            clicksSystem.clicked(x, y);
+        return false;
+    }
+
+    @Override
+    public boolean tap(float x, float y, int count, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean longPress(float x, float y) {
+        return false;
+    }
+
+    @Override
+    public boolean fling(float velocityX, float velocityY, int button) {
+        //Gdx.app.debug("", velocityX + ":" + velocityY);
+        //TODO fling
+        return false;
+    }
+
+    private Vector2 lastPointer;
+    private float lastZoom;
+
+    @Override
+    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+        setZooming(true);
+        setDetached(true);
+
+        float panAmount = pointer1.dst(pointer2);
+        float initAmount = initialPointer1.dst(initialPointer2);
+        float newZoom = (initAmount / panAmount) * getCurrentZoom();
+
+        Vector2 centerPoint = new Vector2((pointer1.x + pointer2.x) / 2, (pointer1.y + pointer2.y) / 2);
+
+        if (lastPointer != null) {
+            Vector2 cameraPosition = getPosition();
+            Vector2 cameraShift = new Vector2(centerPoint.x - cameraPosition.x, cameraPosition.y - centerPoint.y);
+            Vector2 cameraShiftValue = cameraShift.cpy().scl(lastZoom - newZoom);
+
+            if (setZoom(newZoom))
+                moveBy(cameraShiftValue.x, cameraShiftValue.y);
+
+            moveBy(lastPointer.x - centerPoint.x, centerPoint.y - lastPointer.y);
+        }
+
+        lastPointer = centerPoint;
+        lastZoom = newZoom;
+
+        return false;
+    }
+
+    @Override
+    public void pinchStop() {
+        setZooming(false);
+        lastPointer = null;
     }
 }

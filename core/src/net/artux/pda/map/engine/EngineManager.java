@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
@@ -56,7 +54,7 @@ import net.artux.pda.model.user.UserModel;
 
 import java.beans.PropertyChangeListener;
 
-public class EngineManager extends InputListener implements Drawable, Disposable, GestureDetector.GestureListener {
+public class EngineManager extends InputListener implements Drawable, Disposable {
 
     private GameMap map;
     private UserModel userModel;
@@ -113,6 +111,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addEntity(player);
 
         engine.addSystem(new MapOrientationSystem(assetsFinder, map));
+        engine.addSystem(new ClicksSystem());
         engine.addSystem(new CameraSystem());
         engine.addSystem(new SoundsSystem(assetsFinder.getManager()));
         engine.addSystem(new WorldSystem(assetsFinder.getManager()));
@@ -130,7 +129,6 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
         engine.addSystem(new MessagesSystem(playState.getUserInterface()));
         engine.addSystem(new ArtifactSystem());
-        engine.addSystem(new ClicksSystem());
         engine.addSystem(new MapLoggerSystem());
         engine.addSystem(new RenderSystem(stage, assetsFinder));
         engine.addSystem(new BattleSystem(assetsFinder.getManager(), platformInterface));
@@ -138,13 +136,17 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addSystem(new MovementTargetingSystem());
         engine.addSystem(new MoodSystem(assetsFinder.getManager()));
         engine.addSystem(new MovingSystem());
-        engine.addSystem(new DeadCheckerSystem(playState.getUserInterface(), platformInterface, assetsFinder.getManager()));
+        engine.addSystem(new DeadCheckerSystem(playState.getUserInterface(), dataRepository, assetsFinder.getManager()));
 
         clicksSystem = engine.getSystem(ClicksSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);
 
         stage.addListener(this);
         Gdx.app.log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");
+    }
+
+    public GestureDetector.GestureListener getGestureListener() {
+        return engine.getSystem(CameraSystem.class);
     }
 
     public void update(float dt) {
@@ -164,89 +166,6 @@ public class EngineManager extends InputListener implements Drawable, Disposable
             if (s instanceof Disposable) ((Disposable) s).dispose();
         }
         dataRepository.removePropertyChangeListener(storyDataListener);
-    }
-
-    @Override
-    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-        if (clicksSystem != null)
-            clicksSystem.clicked(x, y);
-        return false;
-    }
-
-    @Override
-    public boolean pan(float x, float y, float deltaX, float deltaY) {
-        cameraSystem.setDetached(true);
-        cameraSystem.moveBy(-deltaX, deltaY);
-        return true;
-    }
-
-    @Override
-    public boolean panStop(float x, float y, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean zoom(float initialDistance, float distance) {
-        return false;
-    }
-
-    @Override
-    public boolean touchDown(float x, float y, int pointer, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean tap(float x, float y, int count, int button) {
-        return false;
-    }
-
-    @Override
-    public boolean longPress(float x, float y) {
-        return false;
-    }
-
-    @Override
-    public boolean fling(float velocityX, float velocityY, int button) {
-        //Gdx.app.debug("", velocityX + ":" + velocityY);
-        //TODO fling
-        return false;
-    }
-
-    private Vector2 lastPointer;
-    private float lastZoom;
-
-    @Override
-    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
-        cameraSystem.setZooming(true);
-        cameraSystem.setDetached(true);
-
-        float panAmount = pointer1.dst(pointer2);
-        float initAmount = initialPointer1.dst(initialPointer2);
-        float newZoom = (initAmount / panAmount) * cameraSystem.getCurrentZoom();
-
-        Vector2 centerPoint = new Vector2((pointer1.x + pointer2.x) / 2, (pointer1.y + pointer2.y) / 2);
-
-        if (lastPointer != null) {
-            Vector2 cameraPosition = cameraSystem.getPosition();
-            Vector2 cameraShift = new Vector2(centerPoint.x - cameraPosition.x, cameraPosition.y - centerPoint.y);
-            Vector2 cameraShiftValue = cameraShift.cpy().scl(lastZoom - newZoom);
-
-            if (cameraSystem.setZoom(newZoom))
-                cameraSystem.moveBy(cameraShiftValue.x, cameraShiftValue.y);
-
-            cameraSystem.moveBy(lastPointer.x - centerPoint.x, centerPoint.y - lastPointer.y);
-        }
-
-        lastPointer = centerPoint;
-        lastZoom = newZoom;
-
-        return false;
-    }
-
-    @Override
-    public void pinchStop() {
-        cameraSystem.setZooming(false);
-        lastPointer = null;
     }
 
     public Engine getEngine() {

@@ -5,6 +5,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -73,7 +75,14 @@ public class PlayState extends State {
     protected void handleInput() {
         gsm.addInputProcessor(uistage);
         gsm.addInputProcessor(stage);
-        gsm.addInputProcessor(new GestureDetector(engineManager));
+        GestureDetector.GestureListener gestureListener = engineManager.getGestureListener();
+        stage.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return gestureListener.touchDown(x, y, pointer, button);
+            }
+        });
+        gsm.addInputProcessor(new GestureDetector(gestureListener));
     }
 
     @Override

@@ -18,7 +18,7 @@ import net.artux.pda.map.model.input.GameMap;
 import net.artux.pda.map.model.input.Point;
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.map.ui.UserInterface;
-import net.artux.pda.model.Checker;
+import net.artux.pda.model.QuestUtil;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 
@@ -33,7 +33,7 @@ public class QuestPointsHelper {
         StoryStateModel storyStateModel = dataModel.getCurrentState();
         for (Point point : map.getPoints()) {
             //TODO sync with ui
-            if (Checker.check(point.getCondition(), dataModel))
+            if (QuestUtil.check(point.getCondition(), dataModel))
                 if (point.getData().containsKey("chapter")) {
                     if ((Integer.parseInt(point.getData().get("chapter")) == storyStateModel.getChapterId()
                             || Integer.parseInt(point.getData().get("chapter")) == 0))
