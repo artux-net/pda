@@ -58,27 +58,44 @@ public class DeadCheckerSystem extends BaseSystem {
             PositionComponent positionComponent = pm.get(entity);
 
             if (healthComponent.isDead()) {
-                final Entity deadEntity = new Entity();
-                deadEntity.add(new PositionComponent(positionComponent.getPosition()))
-                        .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4));
+                if (random.nextInt(10) < 1) {
+                    final Entity deadEntity = new Entity();
+                    deadEntity.add(new PositionComponent(positionComponent.getPosition()))
+                            .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4));
 
-                if (entity != player) {
-                    StalkerComponent stalkerComponent = entity.getComponent(StalkerComponent.class);
-                    deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, new InteractiveComponent.InteractListener() {
-                        @Override
-                        public void interact(UserInterface userInterface) {
-                            PlayerSystem playerSystem = getEngine().getSystem(PlayerSystem.class);
-                            /*playerSystem.addMedicine(random.nextInt(3));
-                            playerSystem.addRadiation(random.nextInt(2));*/
-                            getEngine().removeEntity(deadEntity);//TODO
-                        }
-                    })).add(stalkerComponent);
-                } else {
-                    getEngine().removeSystem(getEngine().getSystem(PlayerSystem.class));
+                    if (entity != player) {
+                        StalkerComponent stalkerComponent = entity.getComponent(StalkerComponent.class);
+                        deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, new InteractiveComponent.InteractListener() {
+                            @Override
+                            public void interact(UserInterface userInterface) {
+                                switch (random.nextInt(4)){
+                                    case 0:
+                                        dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("85:1")));
+                                        break;
+                                    case 1:
+                                        dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("83:2")));
+                                        break;
+                                    case 2:
+                                        dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("84:1")));
+                                        break;
+                                    case 3:
+                                        dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("85:2")));
+                                        break;
+                                    case 4:
+                                        dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("83:1")));
+                                        break;
+                                }
+
+                                getEngine().removeEntity(deadEntity);
+                            }
+                        })).add(stalkerComponent);
+                    } else {
+                        getEngine().removeSystem(getEngine().getSystem(PlayerSystem.class));
+                    }
+
+                    getEngine().addEntity(deadEntity);
                 }
-
                 getEngine().removeEntity(entity);
-                getEngine().addEntity(deadEntity);
             }
         }
         if (!getEngine().getEntities().contains(player, false)) {

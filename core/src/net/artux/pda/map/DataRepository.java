@@ -6,6 +6,8 @@ import net.artux.pda.model.QuestUtil;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
+import org.apache.commons.lang3.SerializationUtils;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ public class DataRepository {
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
+        setStoryDataModel(storyDataModel);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
@@ -43,11 +46,11 @@ public class DataRepository {
         if (propertyChangeSupport == null) {
             propertyChangeSupport = new PropertyChangeSupport(storyDataModel);
         }
-        if (oldStoryDataModel == null)
+        if (oldStoryDataModel == null) {
             oldStoryDataModel = storyDataModel;
-        else
+        } else
             oldStoryDataModel = this.storyDataModel;
-        this.storyDataModel = storyDataModel;
+        this.storyDataModel = SerializationUtils.clone(storyDataModel);
         propertyChangeSupport.firePropertyChange("storyData", oldStoryDataModel, storyDataModel);
     }
 

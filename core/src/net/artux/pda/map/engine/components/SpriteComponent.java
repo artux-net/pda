@@ -3,13 +3,9 @@ package net.artux.pda.map.engine.components;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Vector2;
-
-import net.artux.pda.map.engine.components.player.UserVelocityInput;
 
 public class SpriteComponent implements Component {
     public Sprite sprite;
-    private UserVelocityInput userVelocityInput;
 
     public SpriteComponent(Texture texture) {
         sprite = new Sprite(texture);
@@ -22,38 +18,29 @@ public class SpriteComponent implements Component {
         sprite.setOriginCenter();
     }
 
-    public SpriteComponent(UserVelocityInput userVelocityInput, Texture texture, float width, float height) {
-        sprite = new Sprite(texture);
-        sprite.setSize(width, height);
-        sprite.setOriginCenter();
-        this.userVelocityInput = userVelocityInput;
-    }
-
     public void setTexture(Texture texture) {
         sprite.setTexture(texture);
         sprite.setOriginCenter();
     }
 
-    public void setSize(float width, float height){
+    public void setSize(float width, float height) {
         sprite.setSize(width, height);
     }
 
-    public void setAlpha(float a){
+    public void setAlpha(float a) {
         sprite.setAlpha(a);
     }
 
-    public float getRotation(){
-        if (userVelocityInput != null){
-            Vector2 velocity = userVelocityInput.getVelocity();
+    public boolean isVisible() {
+        return sprite.getColor().a > 0.01f;
+    }
 
-            double degrees = Math.atan2(
-                    -velocity.x,
-                    velocity.y
-            ) * 180.0d / Math.PI;
-            if(velocity.x!=0 && velocity.y!=0)
-                sprite.setRotation((float) degrees+90);
-        }
+    public float getRotation() {
         return sprite.getRotation();
+    }
+
+    public void setRotation(float degrees) {
+        sprite.setRotation(degrees + 90);
     }
 
 }

@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
@@ -36,6 +36,8 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
 
     private final PlatformInterface platformInterface;
     private SoundsSystem soundsSystem;
+    private MapOrientationSystem mapOrientationSystem;
+    private MoodSystem moodSystem;
     private AssetManager assetManager;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
@@ -45,8 +47,6 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
 
     private ShapeRenderer sr = new ShapeRenderer();
     private Random random = new Random();
-
-    private MapOrientationSystem mapOrientationSystem;
 
     private boolean playerShoot = false;
 
@@ -63,10 +63,14 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
         super.addedToEngine(engine);
         soundsSystem = engine.getSystem(SoundsSystem.class);
         mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
+        moodSystem = engine.getSystem(MoodSystem.class);
         InteractionSystem interactionSystem = engine.getSystem(InteractionSystem.class);
         interactionSystem.addButton("ui/icons/icon_shoot.png", new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                MoodComponent moodComponent = mm.get(player);
+                if (moodSystem.getPlayerEnemyTarget() != null)
+                    moodComponent.setEnemy(moodSystem.getPlayerEnemyTarget());
                 playerShoot = true;
                 return super.touchDown(event, x, y, pointer, button);
             }
@@ -82,30 +86,41 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
         PlayerSystem playerSystem = engine.getSystem(PlayerSystem.class);
         WeaponComponent entityWeapon = wm.get(player);
         if (entityWeapon.getSelected() != null) {
-            ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+            TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+            style.font = userInterface.getLabelStyle().font;
+            style.fontColor = userInterface.getLabelStyle().fontColor;
             style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
-            style.imageUp = new TextureRegionDrawable(assetManager.get("ui/icons/ic_rifle.png", Texture.class));
 
             weaponSlot = new Slot(userInterface, style);
             weaponSlot.pad(20);
-            weaponSlot.getCell(weaponSlot.getLabel()).align(Align.left);
+            weaponSlot.getCell(weaponSlot.getSecondLabel()).align(Align.left);
             float height = playerSystem.getHud().getHeight() * 0.9f;
             userInterface.getHudTable().add(weaponSlot).height(height).padLeft(20);
 
-            if (entityWeapon.resource != null) {
-                PlayerData.bullet = entityWeapon.resource.getTitle();
-                weaponSlot.setText(entityWeapon.resource.getQuantity() + "/" + entityWeapon.getMagazine());
-            }else{
+            ItemModel resource = entityWeapon.getBulletModel();
+
+            if (resource != null) {
+                PlayerData.bullet = resource.getTitle();
+                weaponSlot.setLabelText(entityWeapon.getMagazine() + "/" + resource.getQuantity());
+                weaponSlot.setText(entityWeapon.getSelected().getTitle());
+            } else {
                 StringBuilder stringBuilder = new StringBuilder();
-                for (ItemModel i:
+                for (ItemModel i :
                         getEngine().getSystem(PlayerSystem.class).getPlayerComponent().gdxData.getAllItems()) {
                     if (i.getType() == ItemType.BULLET)
                         stringBuilder.append("{").append(i.getBaseId()).append("}").append(" ");
                 }
 
-                platformInterface.toast("Патроны для "+ entityWeapon.getSelected().getTitle()
+                platformInterface.toast("Патроны для " + entityWeapon.getSelected().getTitle()
                         + " отсутсутвуют, необходим id: " + entityWeapon.getSelected().getBulletId() + ", есть " + stringBuilder.toString());
             }
+
+            weaponSlot.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    entityWeapon.switchWeapons();
+                }
+            });
 
         }
     }
@@ -119,18 +134,58 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
             entityWeapon.update(deltaTime);
         }
 
-        HealthComponent healthComponent = hm.get(player);
-        PositionComponent positionComponent = pm.get(player);
-        WeaponComponent entityWeapon = wm.get(player);
+        {
+            WeaponComponent entityWeapon = wm.get(player);
 
-
-        if (entityWeapon.getSelected() != null) {
-            PlayerData.selectedWeapon = entityWeapon.getSelected().getTitle();
-            if (entityWeapon.resource != null) {
-                PlayerData.bullet = entityWeapon.resource.getTitle();
-                weaponSlot.setText(entityWeapon.resource.getQuantity() + "/" + entityWeapon.getMagazine());
+            ItemModel resource = entityWeapon.getBulletModel();
+            if (entityWeapon.getSelected() != null) {
+                PlayerData.selectedWeapon = entityWeapon.getSelected().getTitle();
+                if (resource != null) {
+                    PlayerData.bullet = resource.getTitle();
+                    weaponSlot.setLabelText(entityWeapon.getMagazine() + "/" + resource.getQuantity());
+                    weaponSlot.setText(entityWeapon.getSelected().getTitle());
+                }
             }
         }
+
+        for (int i = 0; i < entities.size; i++) {
+            Entity entity = entities.get(i);
+
+            PositionComponent entityPosition = pm.get(entity);
+            WeaponComponent entityWeapon = wm.get(entity);
+            MoodComponent moodComponent = mm.get(entity);
+
+            Entity enemy = moodComponent.enemy;
+            if (enemy != null) {
+                PositionComponent enemyPosition = pm.get(enemy);
+                HealthComponent enemyHealth = hm.get(enemy);
+
+                if (player != entity) {
+                    if (entityWeapon.getSelected() != null) {
+                        if (mapOrientationSystem.isGraphActive()) {
+                            FlatTiledNode entityNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(entityPosition.getPosition());
+                            FlatTiledNode enemyNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(enemyPosition.getPosition());
+                            if (!mapOrientationSystem.collisionDetector.collides(new Ray<>(new Vector2(entityNode.x, entityNode.y), new Vector2(enemyNode.x, enemyNode.y)))) { //TODO new in update
+                                entityWeapon.shoot();
+                                shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
+                            }
+                        } else {
+                            entityWeapon.shoot();
+                            shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
+                        }
+                    }
+                } else if (playerShoot) {
+                    if (entityWeapon.getSelected() != null) {
+                        //todo count walls
+                        entityWeapon.shoot();
+                        shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
+                    }
+                }
+                if (enemyHealth.isDead())
+                    moodComponent.setEnemy(null);
+            }
+        }
+
     }
 
     public Vector2 getPointNear(PositionComponent positionComponent, float precision) {
@@ -160,44 +215,10 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
             MoodComponent moodComponent = mm.get(entity);
             Entity enemy = moodComponent.enemy;
 
-            if (player != entity) {
-                if (enemy != null) {
-                    PositionComponent enemyPosition = pm.get(enemy);
-                    HealthComponent enemyHealth = hm.get(enemy);
-
-                    if (mapOrientationSystem.isGraphActive()) {
-                        FlatTiledNode entityNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(entityPosition.getPosition());
-                        FlatTiledNode enemyNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(enemyPosition.getPosition());
-                        if (!mapOrientationSystem.collisionDetector.collides(new Ray<>(new Vector2(entityNode.x, entityNode.y), new Vector2(enemyNode.x, enemyNode.y)))) { //TODO new in update
-                            if (entityWeapon.getSelected() != null) {
-                                if (entityWeapon.shoot()) {
-                                    drawShoot(batch, enemyPosition.getPosition(), entityPosition.getPosition());
-                                    shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
-                                }
-                            }
-                        }
-                    } else if (entityWeapon.getSelected() != null) {
-                        if (entityWeapon.shoot()) {
-                            drawShoot(batch, enemyPosition.getPosition(), entityPosition.getPosition());
-                            shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
-                        }
-                    }
-                    if (enemyHealth.isDead())
-                        moodComponent.setEnemy(null);
-                }
-            } else if (playerShoot) {
-                if (enemy != null) {
-                    PositionComponent enemyPosition = pm.get(enemy);
-                    HealthComponent enemyHealth = hm.get(enemy);
-
-                    if (entityWeapon.getSelected() != null) {
-                        if (entityWeapon.shoot()) {
-                            drawShoot(batch, enemyPosition.getPosition(), entityPosition.getPosition());
-                            shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
-                        }
-                    }
-                    if (enemyHealth.isDead())
-                        moodComponent.setEnemy(null);
+            if (enemy != null) {
+                PositionComponent enemyPosition = pm.get(enemy);
+                if (entityWeapon.getSelected() != null && entityWeapon.isShootLastFrame()) {
+                    drawShoot(batch, enemyPosition.getPosition(), entityPosition.getPosition());
                 }
             }
         }
@@ -222,7 +243,7 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
     }
 
     private void shoot(HealthComponent enemyHealth, WeaponComponent entityWeapon, Vector2 shootPosition) {
-        enemyHealth.value -= entityWeapon.getSelected().getDamage();
+        enemyHealth.damage(entityWeapon.getSelected().getDamage());
         soundsSystem.playShoot(shootPosition);
     }
 }

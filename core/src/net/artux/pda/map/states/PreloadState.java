@@ -87,6 +87,8 @@ public class PreloadState extends State {
         } else checkForStartPlay();
     }
 
+    boolean started = false;
+
     void checkForStartPlay() {
         GameMap map = dataRepository.getGameMap();
         if (map != null) {
@@ -101,7 +103,8 @@ public class PreloadState extends State {
                     return;
             }
             try {
-                if (!(gsm.peek() instanceof PlayState)) {
+                if (!started) {
+                    started = true;
                     Gdx.app.log("Preload", "Ok, try to load Play State. Preload took " + (TimeUtils.millis() - preloadTime) + " ms.");
                     gsm.set(new PlayState(gsm, dataRepository));
                 }

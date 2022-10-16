@@ -56,12 +56,6 @@ public class InteractionSystem extends BaseSystem {
     }
 
     @Override
-    public void removedFromEngine(Engine engine) {
-        super.removedFromEngine(engine);
-
-    }
-
-    @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
         activeActions.clear();

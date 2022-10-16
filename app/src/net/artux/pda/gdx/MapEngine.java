@@ -85,6 +85,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
                 if (intent.hasExtra(RECEIVE_STORY_DATA)) {
                     StoryDataModel storyDataModel = (StoryDataModel) intent.getSerializableExtra(RECEIVE_STORY_DATA);
                     gdxAdapter.getDataRepository().setStoryDataModel(storyDataModel);
+                    getIntent().putExtra("data", storyDataModel);
                 } else if (intent.hasExtra(RECEIVE_ERROR)) {
                     Throwable throwable = (Throwable) intent.getSerializableExtra(RECEIVE_ERROR);
                     Timber.e(throwable, "Sync map error");
@@ -153,7 +154,8 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
 
     @Override
     public void toast(String msg) {
-        Looper.prepare();
+        if (Looper.myLooper() == null)
+            Looper.prepare();
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 
@@ -171,7 +173,6 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
     @Override
     public void restart() {
         startActivity(getIntent());
-        finish();
     }
 
     @Override

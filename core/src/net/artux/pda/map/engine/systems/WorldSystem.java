@@ -133,7 +133,7 @@ public class WorldSystem extends EntitySystem implements Disposable {
                         .add(new SpriteComponent(assetManager.get("red.png", Texture.class), 8, 8))
                         .add(new VelocityComponent())
                         .add(new HealthComponent())
-                        .add(new WeaponComponent(armor, w, w))
+                        .add(new WeaponComponent(armor, w))
                         .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
                         .add(new StatesComponent<>(entity, BotStatesAshley.FIND_TARGET, BotStatesAshley.GUARDING))
                         .add(new MoodComponent(-1, null, true))

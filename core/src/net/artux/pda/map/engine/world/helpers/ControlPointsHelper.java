@@ -89,7 +89,7 @@ public class ControlPointsHelper {
                         .add(new HealthComponent())
                         .add(moodComponent)
                         .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<ItemModel>()))
-                        .add(new WeaponComponent(armor, w, w))
+                        .add(new WeaponComponent(armor, w))
                         .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
                         .add(new TargetMovingComponent(targeting));
 

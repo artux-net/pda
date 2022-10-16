@@ -87,7 +87,7 @@ android {
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
-            buildConfigField("String", "URL", "\"files.artux.net/\"")
+            buildConfigField("String", "URL", "\"files.artux.net/static/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-3940256099942544/1033173712\"")
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-3940256099942544/2247696110\"")
         }

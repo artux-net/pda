@@ -14,30 +14,32 @@ public class HealthComponent implements Component {
         value = 100;
     }
 
-    public boolean isDead(){
-        return value<1;
+    public boolean isDead() {
+        return value < 1;
     }
 
-    public void damage(float damage){
+    public void damage(float damage) {
         value -= damage;
     }
-    public void treat(float med){
-        if (value  + med < 100)
+
+    public void treat(float med) {
+        if (value + med < 100)
             value += med;
         else
             value = 100;
     }
 
-    public void decreaseRadiation(float value){
+    public void decreaseRadiation(float value) {
+        if (value < 0)
+            value = -value;
         if (radiation - value > 0)
             radiation -= value;
         else radiation = 0;
     }
 
-    public void applyMedicine(MedicineModel model){
-        radiation += model.getRadiation();
+    public void treat(MedicineModel model) {
+        treat(model.getHealth());
         stamina += model.getStamina();
-        value += model.getHealth();
+        decreaseRadiation(model.getRadiation());
     }
-
 }

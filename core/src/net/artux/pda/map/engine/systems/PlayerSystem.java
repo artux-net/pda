@@ -2,6 +2,7 @@ package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -11,32 +12,43 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.components.HealthComponent;
+import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.QuestComponent;
+import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
+import net.artux.pda.map.engine.components.player.UserVelocityInput;
+import net.artux.pda.map.ui.BackpackMenu;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
+import net.artux.pda.model.items.MedicineModel;
+import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 
 public class PlayerSystem extends BaseSystem implements Disposable {
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
+    private ComponentMapper<UserVelocityInput> uvm = ComponentMapper.getFor(UserVelocityInput.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     private ComponentMapper<PlayerComponent> pmm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<VelocityComponent> vcm = ComponentMapper.getFor(VelocityComponent.class);
 
     private final float pixelsPerMeter = 3f;
     private final AssetManager assetManager;
+    private InteractionSystem interactionSystem;
 
-    private Slot medicineSlot;
+    private Slot backpackSlot;
     private HUD hud;
 
     public PlayerSystem(AssetManager assetManager) {
@@ -58,7 +70,7 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        InteractionSystem interactionSystem = engine.getSystem(InteractionSystem.class);
+        interactionSystem = engine.getSystem(InteractionSystem.class);
         interactionSystem.addButton("ui/icons/icon_run.png", new ClickListener() {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
@@ -79,17 +91,22 @@ public class PlayerSystem extends BaseSystem implements Disposable {
         hud = new HUD(assetManager, engine, userInterface);
         userInterface.getHudTable().add(hud);
 
+        AssistantBlock assistantBlock = userInterface.getAssistantBlock();
+
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.font = userInterface.getLabelStyle().font;
+        textButtonStyle.fontColor = userInterface.getLabelStyle().fontColor;
+        textButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
+        backpackSlot = new Slot(userInterface, textButtonStyle);
+        backpackSlot.setText("Рюкзак");
+        backpackSlot.layout();
+        backpackSlot.setLabelText("");
+
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
-        style.imageUp = new TextureRegionDrawable(assetManager.get("ui/bar/ic_health.png", Texture.class));
-
-        AssistantBlock assistantBlock = userInterface.getAssistantBlock();
-        medicineSlot = new Slot(userInterface, style);
-        style = new ImageButton.ImageButtonStyle();
-        style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
         style.imageUp = new TextureRegionDrawable(assetManager.get("ui/bar/ic_radiation.png", Texture.class));
-        assistantBlock.getButtonsTable().add(medicineSlot);
-        medicineSlot.addListener(new ClickListener() {
+        assistantBlock.getButtonsTable().add(backpackSlot);
+        backpackSlot.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 userInterface.switchBackpack();
@@ -103,6 +120,27 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
+        if (player != null) {
+            MoodComponent moodComponent = mm.get(player);
+            PositionComponent playerPosition = pm.get(player);
+            SpriteComponent spriteComponent = sm.get(player);
+            UserVelocityInput userVelocityInput = uvm.get(player);
+            Entity enemy = moodComponent.enemy;
+            Vector2 direction;
+            if (enemy == null) {
+                direction = userVelocityInput.getVelocity();
+            } else {
+                PositionComponent enemyPosition = pm.get(enemy);
+                direction = enemyPosition.getPosition().cpy().sub(playerPosition.getPosition());
+            }
+
+            float degrees = (float) (Math.atan2(
+                    -direction.x,
+                    direction.y
+            ) * 180.0d / Math.PI);
+            if (direction.x != 0 && direction.y != 0)
+                spriteComponent.setRotation(degrees);
+        }
     }
 
     public HUD getHud() {
@@ -133,42 +171,64 @@ public class PlayerSystem extends BaseSystem implements Disposable {
         savePreferences();
     }
 
-    private void savePreferences() {
+    public void savePreferences() {
         if (player != null) {
             Preferences preferences = Gdx.app.getPreferences("player");
+            Preferences positionPrefs = Gdx.app.getPreferences("position");
+
             PlayerComponent playerComponent = getPlayerComponent();
             HealthComponent healthComponent = getHealthComponent();
             PositionComponent positionComponent = pm.get(player);
 
             StoryStateModel storyStateModel = playerComponent.gdxData.getCurrentState();
 
-            preferences.putBoolean(storyStateModel.toString(), true);
-            preferences.putFloat("x", positionComponent.getX());
-            preferences.putFloat("y", positionComponent.getY());
+            positionPrefs.putBoolean(storyStateModel.toString(), true);
+            positionPrefs.putFloat("x", positionComponent.getX());
+            positionPrefs.putFloat("y", positionComponent.getY());
+
             preferences.putFloat("health", healthComponent.value);
-            preferences.putFloat("stamina", healthComponent.stamina);
             preferences.putFloat("radiation", healthComponent.radiation);
 
             preferences.flush();
+            positionPrefs.flush();
         }
     }
 
     private void loadPreferences() {
         if (player != null) {
             Preferences preferences = Gdx.app.getPreferences("player");
-            PlayerComponent playerComponent = getPlayerComponent();
-            HealthComponent healthComponent = getHealthComponent();
-            PositionComponent positionComponent = pm.get(player);
+            Preferences positionPrefs = Gdx.app.getPreferences("position");
 
+            HealthComponent healthComponent = getHealthComponent();
+            healthComponent.value = preferences.getFloat("health", 100);
+            if (healthComponent.isDead())
+                healthComponent.value = 50;
+            healthComponent.radiation = preferences.getFloat("radiation", 0);
+
+            PositionComponent positionComponent = pm.get(player);
+            PlayerComponent playerComponent = getPlayerComponent();
             StoryStateModel storyStateModel = playerComponent.gdxData.getCurrentState();
-            if (preferences.contains(storyStateModel.toString())) {
-                preferences.putBoolean(storyStateModel.toString(), true);
-                positionComponent.setPosition(new Vector2(preferences.getFloat("x"), preferences.getFloat("y")));
-                healthComponent.value = preferences.getFloat("health");
-                healthComponent.stamina = preferences.getFloat("stamina");
-                healthComponent.radiation = preferences.getFloat("radiation");
-            } else preferences.clear();
-            preferences.flush();
+            if (positionPrefs.contains(storyStateModel.toString())) {
+                positionComponent.setPosition(new Vector2(positionPrefs.getFloat("x"), positionPrefs.getFloat("y")));
+            } else positionPrefs.clear();
+
+            positionPrefs.flush();
         }
+    }
+
+    public void updateData(StoryDataModel dataModel) {
+        UserInterface userInterface = interactionSystem.getUserInterface();
+        BackpackMenu backpackMenu = userInterface.getBackpackMenu();
+        backpackMenu.update(dataModel, new MedicineListener(){
+            @Override
+            public void treat(MedicineModel model) {
+                HealthComponent healthComponent = hm.get(player);
+                healthComponent.treat(model);
+            }
+        });
+    }
+
+    public interface MedicineListener{
+        void treat(MedicineModel model);
     }
 }

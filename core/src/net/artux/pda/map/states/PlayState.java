@@ -122,8 +122,8 @@ public class PlayState extends State {
     public void dispose() {
         stage.dispose();
         uistage.dispose();
-        assetsFinder.dispose();
         engineManager.dispose();
+        assetsFinder.dispose();
         if (userInterface != null)
             userInterface.dispose();
     }

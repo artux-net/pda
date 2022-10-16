@@ -42,6 +42,7 @@ import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -50,7 +51,6 @@ import java.util.TimerTask;
 
 public class UserInterface extends Group implements Disposable {
 
-    private GameStateManager gsm;
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.US);
     private final Color primaryColor = Color.valueOf("#3c3d48");
@@ -83,7 +83,6 @@ public class UserInterface extends Group implements Disposable {
 
     public UserInterface(final GameStateManager gsm, DataRepository dataRepository, AssetsFinder assetsFinder, Camera camera) {
         super();
-        this.gsm = gsm;
         this.dataRepository = dataRepository;
         this.assetManager = assetsFinder.getManager();
         long loadTime = TimeUtils.millis();
@@ -124,6 +123,7 @@ public class UserInterface extends Group implements Disposable {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.clicked(event, x, y);
                 Gdx.app.debug("UserInterface", "touched pause - user interface");
+                dataRepository.applyActions(Collections.emptyMap());
                 HashMap<String, String> data = new HashMap<>();
                 data.put("openPda", "");
                 gsm.getPlatformInterface().send(data);

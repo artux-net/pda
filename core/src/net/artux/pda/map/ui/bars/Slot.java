@@ -1,32 +1,28 @@
 package net.artux.pda.map.ui.bars;
 
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 
 import net.artux.pda.map.ui.UserInterface;
 
-public class Slot extends ImageButton {
+public class Slot extends TextButton {
 
-    private Label label;
+    private Label secondLabel;
 
-    public Slot(UserInterface userInterface, ImageButtonStyle style) {
-        super(style);
-        TextureRegionDrawable textureRegionDrawable = (TextureRegionDrawable) style.imageUp;
-        float pad = textureRegionDrawable.getRegion().getRegionHeight() * 0.15f;
-        pad(pad);
+    public Slot(UserInterface userInterface, TextButtonStyle style) {
+        super("", style);
         left();
         bottom();
         row();
-        label = new Label("0", userInterface.getLabelStyle());
-        add(label);
+        secondLabel = new Label("0", userInterface.getLabelStyle());
+        add(secondLabel);
     }
 
-    public Label getLabel() {
-        return label;
+    public Label getSecondLabel() {
+        return secondLabel;
     }
 
-    public void setText(String text){
-        label.setText(text);
+    public void setLabelText(String text) {
+        secondLabel.setText(text);
     }
 }

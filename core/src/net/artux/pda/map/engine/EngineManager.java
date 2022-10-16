@@ -80,6 +80,8 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
                 playerComponent.gdxData = dataModel;
                 weaponComponent.updateData(dataModel);
+                engine.getSystem(PlayerSystem.class).updateData(dataModel);
+                engine.getSystem(PlayerSystem.class).savePreferences();
             }
         }
     };
@@ -91,22 +93,20 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         this.map = dataRepository.getGameMap();
         this.userModel = dataRepository.getUserModel();
         StoryDataModel gdxData = dataRepository.getStoryDataModel();
-        dataRepository.addPropertyChangeListener(storyDataListener);
         long loadTime = TimeUtils.millis();
 
         //player
         Entity player = new Entity();
-        UserVelocityInput velocityComponent = new UserVelocityInput();
         Camera camera = stage.getViewport().getCamera();
         camera.position.x = map.getPlayerPosition().x;
         camera.position.y = map.getPlayerPosition().y;
         player.add(new PositionComponent(map.getPlayerPosition()))
                 .add(new VelocityComponent())
-                .add(new SpriteComponent(velocityComponent, assetsFinder.getManager().get("gg.png", Texture.class), 32, 32))
+                .add(new SpriteComponent(assetsFinder.getManager().get("gg.png", Texture.class), 32, 32))
                 .add(new WeaponComponent(gdxData))
                 .add(new MoodComponent(userModel))
                 .add(new HealthComponent())
-                .add(velocityComponent)
+                .add(new UserVelocityInput())
                 .add(new PlayerComponent(camera, userModel, gdxData));
         engine.addEntity(player);
 
@@ -131,15 +131,16 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addSystem(new ArtifactSystem());
         engine.addSystem(new MapLoggerSystem());
         engine.addSystem(new RenderSystem(stage, assetsFinder));
+        engine.addSystem(new MoodSystem(assetsFinder.getManager()));
         engine.addSystem(new BattleSystem(assetsFinder.getManager(), platformInterface));
         engine.addSystem(new StatesSystem());
         engine.addSystem(new MovementTargetingSystem());
-        engine.addSystem(new MoodSystem(assetsFinder.getManager()));
         engine.addSystem(new MovingSystem());
         engine.addSystem(new DeadCheckerSystem(playState.getUserInterface(), dataRepository, assetsFinder.getManager()));
 
         clicksSystem = engine.getSystem(ClicksSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);
+        engine.getSystem(PlayerSystem.class).updateData(gdxData);
 
         stage.addListener(this);
         Gdx.app.log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");
