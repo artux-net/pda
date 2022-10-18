@@ -2,7 +2,6 @@ package net.artux.pda.map.engine.components;
 
 import com.badlogic.ashley.core.Component;
 
-import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
@@ -141,7 +140,7 @@ public class WeaponComponent implements Component {
                     if (weaponModel.getBulletQuantity() < take) {
                         take = weaponModel.getBulletQuantity();
                     }
-                }else
+                } else
                     take = 0;
             }
             stack = 0;
