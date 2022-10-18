@@ -74,7 +74,6 @@ public class ControlPointsHelper {
             for (int i = 0; i < spawn.getN(); i++) {
                 Entity entity = new Entity();
 
-                ArmorModel armor = new ArmorModel();
                 WeaponModel w = new WeaponModel();
                 w.setSpeed(14);
                 w.setDamage(2);
@@ -89,7 +88,7 @@ public class ControlPointsHelper {
                         .add(new HealthComponent())
                         .add(moodComponent)
                         .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<ItemModel>()))
-                        .add(new WeaponComponent(armor, w))
+                        .add(new WeaponComponent(w))
                         .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
                         .add(new TargetMovingComponent(targeting));
 

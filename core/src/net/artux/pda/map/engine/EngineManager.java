@@ -7,7 +7,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -16,14 +15,9 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.components.MoodComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
-import net.artux.pda.map.engine.components.player.UserVelocityInput;
+import net.artux.pda.map.engine.entities.EntityGenerator;
 import net.artux.pda.map.engine.systems.ArtifactSystem;
 import net.artux.pda.map.engine.systems.BattleSystem;
 import net.artux.pda.map.engine.systems.CameraSystem;
@@ -95,24 +89,12 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         StoryDataModel gdxData = dataRepository.getStoryDataModel();
         long loadTime = TimeUtils.millis();
 
-        //player
-        Entity player = new Entity();
-        Camera camera = stage.getViewport().getCamera();
-        camera.position.x = map.getPlayerPosition().x;
-        camera.position.y = map.getPlayerPosition().y;
-        player.add(new PositionComponent(map.getPlayerPosition()))
-                .add(new VelocityComponent())
-                .add(new SpriteComponent(assetsFinder.getManager().get("gg.png", Texture.class), 32, 32))
-                .add(new WeaponComponent(gdxData))
-                .add(new MoodComponent(userModel))
-                .add(new HealthComponent())
-                .add(new UserVelocityInput())
-                .add(new PlayerComponent(camera, userModel, gdxData));
-        engine.addEntity(player);
+        EntityGenerator entityGenerator = new EntityGenerator(assetsFinder.getManager());
+        engine.addEntity(entityGenerator.player(map.getPlayerPosition(), gdxData, userModel));
 
         engine.addSystem(new MapOrientationSystem(assetsFinder, map));
         engine.addSystem(new ClicksSystem());
-        engine.addSystem(new CameraSystem());
+        engine.addSystem(new CameraSystem(stage.getCamera()));
         engine.addSystem(new SoundsSystem(assetsFinder.getManager()));
         engine.addSystem(new WorldSystem(assetsFinder.getManager()));
         engine.addSystem(new DataSystem(map, userModel));
@@ -143,7 +125,14 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.getSystem(PlayerSystem.class).updateData(gdxData);
 
         stage.addListener(this);
+        syncCameraPosition(stage);
         Gdx.app.log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");
+    }
+
+    private void syncCameraPosition(Stage stage) {
+        Camera camera = stage.getViewport().getCamera();
+        camera.position.x = map.getPlayerPosition().x;
+        camera.position.y = map.getPlayerPosition().y;
     }
 
     public GestureDetector.GestureListener getGestureListener() {

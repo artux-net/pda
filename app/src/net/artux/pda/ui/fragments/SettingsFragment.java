@@ -1,5 +1,6 @@
 package net.artux.pda.ui.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -153,6 +154,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
             case R.id.resetData:
                 storyViewModel.resetData();
                 storyViewModel.clear();
+                clearSharedPreferences(requireContext().getApplicationContext());
                 break;
             case R.id.mapCacheResetButton:
                 if (cacheDirectory.delete()) {
@@ -160,6 +162,18 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                     Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show();
                 }
                 break;
+        }
+    }
+
+    public static void clearSharedPreferences(Context ctx) {
+        File dir = new File(ctx.getFilesDir().getParent() + "/shared_prefs/");
+        String[] children = dir.list();
+        for (String child : children) {
+            if (!child.equals("prefs.xml")) {
+                ctx.getSharedPreferences(child.replace(".xml", ""), Context.MODE_PRIVATE).edit().clear().commit();
+                //delete the file
+                new File(dir, child).delete();
+            }
         }
     }
 }

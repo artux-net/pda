@@ -12,6 +12,10 @@ public class VelocityComponent implements Component {
         velocity = new Vector2();
     }
 
+    public VelocityComponent(float x, float y) {
+        velocity = new Vector2(x, y);
+    }
+
     public boolean isRunning() {
         return running;
     }

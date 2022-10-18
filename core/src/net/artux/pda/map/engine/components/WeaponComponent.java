@@ -13,7 +13,6 @@ import java.util.List;
 
 public class WeaponComponent implements Component {
 
-    private ArmorModel armor;
     private WeaponModel weaponModel;
     private ItemModel bulletModel;
 
@@ -38,16 +37,15 @@ public class WeaponComponent implements Component {
 
     public void updateData(StoryDataModel dataModel) {
         this.dataModel = dataModel;
-        this.armor = (ArmorModel) dataModel.getCurrentWearable(ItemType.ARMOR);
         setWeaponModel((WeaponModel) dataModel.getCurrentWearable(ItemType.RIFLE));
 
         player = true;
         reload();
     }
 
-    public WeaponComponent(ArmorModel armor, WeaponModel weaponModel1) {
-        this.armor = armor;
-        this.weaponModel = weaponModel1;
+    public WeaponComponent(WeaponModel weaponModel) {
+        this.weaponModel = weaponModel;
+        player = false;
         reload();
     }
 
@@ -61,14 +59,6 @@ public class WeaponComponent implements Component {
 
     public ItemModel getBulletModel() {
         return bulletModel;
-    }
-
-    public ArmorModel getArmor() {
-        return armor;
-    }
-
-    public void setArmor(ArmorModel armor) {
-        this.armor = armor;
     }
 
     public void setBulletModel(ItemModel item) {
@@ -129,11 +119,11 @@ public class WeaponComponent implements Component {
                 reloading = true;
 
                 reload();
-                timeout += 20 / weaponModel.getSpeed(); // перезарядка
+                timeout += 30 / weaponModel.getSpeed(); // перезарядка
                 shootLastFrame = false;
             } else {
                 stack = 0;
-                timeout += 10 / weaponModel.getSpeed();
+                timeout += 20 / weaponModel.getSpeed();
                 shootLastFrame = false;
             }
         } else shootLastFrame = false;
@@ -143,13 +133,16 @@ public class WeaponComponent implements Component {
 
     void reload() {
         WeaponModel weaponModel = getSelected();
-        if (weaponModel != null && (!player || (bulletModel != null && bulletModel.getQuantity() > 0))) {
+        if (weaponModel != null) {
             int take = weaponModel.getBulletQuantity();
             if (player) {
-                take = bulletModel.getQuantity();
-                if (weaponModel.getBulletQuantity() < take) {
-                    take = weaponModel.getBulletQuantity();
-                }
+                if (bulletModel != null) {
+                    take = bulletModel.getQuantity();
+                    if (weaponModel.getBulletQuantity() < take) {
+                        take = weaponModel.getBulletQuantity();
+                    }
+                }else
+                    take = 0;
             }
             stack = 0;
             bullets = take;

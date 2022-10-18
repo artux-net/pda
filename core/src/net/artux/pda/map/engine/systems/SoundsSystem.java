@@ -2,24 +2,19 @@ package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SoundComponent;
-import net.artux.pda.map.engine.components.player.PlayerComponent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class SoundsSystem extends BaseSystem {
-
-    private ImmutableArray<Entity> players;
 
     private final List<Music> detections = new ArrayList<>();
     private final List<Music> weapons = new ArrayList<>();
@@ -38,7 +33,7 @@ public class SoundsSystem extends BaseSystem {
 
     @Override
     public void addedToEngine(Engine engine) {
-        //super.addedToEngine(engine);
+        super.addedToEngine(engine);
         detections.add(assetManager.get("sounds/contact_0.ogg", Music.class));
         detections.add(assetManager.get("sounds/contact_1.ogg", Music.class));
 
@@ -56,12 +51,11 @@ public class SoundsSystem extends BaseSystem {
             m.setVolume(0.71f);
         }
         startBackgroundMusic();
-        players = engine.getEntitiesFor(Family.all(PositionComponent.class, PlayerComponent.class).get());
     }
 
-    public void startBackgroundMusic(){
+    public void startBackgroundMusic() {
         stopMusic();
-        Music m  = backgrounds.get(random.nextInt(backgrounds.size()));
+        Music m = backgrounds.get(random.nextInt(backgrounds.size()));
         m.setOnCompletionListener(new Music.OnCompletionListener() {
             @Override
             public void onCompletion(Music music) {
@@ -71,8 +65,8 @@ public class SoundsSystem extends BaseSystem {
         m.play();
     }
 
-    public void stopMusic(){
-        for (Music m : backgrounds){
+    public void stopMusic() {
+        for (Music m : backgrounds) {
             m.stop();
         }
     }
@@ -83,7 +77,7 @@ public class SoundsSystem extends BaseSystem {
     }
 
 
-    public void playStalkerDetection(){
+    public void playStalkerDetection() {
         boolean playing = false;
         for (Music m : detections) {
             if (!playing)
@@ -93,14 +87,14 @@ public class SoundsSystem extends BaseSystem {
             detections.get(random.nextInt(detections.size())).play();
     }
 
-    public void playShoot(Vector2 position){
-        for (int i = 0; i < players.size(); i++) {
-            PositionComponent positionComponent = pm.get(players.get(i));
-
+    public void playShoot(Vector2 position) {
+        PositionComponent positionComponent = pm.get(player);
+        float dst = position.dst(positionComponent.getPosition());
+        float volume = (500 - dst) / 500;
+        if (volume > 0)
             for (Music m : weapons) {
-                m.setVolume(0.01f + (1/position.dst(positionComponent.getPosition())));
+                m.setVolume(volume);
             }
-        }
 
         int i = random.nextInt(weapons.size());
         if (weapons.get(i).isPlaying())
@@ -108,11 +102,11 @@ public class SoundsSystem extends BaseSystem {
         else weapons.get(i).play();
     }
 
-    public void playSound(){
+    public void playSound() {
         anomaly.play();
     }
 
-    public void playSoundAtDistance(SoundComponent soundComponent){
+    public void playSoundAtDistance(SoundComponent soundComponent) {
 
     }
 

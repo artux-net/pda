@@ -6,9 +6,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -16,13 +14,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.engine.components.BulletComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.data.PlayerData;
+import net.artux.pda.map.engine.entities.EntityGenerator;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.map.ui.UserInterface;
@@ -32,7 +34,7 @@ import net.artux.pda.model.items.ItemType;
 
 import java.util.Random;
 
-public class BattleSystem extends BaseSystem implements Disposable, Drawable {
+public class BattleSystem extends BaseSystem implements Disposable {
 
     private final PlatformInterface platformInterface;
     private SoundsSystem soundsSystem;
@@ -44,6 +46,7 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
     private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
+    private ComponentMapper<BulletComponent> bcm = ComponentMapper.getFor(BulletComponent.class);
 
     private ShapeRenderer sr = new ShapeRenderer();
     private Random random = new Random();
@@ -51,16 +54,22 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
     private boolean playerShoot = false;
 
     private Slot weaponSlot;
+    private EntityGenerator entityGenerator;
+    private Array<Entity> bullets;
 
     public BattleSystem(AssetManager assetManager, PlatformInterface platformInterface) {
         super(Family.all(HealthComponent.class, PositionComponent.class, WeaponComponent.class).get());
         this.assetManager = assetManager;
         this.platformInterface = platformInterface;
+        entityGenerator = new EntityGenerator(assetManager);
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
+
+        bullets = listenEntities(Family.all(PositionComponent.class, VelocityComponent.class, BulletComponent.class).get());
+
         soundsSystem = engine.getSystem(SoundsSystem.class);
         mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
         moodSystem = engine.getSystem(MoodSystem.class);
@@ -151,41 +160,55 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
         for (int i = 0; i < entities.size; i++) {
             Entity entity = entities.get(i);
 
-            PositionComponent entityPosition = pm.get(entity);
+            PositionComponent entityPositionComponent = pm.get(entity);
+            HealthComponent entityHealth = hm.get(entity);
+            Vector2 position = entityPositionComponent.getPosition();
             WeaponComponent entityWeapon = wm.get(entity);
             MoodComponent moodComponent = mm.get(entity);
 
             Entity enemy = moodComponent.enemy;
             if (enemy != null) {
                 PositionComponent enemyPosition = pm.get(enemy);
+                Vector2 targetPosition = enemyPosition.getPosition();
                 HealthComponent enemyHealth = hm.get(enemy);
 
                 if (player != entity) {
                     if (entityWeapon.getSelected() != null) {
                         if (mapOrientationSystem.isGraphActive()) {
-                            FlatTiledNode entityNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(entityPosition.getPosition());
+                            FlatTiledNode entityNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(entityPositionComponent.getPosition());
                             FlatTiledNode enemyNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(enemyPosition.getPosition());
                             if (!mapOrientationSystem.collisionDetector.collides(new Ray<>(new Vector2(entityNode.x, entityNode.y), new Vector2(enemyNode.x, enemyNode.y)))) { //TODO new in update
-                                entityWeapon.shoot();
-                                shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
+                                if (entityWeapon.shoot())
+                                    shoot(enemyHealth, entityWeapon, position, targetPosition);
                             }
                         } else {
-                            entityWeapon.shoot();
-                            shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
+                            if (entityWeapon.shoot())
+                                shoot(enemyHealth, entityWeapon, position, targetPosition);
                         }
                     }
                 } else if (playerShoot) {
                     if (entityWeapon.getSelected() != null) {
                         //todo count walls
-                        entityWeapon.shoot();
-                        shoot(enemyHealth, entityWeapon, entityPosition.getPosition());
+                        if (entityWeapon.shoot())
+                            shoot(enemyHealth, entityWeapon, position, targetPosition);
                     }
                 }
                 if (enemyHealth.isDead())
                     moodComponent.setEnemy(null);
             }
-        }
 
+            for (Entity bullet : bullets.toArray()) {
+                BulletComponent bulletComponent = bcm.get(bullet);
+                PositionComponent bulletPositionComponent = pm.get(bullet);
+                float dstToTarget = bulletPositionComponent.getPosition().dst(bulletComponent.getTarget());
+                if (position.epsilonEquals(bulletPositionComponent.getPosition(), 2f) && position.epsilonEquals(bulletComponent.getTarget(), 2f)) {
+                    entityHealth.damage(bulletComponent.getDamage());
+                } else if (dstToTarget > bulletComponent.getLastDstToTarget())
+                    getEngine().removeEntity(bullet);
+                else
+                    bulletComponent.setLastDstToTarget(dstToTarget);
+            }
+        }
     }
 
     public Vector2 getPointNear(PositionComponent positionComponent, float precision) {
@@ -204,7 +227,7 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
         sr.dispose();
     }
 
-    @Override
+  /*  @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.end();
         for (int i = 0; i < entities.size; i++) {
@@ -224,9 +247,9 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
         }
         batch.begin();
 
-    }
+    }*/
 
-    private void drawShoot(Batch batch, Vector2 enemyPosition, Vector2 entityPosition) {
+    /*private void drawShoot(Batch batch, Vector2 enemyPosition, Vector2 entityPosition) {
         sr.setColor(Color.ORANGE);
         sr.setProjectionMatrix(batch.getProjectionMatrix());
 
@@ -235,15 +258,15 @@ public class BattleSystem extends BaseSystem implements Disposable, Drawable {
         Vector2 diff = enemyPosition.cpy().sub(entityPosition);
         Vector2 delayed = entityPosition.cpy().add(diff.scl(0.3f));
 
-        /*sr.rectLine(delayed,
-                getPointNear(enemyPosition, entityWeapon.getSelected().precision), 1);*/ // разбос
+        *//*sr.rectLine(delayed,
+                getPointNear(enemyPosition, entityWeapon.getSelected().precision), 1);*//* // разбос
         sr.rectLine(delayed, enemyPosition, 1);
         sr.end();
 
     }
-
-    private void shoot(HealthComponent enemyHealth, WeaponComponent entityWeapon, Vector2 shootPosition) {
-        enemyHealth.damage(entityWeapon.getSelected().getDamage());
-        soundsSystem.playShoot(shootPosition);
+*/
+    private void shoot(HealthComponent enemyHealth, WeaponComponent entityWeapon, Vector2 start, Vector2 targetPosition) {
+        getEngine().addEntity(entityGenerator.bullet(start, targetPosition, entityWeapon.getSelected()));
+        soundsSystem.playShoot(targetPosition);
     }
 }

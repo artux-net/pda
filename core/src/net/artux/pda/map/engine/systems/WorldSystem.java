@@ -28,7 +28,6 @@ import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.states.BotStatesAshley;
-import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
 
@@ -122,7 +121,6 @@ public class WorldSystem extends EntitySystem implements Disposable {
             public void run() {
                 Entity entity = new Entity();
 
-                ArmorModel armor = new ArmorModel();
                 WeaponModel w = new WeaponModel();
                 w.setSpeed(30);
                 w.setDamage(1);
@@ -133,7 +131,7 @@ public class WorldSystem extends EntitySystem implements Disposable {
                         .add(new SpriteComponent(assetManager.get("red.png", Texture.class), 8, 8))
                         .add(new VelocityComponent())
                         .add(new HealthComponent())
-                        .add(new WeaponComponent(armor, w))
+                        .add(new WeaponComponent(w))
                         .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
                         .add(new StatesComponent<>(entity, BotStatesAshley.FIND_TARGET, BotStatesAshley.GUARDING))
                         .add(new MoodComponent(-1, null, true))

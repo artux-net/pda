@@ -60,19 +60,28 @@ public class MovingSystem extends BaseSystem {
 
             PositionComponent positionComponent = pm.get(entity);
             VelocityComponent velocityComponent = vm.get(entity);
-            HealthComponent healthComponent = hm.get(entity);
-
             Vector2 stepVector;
-            float staminaDifference = 0;
-            if (velocityComponent.isRunning() && healthComponent.stamina > 0) {
-                stepVector = velocityComponent.velocity.scl(deltaTime).scl(RUN_MOVEMENT);
-                if (!alwaysRun && entity == player)
-                    staminaDifference = -0.1f;
+            Vector2 currentVelocity = velocityComponent.velocity.cpy();
+
+            if (hm.has(entity)) {
+                HealthComponent healthComponent = hm.get(entity);
+
+                float staminaDifference = 0;
+                if (velocityComponent.isRunning() && healthComponent.stamina > 0) {
+                    stepVector = currentVelocity.scl(deltaTime).scl(RUN_MOVEMENT);
+                    if (!alwaysRun && entity == player)
+                        staminaDifference = -0.1f;
+                } else {
+                    if (healthComponent.stamina < 100)
+                        staminaDifference = 0.06f;
+                    stepVector = currentVelocity.scl(deltaTime).scl(MOVEMENT);
+                }
+
+                healthComponent.stamina += staminaDifference;
             } else {
-                if (healthComponent.stamina < 100)
-                 staminaDifference = 0.06f;
-                stepVector = velocityComponent.velocity.scl(deltaTime).scl(MOVEMENT);
+                stepVector = currentVelocity.scl(deltaTime).scl(RUN_MOVEMENT);
             }
+
 
             if (!stepVector.isZero()) {
                 float newX = positionComponent.getX() + stepVector.x;
@@ -89,7 +98,6 @@ public class MovingSystem extends BaseSystem {
                         positionComponent.getPosition().y = newY;
                 }
             }
-            healthComponent.stamina += staminaDifference;
         }
     }
 

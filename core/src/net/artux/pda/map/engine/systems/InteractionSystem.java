@@ -136,7 +136,7 @@ public class InteractionSystem extends BaseSystem {
                 counter++;
             }
 
-            if (near && playerComponent.camera.frustum.pointInFrustum(positionComponent.getX(), positionComponent.getY(), 0)) {
+            if (near && cameraSystem.getCamera().frustum.pointInFrustum(positionComponent.getX(), positionComponent.getY(), 0)) {
                 if (!positionComponent.isCameraVisible() && !cameraSystem.detached) {
                     soundsSystem.playStalkerDetection();
                 }

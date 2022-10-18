@@ -46,6 +46,7 @@ public class AssetsFinder implements Disposable {
 
             assetManager.load("data/uiskin.atlas", TextureAtlas.class);
             assetManager.load("quest.png", Texture.class);
+            assetManager.load("bullet.png", Texture.class);
             assetManager.load("seller.png", Texture.class);
             assetManager.load("quest1.png", Texture.class);
             assetManager.load("cache.png", Texture.class);

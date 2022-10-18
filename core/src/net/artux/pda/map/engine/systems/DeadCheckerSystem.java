@@ -58,7 +58,7 @@ public class DeadCheckerSystem extends BaseSystem {
             PositionComponent positionComponent = pm.get(entity);
 
             if (healthComponent.isDead()) {
-                if (random.nextInt(10) < 1) {
+                if (random.nextInt(10) < 5) {
                     final Entity deadEntity = new Entity();
                     deadEntity.add(new PositionComponent(positionComponent.getPosition()))
                             .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4));
@@ -90,6 +90,7 @@ public class DeadCheckerSystem extends BaseSystem {
                             }
                         })).add(stalkerComponent);
                     } else {
+                        getEngine().removeEntity(player);
                         getEngine().removeSystem(getEngine().getSystem(PlayerSystem.class));
                     }
 

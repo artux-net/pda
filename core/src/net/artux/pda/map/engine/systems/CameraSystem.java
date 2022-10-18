@@ -2,6 +2,7 @@ package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
@@ -32,15 +33,14 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     boolean detached;
     boolean specialZoom = false;
 
-    public CameraSystem() {
+    public CameraSystem(Camera camera) {
         super(null);
+        this.camera = (OrthographicCamera) camera;
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        PlayerComponent playerComponent = cm.get(player);
-        camera = (OrthographicCamera) playerComponent.camera;
         camera.zoom = initialZoom;
         clicksSystem = engine.getSystem(ClicksSystem.class);
     }

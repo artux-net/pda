@@ -8,12 +8,10 @@ import net.artux.pda.model.user.UserModel;
 
 public class PlayerComponent implements Component {
 
-    public Camera camera;
     public UserModel userModel;
     public StoryDataModel gdxData;
 
-    public PlayerComponent(Camera camera, UserModel userModel, StoryDataModel gdxData) {
-        this.camera = camera;
+    public PlayerComponent(UserModel userModel, StoryDataModel gdxData) {
         this.userModel = userModel;
         this.gdxData = gdxData;
     }

@@ -40,7 +40,7 @@ public class SpriteComponent implements Component {
     }
 
     public void setRotation(float degrees) {
-        sprite.setRotation(degrees + 90);
+        sprite.setRotation(degrees );
     }
 
 }

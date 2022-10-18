@@ -24,8 +24,8 @@ public class BaseSystem extends EntitySystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        player = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get()).get(0);
-        if (family!=null) {
+        player = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get()).first();
+        if (family != null) {
             ImmutableArray<Entity> immutableArray = engine.getEntitiesFor(family);
             entities = new Array<>();
             for (Entity entity : immutableArray) {
@@ -47,12 +47,12 @@ public class BaseSystem extends EntitySystem {
         }
     }
 
-    protected boolean isPlayerActive(){
+    protected boolean isPlayerActive() {
         return getEngine().getEntities().contains(player, true);
     }
 
-    public final Array<Entity> listenEntities(Family family){
-        final Array<Entity> entities = new Array<>(getEngine().getEntitiesFor(family).toArray());
+    public final Array<Entity> listenEntities(Family family) {
+        final Array<Entity> entities = new Array<Entity>(getEngine().getEntitiesFor(family).toArray(Entity.class));
 
         getEngine().addEntityListener(family, new EntityListener() {
             @Override
