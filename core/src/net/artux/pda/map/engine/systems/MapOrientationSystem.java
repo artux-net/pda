@@ -42,6 +42,14 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
         }
     }
 
+    public IndexedAStarPathFinder<FlatTiledNode> getPathFinder() {
+        return pathFinder;
+    }
+
+    public TiledManhattanDistance<FlatTiledNode> getHeuristic() {
+        return heuristic;
+    }
+
     public TiledRaycastCollisionDetector<FlatTiledNode> getCollisionDetector() {
         return collisionDetector;
     }

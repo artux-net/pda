@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
 import net.artux.pda.map.engine.ContentGenerator;
+import net.artux.pda.map.engine.ai.states.BotStatesAshley;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.ControlPointComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
@@ -19,18 +20,16 @@ import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
-import net.artux.pda.map.engine.components.StatesComponent;
+import net.artux.pda.map.engine.components.StateMachineComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
-import net.artux.pda.map.engine.components.states.BotStatesAshley;
 import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.model.MobType;
 import net.artux.pda.map.model.MobsTypes;
 import net.artux.pda.map.model.Spawn;
 import net.artux.pda.map.model.input.GameMap;
-import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.user.Gang;
@@ -89,7 +88,7 @@ public class ControlPointsHelper {
                         .add(moodComponent)
                         .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<ItemModel>()))
                         .add(new WeaponComponent(w))
-                        .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
+                        .add(new StateMachineComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
                         .add(new TargetMovingComponent(targeting));
 
 
