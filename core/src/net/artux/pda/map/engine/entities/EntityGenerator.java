@@ -6,19 +6,19 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.engine.ContentGenerator;
-import net.artux.pda.map.engine.ai.states.BotStatesAshley;
 import net.artux.pda.map.engine.components.BulletComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
-import net.artux.pda.map.engine.components.StateMachineComponent;
+import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.player.UserVelocityInput;
+import net.artux.pda.map.engine.components.states.BotStatesAshley;
 import net.artux.pda.map.model.MobType;
 import net.artux.pda.map.model.MobsTypes;
 import net.artux.pda.map.model.Spawn;
@@ -105,7 +105,7 @@ public class EntityGenerator {
                 .add(moodComponent)
                 .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<>()))
                 .add(new WeaponComponent(w))
-                .add(new StateMachineComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
+                .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
                 .add(new TargetMovingComponent(targeting));
 
 

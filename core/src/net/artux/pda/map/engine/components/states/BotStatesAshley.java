@@ -1,4 +1,4 @@
-package net.artux.pda.map.engine.ai.states;
+package net.artux.pda.map.engine.components.states;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
@@ -6,10 +6,11 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.StateMachineComponent;
+import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.model.items.WeaponModel;
@@ -17,14 +18,14 @@ import net.artux.pda.model.items.WeaponModel;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public enum BotStatesAshley implements State<Entity> {
+public enum BotStatesAshley implements State<Entity>, Disposable {
 
     FIND_TARGET() {
         @Override
         public void update(Entity entity) {
-            StateMachineComponent<Entity, BotStatesAshley> stateMachineComponent = sm.get(entity);
-            //tmm.get(entity).setNextTarget();
-            stateMachineComponent.stateMachine.changeState(MOVING);
+            StatesComponent<Entity, BotStatesAshley> statesComponent = sm.get(entity);
+            tmm.get(entity).setNextTarget();
+            statesComponent.stateMachine.changeState(MOVING);
         }
     },
 
@@ -32,14 +33,14 @@ public enum BotStatesAshley implements State<Entity> {
         @Override
         public void enter(final Entity entity) {
             super.enter(entity);
-            final StateMachineComponent<Entity, BotStatesAshley> stateMachineComponent = sm.get(entity);
+            final StatesComponent<Entity, BotStatesAshley> statesComponent = sm.get(entity);
             tmm.get(entity).setMovementTarget(null);
             try {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        if (stateMachineComponent.stateMachine.getCurrentState() == STANDING)
-                            stateMachineComponent.stateMachine.changeState(FIND_TARGET);
+                        if (statesComponent.stateMachine.getCurrentState() == STANDING)
+                            statesComponent.stateMachine.changeState(FIND_TARGET);
                     }
                 }, 1000 * (Math.abs(random.nextLong() % 30)));
 
@@ -70,15 +71,16 @@ public enum BotStatesAshley implements State<Entity> {
     MOVING_FOR_SHOOT() {
         @Override
         public void update(Entity entity) {
-            StateMachineComponent<Entity, BotStatesAshley> stateMachineComponent = sm.get(entity);
+            StatesComponent<Entity, BotStatesAshley> statesComponent = sm.get(entity);
             if (mm.get(entity).getEnemy() != null) {
                 Entity enemy = mm.get(entity).getEnemy();
                 if (wm.get(entity).getSelected() != null) {
                     WeaponModel weaponModel = wm.get(entity).getSelected();
                     if (pm.get(enemy).getPosition().dst(pm.get(entity).getPosition()) < distanceToAttack(weaponModel.getPrecision())) {
                         tmm.get(entity).setMovementTarget(null);
-                        stateMachineComponent.stateMachine.changeState(SHOOT);
+                        statesComponent.stateMachine.changeState(SHOOT);
                     } else {
+
                         tmm.get(entity).setMovementTarget(pm.get(enemy).getPosition());
                     }
                 }
@@ -89,7 +91,7 @@ public enum BotStatesAshley implements State<Entity> {
     SHOOT() {
         @Override
         public void update(Entity entity) {
-            StateMachineComponent<Entity, BotStatesAshley> stateMachineComponent = sm.get(entity);
+            StatesComponent<Entity, BotStatesAshley> statesComponent = sm.get(entity);
             if (mm.get(entity).getEnemy() != null) {
                 Entity enemy = mm.get(entity).getEnemy();
                 if (wm.get(entity).getSelected() != null) {
@@ -98,11 +100,11 @@ public enum BotStatesAshley implements State<Entity> {
                     if (dst < distanceToAttack(weaponModel.getPrecision())) {
                         //shoot
                     } else if (dst < 10) {
-                        // отодвинутся от врага
+                      // отодвинутся от врага
                         //TODO
                         //statesComponent.stateMachine.
                     } else {
-                        stateMachineComponent.stateMachine.changeState(MOVING_FOR_SHOOT);
+                        statesComponent.stateMachine.changeState(MOVING_FOR_SHOOT);
                     }
                 }
             }
@@ -111,6 +113,7 @@ public enum BotStatesAshley implements State<Entity> {
 
     ATTACKING() {
         //global
+
         @Override
         public void enter(Entity entity) {
             super.enter(entity);
@@ -121,14 +124,15 @@ public enum BotStatesAshley implements State<Entity> {
         public void update(Entity entity) {
             if (mm.get(entity).getEnemy() == null || pm.get(entity).getPosition().dst(tmm.get(entity).getTargeting().getTarget()) > 200) {
                 mm.get(entity).setEnemy(null);
-                sm.get(entity).stateMachine.setGlobalState(GUARDING);
+                sm.get(entity).stateMachine.changeGlobalState(GUARDING, true);
             }
         }
     },
 
     GUARDING() {
-
         //global
+
+
         @Override
         public void enter(Entity entity) {
             super.enter(entity);
@@ -138,7 +142,7 @@ public enum BotStatesAshley implements State<Entity> {
         @Override
         public void update(Entity entity) {
             if (mm.get(entity).getEnemy() != null) {
-                sm.get(entity).stateMachine.setGlobalState(ATTACKING);
+                sm.get(entity).stateMachine.changeGlobalState(ATTACKING, true);
             }
         }
     };
@@ -147,18 +151,17 @@ public enum BotStatesAshley implements State<Entity> {
         return precision * 20;
     }
 
-    protected ComponentMapper<StateMachineComponent<Entity, BotStatesAshley>> sm;
-
-    protected ComponentMapper<TargetMovingComponent> tmm = ComponentMapper.getFor(TargetMovingComponent.class);
-    protected ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    protected ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
-    protected ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
+    private static ComponentMapper<StatesComponent<Entity, BotStatesAshley>> sm;
+    private static ComponentMapper<TargetMovingComponent> tmm = tmm = ComponentMapper.getFor(TargetMovingComponent.class);
+    private static ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private static ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    private static ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
     protected Timer timer = new Timer();
 
     @Override
     public void enter(Entity entity) {
-        sm = (ComponentMapper<StateMachineComponent<Entity, BotStatesAshley>>) ComponentMapper.getFor(entity.getComponent(StateMachineComponent.class).getClass());
+        sm = (ComponentMapper<StatesComponent<Entity, BotStatesAshley>>) ComponentMapper.getFor(entity.getComponent(StatesComponent.class).getClass());
     }
 
 
@@ -175,4 +178,7 @@ public enum BotStatesAshley implements State<Entity> {
         return true;
     }
 
+    @Override
+    public void dispose() {
+    }
 }

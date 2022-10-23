@@ -17,7 +17,7 @@ import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.StateMachineComponent;
+import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.ui.UserInterface;
@@ -50,7 +50,7 @@ public class InteractionSystem extends BaseSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        mobs = engine.getEntitiesFor(Family.all(MoodComponent.class, PositionComponent.class, StateMachineComponent.class).get());
+        mobs = engine.getEntitiesFor(Family.all(MoodComponent.class, PositionComponent.class, StatesComponent.class).get());
         soundsSystem = engine.getSystem(SoundsSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);
     }

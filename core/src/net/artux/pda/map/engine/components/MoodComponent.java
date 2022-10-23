@@ -52,8 +52,4 @@ public class MoodComponent implements Component {
     public void setEnemy(Entity enemy) {
         this.enemy = enemy;
     }
-
-    public boolean hasEnemy() {
-        return enemy != null;
-    }
 }

@@ -15,7 +15,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.RandomPosition;
-import net.artux.pda.map.engine.ai.states.BotStatesAshley;
 import net.artux.pda.map.engine.components.AnomalyComponent;
 import net.artux.pda.map.engine.components.ArtifactComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
@@ -23,11 +22,12 @@ import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
-import net.artux.pda.map.engine.components.StateMachineComponent;
+import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
+import net.artux.pda.map.engine.components.states.BotStatesAshley;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
 
@@ -133,7 +133,7 @@ public class WorldSystem extends EntitySystem implements Disposable {
                         .add(new HealthComponent())
                         .add(new WeaponComponent(w))
                         .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
-                        .add(new StateMachineComponent<>(entity, BotStatesAshley.FIND_TARGET, BotStatesAshley.GUARDING))
+                        .add(new StatesComponent<>(entity, BotStatesAshley.FIND_TARGET, BotStatesAshley.GUARDING))
                         .add(new MoodComponent(-1, null, true))
                         .add(new TargetMovingComponent(new TargetMovingComponent.Targeting() {
                             @Override
