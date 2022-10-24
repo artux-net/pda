@@ -138,8 +138,23 @@ public class PlayerSystem extends BaseSystem implements Disposable {
                     -direction.x,
                     direction.y
             ) * 180.0d / Math.PI);
-            if (direction.x != 0 && direction.y != 0)
-                spriteComponent.setRotation(degrees + 90);
+            
+            float currentRotation = spriteComponent.getRotation() - 90;
+            float alternativeRotation;
+            if (currentRotation > 0)
+                alternativeRotation = currentRotation - 360;
+            else
+                alternativeRotation = currentRotation + 360;
+
+            float difference = currentRotation - degrees;
+            if (Math.abs(alternativeRotation - degrees) < Math.abs(difference))
+                difference = alternativeRotation - degrees;
+
+            if (direction.x != 0 && direction.y != 0) {
+                float step = difference * deltaTime * 20;
+                spriteComponent.setRotation(spriteComponent.getRotation() - step);
+            }
+
         }
     }
 

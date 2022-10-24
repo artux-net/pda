@@ -1,12 +1,18 @@
 package net.artux.pda.map.engine.entities;
 
+import static com.badlogic.gdx.math.MathUtils.random;
+
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.components.BulletComponent;
+import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -15,14 +21,17 @@ import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
+import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.player.UserVelocityInput;
 import net.artux.pda.map.engine.components.states.BotStatesAshley;
+import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.model.MobType;
 import net.artux.pda.map.model.MobsTypes;
 import net.artux.pda.map.model.Spawn;
 import net.artux.pda.model.items.ArmorModel;
+import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.Gang;
@@ -31,14 +40,18 @@ import net.artux.pda.model.user.UserModel;
 
 import java.util.ArrayList;
 
-public class EntityGenerator {
+public class EntityBuilder {
+
+    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 
     private final AssetManager assetManager;
     private final ContentGenerator contentGenerator;
     private final Texture bulletTexture;
+    private final Engine engine;
 
-    public EntityGenerator(AssetManager assetManager) {
+    public EntityBuilder(AssetManager assetManager, Engine engine) {
         this.assetManager = assetManager;
+        this.engine = engine;
         this.contentGenerator = new ContentGenerator();
         bulletTexture = assetManager.get("bullet.png", Texture.class);
     }
@@ -48,8 +61,9 @@ public class EntityGenerator {
 
         player.add(new PositionComponent(position))
                 .add(new VelocityComponent())
+                .add(new VisionComponent())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
-                .add(new WeaponComponent(gdxData))
+                .add(new WeaponComponent(gdxData, this))
                 .add(new MoodComponent(userModel))
                 .add(new HealthComponent())
                 .add(new UserVelocityInput())
@@ -57,8 +71,12 @@ public class EntityGenerator {
         return player;
     }
 
-    public Entity bullet(Vector2 position, Vector2 targetPosition, WeaponModel weaponModel) {
+    public Entity bullet(Entity author, Vector2 targetPosition, WeaponModel weaponModel) {
+        PositionComponent position = pm.get(author);
+
         Entity player = new Entity();
+
+        targetPosition = getPointNear(targetPosition, weaponModel.getPrecision());
 
         float targetX = targetPosition.x;
         float targetY = targetPosition.y;
@@ -67,8 +85,8 @@ public class EntityGenerator {
         float vY = (float) ((targetY - position.y) /
                 Math.sqrt(((targetY - position.y) * (targetY - position.y)) + ((targetX - position.x) * (targetX - position.x))));
 
-        vX *= weaponModel.getSpeed();
-        vY *= weaponModel.getSpeed();
+        vX *= weaponModel.getSpeed() * 2;
+        vY *= weaponModel.getSpeed() * 2;
 
         Vector2 direction = targetPosition.cpy().sub(position);
         float degrees = (float) (Math.atan2(
@@ -82,8 +100,23 @@ public class EntityGenerator {
         player.add(new PositionComponent(position))
                 .add(new VelocityComponent(vX, vY))
                 .add(spriteComponent)
-                .add(new BulletComponent(targetPosition, weaponModel.getDamage()));
+                .add(new BulletComponent(author, targetPosition, weaponModel.getDamage()));
         return player;
+    }
+
+    public void addBulletToEngine(Entity entity, Vector2 targetPosition, WeaponModel weaponModel) {
+        engine.addEntity(bullet(entity, targetPosition, weaponModel));
+        engine.getSystem(SoundsSystem.class).playShoot(targetPosition);
+    }
+
+    public Vector2 getPointNear(Vector2 basePosition, float precision) {
+        double r = 10 / precision;
+
+        double angle = random.nextInt(360);
+
+        float x = (float) (Math.cos(angle) * r);
+        float y = (float) (Math.sin(angle) * r);
+        return new Vector2(basePosition.x + x, basePosition.y + y);
     }
 
     public Entity spawnStalker(Spawn spawn, MobType mobType, MobsTypes mobsTypes, GangRelation relations, TargetMovingComponent.Targeting targeting) {
@@ -93,7 +126,7 @@ public class EntityGenerator {
         WeaponModel w = new WeaponModel();
         w.setSpeed(14);
         w.setDamage(2);
-        w.setPrecision(1);
+        w.setPrecision(1);//todo here graph logic broke
         w.setBulletQuantity(30);
 
         MoodComponent moodComponent = new MoodComponent(mobType.group, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]), spawn.isAngry());
@@ -102,10 +135,12 @@ public class EntityGenerator {
         entity.add(new PositionComponent(targeting.getTarget()))
                 .add(new VelocityComponent())
                 .add(new HealthComponent())
+                .add(new VisionComponent())
                 .add(moodComponent)
+                .add(new GraphMotionComponent(null))
                 .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<>()))
-                .add(new WeaponComponent(w))
-                .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
+                .add(new WeaponComponent(w, this))
+                .add(new StatesComponent(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
                 .add(new TargetMovingComponent(targeting));
 
 
@@ -119,6 +154,31 @@ public class EntityGenerator {
 
         entity.add(new SpriteComponent(texture, 8, 8));
         return entity;
+    }
+
+    public Entity randomStalker(Vector2 position, TargetMovingComponent.Targeting targeting) {
+        Entity entity = new Entity();
+
+        WeaponModel w = new WeaponModel();
+        w.setSpeed(30);
+        w.setDamage(1);
+        w.setPrecision(10);
+        w.setBulletQuantity(15);
+
+        entity.add(new PositionComponent(position))
+                .add(new VisionComponent())
+                .add(new SpriteComponent(assetManager.get("red.png", Texture.class), 8, 8))
+                .add(new VelocityComponent())
+                .add(new HealthComponent())
+                .add(new GraphMotionComponent(null))
+                .add(new WeaponComponent(w, this))
+                .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
+                .add(new StatesComponent(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
+                .add(new MoodComponent(-1, null, true))
+                .add(new TargetMovingComponent(targeting));
+        Gdx.app.log("WorldSystem", "New entity created.");
+        return entity;
+
     }
 
 }

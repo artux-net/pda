@@ -1,15 +1,16 @@
 package net.artux.pda.map.engine.components;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.gdx.ai.fsm.State;
+import com.badlogic.ashley.core.Entity;
 
+import net.artux.pda.map.engine.components.states.BotStatesAshley;
 import net.artux.pda.map.engine.components.states.MyStateMachine;
 
-public class StatesComponent<E, T extends State<E>> implements Component {
+public class StatesComponent implements Component {
 
-    public MyStateMachine<E, T> stateMachine;
+    public MyStateMachine<Entity, BotStatesAshley> stateMachine;
 
-    public StatesComponent(E owner, T initState, T globalState) {
+    public StatesComponent(Entity owner, BotStatesAshley initState, BotStatesAshley globalState) {
         stateMachine = new MyStateMachine<>(owner, initState, globalState);
     }
 }

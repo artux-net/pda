@@ -8,10 +8,12 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
+import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.model.items.WeaponModel;
 
@@ -23,8 +25,9 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
     FIND_TARGET() {
         @Override
         public void update(Entity entity) {
-            StatesComponent<Entity, BotStatesAshley> statesComponent = sm.get(entity);
-            tmm.get(entity).setNextTarget();
+            StatesComponent statesComponent = sm.get(entity);
+            TargetMovingComponent targetMovingComponent = tmm.get(entity);
+            gmm.get(entity).setMovementTarget(targetMovingComponent.targeting.getTarget());
             statesComponent.stateMachine.changeState(MOVING);
         }
     },
@@ -33,13 +36,14 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
         @Override
         public void enter(final Entity entity) {
             super.enter(entity);
-            final StatesComponent<Entity, BotStatesAshley> statesComponent = sm.get(entity);
-            tmm.get(entity).setMovementTarget(null);
+            final StatesComponent statesComponent = sm.get(entity);
+            vmm.get(entity).set(0,0);
+            gmm.get(entity).setMovementTarget(null);
             try {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        if (statesComponent.stateMachine.getCurrentState() == STANDING)
+                        if (statesComponent.stateMachine.isInState(STANDING))
                             statesComponent.stateMachine.changeState(FIND_TARGET);
                     }
                 }, 1000 * (Math.abs(random.nextLong() % 30)));
@@ -51,16 +55,16 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
 
         @Override
         public void update(Entity entity) {
-            //entity.stand();
+
         }
     },
 
     MOVING() {
         @Override
         public void update(Entity entity) {
-            TargetMovingComponent targetMovingComponent = tmm.get(entity);
+            GraphMotionComponent targetMovingComponent = gmm.get(entity);
             PositionComponent positionComponent = pm.get(entity);
-            if (targetMovingComponent.movementTarget != null) {
+            if (targetMovingComponent.isActive()) {
                 if (positionComponent.getPosition().dst(targetMovingComponent.movementTarget) < 3f) {
                     sm.get(entity).stateMachine.changeState(STANDING);
                 }
@@ -71,17 +75,17 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
     MOVING_FOR_SHOOT() {
         @Override
         public void update(Entity entity) {
-            StatesComponent<Entity, BotStatesAshley> statesComponent = sm.get(entity);
+            StatesComponent statesComponent = sm.get(entity);
+            GraphMotionComponent graphMotionComponent = gmm.get(entity);
             if (mm.get(entity).getEnemy() != null) {
                 Entity enemy = mm.get(entity).getEnemy();
                 if (wm.get(entity).getSelected() != null) {
                     WeaponModel weaponModel = wm.get(entity).getSelected();
-                    if (pm.get(enemy).getPosition().dst(pm.get(entity).getPosition()) < distanceToAttack(weaponModel.getPrecision())) {
-                        tmm.get(entity).setMovementTarget(null);
+                    if (pm.get(enemy).dst(pm.get(entity)) < distanceToAttack(weaponModel.getPrecision())) {
+                        graphMotionComponent.setMovementTarget(null);
                         statesComponent.stateMachine.changeState(SHOOT);
                     } else {
-
-                        tmm.get(entity).setMovementTarget(pm.get(enemy).getPosition());
+                        graphMotionComponent.setMovementTarget(pm.get(enemy).getPosition());
                     }
                 }
             }
@@ -91,7 +95,7 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
     SHOOT() {
         @Override
         public void update(Entity entity) {
-            StatesComponent<Entity, BotStatesAshley> statesComponent = sm.get(entity);
+            StatesComponent statesComponent = sm.get(entity);
             if (mm.get(entity).getEnemy() != null) {
                 Entity enemy = mm.get(entity).getEnemy();
                 if (wm.get(entity).getSelected() != null) {
@@ -100,7 +104,7 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
                     if (dst < distanceToAttack(weaponModel.getPrecision())) {
                         //shoot
                     } else if (dst < 10) {
-                      // отодвинутся от врага
+                        // отодвинутся от врага
                         //TODO
                         //statesComponent.stateMachine.
                     } else {
@@ -151,17 +155,18 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
         return precision * 20;
     }
 
-    private static ComponentMapper<StatesComponent<Entity, BotStatesAshley>> sm;
-    private static ComponentMapper<TargetMovingComponent> tmm = tmm = ComponentMapper.getFor(TargetMovingComponent.class);
-    private static ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    private static ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
-    private static ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
+    protected ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
+    protected ComponentMapper<VelocityComponent> vmm = ComponentMapper.getFor(VelocityComponent.class);
+    protected ComponentMapper<TargetMovingComponent> tmm = ComponentMapper.getFor(TargetMovingComponent.class);
+    protected ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
+    protected ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    protected ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    protected ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
     protected Timer timer = new Timer();
 
     @Override
     public void enter(Entity entity) {
-        sm = (ComponentMapper<StatesComponent<Entity, BotStatesAshley>>) ComponentMapper.getFor(entity.getComponent(StatesComponent.class).getClass());
     }
 
 

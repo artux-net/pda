@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
-import net.artux.pda.map.engine.entities.EntityGenerator;
+import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.systems.ArtifactSystem;
 import net.artux.pda.map.engine.systems.BattleSystem;
 import net.artux.pda.map.engine.systems.CameraSystem;
@@ -89,21 +89,21 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         StoryDataModel gdxData = dataRepository.getStoryDataModel();
         long loadTime = TimeUtils.millis();
 
-        EntityGenerator entityGenerator = new EntityGenerator(assetsFinder.getManager());
-        engine.addEntity(entityGenerator.player(map.getPlayerPosition(), gdxData, userModel));
+        EntityBuilder entityBuilder = new EntityBuilder(assetsFinder.getManager(), engine);
+        engine.addEntity(entityBuilder.player(map.getPlayerPosition(), gdxData, userModel));
 
         engine.addSystem(new MapOrientationSystem(assetsFinder, map));
         engine.addSystem(new ClicksSystem());
         engine.addSystem(new CameraSystem(stage.getCamera()));
         engine.addSystem(new SoundsSystem(assetsFinder.getManager()));
-        engine.addSystem(new WorldSystem(assetsFinder.getManager()));
+        engine.addSystem(new WorldSystem(assetsFinder.getManager(), entityBuilder));
         engine.addSystem(new DataSystem(map, userModel));
         engine.addSystem(new InteractionSystem(stage, playState.getUserInterface()));
         engine.addSystem(new PlayerSystem(assetsFinder.getManager()));
 
 
         if (controlPoints)
-            ControlPointsHelper.createControlPointsEntities(engine, assetsFinder.getManager());
+            ControlPointsHelper.createControlPointsEntities(engine, entityBuilder, assetsFinder.getManager());
         if (questPoints)
             QuestPointsHelper.createQuestPointsEntities(engine, assetsFinder.getManager(), platformInterface);
         if (anomalies)
@@ -114,7 +114,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addSystem(new MapLoggerSystem());
         engine.addSystem(new RenderSystem(stage, assetsFinder));
         engine.addSystem(new MoodSystem(assetsFinder.getManager()));
-        engine.addSystem(new BattleSystem(assetsFinder.getManager(), platformInterface));
+        engine.addSystem(new BattleSystem(assetsFinder.getManager(), entityBuilder, platformInterface));
         engine.addSystem(new StatesSystem());
         engine.addSystem(new MovementTargetingSystem());
         engine.addSystem(new MovingSystem());

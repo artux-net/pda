@@ -57,6 +57,11 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
         int xTile = (int) (x / tileSize);
         int yTile = (int) (y / tileSize);
 
+        if (xTile >= sizeX)
+            xTile = sizeX - 1;
+        if (yTile >= sizeY)
+            yTile = sizeY - 1;
+
         return getNode(xTile, yTile);
     }
 

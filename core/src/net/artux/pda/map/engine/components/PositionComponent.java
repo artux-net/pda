@@ -3,29 +3,28 @@ package net.artux.pda.map.engine.components;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 
-public class PositionComponent implements Component {
+public class PositionComponent extends Vector2 implements Component {
 
     boolean cameraVisible = false;
-    Vector2 position;
 
     public PositionComponent(Vector2 position) {
-        this.position = new Vector2(position);
+        super(position);
     }
 
     public PositionComponent(float x, float y) {
-        position = new Vector2(x, y);
+        super(x, y);
     }
 
     public Vector2 getPosition() {
-        return position;
+        return this;
     }
 
-    public float getX(){
-        return position.x;
+    public float getX() {
+        return x;
     }
 
-    public float getY(){
-        return position.y;
+    public float getY() {
+        return y;
     }
 
     public boolean isCameraVisible() {
@@ -37,6 +36,6 @@ public class PositionComponent implements Component {
     }
 
     public void setPosition(Vector2 position) {
-        this.position = position;
+        set(position);
     }
 }

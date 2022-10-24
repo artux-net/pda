@@ -24,7 +24,7 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.data.PlayerData;
-import net.artux.pda.map.engine.entities.EntityGenerator;
+import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.map.ui.UserInterface;
@@ -54,14 +54,14 @@ public class BattleSystem extends BaseSystem implements Disposable {
     private boolean playerShoot = false;
 
     private Slot weaponSlot;
-    private EntityGenerator entityGenerator;
+    private EntityBuilder entityBuilder;
     private Array<Entity> bullets;
 
-    public BattleSystem(AssetManager assetManager, PlatformInterface platformInterface) {
+    public BattleSystem(AssetManager assetManager, EntityBuilder entityBuilder, PlatformInterface platformInterface) {
         super(Family.all(HealthComponent.class, PositionComponent.class, WeaponComponent.class).get());
         this.assetManager = assetManager;
         this.platformInterface = platformInterface;
-        entityGenerator = new EntityGenerator(assetManager);
+        this.entityBuilder = entityBuilder;
     }
 
     @Override
@@ -179,18 +179,18 @@ public class BattleSystem extends BaseSystem implements Disposable {
                             FlatTiledNode enemyNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(enemyPosition.getPosition());
                             if (!mapOrientationSystem.collisionDetector.collides(new Ray<>(new Vector2(entityNode.x, entityNode.y), new Vector2(enemyNode.x, enemyNode.y)))) { //TODO new in update
                                 if (entityWeapon.shoot())
-                                    shoot(enemyHealth, entityWeapon, position, targetPosition);
+                                    shoot(entity, entityWeapon, targetPosition);
                             }
                         } else {
                             if (entityWeapon.shoot())
-                                shoot(enemyHealth, entityWeapon, position, targetPosition);
+                                shoot(entity, entityWeapon, targetPosition);
                         }
                     }
                 } else if (playerShoot) {
                     if (entityWeapon.getSelected() != null) {
                         //todo count walls
                         if (entityWeapon.shoot())
-                            shoot(enemyHealth, entityWeapon, position, targetPosition);
+                            shoot(player, entityWeapon, targetPosition);
                     }
                 }
                 if (enemyHealth.isDead())
@@ -265,8 +265,8 @@ public class BattleSystem extends BaseSystem implements Disposable {
 
     }
 */
-    private void shoot(HealthComponent enemyHealth, WeaponComponent entityWeapon, Vector2 start, Vector2 targetPosition) {
-        getEngine().addEntity(entityGenerator.bullet(start, targetPosition, entityWeapon.getSelected()));
+    private void shoot(Entity entity, WeaponComponent entityWeapon,  Vector2 targetPosition) {
+        getEngine().addEntity(entityBuilder.bullet(entity, targetPosition, entityWeapon.getSelected()));
         soundsSystem.playShoot(targetPosition);
     }
 }

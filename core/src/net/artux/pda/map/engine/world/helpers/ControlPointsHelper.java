@@ -11,39 +11,26 @@ import com.badlogic.gdx.math.Vector2;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
-import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.ControlPointComponent;
-import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.StalkerComponent;
-import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
-import net.artux.pda.map.engine.components.VelocityComponent;
-import net.artux.pda.map.engine.components.WeaponComponent;
-import net.artux.pda.map.engine.components.states.BotStatesAshley;
+import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.model.MobType;
 import net.artux.pda.map.model.MobsTypes;
 import net.artux.pda.map.model.Spawn;
 import net.artux.pda.map.model.input.GameMap;
-import net.artux.pda.model.items.ArmorModel;
-import net.artux.pda.model.items.ItemModel;
-import net.artux.pda.model.items.WeaponModel;
-import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.UserModel;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ControlPointsHelper {
 
-    public static void createControlPointsEntities(final Engine engine, AssetManager assetManager) {
-        ContentGenerator contentGenerator = new ContentGenerator();
+    public static void createControlPointsEntities(final Engine engine, EntityBuilder entityBuilder, AssetManager assetManager) {
         JsonReader reader = new JsonReader(Gdx.files.internal("mobs.json").reader());
         MobsTypes mobsTypes = new Gson().fromJson(reader, MobsTypes.class);
 
@@ -56,54 +43,20 @@ public class ControlPointsHelper {
             Entity controlPoint = new Entity();
             float size = spawn.getR() * 2 * 0.9f;
 
-            TargetMovingComponent.Targeting targeting = new TargetMovingComponent.Targeting() {
-                @Override
-                public Vector2 getTarget() {
-                    double r = (double) spawn.getR() / 2 + random.nextInt(spawn.getR());
+            TargetMovingComponent.Targeting targeting = () -> {
+                double r = (double) spawn.getR() / 2 + random.nextInt(spawn.getR());
 
-                    double angle = random.nextInt(360);
+                double angle = random.nextInt(360);
 
-                    Vector2 basePosition = spawn.getPosition();
-                    float x = (float) (Math.cos(angle) * r);
-                    float y = (float) (Math.sin(angle) * r);
-                    return new Vector2(basePosition.x + x, basePosition.y + y);
-                }
+                Vector2 basePosition = spawn.getPosition();
+                float x = (float) (Math.cos(angle) * r);
+                float y = (float) (Math.sin(angle) * r);
+                return new Vector2(basePosition.x + x, basePosition.y + y);
             };
 
             List<Entity> pointEntities = new LinkedList<>();
             for (int i = 0; i < spawn.getN(); i++) {
-                Entity entity = new Entity();
-
-                WeaponModel w = new WeaponModel();
-                w.setSpeed(14);
-                w.setDamage(2);
-                w.setPrecision(1);
-                w.setBulletQuantity(30);
-
-                MoodComponent moodComponent = new MoodComponent(mobType.group, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]), spawn.isAngry());
-                moodComponent.ignorePlayer = spawn.isIgnorePlayer();
-
-                entity.add(new PositionComponent(targeting.getTarget()))
-                        .add(new VelocityComponent())
-                        .add(new HealthComponent())
-                        .add(moodComponent)
-                        .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<ItemModel>()))
-                        .add(new WeaponComponent(w))
-                        .add(new StatesComponent<>(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
-                        .add(new TargetMovingComponent(targeting));
-
-
-                Texture texture;
-                if (userModel != null) {
-                    if (mobType.group < 0 || userModel.getRelations().getFor(Gang.ofId(mobType.group)) < -2)
-                        texture = assetManager.get("red.png", Texture.class);
-                    else if (userModel.getRelations().getFor(Gang.ofId(mobType.group)) > 2) //todo
-                        texture = assetManager.get("green.png", Texture.class);
-                    else
-                        texture = assetManager.get("yellow.png", Texture.class);
-                } else texture = assetManager.get("yellow.png", Texture.class);
-
-                entity.add(new SpriteComponent(texture, 8, 8));
+                Entity entity = entityBuilder.spawnStalker(spawn, mobType,mobsTypes, userModel.getRelations(), targeting);
                 engine.addEntity(entity);
                 pointEntities.add(entity);
             }
@@ -113,13 +66,8 @@ public class ControlPointsHelper {
             controlPoint.add(new PositionComponent(spawn.getPosition()))
                     .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size))
                     .add(controlPointComponent)
-                    .add(new ClickComponent(new ClickComponent.ClickListener() {
-                        @Override
-                        public void clicked() {
-                            engine.getSystem(RenderSystem.class)
-                                    .showText(controlPointComponent.desc(), spawn.getPosition());
-                        }
-                    }));
+                    .add(new ClickComponent(() -> engine.getSystem(RenderSystem.class)
+                            .showText(controlPointComponent.desc(), spawn.getPosition())));
             engine.addEntity(controlPoint);
 
         }

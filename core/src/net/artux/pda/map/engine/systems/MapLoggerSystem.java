@@ -4,19 +4,20 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.engine.components.TargetMovingComponent;
+import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.engine.pathfinding.TiledSmoothableGraphPath;
 
-public class MapLoggerSystem extends BaseSystem implements Drawable, Disposable {
+public class MapLoggerSystem extends IteratingSystem implements Drawable, Disposable {
 
-    private final ComponentMapper<TargetMovingComponent> tm = ComponentMapper.getFor(TargetMovingComponent.class);
+    private final ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
 
     private final ShapeRenderer sr;
 
@@ -27,7 +28,7 @@ public class MapLoggerSystem extends BaseSystem implements Drawable, Disposable 
     public static boolean showPaths = false;
 
     public MapLoggerSystem() {
-        super(Family.all(TargetMovingComponent.class).get());
+        super(Family.all(GraphMotionComponent.class).get());
         sr = new ShapeRenderer();
     }
 
@@ -40,6 +41,11 @@ public class MapLoggerSystem extends BaseSystem implements Drawable, Disposable 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
     }
 
     @Override
@@ -82,11 +88,11 @@ public class MapLoggerSystem extends BaseSystem implements Drawable, Disposable 
         if (showPaths) {
             sr.setColor(Color.ORANGE);
 
-            for (int i = 0; i < entities.size; i++) {
-                Entity entity = entities.get(i);
+            for (int i = 0; i < getEntities().size(); i++) {
+                Entity entity = getEntities().get(i);
 
-                TargetMovingComponent targetMovingComponent = tm.get(entity);
-                TiledSmoothableGraphPath<FlatTiledNode> graph = targetMovingComponent.getPath();
+                GraphMotionComponent graphMotionComponent = gmm.get(entity);
+                TiledSmoothableGraphPath<FlatTiledNode> graph = graphMotionComponent.getPath();
                 if (graph != null) {
                     int nodeCount = graph.getCount();
 

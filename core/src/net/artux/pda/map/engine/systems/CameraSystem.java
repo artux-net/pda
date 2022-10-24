@@ -66,7 +66,7 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
 
                 internalMoveBy(unit.x, unit.y);
             }
-            if (!velocityComponent.velocity.isZero())
+            if (!velocityComponent.isZero())
                 detached = false;
 
             if (specialZoom && !detached) {

@@ -18,20 +18,13 @@ import net.artux.pda.map.engine.RandomPosition;
 import net.artux.pda.map.engine.components.AnomalyComponent;
 import net.artux.pda.map.engine.components.ArtifactComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.StalkerComponent;
-import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
-import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
-import net.artux.pda.map.engine.components.states.BotStatesAshley;
-import net.artux.pda.model.items.ItemModel;
-import net.artux.pda.model.items.WeaponModel;
+import net.artux.pda.map.engine.entities.EntityBuilder;
 
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -55,11 +48,12 @@ public class WorldSystem extends EntitySystem implements Disposable {
     private SoundsSystem soundsSystem;
     private MapOrientationSystem mapOrientationSystem;
     private Timer timer;
-
+    private final EntityBuilder entityBuilder;
     public static boolean radiation = true;
 
-    public WorldSystem(AssetManager assetManager) {
+    public WorldSystem(AssetManager assetManager, EntityBuilder entityBuilder) {
         this.assetManager = assetManager;
+        this.entityBuilder = entityBuilder;
         timer = new Timer();
     }
 
@@ -89,7 +83,7 @@ public class WorldSystem extends EntitySystem implements Disposable {
                 PositionComponent positionComponent1 = pm.get(anomalies.get(j));
                 AnomalyComponent anomalyComponent = am.get(anomalies.get(j));
                 if (positionComponent1.getPosition().dst(positionComponent.getPosition()) < anomalyComponent.size) {
-                    if (velocityComponent.velocity.len() > anomalyComponent.maxVelocity)
+                    if (velocityComponent.len() > anomalyComponent.maxVelocity)
                         healthComponent.damage(anomalyComponent.damage);
                     if (radiation)
                         healthComponent.radiation += 0.006;
@@ -119,43 +113,19 @@ public class WorldSystem extends EntitySystem implements Disposable {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Entity entity = new Entity();
+                TargetMovingComponent.Targeting targeting = new TargetMovingComponent.Targeting() {
+                    @Override
+                    public Vector2 getTarget() {
+                        return mapOrientationSystem.getRandomFreePoint(cameraSystem.getCamera());
+                    }
+                };
 
-                WeaponModel w = new WeaponModel();
-                w.setSpeed(30);
-                w.setDamage(1);
-                w.setPrecision(1);
-                w.setBulletQuantity(15);
-
-                entity.add(new PositionComponent(mapOrientationSystem.getRandomFreePoint(cameraSystem.getCamera())))
-                        .add(new SpriteComponent(assetManager.get("red.png", Texture.class), 8, 8))
-                        .add(new VelocityComponent())
-                        .add(new HealthComponent())
-                        .add(new WeaponComponent(w))
-                        .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
-                        .add(new StatesComponent<>(entity, BotStatesAshley.FIND_TARGET, BotStatesAshley.GUARDING))
-                        .add(new MoodComponent(-1, null, true))
-                        .add(new TargetMovingComponent(new TargetMovingComponent.Targeting() {
-                            @Override
-                            public Vector2 getTarget() {
-                                return mapOrientationSystem.getRandomFreePoint(cameraSystem.getCamera());
-                            }
-                        }));
-                getEngine().addEntity(entity);
+                entityBuilder.randomStalker(targeting.getTarget(), targeting);
                 Gdx.app.log("WorldSystem", "New entity created.");
                 generateGroup();
             }
         }, 1000 * random(40, 60));
     }
-
-   /* public Vector2 getRandomFreePosition(){
-        Vector2 position = new Vector2(random.nextInt(GlobalData.mapWidth), random.nextInt(GlobalData.mapHeight));
-        if (mapOrientationSystem.isGraphActive())
-            while (mapOrientationSystem.getWorldGraph().getTypeInPosition(position.x, position.y) == TILE_WALL
-                    || cameraSystem.getCamera().frustum.pointInFrustum(position.x, position.y, 0))
-                position = new Vector2(random.nextInt(GlobalData.mapWidth), random.nextInt(GlobalData.mapHeight));
-            return position;
-    }*/
 
     @Override
     public void dispose() {

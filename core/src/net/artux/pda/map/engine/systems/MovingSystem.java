@@ -50,7 +50,7 @@ public class MovingSystem extends BaseSystem {
 
             velocityComponent.setVelocity(userVelocityInput.getVelocity());
             if (speedup)
-                velocityComponent.velocity.scl(PLAYER_MULTIPLICATION);
+                velocityComponent.scl(PLAYER_MULTIPLICATION);
             if (alwaysRun)
                 velocityComponent.setRunning(true);
         }
@@ -61,7 +61,7 @@ public class MovingSystem extends BaseSystem {
             PositionComponent positionComponent = pm.get(entity);
             VelocityComponent velocityComponent = vm.get(entity);
             Vector2 stepVector;
-            Vector2 currentVelocity = velocityComponent.velocity.cpy();
+            Vector2 currentVelocity = velocityComponent.cpy();
 
             if (hm.has(entity)) {
                 HealthComponent healthComponent = hm.get(entity);

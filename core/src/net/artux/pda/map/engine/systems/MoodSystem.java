@@ -98,7 +98,7 @@ public class MoodSystem extends BaseSystem implements Drawable {
                     moodComponent2.setEnemy(entity1);
             }
 
-            if (moodComponent1.enemy != null && pm.get(entity1).getPosition().dst(pm.get(moodComponent1.enemy).getPosition()) > 100)
+            if (moodComponent1.enemy != null && pm.get(entity1).getPosition().dst(pm.get(moodComponent1.enemy).getPosition()) > 200)
                 moodComponent1.setEnemy(null);
         }
         if (playerEnemyTarget != null && !playerEnemies.contains(playerEnemyTarget))
