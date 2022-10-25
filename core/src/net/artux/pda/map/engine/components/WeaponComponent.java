@@ -114,9 +114,10 @@ public class WeaponComponent implements Component {
                 bullets--;
 
                 timeout += 1 / weaponModel.getSpeed();
-                stack++;
+
                 if (player)
                     bulletModel.setQuantity(bulletModel.getQuantity() - 1);
+                stack++;
                 shootLastFrame = true;
             } else if (magazine == 0) {
                 reloading = true;

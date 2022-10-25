@@ -16,8 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.RelationalSpriteComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.ui.UserInterface;
@@ -42,7 +42,8 @@ public class InteractionSystem extends BaseSystem {
     private ImmutableArray<Entity> mobs;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    private ComponentMapper<SpriteComponent> scm = ComponentMapper.getFor(SpriteComponent.class);
+    private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
+    private ComponentMapper<RelationalSpriteComponent> rsm = ComponentMapper.getFor(RelationalSpriteComponent.class);
     private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
     private List<String> activeActions = new LinkedList<>();
@@ -50,7 +51,7 @@ public class InteractionSystem extends BaseSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        mobs = engine.getEntitiesFor(Family.all(MoodComponent.class, PositionComponent.class, StatesComponent.class).get());
+        mobs = engine.getEntitiesFor(Family.all(SpriteComponent.class, MoodComponent.class, PositionComponent.class).get());
         soundsSystem = engine.getSystem(SoundsSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);
     }
@@ -59,9 +60,9 @@ public class InteractionSystem extends BaseSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
         activeActions.clear();
-        for (int i = 0; i < entities.size; i++) {
-            PositionComponent positionComponent = pm.get(entities.get(i));
-            final InteractiveComponent interactiveComponent = im.get(entities.get(i));
+        for (int i = 0; i < getEntities().size(); i++) {
+            PositionComponent positionComponent = pm.get(getEntities().get(i));
+            final InteractiveComponent interactiveComponent = im.get(getEntities().get(i));
 
             PositionComponent playerPosition = pm.get(player);
 
@@ -90,7 +91,7 @@ public class InteractionSystem extends BaseSystem {
                                 break;
                         }
 
-                        userInterface.addInteractButton(name, icon,new ChangeListener(){
+                        userInterface.addInteractButton(name, icon, new ChangeListener() {
                             @Override
                             public void changed(ChangeEvent event, Actor actor) {
                                 interactiveComponent.listener.interact(userInterface);
@@ -116,25 +117,29 @@ public class InteractionSystem extends BaseSystem {
         for (int i = 0; i < mobs.size(); i++) {
             Entity mob = mobs.get(i);
             PositionComponent positionComponent = pm.get(mob);
-            SpriteComponent spriteComponent = scm.get(mob);
 
-            PlayerComponent playerComponent = pcm.get(player);
+
             PositionComponent playerPosition = pm.get(player);
 
-            float dst = positionComponent.getPosition().dst(playerPosition.getPosition());
+            float dst = positionComponent.dst(playerPosition);
 
             boolean near = true;
-
+            float alpha;
             if (dst < 200) {
-                spriteComponent.setAlpha(1);
+                alpha = 1;
                 counter++;
             } else if (dst > 270) {
-                spriteComponent.setAlpha(0);
+                alpha = 0;
                 near = false;
             } else {
-                spriteComponent.setAlpha((300 - dst) / 100);
+                alpha = (300 - dst) / 100;
                 counter++;
             }
+
+            if (sm.has(mob)) {
+                sm.get(mob).setAlpha(alpha);
+            } else if (rsm.has(mob))
+                rsm.get(mob).setAlpha(alpha);
 
             if (near && cameraSystem.getCamera().frustum.pointInFrustum(positionComponent.getX(), positionComponent.getY(), 0)) {
                 if (!positionComponent.isCameraVisible() && !cameraSystem.detached) {
@@ -146,6 +151,11 @@ public class InteractionSystem extends BaseSystem {
 
         }
         PlayerData.visibleEntities = counter;
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
     }
 
     public void addButton(String icon, InteractiveComponent.InteractListener listener) {

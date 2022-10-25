@@ -5,6 +5,7 @@ import static net.artux.pda.map.engine.pathfinding.TiledNode.TILE_WALL;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
+import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
@@ -29,8 +30,10 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
     IndexedAStarPathFinder<FlatTiledNode> pathFinder;
     PathSmoother<FlatTiledNode, Vector2> pathSmoother;
     TiledRaycastCollisionDetector<FlatTiledNode> collisionDetector;
+    private final Ray<Vector2> ray;
 
     public MapOrientationSystem(AssetsFinder assetsFinder, GameMap map) {
+        ray = new Ray<>(Vector2.Zero, Vector2.Zero);
         this.mapBorders = new MapBorders(assetsFinder.getLocal(map.getTilesTexture()),
                 assetsFinder.getLocal(map.getBoundsTextureUri()));
         if (mapBorders.isMobTilesActive()) {
@@ -91,5 +94,20 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
     public void dispose() {
         worldGraph.dispose();
         mapBorders.dispose();
+    }
+
+    private boolean isInsideMap(Vector2 position) {
+        return position.x >= 0 && position.y >= 0 && position.x <= mapBorders.getWidth() && position.y <= mapBorders.getHeight();
+    }
+
+    public boolean collides(Vector2 start, Vector2 end) {
+        if (isGraphActive() && isInsideMap(start) && isInsideMap(end)) {
+            FlatTiledNode startNode = getWorldGraph().getNodeInPosition(start);
+            FlatTiledNode endNode = getWorldGraph().getNodeInPosition(end);
+
+            ray.set(startNode.getPosition(), endNode.getPosition());
+            return collisionDetector.collides(ray);
+        }
+        return false;
     }
 }

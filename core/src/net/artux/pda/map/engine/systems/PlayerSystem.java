@@ -138,7 +138,7 @@ public class PlayerSystem extends BaseSystem implements Disposable {
                     -direction.x,
                     direction.y
             ) * 180.0d / Math.PI);
-            
+
             float currentRotation = spriteComponent.getRotation() - 90;
             float alternativeRotation;
             if (currentRotation > 0)
@@ -156,6 +156,11 @@ public class PlayerSystem extends BaseSystem implements Disposable {
             }
 
         }
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
     }
 
     public HUD getHud() {
@@ -176,8 +181,8 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     }
 
     public int getDistance() {
-        if (entities.size > 0) {
-            return (int) (getPosition().dst(pm.get(entities.get(0)).getPosition()) / pixelsPerMeter);//TODO select target
+        if (getEntities() != null) {
+            return (int) (getPosition().dst(pm.get(getEntities().first()).getPosition()) / pixelsPerMeter);//TODO select target
         } else return -1;
     }
 
@@ -234,7 +239,7 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     public void updateData(StoryDataModel dataModel) {
         UserInterface userInterface = interactionSystem.getUserInterface();
         BackpackMenu backpackMenu = userInterface.getBackpackMenu();
-        backpackMenu.update(dataModel, new MedicineListener(){
+        backpackMenu.update(dataModel, new MedicineListener() {
             @Override
             public void treat(MedicineModel model) {
                 HealthComponent healthComponent = hm.get(player);
@@ -243,7 +248,7 @@ public class PlayerSystem extends BaseSystem implements Disposable {
         });
     }
 
-    public interface MedicineListener{
+    public interface MedicineListener {
         void treat(MedicineModel model);
     }
 }

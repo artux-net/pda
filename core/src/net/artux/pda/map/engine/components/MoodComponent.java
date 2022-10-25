@@ -39,8 +39,8 @@ public class MoodComponent implements Component {
             response = false;
         else
             response = moodComponent.group < 0 // is animal
-                || angry
-                || moodComponent.group < relations.length && relations[moodComponent.group] < -2 && group != moodComponent.group; // is person
+                    || angry
+                    || moodComponent.group < relations.length && relations[moodComponent.group] < -2 && group != moodComponent.group; // is person
 
         return response;
     }
@@ -52,4 +52,20 @@ public class MoodComponent implements Component {
     public void setEnemy(Entity enemy) {
         this.enemy = enemy;
     }
+
+    public boolean hasEnemy() {
+        return enemy != null;
+    }
+
+    public int getRelation(MoodComponent moodComponent) {
+        if (moodComponent.group < relations.length)
+            return relations[moodComponent.group];
+        else return -10;
+    }
+
+    public void setRelation(MoodComponent moodComponent, int relation) {
+        if (moodComponent.group < relations.length)
+            relations[moodComponent.group] = relation;
+    }
+
 }

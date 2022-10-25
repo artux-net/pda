@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -14,23 +15,25 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.SpriteComponent;
+import net.artux.pda.map.engine.components.VisionComponent;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class MoodSystem extends BaseSystem implements Drawable {
+public class VisionSystem extends BaseSystem implements Drawable {
 
-    private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    private static final float VISION_DISTANCE = 100f;
+
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    private ComponentMapper<SpriteComponent> scm = ComponentMapper.getFor(SpriteComponent.class);
-    private LinkedList<Entity> playerEnemies = new LinkedList<>();
-    private InteractionSystem interactionSystem;
-    private Sprite enemyTarget;
-    private Entity playerEnemyTarget;
+    private ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
+    private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
-    public MoodSystem(AssetManager assetManager) {
-        super(Family.all(MoodComponent.class, PositionComponent.class).get());
+    private InteractionSystem interactionSystem;
+    private MapOrientationSystem mapOrientationSystem;
+    private Sprite enemyTarget;
+
+    public VisionSystem(AssetManager assetManager) {
+        super(Family.all(VisionComponent.class, PositionComponent.class).get());
         enemyTarget = new Sprite(assetManager.get("transfer.png", Texture.class));
         enemyTarget.setSize(16, 16);
         enemyTarget.setOriginCenter();
@@ -43,74 +46,71 @@ public class MoodSystem extends BaseSystem implements Drawable {
         interactionSystem.addButton("ui/icons/icon_target.png", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                LinkedList<Entity> playerEnemies = vcm.get(player).getVisibleEntities();
+                MoodComponent moodComponent = mm.get(player);
+                Entity playerEnemyTarget = moodComponent.getEnemy();
                 if (playerEnemies.size() > 1) {
                     Iterator<Entity> iterator = playerEnemies.iterator();
                     if (playerEnemyTarget == playerEnemies.getLast() ||
                             playerEnemyTarget == null || !playerEnemies.contains(playerEnemyTarget))
-                        playerEnemyTarget = playerEnemies.getFirst();
+                        moodComponent.setEnemy(playerEnemies.getFirst());
                     else while (iterator.hasNext()) {
                         if (iterator.next() == playerEnemyTarget) {
-                            playerEnemyTarget = iterator.next();
+                            moodComponent.setEnemy(iterator.next());
                             break;
                         }
                     }
-                } else
-                    playerEnemyTarget = null;
+                } else if (playerEnemies.size() == 1)
+                    moodComponent.setEnemy(playerEnemies.getFirst());
             }
         });
-    }
-
-    public Entity getPlayerEnemyTarget() {
-        return playerEnemyTarget;
+        mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        playerEnemies.clear();
-        for (int i = 0; i < entities.size - 1; i++) {
+        ImmutableArray<Entity> entities = getEntities();
+        for (int i = 0; i < entities.size(); i++) {
             Entity entity1 = entities.get(i);
 
-            MoodComponent moodComponent1 = mm.get(entity1);
+            PositionComponent positionComponent1 = pm.get(entity1);
+            VisionComponent visionComponent1 = vcm.get(entity1);
+            visionComponent1.clear();
 
-            for (int j = i + 1; j < entities.size; j++) {
+            for (int j = 0; j < entities.size(); j++) {
                 Entity entity2 = entities.get(j);
+                if (entity2 == entity1)
+                    continue;
 
-                float dst = pm.get(entity1).getPosition().dst(pm.get(entity2).getPosition());
-                MoodComponent moodComponent2 = mm.get(entity2);
+                PositionComponent positionComponent2 = pm.get(entity2);
+                float dst = positionComponent1.dst(positionComponent2);
 
-                if (dst < 60) {
-                    if (moodComponent1.isEnemy(moodComponent2)) {
-                        if (moodComponent1.enemy == null) {
-                            moodComponent1.setEnemy(entity2);
-                        }
-                    }
+                if (dst < VISION_DISTANCE && !mapOrientationSystem.collides(positionComponent1, positionComponent2)) {
+                    visionComponent1.addVisibleEntity(entity2);
                 }
-                if (player == entity1) {
-                    // select visible enemies for player
-                    SpriteComponent spriteComponent = scm.get(entity2);
-                    if (spriteComponent.isVisible())
-                        playerEnemies.add(entity2);
-                }
-
-
-                if (moodComponent1.enemy == entity2)
-                    moodComponent2.setEnemy(entity1);
             }
-
-            if (moodComponent1.enemy != null && pm.get(entity1).getPosition().dst(pm.get(moodComponent1.enemy).getPosition()) > 200)
-                moodComponent1.setEnemy(null);
         }
-        if (playerEnemyTarget != null && !playerEnemies.contains(playerEnemyTarget))
-            playerEnemyTarget = null;
+
+        LinkedList<Entity> playerEnemies = vcm.get(player).getVisibleEntities();
+        MoodComponent moodComponent = mm.get(player);
+        if (moodComponent.hasEnemy() && !playerEnemies.contains(moodComponent.getEnemy()))
+            moodComponent.setEnemy(null);
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         Sprite sprite = enemyTarget;
+        VisionComponent visionComponent = vcm.get(player);
         MoodComponent moodComponent = mm.get(player);
+        Entity playerEnemyTarget = moodComponent.getEnemy();
         if (playerEnemyTarget != null) {
-            if (getEngine().getEntities().contains(playerEnemyTarget, true)) {
+            if (visionComponent.getVisibleEntities().contains(playerEnemyTarget)) {
                 Vector2 enemyPosition = pm.get(playerEnemyTarget).getPosition();
                 batch.draw(sprite, enemyPosition.x - sprite.getOriginX(), enemyPosition.y - sprite.getOriginY(), sprite.getOriginX(),
                         sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), enemyTarget.getRotation());
@@ -118,7 +118,7 @@ public class MoodSystem extends BaseSystem implements Drawable {
                 enemyTarget.rotate(-1.5f);
                 enemyTarget.draw(batch);
             } else {
-                moodComponent.enemy = null; // TODO here null?
+                moodComponent.setEnemy(null);
             }
         }
     }

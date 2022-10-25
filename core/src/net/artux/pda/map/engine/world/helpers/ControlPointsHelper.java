@@ -56,7 +56,7 @@ public class ControlPointsHelper {
 
             List<Entity> pointEntities = new LinkedList<>();
             for (int i = 0; i < spawn.getN(); i++) {
-                Entity entity = entityBuilder.spawnStalker(spawn, mobType,mobsTypes, userModel.getRelations(), targeting);
+                Entity entity = entityBuilder.spawnStalker(spawn, mobType, mobsTypes, targeting);
                 engine.addEntity(entity);
                 pointEntities.add(entity);
             }

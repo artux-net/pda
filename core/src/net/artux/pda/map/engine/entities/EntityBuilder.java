@@ -16,6 +16,7 @@ import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.RelationalSpriteComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
@@ -30,12 +31,9 @@ import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.model.MobType;
 import net.artux.pda.map.model.MobsTypes;
 import net.artux.pda.map.model.Spawn;
-import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pda.model.user.Gang;
-import net.artux.pda.model.user.GangRelation;
 import net.artux.pda.model.user.UserModel;
 
 import java.util.ArrayList;
@@ -119,14 +117,13 @@ public class EntityBuilder {
         return new Vector2(basePosition.x + x, basePosition.y + y);
     }
 
-    public Entity spawnStalker(Spawn spawn, MobType mobType, MobsTypes mobsTypes, GangRelation relations, TargetMovingComponent.Targeting targeting) {
+    public Entity spawnStalker(Spawn spawn, MobType mobType, MobsTypes mobsTypes, TargetMovingComponent.Targeting targeting) {
         Entity entity = new Entity();
 
-        ArmorModel armor = new ArmorModel();
         WeaponModel w = new WeaponModel();
         w.setSpeed(14);
         w.setDamage(2);
-        w.setPrecision(1);//todo here graph logic broke
+        w.setPrecision(10);
         w.setBulletQuantity(30);
 
         MoodComponent moodComponent = new MoodComponent(mobType.group, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]), spawn.isAngry());
@@ -141,18 +138,9 @@ public class EntityBuilder {
                 .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<>()))
                 .add(new WeaponComponent(w, this))
                 .add(new StatesComponent(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
-                .add(new TargetMovingComponent(targeting));
+                .add(new TargetMovingComponent(targeting))
+                .add(new RelationalSpriteComponent(8, 8));
 
-
-        Texture texture;
-        if (mobType.group < 0 || relations.getFor(Gang.ofId(mobType.group)) < -2)
-            texture = assetManager.get("red.png", Texture.class);
-        else if (relations.getFor(Gang.ofId(mobType.group)) > 2) //todo
-            texture = assetManager.get("green.png", Texture.class);
-        else
-            texture = assetManager.get("yellow.png", Texture.class);
-
-        entity.add(new SpriteComponent(texture, 8, 8));
         return entity;
     }
 
@@ -167,7 +155,7 @@ public class EntityBuilder {
 
         entity.add(new PositionComponent(position))
                 .add(new VisionComponent())
-                .add(new SpriteComponent(assetManager.get("red.png", Texture.class), 8, 8))
+                .add(new RelationalSpriteComponent(8, 8))
                 .add(new VelocityComponent())
                 .add(new HealthComponent())
                 .add(new GraphMotionComponent(null))

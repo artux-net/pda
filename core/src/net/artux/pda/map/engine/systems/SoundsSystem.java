@@ -2,6 +2,7 @@ package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
@@ -74,6 +75,11 @@ public class SoundsSystem extends BaseSystem {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
     }
 
 

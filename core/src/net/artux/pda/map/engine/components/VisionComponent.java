@@ -12,7 +12,7 @@ public class VisionComponent implements Component {
         visibleEntities = new LinkedList<>();
     }
 
-    public void addVisibleEntity(Entity entity){
+    public void addVisibleEntity(Entity entity) {
         visibleEntities.add(entity);
     }
 
@@ -20,7 +20,11 @@ public class VisionComponent implements Component {
         return visibleEntities;
     }
 
-    public void clear(){
+    public boolean isSeeing(Entity entity) {
+        return visibleEntities.contains(entity);
+    }
+
+    public void clear() {
         visibleEntities.clear();
     }
 }

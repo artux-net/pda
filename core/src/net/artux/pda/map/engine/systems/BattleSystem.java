@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -14,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.components.BulletComponent;
@@ -36,11 +36,14 @@ import java.util.Random;
 
 public class BattleSystem extends BaseSystem implements Disposable {
 
+    private ImmutableArray<Entity> bullets;
+
     private final PlatformInterface platformInterface;
+    private final EntityBuilder entityBuilder;
+    private final AssetManager assetManager;
+
     private SoundsSystem soundsSystem;
     private MapOrientationSystem mapOrientationSystem;
-    private MoodSystem moodSystem;
-    private AssetManager assetManager;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
@@ -54,8 +57,6 @@ public class BattleSystem extends BaseSystem implements Disposable {
     private boolean playerShoot = false;
 
     private Slot weaponSlot;
-    private EntityBuilder entityBuilder;
-    private Array<Entity> bullets;
 
     public BattleSystem(AssetManager assetManager, EntityBuilder entityBuilder, PlatformInterface platformInterface) {
         super(Family.all(HealthComponent.class, PositionComponent.class, WeaponComponent.class).get());
@@ -68,18 +69,15 @@ public class BattleSystem extends BaseSystem implements Disposable {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
 
-        bullets = listenEntities(Family.all(PositionComponent.class, VelocityComponent.class, BulletComponent.class).get());
+        bullets = engine.getEntitiesFor(Family.all(PositionComponent.class, VelocityComponent.class, BulletComponent.class).get());
 
         soundsSystem = engine.getSystem(SoundsSystem.class);
         mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
-        moodSystem = engine.getSystem(MoodSystem.class);
+
         InteractionSystem interactionSystem = engine.getSystem(InteractionSystem.class);
         interactionSystem.addButton("ui/icons/icon_shoot.png", new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                MoodComponent moodComponent = mm.get(player);
-                if (moodSystem.getPlayerEnemyTarget() != null)
-                    moodComponent.setEnemy(moodSystem.getPlayerEnemyTarget());
                 playerShoot = true;
                 return super.touchDown(event, x, y, pointer, button);
             }
@@ -138,7 +136,7 @@ public class BattleSystem extends BaseSystem implements Disposable {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        for (Entity entity : entities) {
+        for (Entity entity : getEntities()) {
             WeaponComponent entityWeapon = wm.get(entity);
             entityWeapon.update(deltaTime);
         }
@@ -157,8 +155,8 @@ public class BattleSystem extends BaseSystem implements Disposable {
             }
         }
 
-        for (int i = 0; i < entities.size; i++) {
-            Entity entity = entities.get(i);
+        for (int i = 0; i < getEntities().size(); i++) {
+            Entity entity = getEntities().get(i);
 
             PositionComponent entityPositionComponent = pm.get(entity);
             HealthComponent entityHealth = hm.get(entity);
@@ -197,18 +195,30 @@ public class BattleSystem extends BaseSystem implements Disposable {
                     moodComponent.setEnemy(null);
             }
 
-            for (Entity bullet : bullets.toArray()) {
+            for (Entity bullet : bullets) {
                 BulletComponent bulletComponent = bcm.get(bullet);
                 PositionComponent bulletPositionComponent = pm.get(bullet);
                 float dstToTarget = bulletPositionComponent.getPosition().dst(bulletComponent.getTarget());
-                if (position.epsilonEquals(bulletPositionComponent.getPosition(), 2f) && position.epsilonEquals(bulletComponent.getTarget(), 2f)) {
+                if (position.epsilonEquals(bulletPositionComponent.getPosition(), 4f) && position.epsilonEquals(bulletComponent.getTarget(), 4f)) {
                     entityHealth.damage(bulletComponent.getDamage());
+                    if (!moodComponent.hasEnemy()) {
+                        moodComponent.setEnemy(bulletComponent.getAuthor());
+                        MoodComponent playerMood = mm.get(player);
+                        if (bulletComponent.getAuthor() == player && !moodComponent.isEnemy(playerMood)) {
+                            playerMood.setRelation(moodComponent, -10);
+                        }
+                    }
                 } else if (dstToTarget > bulletComponent.getLastDstToTarget())
                     getEngine().removeEntity(bullet);
                 else
                     bulletComponent.setLastDstToTarget(dstToTarget);
             }
         }
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
     }
 
     public Vector2 getPointNear(PositionComponent positionComponent, float precision) {
@@ -265,7 +275,7 @@ public class BattleSystem extends BaseSystem implements Disposable {
 
     }
 */
-    private void shoot(Entity entity, WeaponComponent entityWeapon,  Vector2 targetPosition) {
+    private void shoot(Entity entity, WeaponComponent entityWeapon, Vector2 targetPosition) {
         getEngine().addEntity(entityBuilder.bullet(entity, targetPosition, entityWeapon.getSelected()));
         soundsSystem.playShoot(targetPosition);
     }

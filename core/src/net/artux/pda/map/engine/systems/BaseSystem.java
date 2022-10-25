@@ -2,69 +2,28 @@ package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntityListener;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.ashley.systems.IteratingSystem;
 
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 
-public class BaseSystem extends EntitySystem {
+public abstract class BaseSystem extends IteratingSystem {
 
-    protected Array<Entity> entities;
     protected Entity player;
-    private final Family family;
 
     public BaseSystem(Family family) {
-        this.family = family;
+        super(family);
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         player = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get()).first();
-        if (family != null) {
-            ImmutableArray<Entity> immutableArray = engine.getEntitiesFor(family);
-            entities = new Array<>();
-            for (Entity entity : immutableArray) {
-                entities.add(entity);
-            }
-
-
-            engine.addEntityListener(family, new EntityListener() {
-                @Override
-                public void entityAdded(Entity entity) {
-                    entities.add(entity);
-                }
-
-                @Override
-                public void entityRemoved(Entity entity) {
-                    entities.removeValue(entity, true);
-                }
-            });
-        }
     }
 
     protected boolean isPlayerActive() {
         return getEngine().getEntities().contains(player, true);
     }
 
-    public final Array<Entity> listenEntities(Family family) {
-        final Array<Entity> entities = new Array<Entity>(getEngine().getEntitiesFor(family).toArray(Entity.class));
-
-        getEngine().addEntityListener(family, new EntityListener() {
-            @Override
-            public void entityAdded(Entity entity) {
-                entities.add(entity);
-            }
-
-            @Override
-            public void entityRemoved(Entity entity) {
-                entities.removeValue(entity, true);
-            }
-        });
-        return entities;
-    }
 }

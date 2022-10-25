@@ -14,8 +14,8 @@ import net.artux.pda.map.engine.data.GlobalData;
 
 public class MovingSystem extends BaseSystem {
 
-    private final float MOVEMENT = 10f;
-    private final float RUN_MOVEMENT = 20f;
+    private final float MOVEMENT = 20f;
+    private final float RUN_MOVEMENT = 30f;
     private final float PLAYER_MULTIPLICATION = 6f;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
@@ -27,7 +27,7 @@ public class MovingSystem extends BaseSystem {
 
     public static boolean playerWalls = true;
     public static boolean speedup = true;
-    public static boolean alwaysRun = true;
+    public static boolean alwaysRun = false;
 
     public MovingSystem() {
         super(Family.all(VelocityComponent.class, PositionComponent.class).get());
@@ -55,8 +55,8 @@ public class MovingSystem extends BaseSystem {
                 velocityComponent.setRunning(true);
         }
 
-        for (int i = 0; i < entities.size; i++) {
-            Entity entity = entities.get(i);
+        for (int i = 0; i < getEntities().size(); i++) {
+            Entity entity = getEntities().get(i);
 
             PositionComponent positionComponent = pm.get(entity);
             VelocityComponent velocityComponent = vm.get(entity);
@@ -99,6 +99,11 @@ public class MovingSystem extends BaseSystem {
                 }
             }
         }
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
     }
 
     public boolean insideMap(float x, float y) {

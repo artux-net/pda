@@ -29,13 +29,13 @@ import net.artux.pda.map.engine.systems.InteractionSystem;
 import net.artux.pda.map.engine.systems.MapLoggerSystem;
 import net.artux.pda.map.engine.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.systems.MessagesSystem;
-import net.artux.pda.map.engine.systems.MoodSystem;
 import net.artux.pda.map.engine.systems.MovementTargetingSystem;
 import net.artux.pda.map.engine.systems.MovingSystem;
 import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.engine.systems.StatesSystem;
+import net.artux.pda.map.engine.systems.VisionSystem;
 import net.artux.pda.map.engine.systems.WorldSystem;
 import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
@@ -113,10 +113,10 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addSystem(new ArtifactSystem());
         engine.addSystem(new MapLoggerSystem());
         engine.addSystem(new RenderSystem(stage, assetsFinder));
-        engine.addSystem(new MoodSystem(assetsFinder.getManager()));
         engine.addSystem(new BattleSystem(assetsFinder.getManager(), entityBuilder, platformInterface));
         engine.addSystem(new StatesSystem());
         engine.addSystem(new MovementTargetingSystem());
+        engine.addSystem(new VisionSystem(assetsFinder.getManager()));
         engine.addSystem(new MovingSystem());
         engine.addSystem(new DeadCheckerSystem(playState.getUserInterface(), dataRepository, assetsFinder.getManager()));
 

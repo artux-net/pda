@@ -2,6 +2,8 @@ package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
@@ -34,7 +36,7 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     boolean specialZoom = false;
 
     public CameraSystem(Camera camera) {
-        super(null);
+        super(Family.all().get());
         this.camera = (OrthographicCamera) camera;
     }
 
@@ -93,6 +95,11 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
             }
             updateData();
         }
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
     }
 
     private void updateData() {

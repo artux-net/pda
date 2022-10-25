@@ -51,8 +51,8 @@ public class DeadCheckerSystem extends BaseSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
 
-        for (int i = 0; i < entities.size; i++) {
-            Entity entity = entities.get(i);
+        for (int i = 0; i < getEntities().size(); i++) {
+            Entity entity = getEntities().get(i);
 
             HealthComponent healthComponent = hm.get(entity);
             PositionComponent positionComponent = pm.get(entity);
@@ -125,6 +125,11 @@ public class DeadCheckerSystem extends BaseSystem {
                 deadMessage = true;
             }
         }
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
     }
 
 }

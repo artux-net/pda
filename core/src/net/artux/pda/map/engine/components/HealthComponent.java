@@ -12,6 +12,7 @@ public class HealthComponent implements Component {
 
     public HealthComponent() {
         value = 100;
+        stamina = 100;
     }
 
     public boolean isDead() {
