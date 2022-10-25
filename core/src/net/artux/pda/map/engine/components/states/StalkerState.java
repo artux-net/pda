@@ -1,13 +1,12 @@
 package net.artux.pda.map.engine.components.states;
 
 import static com.badlogic.gdx.math.MathUtils.random;
+import static net.artux.pda.map.engine.MessagingCodes.ATTACKED;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
-import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
@@ -19,7 +18,9 @@ import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.model.items.WeaponModel;
 
-public enum BotStatesAshley implements State<Entity>, Disposable {
+import java.util.TimerTask;
+
+public enum StalkerState implements State<Entity> {
 
     FIND_TARGET() {
         @Override
@@ -27,7 +28,12 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
             StatesComponent statesComponent = sm.get(entity);
             TargetMovingComponent targetMovingComponent = tmm.get(entity);
             gmm.get(entity).setMovementTarget(targetMovingComponent.targeting.getTarget());
-            statesComponent.stateMachine.changeState(MOVING);
+            statesComponent.changeState(MOVING);
+        }
+
+        @Override
+        public boolean onMessage(Entity entity, Telegram telegram) {
+            return false;
         }
     },
 
@@ -37,20 +43,25 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
             super.enter(entity);
             final StatesComponent statesComponent = sm.get(entity);
             vmm.get(entity).set(0, 0);
-            gmm.get(entity).setMovementTarget(null);
-            timer.scheduleTask(new Timer.Task() {
+            gmm.get(entity).disable();
+            timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    if (statesComponent.stateMachine.isInState(STANDING))
-                        statesComponent.stateMachine.changeState(FIND_TARGET);
+                    if (statesComponent.isInState(STANDING))
+                        statesComponent.changeState(FIND_TARGET);
                 }
-            }, (Math.abs(random.nextLong() % 30)));
+            }, 1000 * (Math.abs(random.nextLong() % 30)));
 
         }
 
         @Override
         public void update(Entity entity) {
 
+        }
+
+        @Override
+        public boolean onMessage(Entity entity, Telegram telegram) {
+            return false;
         }
     },
 
@@ -61,9 +72,14 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
             PositionComponent positionComponent = pm.get(entity);
             if (targetMovingComponent.isActive()) {
                 if (positionComponent.getPosition().dst(targetMovingComponent.movementTarget) < 3f) {
-                    sm.get(entity).stateMachine.changeState(STANDING);
+                    sm.get(entity).changeState(STANDING);
                 }
-            } else sm.get(entity).stateMachine.changeState(STANDING);
+            } else sm.get(entity).changeState(STANDING);
+        }
+
+        @Override
+        public boolean onMessage(Entity entity, Telegram telegram) {
+            return false;
         }
     },
 
@@ -81,12 +97,17 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
                     if (dst < distanceToAttack(weaponModel.getPrecision())
                             && visionComponent.isSeeing(enemy)) {
                         graphMotionComponent.setMovementTarget(null);
-                        statesComponent.stateMachine.changeState(SHOOT);
+                        statesComponent.changeState(SHOOT);
                     } else {
-                        graphMotionComponent.setMovementTarget(pm.get(enemy).getPosition());
+                        graphMotionComponent.setMovementTarget(pm.get(enemy));
                     }
                 }
             }
+        }
+
+        @Override
+        public boolean onMessage(Entity entity, Telegram telegram) {
+            return false;
         }
     },
 
@@ -104,12 +125,17 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
                     } else if (dst < 10) {
                         // отодвинутся от врага
                         //TODO
-                        //statesComponent.stateMachine.
+                        //statesComponent.
                     } else {
-                        statesComponent.stateMachine.changeState(MOVING_FOR_SHOOT);
+                        statesComponent.changeState(MOVING_FOR_SHOOT);
                     }
                 }
             }
+        }
+
+        @Override
+        public boolean onMessage(Entity entity, Telegram telegram) {
+            return false;
         }
     },
 
@@ -119,48 +145,65 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
         @Override
         public void enter(Entity entity) {
             super.enter(entity);
-            sm.get(entity).stateMachine.changeState(MOVING_FOR_SHOOT);
+            sm.get(entity).changeState(MOVING_FOR_SHOOT);
         }
 
         @Override
         public void update(Entity entity) {
-            if (mm.get(entity).getEnemy() == null || pm.get(entity).getPosition().dst(tmm.get(entity).getTargeting().getTarget()) > 200) {
+            MoodComponent moodComponent = mm.get(entity);
+            if (!mm.get(entity).hasEnemy() || pm.get(entity).dst(pm.get(moodComponent.getEnemy())) > 150) {
                 mm.get(entity).setEnemy(null);
-                sm.get(entity).stateMachine.changeGlobalState(GUARDING, true);
+                sm.get(entity).changeGlobalState(GUARDING, true);
             }
+        }
+
+        @Override
+        public boolean onMessage(Entity entity, Telegram telegram) {
+            return false;
         }
     },
 
     GUARDING() {
         //global
 
-
         @Override
         public void enter(Entity entity) {
             super.enter(entity);
-            sm.get(entity).stateMachine.changeState(STANDING);
+            sm.get(entity).changeState(STANDING);
         }
 
         @Override
         public void update(Entity entity) {
             MoodComponent moodComponent = mm.get(entity);
             if (moodComponent.hasEnemy()) {
-                sm.get(entity).stateMachine.changeGlobalState(ATTACKING, true);
+                sm.get(entity).getDispatcher().dispatchMessage(ATTACKED, moodComponent.enemy);
+                sm.get(entity).changeGlobalState(ATTACKING, true);
             } else {
                 VisionComponent visionComponent = visionMapper.get(entity);
                 for (Entity visibleEntity : visionComponent.getVisibleEntities()) {
                     MoodComponent enemyMood = mm.get(visibleEntity);
                     if (moodComponent.isEnemy(enemyMood)) {
                         moodComponent.setEnemy(visibleEntity);
-                        sm.get(entity).stateMachine.changeGlobalState(ATTACKING, true);
+                        sm.get(entity).getDispatcher().dispatchMessage(ATTACKED, moodComponent.enemy);
+                        sm.get(entity).changeGlobalState(ATTACKING, true);
                     }
                 }
             }
         }
+
+        @Override
+        public boolean onMessage(Entity entity, Telegram telegram) {
+            MoodComponent moodComponent = mm.get(entity);
+            if (telegram.message == ATTACKED && !moodComponent.hasEnemy()) {
+                moodComponent.setEnemy((Entity) telegram.extraInfo);
+                sm.get(entity).changeGlobalState(ATTACKING, true);
+            }
+            return true;
+        }
     };
 
     public float distanceToAttack(float precision) {
-        return precision * 20;
+        return precision * 3;
     }
 
     protected ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
@@ -172,7 +215,7 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
     protected ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
     protected ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
-    protected Timer timer = Timer.instance();
+    protected java.util.Timer timer = new java.util.Timer();
 
     @Override
     public void enter(Entity entity) {
@@ -184,15 +227,4 @@ public enum BotStatesAshley implements State<Entity>, Disposable {
 
     }
 
-    @Override
-    public boolean onMessage(Entity entity, Telegram telegram) {
-        if (telegram.message == 1) {
-            //entity.setEnemy((Entity) telegram.extraInfo);
-        }
-        return true;
-    }
-
-    @Override
-    public void dispose() {
-    }
 }

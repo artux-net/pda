@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 
-public class Spawn implements Serializable {
+public class SpawnModel implements Serializable {
 
     private int id;
     private int r;

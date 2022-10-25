@@ -15,6 +15,7 @@ import net.artux.pda.model.quest.*
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
 import net.artux.pda.repositories.SummaryRepository
+import net.artux.pda.repositories.UserRepository
 import net.artux.pdanetwork.model.CommandBlock
 import timber.log.Timber
 import java.util.*
@@ -22,6 +23,7 @@ import java.util.*
 @HiltViewModel
 class StoryViewModel @javax.inject.Inject constructor(
     var summaryRepository: SummaryRepository,
+    var userRepository: UserRepository,
     var repository: QuestRepository,
     var stageMapper: StageMapper,
     var mapper: StoryMapper,
@@ -53,7 +55,14 @@ class StoryViewModel @javax.inject.Inject constructor(
         viewModelScope.launch {
             repository.updateStories()
                 .map { mapper.stories(it) }
-                .onSuccess { stories.postValue(it) }
+                .onSuccess {
+                    val item = StoryItem()
+                    item.id = -1
+                    item.title = "Загрузка стадии на выбор"
+                    item.desc = ".."
+                    it.add(item)
+                    stories.postValue(it)
+                }
                 .onFailure { status.postValue(StatusModel(it)) }
         }
     }
@@ -236,7 +245,9 @@ class StoryViewModel @javax.inject.Inject constructor(
 
     fun resetData() {
         viewModelScope.launch {
+            userRepository.clearMemberCache()
             repository.clearCache()
+            userRepository.getMember()
             repository.resetData()
                 .map { mapper.dataModel(it) }
                 .onSuccess {

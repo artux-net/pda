@@ -8,10 +8,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.RandomPosition;
@@ -20,7 +18,6 @@ import net.artux.pda.map.engine.components.ArtifactComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.entities.EntityBuilder;
@@ -113,7 +110,7 @@ public class WorldSystem extends EntitySystem implements Disposable {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                TargetMovingComponent.Targeting targeting = new TargetMovingComponent.Targeting() {
+                /*TargetMovingComponent.Targeting targeting = new TargetMovingComponent.Targeting() {
                     @Override
                     public Vector2 getTarget() {
                         return mapOrientationSystem.getRandomFreePoint(cameraSystem.getCamera());
@@ -122,7 +119,8 @@ public class WorldSystem extends EntitySystem implements Disposable {
 
                 entityBuilder.randomStalker(targeting.getTarget(), targeting);
                 Gdx.app.log("WorldSystem", "New entity created.");
-                generateGroup();
+                generateGroup();*/
+                //todo
             }
         }, 1000 * random(40, 60));
     }

@@ -2,7 +2,7 @@ package net.artux.pda.map.model.input;
 
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.model.Spawn;
+import net.artux.pda.map.model.SpawnModel;
 
 import java.io.Serializable;
 import java.util.List;
@@ -17,7 +17,7 @@ public class GameMap implements Serializable {
     private String blurTexture;
     private String defPos;
     private List<Point> points;
-    private List<Spawn> spawns;
+    private List<SpawnModel> spawnModels;
 
     public void setTexture(String texture) {
         this.texture = texture;
@@ -43,8 +43,8 @@ public class GameMap implements Serializable {
         return points;
     }
 
-    public List<Spawn> getSpawns() {
-        return spawns;
+    public List<SpawnModel> getSpawns() {
+        return spawnModels;
     }
 
     public void setPlayerPos(String pos) {
@@ -111,7 +111,7 @@ public class GameMap implements Serializable {
         this.points = points;
     }
 
-    public void setSpawns(List<Spawn> spawns) {
-        this.spawns = spawns;
+    public void setSpawns(List<SpawnModel> spawnModels) {
+        this.spawnModels = spawnModels;
     }
 }

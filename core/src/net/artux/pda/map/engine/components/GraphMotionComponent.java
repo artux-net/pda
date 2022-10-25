@@ -34,9 +34,7 @@ public class GraphMotionComponent implements Component {
 
     public void disable() {
         movementTarget = null;
-        path.clear();
-        tempTarget = null;
-        iterator = null;
+        reset();
     }
 
     public void reset() {

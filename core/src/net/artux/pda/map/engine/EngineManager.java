@@ -75,7 +75,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
                 playerComponent.gdxData = dataModel;
                 weaponComponent.updateData(dataModel);
                 engine.getSystem(PlayerSystem.class).updateData(dataModel);
-                engine.getSystem(PlayerSystem.class).savePreferences();
+                //engine.getSystem(PlayerSystem.class).savePreferences();
             }
         }
     };

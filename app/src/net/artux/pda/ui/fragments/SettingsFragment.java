@@ -152,9 +152,8 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
                     binding.debugMember.setVisibility(View.VISIBLE);
                 break;
             case R.id.resetData:
-                storyViewModel.resetData();
-                storyViewModel.clear();
                 clearSharedPreferences(requireContext().getApplicationContext());
+                storyViewModel.resetData();
                 break;
             case R.id.mapCacheResetButton:
                 if (cacheDirectory.delete()) {

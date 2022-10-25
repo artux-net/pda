@@ -9,34 +9,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.artux.pda.R;
 import net.artux.pda.model.quest.StoryItem;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class StoriesAdapter extends RecyclerView.Adapter<StoryHolder> {
 
-    private List<StoryItem> stories = new ArrayList<>();
+    private List<StoryItem> stories = new LinkedList<>();
     private final OnStoryClickListener listener;
 
-    public StoriesAdapter( OnStoryClickListener listener) {
+    public StoriesAdapter(OnStoryClickListener listener) {
         this.listener = listener;
     }
 
     public void setStories(List<StoryItem> stories) {
         this.stories = stories;
-        StoryItem item = new StoryItem();
-        item.setId(-1);
-        item.setTitle("Загрузка стадии на выбор");
-        item.setDesc("..");
-
-        this.stories.add(item);
-
         notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public StoryHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new StoryHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_story,  parent, false), listener);
+        return new StoryHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_story, parent, false), listener);
     }
 
     @Override

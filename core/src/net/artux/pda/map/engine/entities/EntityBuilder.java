@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -17,6 +18,7 @@ import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.RelationalSpriteComponent;
+import net.artux.pda.map.engine.components.SpawnComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
@@ -26,11 +28,8 @@ import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.player.UserVelocityInput;
-import net.artux.pda.map.engine.components.states.BotStatesAshley;
 import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.model.MobType;
-import net.artux.pda.map.model.MobsTypes;
-import net.artux.pda.map.model.Spawn;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
@@ -46,11 +45,13 @@ public class EntityBuilder {
     private final ContentGenerator contentGenerator;
     private final Texture bulletTexture;
     private final Engine engine;
+    private final MessageManager messageManager;
 
     public EntityBuilder(AssetManager assetManager, Engine engine) {
         this.assetManager = assetManager;
         this.engine = engine;
         this.contentGenerator = new ContentGenerator();
+        this.messageManager = MessageManager.getInstance();
         bulletTexture = assetManager.get("bullet.png", Texture.class);
     }
 
@@ -117,7 +118,7 @@ public class EntityBuilder {
         return new Vector2(basePosition.x + x, basePosition.y + y);
     }
 
-    public Entity spawnStalker(Spawn spawn, MobType mobType, MobsTypes mobsTypes, TargetMovingComponent.Targeting targeting) {
+    public Entity spawnStalker(SpawnComponent spawnComponent, MobType mobType) {
         Entity entity = new Entity();
 
         WeaponModel w = new WeaponModel();
@@ -126,10 +127,10 @@ public class EntityBuilder {
         w.setPrecision(10);
         w.setBulletQuantity(30);
 
-        MoodComponent moodComponent = new MoodComponent(mobType.group, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]), spawn.isAngry());
-        moodComponent.ignorePlayer = spawn.isIgnorePlayer();
+        MoodComponent moodComponent = new MoodComponent(mobType.group, spawnComponent.getRelations(), spawnComponent.getSpawnModel().isAngry());
+        moodComponent.ignorePlayer = spawnComponent.getSpawnModel().isIgnorePlayer();
 
-        entity.add(new PositionComponent(targeting.getTarget()))
+        entity.add(new PositionComponent(spawnComponent.getTargeting().getTarget()))
                 .add(new VelocityComponent())
                 .add(new HealthComponent())
                 .add(new VisionComponent())
@@ -137,8 +138,8 @@ public class EntityBuilder {
                 .add(new GraphMotionComponent(null))
                 .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<>()))
                 .add(new WeaponComponent(w, this))
-                .add(new StatesComponent(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
-                .add(new TargetMovingComponent(targeting))
+                .add(new StatesComponent(entity, spawnComponent.getDispatcher()))
+                .add(new TargetMovingComponent(spawnComponent.getTargeting()))
                 .add(new RelationalSpriteComponent(8, 8));
 
         return entity;
@@ -161,7 +162,7 @@ public class EntityBuilder {
                 .add(new GraphMotionComponent(null))
                 .add(new WeaponComponent(w, this))
                 .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
-                .add(new StatesComponent(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
+                .add(new StatesComponent(entity, null))
                 .add(new MoodComponent(-1, null, true))
                 .add(new TargetMovingComponent(targeting));
         Gdx.app.log("WorldSystem", "New entity created.");

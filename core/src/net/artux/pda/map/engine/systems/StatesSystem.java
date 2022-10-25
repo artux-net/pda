@@ -13,6 +13,8 @@ public class StatesSystem extends IteratingSystem {
 
     private ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
 
+    private final MessageManager messageManager = MessageManager.getInstance();
+
     public StatesSystem() {
         super(Family.all(StatesComponent.class).get());
     }
@@ -20,16 +22,22 @@ public class StatesSystem extends IteratingSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
+
         for (int i = 0; i < getEntities().size(); i++) {
             Entity entity = getEntities().get(i);
-            sm.get(entity).stateMachine.getCurrentState().enter(entity);
+            sm.get(entity).getCurrentState().enter(entity);
         }
     }
 
     @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+        messageManager.update();
+    }
+
+    @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        sm.get(entity).stateMachine.update();
-        MessageManager.getInstance().update();
+        sm.get(entity).update();
     }
 
 }
