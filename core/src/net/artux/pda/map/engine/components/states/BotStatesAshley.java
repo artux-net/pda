@@ -1,0 +1,196 @@
+package net.artux.pda.map.engine.components.states;
+
+import static com.badlogic.gdx.math.MathUtils.random;
+
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.ai.fsm.State;
+import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Timer;
+
+import net.artux.pda.map.engine.components.BodyComponent;
+import net.artux.pda.map.engine.components.GraphMotionComponent;
+import net.artux.pda.map.engine.components.MoodComponent;
+import net.artux.pda.map.engine.components.StatesComponent;
+import net.artux.pda.map.engine.components.TargetMovingComponent;
+import net.artux.pda.map.engine.components.VisionComponent;
+import net.artux.pda.map.engine.components.WeaponComponent;
+import net.artux.pda.model.items.WeaponModel;
+
+public enum BotStatesAshley implements State<Entity>, Disposable {
+
+    FIND_TARGET() {
+        @Override
+        public void update(Entity entity) {
+            StatesComponent statesComponent = sm.get(entity);
+            TargetMovingComponent targetMovingComponent = tmm.get(entity);
+            gmm.get(entity).setMovementTarget(targetMovingComponent.targeting.getTarget());
+            statesComponent.stateMachine.changeState(MOVING);
+        }
+    },
+
+    STANDING() {
+        @Override
+        public void enter(final Entity entity) {
+            super.enter(entity);
+            final StatesComponent statesComponent = sm.get(entity);
+            gmm.get(entity).setMovementTarget(null);
+            timer.scheduleTask(new Timer.Task() {
+                @Override
+                public void run() {
+                    if (statesComponent.stateMachine.isInState(STANDING))
+                        statesComponent.stateMachine.changeState(FIND_TARGET);
+                }
+            }, (Math.abs(random.nextLong() % 30)));
+
+        }
+
+        @Override
+        public void update(Entity entity) {
+
+        }
+    },
+
+    MOVING() {
+        @Override
+        public void update(Entity entity) {
+            GraphMotionComponent targetMovingComponent = gmm.get(entity);
+            Vector2 positionComponent = pm.get(entity).getBody().getPosition();
+            if (targetMovingComponent.isActive()) {
+                if (positionComponent.dst(targetMovingComponent.movementTarget) < 3f) {
+                    sm.get(entity).stateMachine.changeState(STANDING);
+                }
+            } else sm.get(entity).stateMachine.changeState(STANDING);
+        }
+    },
+
+    MOVING_FOR_SHOOT() {
+        @Override
+        public void update(Entity entity) {
+            StatesComponent statesComponent = sm.get(entity);
+            GraphMotionComponent graphMotionComponent = gmm.get(entity);
+            VisionComponent visionComponent = visionMapper.get(entity);
+            if (mm.get(entity).getEnemy() != null) {
+                Entity enemy = mm.get(entity).getEnemy();
+                if (wm.get(entity).getSelected() != null) {
+                    WeaponModel weaponModel = wm.get(entity).getSelected();
+                    float dst = pm.get(enemy).getBody().getPosition().dst(pm.get(entity).body.getPosition());
+                    if (dst < distanceToAttack(weaponModel.getPrecision())
+                            && visionComponent.isSeeing(enemy)) {
+                        graphMotionComponent.setMovementTarget(null);
+                        statesComponent.stateMachine.changeState(SHOOT);
+                    } else {
+                        graphMotionComponent.setMovementTarget(pm.get(enemy).getBody().getPosition());
+                    }
+                }
+            }
+        }
+    },
+
+    SHOOT() {
+        @Override
+        public void update(Entity entity) {
+            StatesComponent statesComponent = sm.get(entity);
+            if (mm.get(entity).getEnemy() != null) {
+                Entity enemy = mm.get(entity).getEnemy();
+                if (wm.get(entity).getSelected() != null) {
+                    WeaponModel weaponModel = wm.get(entity).getSelected();
+                    float dst = pm.get(enemy).getBody().getPosition().dst(pm.get(entity).getBody().getPosition());
+                    if (dst < distanceToAttack(weaponModel.getPrecision())) {
+                        //shoot
+                    } else if (dst < 10) {
+                        // отодвинутся от врага
+                        //TODO
+                        //statesComponent.stateMachine.
+                    } else {
+                        statesComponent.stateMachine.changeState(MOVING_FOR_SHOOT);
+                    }
+                }
+            }
+        }
+    },
+
+    ATTACKING() {
+        //global
+
+        @Override
+        public void enter(Entity entity) {
+            super.enter(entity);
+            sm.get(entity).stateMachine.changeState(MOVING_FOR_SHOOT);
+        }
+
+        @Override
+        public void update(Entity entity) {
+            if (mm.get(entity).getEnemy() == null || pm.get(entity).getBody().getPosition().dst(tmm.get(entity).getTargeting().getTarget()) > 200) {
+                mm.get(entity).setEnemy(null);
+                sm.get(entity).stateMachine.changeGlobalState(GUARDING, true);
+            }
+        }
+    },
+
+    GUARDING() {
+        //global
+
+
+        @Override
+        public void enter(Entity entity) {
+            super.enter(entity);
+            sm.get(entity).stateMachine.changeState(STANDING);
+        }
+
+        @Override
+        public void update(Entity entity) {
+            MoodComponent moodComponent = mm.get(entity);
+            if (moodComponent.hasEnemy()) {
+                sm.get(entity).stateMachine.changeGlobalState(ATTACKING, true);
+            } else {
+                VisionComponent visionComponent = visionMapper.get(entity);
+                for (Entity visibleEntity : visionComponent.getVisibleEntities()) {
+                    MoodComponent enemyMood = mm.get(visibleEntity);
+                    if (moodComponent.isEnemy(enemyMood)) {
+                        moodComponent.setEnemy(visibleEntity);
+                        sm.get(entity).stateMachine.changeGlobalState(ATTACKING, true);
+                    }
+                }
+            }
+        }
+    };
+
+    public float distanceToAttack(float precision) {
+        return precision * 20;
+    }
+
+    protected ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
+    protected ComponentMapper<VisionComponent> visionMapper = ComponentMapper.getFor(VisionComponent.class);
+    protected ComponentMapper<TargetMovingComponent> tmm = ComponentMapper.getFor(TargetMovingComponent.class);
+    protected ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
+    protected ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    protected ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    protected ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
+
+    protected Timer timer = Timer.instance();
+
+    @Override
+    public void enter(Entity entity) {
+    }
+
+
+    @Override
+    public void exit(Entity entity) {
+
+    }
+
+    @Override
+    public boolean onMessage(Entity entity, Telegram telegram) {
+        if (telegram.message == 1) {
+            //entity.setEnemy((Entity) telegram.extraInfo);
+        }
+        return true;
+    }
+
+    @Override
+    public void dispose() {
+    }
+}

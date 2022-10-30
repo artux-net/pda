@@ -16,23 +16,16 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Timer;
 
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
-import net.artux.pda.map.engine.components.FogOfWarComponent;
+import net.artux.pda.map.engine.components.BodyComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
-import net.artux.pda.map.engine.components.PassivityComponent;
-import net.artux.pda.map.engine.components.Position;
+import net.artux.pda.map.engine.components.RelationalSpriteComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.entities.RelationType;
 
 import java.util.HashMap;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
-@PerGameMap
 public class RenderSystem extends BaseSystem implements Drawable {
 
     private Stage stage;
@@ -40,9 +33,9 @@ public class RenderSystem extends BaseSystem implements Drawable {
     private BitmapFont font;
     private Label.LabelStyle labelStyle;
 
-    private ComponentMapper<FogOfWarComponent> fog = ComponentMapper.getFor(FogOfWarComponent.class);
+    private ComponentMapper<RelationalSpriteComponent> rsm = ComponentMapper.getFor(RelationalSpriteComponent.class);
     private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
     private ImmutableArray<Entity> relationalEntities;
@@ -50,9 +43,8 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
     public static boolean showAll = false;
 
-    @Inject
-    public RenderSystem(@Named("gameStage") Stage stage, AssetsFinder assetsFinder) {
-        super(Family.all(SpriteComponent.class, Position.class).exclude(PassivityComponent.class).get());
+    public RenderSystem(Stage stage, AssetsFinder assetsFinder) {
+        super(Family.all(SpriteComponent.class, BodyComponent.class).get());
         this.stage = stage;
 
         font = assetsFinder.getFontManager().getFont(16);
@@ -78,7 +70,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        relationalEntities = engine.getEntitiesFor(Family.all(MoodComponent.class, Position.class).exclude(SpriteComponent.class).get());
+        relationalEntities = engine.getEntitiesFor(Family.all(RelationalSpriteComponent.class, MoodComponent.class, BodyComponent.class).get());
     }
 
     public void showText(String text, float x, float y) {
@@ -88,13 +80,18 @@ public class RenderSystem extends BaseSystem implements Drawable {
             label.setOrigin(Align.center);
             label.setPosition(x, y);
             stage.addActor(label);
-            Timer.schedule(new Timer.Task() {
+            new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    if (stage.getActors().contains(label, true))
-                        label.remove();
+                    try {
+                        Thread.sleep(5000);
+                        if (stage.getActors().contains(label, true))
+                            label.remove();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }, 5);
+            }).start();
         }
     }
 
@@ -107,6 +104,10 @@ public class RenderSystem extends BaseSystem implements Drawable {
         return false;
     }
 
+    public void showText(String text, int x, int y, int offsetX, int offsetY) {
+        showText(text, x + offsetX, y + offsetY);
+    }
+
     public void showText(String text, Vector2 position) {
         showText(text, position.x, position.y);
     }
@@ -114,35 +115,34 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        ImmutableArray<Entity> entities = getEntities();
-        for (int i = 0; i < entities.size(); i++) {
-            Entity entity = entities.get(i);
-            Position position = pm.get(entity);
+
+        for (int i = 0; i < getEntities().size(); i++) {
+            Entity entity = getEntities().get(i);
+            Vector2 positionComponent = pm.get(entity).getBody().getPosition();
             SpriteComponent spriteComponent = sm.get(entity);
             Sprite sprite = spriteComponent.sprite;
-            if (!showAll && fog.has(entity)) {
-                sprite.setAlpha(fog.get(entity).visionCoefficient);
+            if (!showAll)
                 batch.setColor(sprite.getColor());
-            }
 
-            batch.draw(sprite, position.getX() - sprite.getOriginX(), position.getY() - sprite.getOriginY(), sprite.getOriginX(),
+            batch.draw(sprite, positionComponent.x - sprite.getOriginX(), positionComponent.y - sprite.getOriginY(), sprite.getOriginX(),
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), spriteComponent.getRotation());
             batch.setColor(Color.WHITE);
         }
 
         for (int i = 0; i < relationalEntities.size(); i++) {
             Entity entity = relationalEntities.get(i);
-            Position position = pm.get(entity);
+            Vector2 positionComponent = pm.get(entity).getBody().getPosition();
 
-            MoodComponent moodComponent = mm.get(getPlayer());
+            MoodComponent moodComponent = mm.get(player);
             MoodComponent entityMoodComponent = mm.get(entity);
 
             Sprite sprite = relationalSprites.get(RelationType.by(moodComponent.getRelation(entityMoodComponent)));
-            if (!showAll && fog.has(entity)) {
-                sprite.setAlpha(fog.get(entity).visionCoefficient);
+            RelationalSpriteComponent relationalSpriteComponent = rsm.get(entity);
+            sprite.setAlpha(relationalSpriteComponent.getAlpha());
+            if (!showAll)
                 batch.setColor(sprite.getColor());
-            }
-            batch.draw(sprite, position.getX() - sprite.getOriginX(), position.getY() - sprite.getOriginY(), sprite.getOriginX(),
+
+            batch.draw(sprite, positionComponent.x - sprite.getOriginX(), positionComponent.y - sprite.getOriginY(), sprite.getOriginX(),
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), 0);
             batch.setColor(Color.WHITE);
         }

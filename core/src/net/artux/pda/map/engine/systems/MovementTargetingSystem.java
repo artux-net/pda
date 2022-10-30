@@ -8,41 +8,37 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.components.BodyComponent;
 import net.artux.pda.map.engine.components.GraphMotionComponent;
-import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 
-import javax.inject.Inject;
-
-@PerGameMap
 public class MovementTargetingSystem extends IteratingSystem {
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
 
-    private TiledManhattanDistance<FlatTiledNode> heuristic;
-    private IndexedAStarPathFinder<FlatTiledNode> pathFinder;
-    private PathSmoother<FlatTiledNode, Vector2> pathSmoother;
+    TiledManhattanDistance<FlatTiledNode> heuristic;
+    IndexedAStarPathFinder<FlatTiledNode> pathFinder;
+    PathSmoother<FlatTiledNode, Vector2> pathSmoother;
     MapOrientationSystem mapOrientationSystem;
 
-    @Inject
-    public MovementTargetingSystem(MapOrientationSystem mapOrientationSystem) {
-        super(Family.all(VelocityComponent.class, Position.class, GraphMotionComponent.class).get());
-        this.mapOrientationSystem = mapOrientationSystem;
+    public MovementTargetingSystem() {
+        super(Family.all(BodyComponent.class, GraphMotionComponent.class).get());
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
+        mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
 
-        heuristic = mapOrientationSystem.getHeuristic();
-        pathFinder = mapOrientationSystem.getPathFinder();
-        pathSmoother = mapOrientationSystem.getPathSmoother();
+        heuristic = mapOrientationSystem.heuristic;
+        pathFinder = mapOrientationSystem.pathFinder;
+        pathSmoother = mapOrientationSystem.pathSmoother;
     }
 
     @Override
@@ -51,8 +47,7 @@ public class MovementTargetingSystem extends IteratingSystem {
         for (int i = 0; i < getEntities().size(); i++) {
             Entity entity = getEntities().get(i);
 
-            Position position = pm.get(entity);
-            VelocityComponent velocityComponent = vm.get(entity);
+            Vector2 positionComponent = pm.get(entity).getBody().getPosition();
             GraphMotionComponent targetMovingComponent = gmm.get(entity);
 
             if (targetMovingComponent.isActive()) {
@@ -60,7 +55,7 @@ public class MovementTargetingSystem extends IteratingSystem {
                 Vector2 target = targetMovingComponent.movementTarget;
 
                 if (mapOrientationSystem.isGraphActive()) {
-                    FlatTiledNode startNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(position.getX(), position.getY());
+                    FlatTiledNode startNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(positionComponent.x, positionComponent.y);
                     FlatTiledNode endNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(targetMovingComponent.movementTarget.x, targetMovingComponent.movementTarget.y);
                     if (targetMovingComponent.getPath().nodes.size == 0 || !targetMovingComponent.getPath().nodes.peek().equals(endNode)) {
                         //пути нет и конец не совпадает
@@ -76,7 +71,7 @@ public class MovementTargetingSystem extends IteratingSystem {
                         if (targetMovingComponent.iterator == null)
                             targetMovingComponent.iterator = targetMovingComponent.getPath().iterator();
                         if (targetMovingComponent.tempTarget == null
-                                || position.getPosition().dst(
+                                || positionComponent.dst(
                                 new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY)) < 5) {
                             if (targetMovingComponent.iterator.hasNext()) {
                                 targetMovingComponent.tempTarget = targetMovingComponent.iterator.next();
@@ -93,11 +88,13 @@ public class MovementTargetingSystem extends IteratingSystem {
                     }
                 }
 
-                Vector2 unit = new Vector2(target.x - position.getX(),
-                        target.y - position.getY());
+                Vector2 unit = new Vector2(target.x - positionComponent.x,
+                        target.y - positionComponent.y);
 
                 unit.scl(1 / unit.len());
-                velocityComponent.setVelocity(unit);
+                Body body = pm.get(entity).getBody();
+                unit.scl(200);
+                body.applyLinearImpulse(unit, body.getPosition(), true);
             }
         }
     }

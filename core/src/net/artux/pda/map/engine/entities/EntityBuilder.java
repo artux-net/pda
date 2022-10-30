@@ -3,84 +3,114 @@ package net.artux.pda.map.engine.entities;
 import static com.badlogic.gdx.math.MathUtils.random;
 
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
 
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ContentGenerator;
-import net.artux.pda.map.engine.MessagingCodes;
+import net.artux.pda.map.engine.components.BodyComponent;
 import net.artux.pda.map.engine.components.BulletComponent;
-import net.artux.pda.map.engine.components.FogOfWarComponent;
 import net.artux.pda.map.engine.components.GraphMotionComponent;
-import net.artux.pda.map.engine.components.GroupComponent;
-import net.artux.pda.map.engine.components.GroupTargetMovingComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
-import net.artux.pda.map.engine.components.Position;
+import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.RelationalSpriteComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
+import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
-import net.artux.pda.map.engine.components.states.StalkerState;
-import net.artux.pda.model.items.ItemType;
+import net.artux.pda.map.engine.components.player.UserVelocityInput;
+import net.artux.pda.map.engine.components.states.BotStatesAshley;
+import net.artux.pda.map.engine.systems.SoundsSystem;
+import net.artux.pda.map.model.MobType;
+import net.artux.pda.map.model.MobsTypes;
+import net.artux.pda.map.model.Spawn;
+import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
 import java.util.ArrayList;
 
-import javax.inject.Inject;
-
-@PerGameMap
 public class EntityBuilder {
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 
     private final AssetManager assetManager;
     private final ContentGenerator contentGenerator;
     private final Texture bulletTexture;
+    private final Engine engine;
+    private final World world;
 
-    @Inject
-    public EntityBuilder(AssetManager assetManager) {
+    public EntityBuilder(AssetManager assetManager, Engine engine, World world) {
         this.assetManager = assetManager;
+        this.engine = engine;
+        this.world = world;
         this.contentGenerator = new ContentGenerator();
-
         bulletTexture = assetManager.get("bullet.png", Texture.class);
     }
 
     public Entity player(Vector2 position, StoryDataModel gdxData, UserModel userModel) {
-        return new Entity()
-                .add(new Position(position))
-                .add(new VelocityComponent())
-                .add(new VisionComponent())
+        Entity player = new Entity();
+
+        player.add(new VisionComponent())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
-                .add(new WeaponComponent(gdxData, assetManager))
+                .add(new WeaponComponent(gdxData, this))
                 .add(new MoodComponent(userModel))
                 .add(new HealthComponent())
+                .add(new BodyComponent(() -> {
+                    BodyDef bodyDef = new BodyDef();
+                    bodyDef.type = BodyDef.BodyType.DynamicBody;
+                    bodyDef.position.set(position);
+
+                    Body body = world.createBody(bodyDef);
+                    body.setLinearDamping(10);
+                    CircleShape circle = new CircleShape();
+                    circle.setRadius(6f);
+
+                    FixtureDef fixtureDef = new FixtureDef();
+                    fixtureDef.shape = circle;
+                    fixtureDef.density = 0.5f;
+                    fixtureDef.friction = 0;
+
+                    body.createFixture(fixtureDef);
+
+                    circle.dispose();
+                    return body;
+                }))
+                .add(new UserVelocityInput())
                 .add(new PlayerComponent(userModel, gdxData));
+        return player;
     }
 
-    public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {
-        Position position = pm.get(author);
-        Vector2 targetPosition = pm.get(target);
-        targetPosition = getPointNear(targetPosition.cpy(), weaponModel.getPrecision());
+    public Entity bullet(Entity author, Vector2 targetPosition, WeaponModel weaponModel) {
+        PositionComponent position = pm.get(author);
+
+        Entity player = new Entity();
+
+        targetPosition = getPointNear(targetPosition, weaponModel.getPrecision());
 
         float targetX = targetPosition.x;
         float targetY = targetPosition.y;
-
         float vX = (float) ((targetX - position.x) /
                 Math.sqrt(((targetX - position.x) * (targetX - position.x)) + ((targetY - position.y) * (targetY - position.y))));
         float vY = (float) ((targetY - position.y) /
                 Math.sqrt(((targetY - position.y) * (targetY - position.y)) + ((targetX - position.x) * (targetX - position.x))));
 
-        vX *= weaponModel.getSpeed();
-        vY *= weaponModel.getSpeed();
+        vX *= weaponModel.getSpeed() * 2;
+        vY *= weaponModel.getSpeed() * 2;
 
         Vector2 direction = targetPosition.cpy().sub(position);
         float degrees = (float) (Math.atan2(
@@ -91,12 +121,16 @@ public class EntityBuilder {
         SpriteComponent spriteComponent = new SpriteComponent(bulletTexture, 15, 2);
         spriteComponent.setRotation(degrees + 90);
 
-        return new Entity()
-                .add(new Position(position))
-                .add(new VelocityComponent(vX, vY, true))
+        player.add(new PositionComponent(position))
+                .add(new VelocityComponent(vX, vY))
                 .add(spriteComponent)
-                .add(new FogOfWarComponent())
-                .add(new BulletComponent(author, target, targetPosition, weaponModel.getDamage()));
+                .add(new BulletComponent(author, targetPosition, weaponModel.getDamage()));
+        return player;
+    }
+
+    public void addBulletToEngine(Entity entity, Vector2 targetPosition, WeaponModel weaponModel) {
+        engine.addEntity(bullet(entity, targetPosition, weaponModel));
+        engine.getSystem(SoundsSystem.class).playShoot(targetPosition);
     }
 
     public Vector2 getPointNear(Vector2 basePosition, float precision) {
@@ -109,53 +143,61 @@ public class EntityBuilder {
         return new Vector2(basePosition.x + x, basePosition.y + y);
     }
 
-
-    public Entity spawnStalker(Vector2 position, GroupComponent group) {
+    public Entity spawnStalker(Spawn spawn, MobType mobType, MobsTypes mobsTypes, TargetMovingComponent.Targeting targeting) {
         Entity entity = new Entity();
 
         WeaponModel w = new WeaponModel();
-        w.setType(ItemType.RIFLE);
-        w.setSpeed(random(5, 10));
-        w.setDamage(random(3, 5));
-        w.setPrecision(random(15, 25));
+        w.setSpeed(14);
+        w.setDamage(2);
+        w.setPrecision(10);
         w.setBulletQuantity(30);
 
-        HealthComponent healthComponent = new HealthComponent();
-        healthComponent.setImmortal(group.getParams().contains("immortal"));
+        MoodComponent moodComponent = new MoodComponent(mobType.group, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]), spawn.isAngry());
+        moodComponent.ignorePlayer = spawn.isIgnorePlayer();
 
-        StatesComponent statesComponent = new StatesComponent(entity, group.getDispatcher(), StalkerState.INITIAL, StalkerState.GUARDING);
-        group.getDispatcher().addListener(statesComponent, MessagingCodes.ATTACKED);
-
-        entity
-                .add(new Position(position))
-                .add(new GraphMotionComponent(null))
-                .add(new VelocityComponent())
+        entity.add(new HealthComponent())
                 .add(new VisionComponent())
-                .add(healthComponent)
-                .add(group)
-                .add(group.getMood())
+                .add(moodComponent)
+                .add(new BodyComponent(() -> {
+                    BodyDef bodyDef = new BodyDef();
+                    bodyDef.type = BodyDef.BodyType.DynamicBody;
+                    bodyDef.position.set(targeting.getTarget());
+
+                    Body body = world.createBody(bodyDef);
+                    body.setLinearDamping(20f);
+                    CircleShape circle = new CircleShape();
+                    circle.setRadius(4f);
+
+                    FixtureDef fixtureDef = new FixtureDef();
+                    fixtureDef.shape = circle;
+                    fixtureDef.density = 0.5f;
+                    fixtureDef.friction = 0;
+
+                    body.createFixture(fixtureDef);
+
+                    circle.dispose();
+                    return body;
+                }))
+                .add(new GraphMotionComponent(null))
                 .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<>()))
-                .add(new WeaponComponent(w, assetManager))
-                .add(statesComponent)
-                .add(new GroupTargetMovingComponent(group))
-                .add(new FogOfWarComponent());
+                .add(new WeaponComponent(w, this))
+                .add(new StatesComponent(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
+                .add(new TargetMovingComponent(targeting))
+                .add(new RelationalSpriteComponent(8, 8));
 
         return entity;
     }
 
-    public Entity randomStalker(GroupTargetMovingComponent.Targeting targeting) {
+    public Entity randomStalker(Vector2 position, TargetMovingComponent.Targeting targeting) {
         Entity entity = new Entity();
-/*
 
         WeaponModel w = new WeaponModel();
-        w.setSpeed(random(5, 10));
-        w.setDamage(random(3, 5));
-        w.setPrecision(random(15, 25));
-        w.setBulletQuantity(30);
+        w.setSpeed(30);
+        w.setDamage(1);
+        w.setPrecision(10);
+        w.setBulletQuantity(15);
 
-        StatesComponent statesComponent = new StatesComponent(entity, null, StalkerState.INITIAL, StalkerState.GUARDING);
-
-        entity.add(new PositionComponent(targeting.getTarget()))
+        entity.add(new PositionComponent(position))
                 .add(new VisionComponent())
                 .add(new RelationalSpriteComponent(8, 8))
                 .add(new VelocityComponent())
@@ -163,14 +205,12 @@ public class EntityBuilder {
                 .add(new GraphMotionComponent(null))
                 .add(new WeaponComponent(w, this))
                 .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
-                .add(statesComponent)
-                .add(new MoodComponent(-1, null, Collections.singleton("angry")))
-                .add(new GroupTargetMovingComponent(targeting));
-*/
-
+                .add(new StatesComponent(entity, BotStatesAshley.STANDING, BotStatesAshley.GUARDING))
+                .add(new MoodComponent(-1, null, true))
+                .add(new TargetMovingComponent(targeting));
         Gdx.app.log("WorldSystem", "New entity created.");
         return entity;
-    }
 
+    }
 
 }
