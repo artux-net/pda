@@ -181,7 +181,7 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     }
 
     public int getDistance() {
-        if (getEntities() != null) {
+        if (getEntities() != null && getEntities().size() > 0) {
             return (int) (getPosition().dst(pm.get(getEntities().first()).getPosition()) / pixelsPerMeter);//TODO select target
         } else return -1;
     }
