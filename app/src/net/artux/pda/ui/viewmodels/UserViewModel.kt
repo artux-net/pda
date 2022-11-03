@@ -59,7 +59,7 @@ class UserViewModel @Inject constructor(
     }
 
     fun getId(): UUID {
-        return userRepository.getCachedMember().getOrThrow().id!!
+        return userRepository.getCachedMember().map { it.id }.getOrDefault(UUID.randomUUID())
     }
 
     fun signOut() {

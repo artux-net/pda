@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
-import net.artux.pda.map.engine.ContentGenerator;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

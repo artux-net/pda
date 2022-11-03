@@ -4,6 +4,8 @@ import android.app.Application;
 
 import net.artux.pda.R;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import dagger.hilt.android.HiltAndroidApp;
@@ -15,7 +17,7 @@ public class PDAApplication extends Application {
     @Inject
     protected DataManager dataManager;
     @Inject
-    protected Timber.Tree tree;
+    protected List<Timber.Tree> forest;
 
     public static int[] group_avatars = {
             R.drawable.g0,
@@ -32,9 +34,11 @@ public class PDAApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        for (Timber.Tree tree : forest) {
+            Timber.plant(tree);
+            Timber.i("%s planted", tree.getClass().getSimpleName());
+        }
         Timber.i("App started.");
-        Timber.plant(tree);
-        Timber.i("%s planted", tree.getClass().getSimpleName());
     }
 
     public DataManager getDataManager() {

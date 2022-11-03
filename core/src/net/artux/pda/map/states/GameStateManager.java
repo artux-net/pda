@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 
-import net.artux.pda.map.platform.PlatformInterface;
+import net.artux.pda.map.utils.PlatformInterface;
 
 import java.util.Stack;
 

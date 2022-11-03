@@ -1,7 +1,7 @@
 package net.artux.pda.map;
 
-import net.artux.pda.map.model.input.GameMap;
-import net.artux.pda.map.platform.PlatformInterface;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.QuestUtil;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;

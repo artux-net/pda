@@ -6,8 +6,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.model.input.GameMap;
-import net.artux.pda.map.platform.PlatformInterface;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.PreloadState;
 import net.artux.pda.model.quest.story.StoryDataModel;

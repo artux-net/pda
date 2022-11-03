@@ -6,7 +6,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.model.input.GameMap;
+import net.artux.pda.model.map.GameMap;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,9 +33,9 @@ public class PreloadState extends State {
         preloadTime = TimeUtils.millis();
         if (map != null) {
             Gdx.app.debug("Preload", "Checking cache for " + map.getTitle() + "{" + map.getId() + "} , load missed files.");
-            remoteAssets.add(map.getTextureUri());
-            remoteAssets.add(map.getBlurTextureUri());
-            remoteAssets.add(map.getBoundsTextureUri());
+            remoteAssets.add(map.getTexture());
+            remoteAssets.add(map.getBlurTexture());
+            remoteAssets.add(map.getBoundsTexture());
             remoteAssets.add(map.getTilesTexture());
 
             for (String asset :
@@ -92,7 +92,7 @@ public class PreloadState extends State {
     void checkForStartPlay() {
         GameMap map = dataRepository.getGameMap();
         if (map != null) {
-            FileHandle file = Gdx.files.local(cachePath + map.getTextureUri());
+            FileHandle file = Gdx.files.local(cachePath + map.getTexture());
 
             if (!file.exists())
                 return;

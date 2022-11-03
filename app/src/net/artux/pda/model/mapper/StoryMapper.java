@@ -1,7 +1,7 @@
 package net.artux.pda.model.mapper;
 
-import net.artux.pda.map.model.input.GameMap;
-import net.artux.pda.map.model.input.Point;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.model.map.Point;
 import net.artux.pda.model.quest.ChapterModel;
 import net.artux.pda.model.quest.Sound;
 import net.artux.pda.model.quest.Stage;

@@ -18,8 +18,8 @@ import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.data.GlobalData;
-import net.artux.pda.map.model.LevelBackground;
-import net.artux.pda.map.model.input.GameMap;
+import net.artux.pda.map.engine.LevelBackground;
+import net.artux.pda.model.map.GameMap;
 import net.artux.pda.map.ui.UserInterface;
 
 
@@ -51,12 +51,12 @@ public class PlayState extends State {
 
             long loadTime = TimeUtils.millis();
 
-            Texture background = assetsFinder.getLocal(map.getTextureUri());
+            Texture background = assetsFinder.getLocal(map.getTexture());
             GlobalData.mapWidth = background.getWidth();
             GlobalData.mapHeight = background.getHeight();
             stage.addActor(new Image(background));
 
-            Texture levelTexture = assetsFinder.getLocal(map.getBlurTextureUri());
+            Texture levelTexture = assetsFinder.getLocal(map.getBlurTexture());
             if (levelTexture != null) {
                 levelBackground = new LevelBackground(levelTexture, stage.getCamera());
             }

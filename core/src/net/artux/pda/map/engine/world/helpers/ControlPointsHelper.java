@@ -15,11 +15,15 @@ import net.artux.pda.map.engine.components.SpawnComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.systems.DataSystem;
+import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.model.MobType;
 import net.artux.pda.map.model.MobsTypes;
-import net.artux.pda.map.model.SpawnModel;
-import net.artux.pda.map.model.input.GameMap;
+import net.artux.pda.map.utils.Mappers;
+import net.artux.pda.model.map.SpawnModel;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.model.QuestUtil;
+import net.artux.pda.model.quest.story.StoryDataModel;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -31,32 +35,35 @@ public class ControlPointsHelper {
         MobsTypes mobsTypes = new Gson().fromJson(reader, MobsTypes.class);
 
         GameMap map = engine.getSystem(DataSystem.class).getMap();
+        StoryDataModel storyDataModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().gdxData;
+
 
         for (final SpawnModel spawnModel : map.getSpawns()) {
-            MobType mobType = mobsTypes.getMobType(spawnModel.getId());
+            if(QuestUtil.check(spawnModel.getCondition(), storyDataModel)) {
+                MobType mobType = mobsTypes.getMobType(spawnModel.getId());
 
-            SpawnComponent spawnComponent = new SpawnComponent(spawnModel, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]));
+                SpawnComponent spawnComponent = new SpawnComponent(spawnModel, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]));
 
-            Entity controlPoint = new Entity();
-            float size = spawnModel.getR() * 2 * 0.9f;
+                Entity controlPoint = new Entity();
+                float size = spawnModel.getR() * 2 * 0.9f;
 
-            List<Entity> pointEntities = new LinkedList<>();
-            for (int i = 0; i < spawnModel.getN(); i++) {
-                Entity entity = entityBuilder.spawnStalker(spawnComponent, mobType);
-                engine.addEntity(entity);
-                pointEntities.add(entity);
+                List<Entity> pointEntities = new LinkedList<>();
+                for (int i = 0; i < spawnModel.getN(); i++) {
+                    Entity entity = entityBuilder.spawnStalker(spawnComponent, mobType);
+                    engine.addEntity(entity);
+                    pointEntities.add(entity);
+                }
+
+                final ControlPointComponent controlPointComponent = new ControlPointComponent("Контрольная точка", mobType, pointEntities);
+
+                controlPoint.add(new PositionComponent(Mappers.vector2(spawnModel.getPos())))
+                        .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size))
+                        .add(spawnComponent)
+                        .add(controlPointComponent)
+                        .add(new ClickComponent(() -> engine.getSystem(RenderSystem.class)
+                                .showText(controlPointComponent.desc(), Mappers.vector2(spawnModel.getPos()))));
+                engine.addEntity(controlPoint);
             }
-
-            final ControlPointComponent controlPointComponent = new ControlPointComponent("Контрольная точка", mobType, pointEntities);
-
-            controlPoint.add(new PositionComponent(spawnModel.getPosition()))
-                    .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size))
-                    .add(spawnComponent)
-                    .add(controlPointComponent)
-                    .add(new ClickComponent(() -> engine.getSystem(RenderSystem.class)
-                            .showText(controlPointComponent.desc(), spawnModel.getPosition())));
-            engine.addEntity(controlPoint);
-
         }
     }
 

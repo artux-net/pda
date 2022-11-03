@@ -40,9 +40,10 @@ import net.artux.pda.map.engine.systems.WorldSystem;
 import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
-import net.artux.pda.map.model.input.GameMap;
-import net.artux.pda.map.platform.PlatformInterface;
 import net.artux.pda.map.states.PlayState;
+import net.artux.pda.map.utils.Mappers;
+import net.artux.pda.map.utils.PlatformInterface;
+import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
@@ -90,7 +91,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         long loadTime = TimeUtils.millis();
 
         EntityBuilder entityBuilder = new EntityBuilder(assetsFinder.getManager(), engine);
-        engine.addEntity(entityBuilder.player(map.getPlayerPosition(), gdxData, userModel));
+        engine.addEntity(entityBuilder.player(Mappers.vector2(map.getDefPos()), gdxData, userModel));
 
         engine.addSystem(new MapOrientationSystem(assetsFinder, map));
         engine.addSystem(new ClicksSystem());
@@ -131,8 +132,8 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
     private void syncCameraPosition(Stage stage) {
         Camera camera = stage.getViewport().getCamera();
-        camera.position.x = map.getPlayerPosition().x;
-        camera.position.y = map.getPlayerPosition().y;
+        camera.position.x = Mappers.vector2(map.getDefPos()).x;
+        camera.position.y = Mappers.vector2(map.getDefPos()).y;
     }
 
     public GestureDetector.GestureListener getGestureListener() {

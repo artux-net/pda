@@ -26,7 +26,7 @@ import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
-import net.artux.pda.map.platform.PlatformInterface;
+import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.model.items.ItemModel;

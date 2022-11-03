@@ -1,4 +1,4 @@
-package net.artux.pda.map.platform;
+package net.artux.pda.map.utils;
 
 import java.util.HashMap;
 import java.util.List;

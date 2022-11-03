@@ -18,8 +18,8 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import net.artux.pda.app.ForegroundService;
 import net.artux.pda.map.GdxAdapter;
-import net.artux.pda.map.model.input.GameMap;
-import net.artux.pda.map.platform.PlatformInterface;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 import net.artux.pda.model.user.UserModel;

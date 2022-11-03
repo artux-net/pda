@@ -6,7 +6,8 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.model.SpawnModel;
+import net.artux.pda.map.utils.Mappers;
+import net.artux.pda.model.map.SpawnModel;
 
 public class SpawnComponent implements Component {
 
@@ -25,7 +26,7 @@ public class SpawnComponent implements Component {
 
             double angle = random.nextInt(360);
 
-            Vector2 basePosition = spawnModel.getPosition();
+            Vector2 basePosition = Mappers.vector2(spawnModel.getPos());
             float x = (float) (Math.cos(angle) * r);
             float y = (float) (Math.sin(angle) * r);
             return new Vector2(basePosition.x + x, basePosition.y + y);

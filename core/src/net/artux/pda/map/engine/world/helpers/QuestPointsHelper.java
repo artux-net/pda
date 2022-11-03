@@ -13,19 +13,15 @@ import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
-import net.artux.pda.map.model.Transfer;
-import net.artux.pda.map.model.input.GameMap;
-import net.artux.pda.map.model.input.Point;
-import net.artux.pda.map.platform.PlatformInterface;
-import net.artux.pda.map.ui.UserInterface;
+import net.artux.pda.map.utils.Mappers;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.model.map.Point;
+import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.QuestUtil;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 
-import java.util.HashMap;
-
 public class QuestPointsHelper {
-
 
     public static void createQuestPointsEntities(Engine engine, AssetManager assetManager, PlatformInterface platformInterface) {
         GameMap map = engine.getSystem(DataSystem.class).getMap();
@@ -44,13 +40,13 @@ public class QuestPointsHelper {
 
     private static void addPoint(final Engine engine, AssetManager assetManager, final Point point, PlatformInterface platformInterface) {
         Entity entity = new Entity();
-        entity.add(new PositionComponent(point.getPosition()))
-                .add(new InteractiveComponent(point.getTitle(), point.type, userInterface -> platformInterface.send(point.getData())))
+        entity.add(new PositionComponent(Mappers.vector2(point.getPos())))
+                .add(new InteractiveComponent(point.getName(), point.getType(), userInterface -> platformInterface.send(point.getData())))
                 .add(new ClickComponent(() -> engine.getSystem(RenderSystem.class)
-                        .showText("Метка: " + point.getTitle(), point.getPosition())));
+                        .showText("Метка: " + point.getName(), Mappers.vector2(point.getPos()))));
 
         Texture texture = null;
-        switch (point.type) {
+        switch (point.getType()) {
             case 0:
             case 1:
                 entity.add(new QuestComponent());
@@ -73,32 +69,6 @@ public class QuestPointsHelper {
         int size = 23;
         if (texture != null)
             entity.add(new SpriteComponent(texture, size, size));
-
-        engine.addEntity(entity);
-    }
-
-    private static void addTransferPoint(final Engine engine, AssetManager assetManager, final Transfer point) {
-        Entity entity = new Entity();
-
-        entity.add(new PositionComponent(point.getPosition()))
-                .add(new InteractiveComponent(point.getMessage(), -1, new InteractiveComponent.InteractListener() {
-                    @Override
-                    public void interact(UserInterface userInterface) {
-                        HashMap<String, String> data = new HashMap<>();
-                        data.put("map", String.valueOf(point.getTo()));
-                        data.put("pos", point.getToPosition());
-                        //todo State.gsm.getPlatformInterface().send(data);
-                    }
-                }))
-                .add(new ClickComponent(new ClickComponent.ClickListener() {
-                    @Override
-                    public void clicked() {
-                        engine.getSystem(RenderSystem.class)
-                                .showText("Локация " + point.getMessage(), point.getPosition());
-                    }
-                }));
-
-        entity.add(new SpriteComponent(assetManager.get("transfer.png", Texture.class), 32, 32));
 
         engine.addEntity(entity);
     }

@@ -1,9 +1,8 @@
-package net.artux.pda.map.model;
+package net.artux.pda.map.engine;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Disposable;
 
 public class LevelBackground {
 

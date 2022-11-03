@@ -30,8 +30,8 @@ import com.badlogic.gdx.utils.TimeUtils;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.InteractiveComponent;
-import net.artux.pda.map.model.input.GameMap;
-import net.artux.pda.map.model.input.Point;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.model.map.Point;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.bars.Utils;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
@@ -294,16 +294,16 @@ public class UserInterface extends Group implements Disposable {
 
         if (map != null)
             for (final Point point : map.getPoints()) {
-                if (point.type < 2 || point.type > 3)
+                if (point.getType() < 2 || point.getType() > 3)
                     if (storyStateModel != null && QuestUtil.check(point.getCondition(), dataModel)) {
                         if (point.getData().containsKey("chapter")) {
                             int chapterId = storyStateModel.getChapterId();
                             if ((Integer.parseInt(point.getData().get("chapter")) == chapterId
                                     || Integer.parseInt(point.getData().get("chapter")) == 0)) {
-                                menuTable.addActor(getLabel(point.getTitle(), labelStyle));
+                                menuTable.addActor(getLabel(point.getName(), labelStyle));
                             }
                         } else {
-                            menuTable.addActor(getLabel(point.getTitle(), labelStyle));
+                            menuTable.addActor(getLabel(point.getName(), labelStyle));
                         }
                     }
             }

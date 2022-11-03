@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import net.artux.pda.map.model.input.GameMap
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.UserMessage
+import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.mapper.StageMapper
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
@@ -150,7 +150,7 @@ class StoryViewModel @javax.inject.Inject constructor(
                                 .map { mapper.map(it) }
                                 .onSuccess {
                                     if (chapterStage.data.containsKey("pos"))
-                                        it.setPlayerPos(chapterStage.data["pos"])
+                                        it.defPos = chapterStage.data["pos"]
                                     Timber.i("${storyData.value}")
                                     map.postValue(it)
                                 }
