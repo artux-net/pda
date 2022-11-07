@@ -114,6 +114,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             intent.putExtra("map", map);
             intent.putExtra("data", storyViewModel.getStoryData().getValue());
             intent.putExtra("user", provider.get(UserViewModel.class).getFromCache());
+            intent.putExtra("story", provider.get(StoryViewModel.class).getCurrentStory());
             QuestActivity.this.startActivity(intent);
             QuestActivity.this.finish();
         });

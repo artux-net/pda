@@ -1,7 +1,6 @@
 package net.artux.pda.map.engine.components;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.gdx.graphics.Texture;
 
 import net.artux.pda.map.ui.UserInterface;
 
@@ -14,11 +13,6 @@ public class InteractiveComponent implements Component {
     public InteractiveComponent(String title, int type, InteractListener listener) {
         this.title = title;
         switch (type){
-            /*case 0:
-            case 1:
-            case 4:
-            case 6:*/
-
             case 5:
                 this.type = Type.FINDING;
                 break;

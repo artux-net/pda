@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.engine.ContentGenerator;
+import net.artux.pda.map.engine.MessagingCodes;
 import net.artux.pda.map.engine.components.BulletComponent;
 import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
@@ -28,6 +29,7 @@ import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.player.UserVelocityInput;
+import net.artux.pda.map.engine.components.states.StalkerState;
 import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.model.MobType;
 import net.artux.pda.model.items.ItemModel;
@@ -130,6 +132,9 @@ public class EntityBuilder {
         MoodComponent moodComponent = new MoodComponent(mobType.group, spawnComponent.getRelations(), spawnComponent.getSpawnModel().isAngry());
         moodComponent.ignorePlayer = spawnComponent.getSpawnModel().isIgnorePlayer();
 
+        StatesComponent statesComponent = new StatesComponent(entity, spawnComponent.getDispatcher(), StalkerState.INITIAL, StalkerState.GUARDING);
+        spawnComponent.getDispatcher().addListener(statesComponent, MessagingCodes.ATTACKED);
+
         entity.add(new PositionComponent(spawnComponent.getTargeting().getTarget()))
                 .add(new VelocityComponent())
                 .add(new HealthComponent())
@@ -138,7 +143,7 @@ public class EntityBuilder {
                 .add(new GraphMotionComponent(null))
                 .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<>()))
                 .add(new WeaponComponent(w, this))
-                .add(new StatesComponent(entity, spawnComponent.getDispatcher()))
+                .add(statesComponent)
                 .add(new TargetMovingComponent(spawnComponent.getTargeting()))
                 .add(new RelationalSpriteComponent(8, 8));
 
@@ -154,6 +159,8 @@ public class EntityBuilder {
         w.setPrecision(10);
         w.setBulletQuantity(15);
 
+        StatesComponent statesComponent = new StatesComponent(entity, null, StalkerState.INITIAL, StalkerState.GUARDING);
+
         entity.add(new PositionComponent(position))
                 .add(new VisionComponent())
                 .add(new RelationalSpriteComponent(8, 8))
@@ -162,12 +169,12 @@ public class EntityBuilder {
                 .add(new GraphMotionComponent(null))
                 .add(new WeaponComponent(w, this))
                 .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
-                .add(new StatesComponent(entity, null))
+                .add(statesComponent)
                 .add(new MoodComponent(-1, null, true))
                 .add(new TargetMovingComponent(targeting));
+
         Gdx.app.log("WorldSystem", "New entity created.");
         return entity;
-
     }
 
 }

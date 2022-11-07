@@ -67,6 +67,12 @@ class StoryViewModel @javax.inject.Inject constructor(
         }
     }
 
+    fun getCurrentStory(): StoryModel {
+        return repository.getCachedStory(currentStoryId)
+            .map { mapper.story(it) }
+            .getOrThrow()
+    }
+
     fun updateData(): MutableLiveData<StoryDataModel> {
         storyData = MutableLiveData()
         viewModelScope.launch {

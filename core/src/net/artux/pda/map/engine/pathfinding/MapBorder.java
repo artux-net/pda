@@ -5,53 +5,58 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Disposable;
 
-public class MapBorders implements Disposable {
+import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.model.map.GameMap;
 
-    private Pixmap mobPixmap;
-    private Texture mobLayout;
+public class MapBorder implements Disposable {
 
+    private final Texture playerLayout;
+    private final Texture mobLayout;
     private Pixmap playerPixmap;
-    private Texture playerLayout;
+    private Pixmap mobPixmap;
 
-    int tileWidth;
-    int tileHeight;
+    private int tileWidth;
+    private int tileHeight;
 
-    public MapBorders(Texture mobLayout, Texture playerBounds) {
-        this.mobLayout = mobLayout;
+    public MapBorder(AssetsFinder finder, GameMap map) {
+        mobLayout = finder.getLocal(map.getTilesTexture());
+        playerLayout = finder.getLocal(map.getBoundsTexture());
+
         if (mobLayout != null) {
-            if (!mobLayout.getTextureData().isPrepared()) {
-                mobLayout.getTextureData().prepare();
-            }
+            prepareTexture(mobLayout);
             mobPixmap = mobLayout.getTextureData().consumePixmap();
         }
-        if (playerBounds!=null) {
-            this.playerLayout = playerBounds;
-            if (!playerBounds.getTextureData().isPrepared()) {
-                playerBounds.getTextureData().prepare();
-            }
-            playerPixmap = playerBounds.getTextureData().consumePixmap();
+        if (playerLayout != null) {
+            prepareTexture(playerLayout);
+            playerPixmap = playerLayout.getTextureData().consumePixmap();
         }
     }
 
-    public boolean isMobTilesActive(){
+    private void prepareTexture(Texture texture) {
+        if (!texture.getTextureData().isPrepared()) {
+            texture.getTextureData().prepare();
+        }
+    }
+
+    public boolean isMobTilesActive() {
         return mobLayout != null;
     }
 
-    public int getWidth() {
+    public int getMapWidth() {
         return mobLayout.getWidth();
     }
 
-    public int getHeight() {
+    public int getMapHeight() {
         return mobLayout.getHeight();
     }
 
-    void setTilesSize(int width, int height){
-        this.tileWidth = mobLayout.getWidth()/width;
-        this.tileHeight = mobLayout.getHeight()/height;
+    void setTilesSize(int width, int height) {
+        this.tileWidth = mobLayout.getWidth() / width;
+        this.tileHeight = mobLayout.getHeight() / height;
     }
 
-    public float getK(float x, float y){
-        int value = playerPixmap.getPixel((int)x, playerLayout.getHeight() - (int) y);
+    public float getK(float x, float y) {
+        int value = playerPixmap.getPixel((int) x, playerLayout.getHeight() - (int) y);
 
         float r = ((value & 0xff000000) >>> 24) / 255f;
         float g = ((value & 0x00ff0000) >>> 16) / 255f;
@@ -65,8 +70,8 @@ public class MapBorders implements Disposable {
         return 1 - r * a;
     }
 
-    public int getTileType(float x, float y){
-        int value = playerPixmap.getPixel((int)x, playerLayout.getHeight() - (int) y);
+    public int getTileType(float x, float y) {
+        int value = playerPixmap.getPixel((int) x, playerLayout.getHeight() - (int) y);
 
         float r = ((value & 0xff000000) >>> 24) / 255f;
         float g = ((value & 0x00ff0000) >>> 16) / 255f;
@@ -85,7 +90,7 @@ public class MapBorders implements Disposable {
         return TiledNode.TILE_EMPTY;
     }
 
-    public int getTileTypeInTileForMob(int xTile, int yTile){
+    public int getTileTypeInTileForMob(int xTile, int yTile) {
         if (mobLayout != null) {
             int x = xTile * tileWidth;
             int y = yTile * tileHeight;

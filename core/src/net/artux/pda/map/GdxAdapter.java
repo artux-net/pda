@@ -6,10 +6,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.model.map.GameMap;
-import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.PreloadState;
+import net.artux.pda.map.utils.PlatformInterface;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
@@ -91,6 +92,11 @@ public class GdxAdapter extends ApplicationAdapter {
 
         public Builder storyData(StoryDataModel dataModel) {
             gdxAdapter.dataRepository.setStoryDataModel(dataModel);
+            return this;
+        }
+
+        public Builder story(StoryModel dataModel) {
+            gdxAdapter.dataRepository.setStoryModel(dataModel);
             return this;
         }
 

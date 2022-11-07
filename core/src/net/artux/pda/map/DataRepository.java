@@ -1,8 +1,9 @@
 package net.artux.pda.map;
 
-import net.artux.pda.model.map.GameMap;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.QuestUtil;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
@@ -20,7 +21,9 @@ public class DataRepository {
     private PropertyChangeSupport propertyChangeSupport;
     private StoryDataModel oldStoryDataModel;
     private StoryDataModel storyDataModel;
+
     private GameMap gameMap;
+    private StoryModel storyModel;
     private UserModel userModel;
 
     private final PlatformInterface platformInterface;
@@ -60,6 +63,14 @@ public class DataRepository {
 
     public void setGameMap(GameMap gameMap) {
         this.gameMap = gameMap;
+    }
+
+    public void setStoryModel(StoryModel storyModel) {
+        this.storyModel = storyModel;
+    }
+
+    public StoryModel getStoryModel() {
+        return storyModel;
     }
 
     public UserModel getUserModel() {

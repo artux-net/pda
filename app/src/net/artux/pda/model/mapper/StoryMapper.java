@@ -6,10 +6,12 @@ import net.artux.pda.model.quest.ChapterModel;
 import net.artux.pda.model.quest.Sound;
 import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.StoryItem;
+import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.ParameterModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pdanetwork.model.Chapter;
 import net.artux.pdanetwork.model.ParameterDto;
+import net.artux.pdanetwork.model.Story;
 import net.artux.pdanetwork.model.StoryData;
 import net.artux.pdanetwork.model.StoryDto;
 
@@ -23,6 +25,8 @@ import java.util.List;
 public interface StoryMapper {
 
     StoryMapper INSTANCE = Mappers.getMapper(StoryMapper.class);
+
+    StoryModel story(Story story);
 
     @Mapping(target = "parametersMap", ignore = true)
     @Mapping(target = "allItems", ignore = true)

@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -26,9 +25,9 @@ import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
-import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.Slot;
+import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemType;
 
@@ -175,7 +174,7 @@ public class BattleSystem extends BaseSystem implements Disposable {
                         if (mapOrientationSystem.isGraphActive()) {
                             FlatTiledNode entityNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(entityPositionComponent.getPosition());
                             FlatTiledNode enemyNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(enemyPosition.getPosition());
-                            if (!mapOrientationSystem.collisionDetector.collides(new Ray<>(new Vector2(entityNode.x, entityNode.y), new Vector2(enemyNode.x, enemyNode.y)))) { //TODO new in update
+                            if (!mapOrientationSystem.collides(entityNode.getPosition(), enemyNode.getPosition())) {
                                 if (entityWeapon.shoot())
                                     shoot(entity, entityWeapon, targetPosition);
                             }

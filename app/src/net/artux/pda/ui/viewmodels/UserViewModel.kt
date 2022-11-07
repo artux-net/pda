@@ -44,7 +44,7 @@ class UserViewModel @Inject constructor(
     fun getFromCache(): UserModel? {
         return userRepository.getCachedMember()
             .map { userMapper.model(it) }
-            .getOrNull()
+            .getOrThrow()
     }
 
     fun updateMember() {

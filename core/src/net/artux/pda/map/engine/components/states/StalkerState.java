@@ -22,6 +22,14 @@ import java.util.TimerTask;
 
 public enum StalkerState implements State<Entity> {
 
+    INITIAL(){
+        @Override
+        public void update(Entity entity) {
+            StatesComponent statesComponent = sm.get(entity);
+            statesComponent.changeState(STANDING);
+        }
+    },
+
     FIND_TARGET() {
         @Override
         public void update(Entity entity) {
@@ -30,19 +38,13 @@ public enum StalkerState implements State<Entity> {
             gmm.get(entity).setMovementTarget(targetMovingComponent.targeting.getTarget());
             statesComponent.changeState(MOVING);
         }
+        },
 
-        @Override
-        public boolean onMessage(Entity entity, Telegram telegram) {
-            return false;
-        }
-    },
-
+    //can not be initial
     STANDING() {
         @Override
         public void enter(final Entity entity) {
-            super.enter(entity);
             final StatesComponent statesComponent = sm.get(entity);
-            vmm.get(entity).set(0, 0);
             gmm.get(entity).disable();
             timer.schedule(new TimerTask() {
                 @Override
@@ -58,11 +60,6 @@ public enum StalkerState implements State<Entity> {
         public void update(Entity entity) {
 
         }
-
-        @Override
-        public boolean onMessage(Entity entity, Telegram telegram) {
-            return false;
-        }
     },
 
     MOVING() {
@@ -75,11 +72,6 @@ public enum StalkerState implements State<Entity> {
                     sm.get(entity).changeState(STANDING);
                 }
             } else sm.get(entity).changeState(STANDING);
-        }
-
-        @Override
-        public boolean onMessage(Entity entity, Telegram telegram) {
-            return false;
         }
     },
 
@@ -104,11 +96,6 @@ public enum StalkerState implements State<Entity> {
                 }
             }
         }
-
-        @Override
-        public boolean onMessage(Entity entity, Telegram telegram) {
-            return false;
-        }
     },
 
     SHOOT() {
@@ -132,11 +119,6 @@ public enum StalkerState implements State<Entity> {
                 }
             }
         }
-
-        @Override
-        public boolean onMessage(Entity entity, Telegram telegram) {
-            return false;
-        }
     },
 
     ATTACKING() {
@@ -153,14 +135,11 @@ public enum StalkerState implements State<Entity> {
             MoodComponent moodComponent = mm.get(entity);
             if (!mm.get(entity).hasEnemy() || pm.get(entity).dst(pm.get(moodComponent.getEnemy())) > 150) {
                 mm.get(entity).setEnemy(null);
-                sm.get(entity).changeGlobalState(GUARDING, true);
+                sm.get(entity).setGlobalState(GUARDING);
             }
         }
 
-        @Override
-        public boolean onMessage(Entity entity, Telegram telegram) {
-            return false;
-        }
+
     },
 
     GUARDING() {
@@ -177,7 +156,7 @@ public enum StalkerState implements State<Entity> {
             MoodComponent moodComponent = mm.get(entity);
             if (moodComponent.hasEnemy()) {
                 sm.get(entity).getDispatcher().dispatchMessage(ATTACKED, moodComponent.enemy);
-                sm.get(entity).changeGlobalState(ATTACKING, true);
+                sm.get(entity).setGlobalState(ATTACKING);
             } else {
                 VisionComponent visionComponent = visionMapper.get(entity);
                 for (Entity visibleEntity : visionComponent.getVisibleEntities()) {
@@ -185,7 +164,7 @@ public enum StalkerState implements State<Entity> {
                     if (moodComponent.isEnemy(enemyMood)) {
                         moodComponent.setEnemy(visibleEntity);
                         sm.get(entity).getDispatcher().dispatchMessage(ATTACKED, moodComponent.enemy);
-                        sm.get(entity).changeGlobalState(ATTACKING, true);
+                        sm.get(entity).setGlobalState(ATTACKING);
                     }
                 }
             }
@@ -196,7 +175,7 @@ public enum StalkerState implements State<Entity> {
             MoodComponent moodComponent = mm.get(entity);
             if (telegram.message == ATTACKED && !moodComponent.hasEnemy()) {
                 moodComponent.setEnemy((Entity) telegram.extraInfo);
-                sm.get(entity).changeGlobalState(ATTACKING, true);
+                sm.get(entity).setGlobalState(ATTACKING);
             }
             return true;
         }
@@ -227,4 +206,8 @@ public enum StalkerState implements State<Entity> {
 
     }
 
+    @Override
+    public boolean onMessage(Entity entity, Telegram telegram) {
+        return false;
+    }
 }

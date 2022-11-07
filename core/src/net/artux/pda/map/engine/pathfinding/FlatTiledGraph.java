@@ -17,17 +17,17 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
     public static boolean diagonal;
     public FlatTiledNode startNode;
 
-    public FlatTiledGraph(MapBorders mapBorders) {
+    public FlatTiledGraph(MapBorder mapBorder) {
         this.sizeX = GlobalData.mapWidth / tileSize;
         this.sizeY = GlobalData.mapHeight / tileSize;
         this.nodes = new Array<>(sizeX * sizeY);
         diagonal = true;
 
-        mapBorders.setTilesSize(sizeX, sizeY);
+        mapBorder.setTilesSize(sizeX, sizeY);
 
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
-                nodes.add(new FlatTiledNode(this, x, y, x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, mapBorders.getTileTypeInTileForMob(x, y), 4));
+                nodes.add(new FlatTiledNode(this, x, y, x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, mapBorder.getTileTypeInTileForMob(x, y), 4));
             }
         }
 

@@ -1,0 +1,27 @@
+package net.artux.pda.model.quest;
+
+import java.util.Arrays;
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class MissionModel {
+    private String title;
+    private String name;
+    private List<CheckpointModel> checkpoints;
+
+    public boolean hasParams(String... params) {
+        return getCurrentCheckpoint(params) != null;
+    }
+
+    public CheckpointModel getCurrentCheckpoint(String... params) {
+        for (CheckpointModel checkpointModel : checkpoints) {
+            if (Arrays.stream(params).anyMatch(s -> checkpointModel.getParameter().equals(s)))
+                return checkpointModel;
+        }
+        return null;
+    }
+
+
+}

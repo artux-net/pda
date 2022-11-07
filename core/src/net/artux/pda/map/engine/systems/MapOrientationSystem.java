@@ -1,5 +1,6 @@
 package net.artux.pda.map.engine.systems;
 
+import static com.badlogic.gdx.math.MathUtils.random;
 import static net.artux.pda.map.engine.pathfinding.TiledNode.TILE_WALL;
 
 import com.badlogic.ashley.core.EntitySystem;
@@ -13,36 +14,41 @@ import com.badlogic.gdx.utils.Disposable;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
-import net.artux.pda.map.engine.pathfinding.MapBorders;
+import net.artux.pda.map.engine.pathfinding.MapBorder;
 import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 import net.artux.pda.map.engine.pathfinding.TiledRaycastCollisionDetector;
 import net.artux.pda.model.map.GameMap;
 
-import java.util.Random;
-
 public class MapOrientationSystem extends EntitySystem implements Disposable {
 
     private FlatTiledGraph worldGraph;
-    private final MapBorders mapBorders;
-    private Random random = new Random();
+    private final MapBorder mapBorder;
 
-    TiledManhattanDistance<FlatTiledNode> heuristic;
-    IndexedAStarPathFinder<FlatTiledNode> pathFinder;
-    PathSmoother<FlatTiledNode, Vector2> pathSmoother;
-    TiledRaycastCollisionDetector<FlatTiledNode> collisionDetector;
+    private TiledManhattanDistance<FlatTiledNode> heuristic;
+    private IndexedAStarPathFinder<FlatTiledNode> pathFinder;
+    private PathSmoother<FlatTiledNode, Vector2> pathSmoother;
+    private TiledRaycastCollisionDetector<FlatTiledNode> collisionDetector;
     private final Ray<Vector2> ray;
 
     public MapOrientationSystem(AssetsFinder assetsFinder, GameMap map) {
         ray = new Ray<>(Vector2.Zero, Vector2.Zero);
-        this.mapBorders = new MapBorders(assetsFinder.getLocal(map.getTilesTexture()),
-                assetsFinder.getLocal(map.getBoundsTexture()));
-        if (mapBorders.isMobTilesActive()) {
-            this.worldGraph = new FlatTiledGraph(mapBorders);
+        this.mapBorder = new MapBorder(assetsFinder, map);
+
+        if (mapBorder.isMobTilesActive()) {
+            this.worldGraph = new FlatTiledGraph(mapBorder);
             heuristic = new TiledManhattanDistance<>();
             pathFinder = new IndexedAStarPathFinder<>(worldGraph, true);
             collisionDetector = new TiledRaycastCollisionDetector<>(worldGraph);
             pathSmoother = new PathSmoother<>(collisionDetector);
         }
+    }
+
+    public TiledManhattanDistance<FlatTiledNode> getHeuristic() {
+        return heuristic;
+    }
+
+    public IndexedAStarPathFinder<FlatTiledNode> getPathFinder() {
+        return pathFinder;
     }
 
     public TiledRaycastCollisionDetector<FlatTiledNode> getCollisionDetector() {
@@ -61,15 +67,14 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
         int x;
         int y;
         Vector2 result;
-        if (worldGraph != null) {
+        if (mapBorder.isMobTilesActive()) {
             do {
                 x = random.nextInt(worldGraph.sizeX);
                 y = random.nextInt(worldGraph.sizeY);
                 result = getRandomVectorWithInNode(x, y);
             } while (worldGraph.getNode(x, y).type == TILE_WALL || camera.frustum.pointInFrustum(result.x, result.y, 0));
         } else {
-            //todo map borders were null from group generation WorldSystem.java:132
-            result = new Vector2(random.nextInt(mapBorders.getWidth()), random.nextInt(mapBorders.getHeight()));
+            result = new Vector2(random.nextInt(mapBorder.getMapWidth()), random.nextInt(mapBorder.getMapHeight()));
         }
         return result;
     }
@@ -78,26 +83,26 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
         return new Vector2(x * FlatTiledGraph.tileSize + random.nextInt(FlatTiledGraph.tileSize), y * FlatTiledGraph.tileSize + random.nextInt(FlatTiledGraph.tileSize));
     }
 
-    public MapBorders getMapBorder() {
-        return mapBorders;
+    public MapBorder getMapBorder() {
+        return mapBorder;
     }
 
     public boolean isGraphActive() {
         return worldGraph != null;
     }
 
-    public MapBorders getMapBorders() {
-        return mapBorders;
+    public MapBorder getMapBorders() {
+        return mapBorder;
     }
 
     @Override
     public void dispose() {
         worldGraph.dispose();
-        mapBorders.dispose();
+        mapBorder.dispose();
     }
 
     private boolean isInsideMap(Vector2 position) {
-        return position.x >= 0 && position.y >= 0 && position.x <= mapBorders.getWidth() && position.y <= mapBorders.getHeight();
+        return position.x >= 0 && position.y >= 0 && position.x <= mapBorder.getMapWidth() && position.y <= mapBorder.getMapHeight();
     }
 
     public boolean collides(Vector2 start, Vector2 end) {

@@ -21,9 +21,9 @@ public class MovementTargetingSystem extends IteratingSystem {
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
 
-    TiledManhattanDistance<FlatTiledNode> heuristic;
-    IndexedAStarPathFinder<FlatTiledNode> pathFinder;
-    PathSmoother<FlatTiledNode, Vector2> pathSmoother;
+    private TiledManhattanDistance<FlatTiledNode> heuristic;
+    private IndexedAStarPathFinder<FlatTiledNode> pathFinder;
+    private PathSmoother<FlatTiledNode, Vector2> pathSmoother;
     MapOrientationSystem mapOrientationSystem;
 
     public MovementTargetingSystem() {
@@ -35,9 +35,9 @@ public class MovementTargetingSystem extends IteratingSystem {
         super.addedToEngine(engine);
         mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
 
-        heuristic = mapOrientationSystem.heuristic;
-        pathFinder = mapOrientationSystem.pathFinder;
-        pathSmoother = mapOrientationSystem.pathSmoother;
+        heuristic = mapOrientationSystem.getHeuristic();
+        pathFinder = mapOrientationSystem.getPathFinder();
+        pathSmoother = mapOrientationSystem.getPathSmoother();
     }
 
     @Override
