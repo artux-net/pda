@@ -98,7 +98,7 @@ public class MovingSystem extends BaseSystem {
                         positionComponent.getPosition().y = newY;
                 }
             }
-            if (!velocityComponent.isConstant())
+            if (!velocityComponent.isConstant() && entity != player)
                 velocityComponent.set(0, 0);
         }
     }
