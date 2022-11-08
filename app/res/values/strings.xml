@@ -96,6 +96,7 @@
     <string name="weapon_desc">Precision: %1$s \nSpeed: %2$s \nDamage: %3$s \nCondition: %4$s \n</string>
     <string name="armor_desc">Thermal protection: %1$s \nElectric protection: %2$s \nChemical protection: %3$s \nRadio protection: %4$s \nPsy protection: %5$s \nDamage protection: %6$s \nCondition: %7$s \n</string>
     <string name="artifact_desc">"Health: %1$s  Radio: %2$s  Damage: %3$s  Bleeding: %4$s  Thermal: %5$s  Chemical: %6$s  Endurance: %7$s  Electric: %8$s  "</string>
+    <string name="detector_desc">"Type: %1$s"</string>
 
     <string name="member_debug">Show userModel debug info</string>
     <string name="resetData">Reset data</string>
@@ -148,6 +149,13 @@
         <item>Группировки</item>
         <item>Локации</item>
     </string-array>
+
+    <string-array name="message_actions">
+        <item>Перейти к диалогу</item>
+        <item>Посмотреть профиль</item>
+    </string-array>
+
+    <string-array name="dialogs_actions"></string-array>
     <string name="quit">Quit</string>
     <string name="empty">"There are no entries. "</string>
     <string name="note_isnt_selected">Note isn\'t selected.</string>
@@ -189,4 +197,7 @@
     <string name="summaryDate">Summary from %s</string>
     <string name="selectSummary">Select summary.</string>
     <string name="item_as_main">Make as main</string>
+    <string name="notification_message">Сообщение</string>
+    <string name="notification_alert">Уведомление</string>
+    <string name="any_select_action">Выберете действие</string>
 </resources>

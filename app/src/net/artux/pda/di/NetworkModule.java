@@ -11,6 +11,7 @@ import com.google.gson.JsonSerializer;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.app.DataManager;
+import net.artux.pda.common.PropertyFields;
 import net.artux.pdanetwork.ApiClient;
 import net.artux.pdanetwork.api.DefaultApi;
 
@@ -68,7 +69,7 @@ public class NetworkModule {
     @Singleton
     public Retrofit retrofit(OkHttpClient client, FirebaseRemoteConfig remoteConfig, Gson gson) {
         return new Retrofit.Builder()
-                .baseUrl(remoteConfig.getString(RemoteValue.RESOURCE_URL))
+                .baseUrl(remoteConfig.getString(PropertyFields.RESOURCE_URL))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(client)
                 .build();
@@ -78,8 +79,8 @@ public class NetworkModule {
     @Singleton
     public Map<String, Object> defaults() {
         Map<String, Object> defaults = new HashMap<>();
-        defaults.put(RemoteValue.BASEURL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);
-        defaults.put(RemoteValue.RESOURCE_URL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL);
+        defaults.put(PropertyFields.API_URL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);
+        defaults.put(PropertyFields.RESOURCE_URL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL);
         return defaults;
     }
 
@@ -115,7 +116,7 @@ public class NetworkModule {
     public ApiClient apiClient(OkHttpClient okHttpClient, FirebaseRemoteConfig remoteConfig) {
         ApiClient apiClient = new ApiClient();
         apiClient.configureFromOkclient(okHttpClient);
-        String baseUrl = remoteConfig.getString(RemoteValue.BASEURL);
+        String baseUrl = remoteConfig.getString(PropertyFields.API_URL);
         if (BuildConfig.DEBUG)
             apiClient.getAdapterBuilder().baseUrl(BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);
         else if (!baseUrl.equals(FirebaseRemoteConfig.DEFAULT_VALUE_FOR_STRING)) {

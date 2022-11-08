@@ -8,10 +8,10 @@ import androidx.appcompat.content.res.AppCompatResources;
 
 import com.bumptech.glide.Glide;
 
-import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.ProfileModel;
+import net.artux.pda.utils.URLHelper;
 
 import java.time.Instant;
 
@@ -51,18 +51,17 @@ public class ProfileHelper {
 
     public static void setAvatar(ImageView imageView, String avatar) {
         Context context = imageView.getContext();
-        if (isInteger(avatar))
-            Glide.with(context)
-                    .load(Uri.parse("file:///android_asset/avatars/a" + (Integer.parseInt(avatar) + 1) + ".png"))
-                    .into(imageView);
-        else if (avatar == null) {
+        if (avatar == null)
             Glide.with(context)
                     .asDrawable()
                     .load(AppCompatResources.getDrawable(context, R.mipmap.ic_launcher))
                     .into(imageView);
-        }
-        else if (!avatar.contains("http")) {
-            avatar = "https://" + BuildConfig.URL + "/" + avatar;
+        else if (isInteger(avatar))
+            Glide.with(context)
+                    .load(Uri.parse("file:///android_asset/avatars/a" + (Integer.parseInt(avatar) + 1) + ".png"))
+                    .into(imageView);
+        else {
+            avatar = URLHelper.getResourceURL(avatar);
 
             Glide.with(context)
                     .asDrawable()

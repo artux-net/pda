@@ -18,7 +18,7 @@ import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.Point;
 import net.artux.pda.model.quest.StoryModel;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 public class PlayerTargetingSystem extends BaseSystem {
@@ -48,7 +48,7 @@ public class PlayerTargetingSystem extends BaseSystem {
     }
 
     void buildSystemFromStory(StoryModel storyModel) {
-        List<GameMap> maps = storyModel.getMaps();
+        Collection<GameMap> maps = storyModel.getMaps().values();
         for (GameMap map : maps){
             for (Point point : map.getPoints()){
                 if (point.getType() == 7){

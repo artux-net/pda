@@ -16,8 +16,8 @@ repositories {
 
 task downloadAPI {
     def f = new File('app/api.json')
-    new URL('https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest')
-            .withInputStream { i -> f.withOutputStream { it << i } }
+   /* new URL('https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest')
+            .withInputStream { i -> f.withOutputStream { it << i } }*/
 }
 
 swaggerSources {

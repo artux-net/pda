@@ -96,10 +96,9 @@ public class DialogsFragment extends BaseFragment implements DialogsAdapter.OnCl
 
         binding.addChatBtn.setOnClickListener(view1 -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
-            builder.setTitle("Выберете действие");
-            //todo
-            builder.setItems(new String[]{"Перейти к диалогу", "Посмотреть профиль"}, (dialogInterface, i) -> {
-
+            builder.setTitle(R.string.any_select_action);
+            builder.setItems(getResources().getStringArray(R.array.dialogs_actions), (dialogInterface, i) -> {
+                //todo
             });
             builder.show();
         });

@@ -15,16 +15,16 @@ public class ItemsHelper {
 
     private static final DecimalFormat decimalFormat = new DecimalFormat("###.##");
 
-    private static String getDefault(ItemModel item, Context context){
+    private static String getDefault(ItemModel item, Context context) {
         return context.getString(R.string.item_desc, String.valueOf(item.getPrice()),
                 String.valueOf(item.getWeight()), String.valueOf(item.getQuantity()),
-                decimalFormat.format(item.getQuantity()*item.getWeight()));
+                decimalFormat.format(item.getQuantity() * item.getWeight()));
     }
 
     public static String getDesc(ItemModel item, Context context) {
         String result = getDefault(item, context);
 
-        if (item instanceof ArmorModel){
+        if (item instanceof ArmorModel) {
             ArmorModel armor = (ArmorModel) item;
             result += context.getString(R.string.armor_desc,
                     String.valueOf(armor.getThermal_pr()),
@@ -34,7 +34,7 @@ public class ItemsHelper {
                     String.valueOf(armor.getPsy_pr()),
                     String.valueOf(armor.getDamage_pr()),
                     String.valueOf(armor.getCondition()));
-        }else if(item instanceof ArtifactModel){
+        } else if (item instanceof ArtifactModel) {
             ArtifactModel artifact = (ArtifactModel) item;
             context.getString(R.string.artifact_desc,
                     String.valueOf(artifact.getHealth()),
@@ -45,9 +45,11 @@ public class ItemsHelper {
                     String.valueOf(artifact.getChemical()),
                     String.valueOf(artifact.getEndurance()),
                     String.valueOf(artifact.getElectric()));
-        }else if (item instanceof DetectorModel){
-            //TODO
-        }else if (item instanceof WeaponModel){
+        } else if (item instanceof DetectorModel) {
+            DetectorModel detectorModel = (DetectorModel) item;
+            context.getString(R.string.detector_desc,
+                    String.valueOf(detectorModel.getDetectorType().toString()));
+        } else if (item instanceof WeaponModel) {
             WeaponModel weapon = (WeaponModel) item;
             context.getString(R.string.weapon_desc,
                     String.valueOf(weapon.getPrecision()),

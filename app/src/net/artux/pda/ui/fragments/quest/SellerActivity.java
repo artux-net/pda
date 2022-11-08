@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentQuest3Binding;
 import net.artux.pda.model.items.ItemModel;
@@ -22,6 +21,7 @@ import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
 import net.artux.pda.ui.viewmodels.ItemsViewModel;
 import net.artux.pda.ui.viewmodels.SellerViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
+import net.artux.pda.utils.URLHelper;
 
 import java.util.List;
 
@@ -98,18 +98,12 @@ public class SellerActivity extends AppCompatActivity implements View.OnClickLis
             List<ItemModel> items = sellerModel.getAllItems();
 
             binding.sellerName.setText(sellerModel.getName());
-            if (sellerModel.getImage().contains("http"))
-                Glide.with(getApplicationContext())
-                        .asDrawable()
-                        .centerCrop()
-                        .load(sellerModel.getImage())
-                        .into(background);
-            else
-                Glide.with(getApplicationContext())
-                        .asDrawable()
-                        .centerCrop()
-                        .load("https://" + BuildConfig.URL + "/" + sellerModel.getImage())
-                        .into(background);
+            String imageUrl = URLHelper.getResourceURL(sellerModel.getImage());
+            Glide.with(getApplicationContext())
+                    .asDrawable()
+                    .centerCrop()
+                    .load(imageUrl)
+                    .into(background);
 
             if (items.size() > 0) {
                 sellerAdapter.setItems(items);

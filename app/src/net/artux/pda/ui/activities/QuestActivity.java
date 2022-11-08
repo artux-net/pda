@@ -30,7 +30,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentNotificationBinding;
 import net.artux.pda.gdx.MapEngine;
@@ -41,6 +40,7 @@ import net.artux.pda.ui.fragments.quest.StageFragment;
 import net.artux.pda.ui.viewmodels.StoryViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
 import net.artux.pda.utils.MultiExoPlayer;
+import net.artux.pda.utils.URLHelper;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -61,7 +61,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     @Inject
     protected Gson gson;
 
-    private String background_url = "";
+    private String currentBackground = "";
 
     private BroadcastReceiver timeChangeReceiver;
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -83,13 +83,8 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                 multiExoPlayer = new MultiExoPlayer(QuestActivity.this, chapter.getMusic());
                 //preload images
                 for (Stage stage : chapter.getStages()) {
-                    if (stage.getBackgroundUrl() != null && !stage.getBackgroundUrl().equals("")) {
-                        String background_url;
-                        if (!stage.getBackgroundUrl().contains("http")) {
-                            //todo remote url
-                            background_url = "https://" + BuildConfig.URL + "/" + stage.getBackgroundUrl();
-                        } else
-                            background_url = stage.getBackgroundUrl();
+                    if (stage.getBackgroundUrl() != null && !stage.getBackgroundUrl().isEmpty()) {
+                        String background_url = URLHelper.getResourceURL(stage.getBackgroundUrl());
 
                         Glide.with(QuestActivity.this)
                                 .downloadOnly()
@@ -161,10 +156,10 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                 FragmentNotificationBinding binding = FragmentNotificationBinding.inflate(getLayoutInflater());
                 switch (notificationModel.getType()) {
                     case ALERT:
-                        binding.notificationTitle.setText("Уведомление");
+                        binding.notificationTitle.setText(R.string.notification_alert);
                         break;
                     case MESSAGE:
-                        binding.notificationTitle.setText("Сообщение");//todo locale
+                        binding.notificationTitle.setText(R.string.notification_message);
                         break;
                 }
                 if (notificationModel.getTitle() != null)
@@ -228,21 +223,17 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         finish();
     }
 
-    public void setBackground(String backgroundUrl) {
-        if (backgroundUrl != null)
-            if (!background_url.equals(backgroundUrl)) {
-                if (!backgroundUrl.contains("http")) {
-                    //todo remote config
-                    background_url = "https://" + BuildConfig.URL + "/" + backgroundUrl;
-                } else background_url = backgroundUrl;
+    public void setBackground(String nextBackground) {
+        if (!currentBackground.equals(nextBackground)) {
+            currentBackground = URLHelper.getResourceURL(nextBackground);
 
-                Glide.with(this)
-                        .load(background_url)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .centerCrop()
-                        .into((ImageView) switcher.getNextView());
-                switcher.showNext();
-            }
+            Glide.with(this)
+                    .load(currentBackground)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .centerCrop()
+                    .into((ImageView) switcher.getNextView());
+            switcher.showNext();
+        }
     }
 
     @Override

@@ -111,4 +111,7 @@
     <string name="summaryDate">Сводка от %s</string>
     <string name="selectSummary">Выберите сводку в меню справа.</string>
     <string name="item_as_main">Сделать основным</string>
+    <string name="notification_message">Сообщение</string>
+    <string name="notification_alert">Уведомление</string>
+    <string name="any_select_action">Выберете действие</string>
 </resources>

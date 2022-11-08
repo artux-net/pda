@@ -1,8 +1,8 @@
-package net.artux.pda.di;
+package net.artux.pda.common;
 
-public abstract class RemoteValue {
+public abstract class PropertyFields {
 
-    public static final String BASEURL = "baseUrl";
+    public static final String API_URL = "baseUrl";
     public static final String RESOURCE_URL = "resourceUrl";
     public static final String XP_CHAT_LIMIT = "xpChatLimit";
 

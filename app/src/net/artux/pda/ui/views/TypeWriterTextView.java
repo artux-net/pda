@@ -13,10 +13,12 @@ public class TypeWriterTextView extends androidx.appcompat.widget.AppCompatTextV
 
     public TypeWriterTextView(Context context) {
         super(context);
+        setOnClickListener(v -> setEffect(false));
     }
 
     public TypeWriterTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setOnClickListener(v -> setEffect(false));
     }
 
     public void setListener(AnimationListener listener) {
@@ -65,8 +67,6 @@ public class TypeWriterTextView extends androidx.appcompat.widget.AppCompatTextV
                 listener.onAnimationEnd();
         }
     };
-    //todo on click set text immediately
-    //todo on click open transfers
 
     public interface AnimationListener {
         void onAnimationEnd();

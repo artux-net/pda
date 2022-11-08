@@ -208,10 +208,9 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     @Override
     public void onLongClick(UserMessage message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
-        builder.setTitle("Выберете действие");
-        //todo
-        builder.setItems(new String[]{"Перейти к диалогу", "Посмотреть профиль"}, (dialogInterface, i) -> {
-            switch (i){
+        builder.setTitle(getString(R.string.any_select_action));
+        builder.setItems(getResources().getStringArray(R.array.message_actions), (dialogInterface, i) -> {
+            switch (i) {
                 default:
                     navigationPresenter.addFragment(ChatFragment.with(message.getAuthor()), true);
                 case 1:

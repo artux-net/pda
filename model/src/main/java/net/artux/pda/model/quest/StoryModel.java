@@ -15,7 +15,7 @@ public class StoryModel implements Serializable {
 
     private Long id;
     private String title;
-    private List<GameMap> maps;
+    private Map<Long, GameMap> maps;
     private Map<String, ChapterModel> chapters;
     private List<MissionModel> missions;
 
@@ -46,7 +46,7 @@ public class StoryModel implements Serializable {
             CheckpointModel checkpointModel = missionModel.getCurrentCheckpoint(param);
             Point targetPoint;
             GameMap targetMap;
-            for (GameMap map : maps) {
+            for (GameMap map : maps.values()) {
                 for (Point point : map.getPoints()) {
                     Map<String, String> data = point.getData();
                     String chapterString = data.get("chapter");

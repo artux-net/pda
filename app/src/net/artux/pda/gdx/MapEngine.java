@@ -28,9 +28,11 @@ import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.quest.SellerActivity;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import timber.log.Timber;
 
@@ -71,6 +73,15 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
         StoryModel storyModel = (StoryModel) intent.getSerializableExtra("story");
         StoryDataModel dataModel = (StoryDataModel) intent.getSerializableExtra("data");
         GameMap map = (GameMap) intent.getSerializableExtra("map");
+
+        try {
+            Properties properties = new Properties();
+            properties.load(getAssets().open("config/core.properties"));
+            System.setProperties(properties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         lastStoryState = dataModel.getCurrentState();
 
         GdxAdapter.Builder builder = new GdxAdapter.Builder(this)

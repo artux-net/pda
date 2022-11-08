@@ -70,9 +70,6 @@ public class StageFragment extends Fragment {
 
             mainText.setmText(stage.getContent());
             mainText.setListener(() -> setSceneResponses(stage.getTransfers()));
-            mainText.setOnClickListener(v -> mainText.setEffect(false));
-            if (stage.getType() != StageType.DIALOG)
-                mainText.setEffect(false);
 
             usualStageBinding.scrollScene.setOnClickListener(v -> mainText.setEffect(false));
         } else {

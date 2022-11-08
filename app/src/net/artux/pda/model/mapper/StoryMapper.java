@@ -19,7 +19,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Mapper(uses = {ItemMapper.class, UserMapper.class})
 public interface StoryMapper {
@@ -45,5 +48,15 @@ public interface StoryMapper {
     Stage stage(net.artux.pdanetwork.model.Stage stage);
 
     Sound sound(net.artux.pdanetwork.model.Sound sound);
+
+    default List<GameMap> maps(HashMap<Long, net.artux.pdanetwork.model.GameMap> maps){
+        List<GameMap> result = new LinkedList<>();
+        for (Map.Entry<Long, net.artux.pdanetwork.model.GameMap> map : maps.entrySet()) {
+            GameMap m = new GameMap();
+            m.setId(m.getId());
+            result.add(m);
+        }
+        return result;
+    }
 
 }

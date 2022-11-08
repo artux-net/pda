@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.model.quest.StoryItem;
+import net.artux.pda.utils.URLHelper;
 
 public class StoryHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -27,15 +27,13 @@ public class StoryHolder extends RecyclerView.ViewHolder implements View.OnClick
         this.storyItem = storyItem;
         ((TextView) itemView.findViewById(R.id.storyTitle)).setText(storyItem.getTitle());
         ((TextView) itemView.findViewById(R.id.storyDesc)).setText(storyItem.getDesc());
-        if (storyItem.getIconUrl() != null)
-            if (storyItem.getIconUrl().contains("http"))
-                Glide.with(itemView)
-                        .load(storyItem.getIconUrl())
-                        .into((ImageView) itemView.findViewById(R.id.storyIcon));
-            else
-                Glide.with(itemView)
-                        .load("https://" + BuildConfig.URL + "/" + storyItem.getIconUrl())
-                        .into((ImageView) itemView.findViewById(R.id.storyIcon));
+        if (storyItem.getIconUrl() != null) {
+            String iconUrl = URLHelper.getResourceURL(storyItem.getIconUrl());
+
+            Glide.with(itemView)
+                    .load(iconUrl)
+                    .into((ImageView) itemView.findViewById(R.id.storyIcon));
+        }
         itemView.setOnClickListener(this);
     }
 

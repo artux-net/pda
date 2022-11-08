@@ -7,7 +7,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.app.DataManager
-import net.artux.pda.di.RemoteValue
+import net.artux.pda.common.PropertyFields
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
@@ -73,7 +73,7 @@ class UserViewModel @Inject constructor(
 
     fun isChatAllowed(): Boolean {
         val userModel: UserModel? = getFromCache()
-        val xpChatLimit = firebaseRemoteConfig.getLong(RemoteValue.XP_CHAT_LIMIT)
+        val xpChatLimit = firebaseRemoteConfig.getLong(PropertyFields.XP_CHAT_LIMIT)
         return (userModel != null && xpChatLimit < userModel.xp)
     }
 

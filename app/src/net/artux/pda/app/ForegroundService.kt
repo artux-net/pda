@@ -64,7 +64,6 @@ open class ForegroundService : Service() {
                     val intent = Intent(MapEngine.RECEIVER_INTENT)
                     intent.putExtra(MapEngine.RECEIVE_STORY_DATA, it)
                     LocalBroadcastManager.getInstance(this@ForegroundService).sendBroadcast(intent)
-                    //todo error
                 }
                 .onFailure {
                     val intent = Intent(MapEngine.RECEIVER_INTENT)

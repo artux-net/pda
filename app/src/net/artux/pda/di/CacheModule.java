@@ -8,11 +8,10 @@ import net.artux.pda.app.DataManager;
 import net.artux.pda.model.Summary;
 import net.artux.pda.repositories.Cache;
 import net.artux.pdanetwork.model.ArticleDto;
-import net.artux.pdanetwork.model.Chapter;
-import net.artux.pdanetwork.model.GameMap;
 import net.artux.pdanetwork.model.NoteDto;
 import net.artux.pdanetwork.model.Profile;
 import net.artux.pdanetwork.model.SellerDto;
+import net.artux.pdanetwork.model.Story;
 import net.artux.pdanetwork.model.StoryData;
 import net.artux.pdanetwork.model.StoryDto;
 import net.artux.pdanetwork.model.UserDto;
@@ -43,13 +42,8 @@ public class CacheModule {
     }
 
     @Provides
-    public Cache<Chapter> getChapterCache(@ApplicationContext Context context, Gson gson) {
-        return new Cache<>(Chapter.class, context, gson);
-    }
-
-    @Provides
-    public Cache<GameMap> getMapCache(@ApplicationContext Context context, Gson gson) {
-        return new Cache<>(GameMap.class, context, gson);
+    public Cache<Story> getStoryCache(@ApplicationContext Context context, Gson gson) {
+        return new Cache<>(Story.class, context, gson);
     }
 
     @Provides

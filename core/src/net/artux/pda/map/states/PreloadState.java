@@ -5,6 +5,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.model.map.GameMap;
 
@@ -14,14 +15,15 @@ import java.util.List;
 
 public class PreloadState extends State {
 
-    private static final String protocol = "https";
-    private static final String url = "files.artux.net/static/"; //todo remote config
-    private static final String baseUrl = protocol + "://" + url;
-    String cachePath = "cache/";
-    int triesLimit = 3;
+    private final String baseUrl;
+
+    private final int triesLimit = 3;
+
+    private final String fileCachePath = "cache/";
 
     public PreloadState(final GameStateManager gsm, DataRepository dataRepository) {
         super(gsm, dataRepository);
+        baseUrl = System.getProperty(PropertyFields.RESOURCE_URL);
     }
 
     List<String> remoteAssets = new LinkedList<>();
@@ -48,7 +50,7 @@ public class PreloadState extends State {
     }
 
     public void loadTexture(final String path, final int tries) {
-        final FileHandle file = Gdx.files.local(cachePath + path);
+        final FileHandle file = Gdx.files.local(fileCachePath + path);
         if (!file.exists() && path != null && !path.equals("")) {
             final String url = baseUrl + path;
             Gdx.app.error("Preload", path + " missed, try to load from net.");
@@ -92,13 +94,13 @@ public class PreloadState extends State {
     void checkForStartPlay() {
         GameMap map = dataRepository.getGameMap();
         if (map != null) {
-            FileHandle file = Gdx.files.local(cachePath + map.getTexture());
+            FileHandle file = Gdx.files.local(fileCachePath + map.getTexture());
 
             if (!file.exists())
                 return;
             for (String path :
                     remoteAssets) {
-                file = Gdx.files.local(cachePath + path);
+                file = Gdx.files.local(fileCachePath + path);
                 if (!file.exists() && path != null && !path.equals(""))
                     return;
             }

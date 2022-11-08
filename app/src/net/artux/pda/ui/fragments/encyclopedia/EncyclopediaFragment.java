@@ -14,11 +14,11 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
+import net.artux.pda.utils.URLHelper;
 
 import timber.log.Timber;
 
@@ -80,10 +80,9 @@ public class EncyclopediaFragment extends BaseFragment {
         webView.loadUrl("about:blank");
         if (getArguments() != null) {
             int id = getArguments().getInt(BASE_ID);
-            lastUrl = "https://" + BuildConfig.URL_API + "enc/item/" + id;
+            lastUrl = URLHelper.getApiUrl("enc/item/" + id);
         } else
-            lastUrl = "https://" + BuildConfig.URL_API + "enc";
-        //todo remote config
+            lastUrl = URLHelper.getApiUrl("enc");
 
         Timber.i("Load enc with baseId: %s", lastUrl);
         webView.loadUrl(lastUrl);
