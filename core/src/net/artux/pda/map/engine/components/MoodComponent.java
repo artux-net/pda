@@ -6,16 +6,23 @@ import com.badlogic.ashley.core.Entity;
 import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.UserModel;
 
+import java.util.Set;
+
 
 public class MoodComponent implements Component {
 
     public int group = -1;
     public Integer[] relations;
-    public boolean angry;
+
     public boolean player;
-    public boolean ignorePlayer;
 
     public Entity enemy;
+
+    public boolean immortal;
+    public boolean untarget;
+    public boolean angry;
+    public boolean angryOnPlayer;
+    public boolean ignorePlayer;
 
     public MoodComponent(UserModel userModel) {
         player = true;
@@ -27,17 +34,26 @@ public class MoodComponent implements Component {
         }
     }
 
-    public MoodComponent(int group, Integer[] relations, boolean angry) {
+    public MoodComponent(int group, Integer[] relations, Set<String> params) {
         this.group = group;
         this.relations = relations;
-        this.angry = angry;
+        this.angry = params.contains("angry");
+        immortal = params.contains("immortal");
+        untarget = params.contains("untarget");
+        this.angryOnPlayer = params.contains("angryOnPlayer");
+        this.ignorePlayer = params.contains("ignorePlayer");
     }
 
     public boolean isEnemy(MoodComponent moodComponent) {
         boolean response;
-        if ((ignorePlayer && moodComponent.player) || (player && moodComponent.ignorePlayer))
-            response = false;
+        if (ignorePlayer && moodComponent.player)
+            return false;
+        if (angryOnPlayer && moodComponent.player)
+            return true;
+        if (angry)
+            return true;
         else
+            //usual compare
             response = moodComponent.group < 0 // is animal
                     || angry
                     || moodComponent.group < relations.length && relations[moodComponent.group] < -2 && group != moodComponent.group; // is person

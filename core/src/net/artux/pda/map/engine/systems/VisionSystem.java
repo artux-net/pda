@@ -86,7 +86,8 @@ public class VisionSystem extends BaseSystem implements Drawable {
                 PositionComponent positionComponent2 = pm.get(entity2);
                 float dst = positionComponent1.dst(positionComponent2);
 
-                if (dst < VISION_DISTANCE && !mapOrientationSystem.collides(positionComponent1, positionComponent2)) {
+                if (dst < VISION_DISTANCE
+                        && !mapOrientationSystem.collides(positionComponent1, positionComponent2)) {
                     visionComponent1.addVisibleEntity(entity2);
                 }
             }

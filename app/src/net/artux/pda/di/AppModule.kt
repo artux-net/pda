@@ -3,6 +3,7 @@ package net.artux.pda.di
 import android.content.Context
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,6 +13,7 @@ import fr.bipi.tressence.file.FileLoggerTree
 import net.artux.pda.BuildConfig
 import timber.log.Timber
 import timber.log.Timber.DebugTree
+import java.io.IOException
 import java.util.*
 import javax.inject.Singleton
 
@@ -19,19 +21,35 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+
+    @Provides
+    @Singleton
+    fun properties(@ApplicationContext context: Context, remoteConfig: FirebaseRemoteConfig): Properties {
+        val properties = Properties()
+        try {
+            properties.load(context.assets.open("config/app.properties"))
+        } catch (e: IOException) {
+            Timber.i("Props not found.")
+        }
+        properties.putAll(remoteConfig.all.mapValues { it.value.asString() })
+        return properties
+    }
+
     @Provides
     @Singleton
     fun logForest(@ApplicationContext context: Context): List<Timber.Tree> {
         val list = LinkedList<Timber.Tree>()
         list.add(if (BuildConfig.DEBUG) DebugTree() else CrashReportingTree())
         var filePath = context.filesDir.absolutePath + "/logs";
-        list.add(FileLoggerTree.Builder()
-            .withFileName("file.log")
-            .withDirName(filePath)
-            .withSizeLimit(20000)
-            .withFileLimit(3)
-            .appendToFile(true)
-            .build())
+        list.add(
+            FileLoggerTree.Builder()
+                .withFileName("file.log")
+                .withDirName(filePath)
+                .withSizeLimit(20000)
+                .withFileLimit(3)
+                .appendToFile(true)
+                .build()
+        )
         return list
     }
 

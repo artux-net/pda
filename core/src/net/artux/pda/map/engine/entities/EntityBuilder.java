@@ -38,6 +38,7 @@ import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class EntityBuilder {
 
@@ -72,8 +73,9 @@ public class EntityBuilder {
         return player;
     }
 
-    public Entity bullet(Entity author, Vector2 targetPosition, WeaponModel weaponModel) {
+    public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {
         PositionComponent position = pm.get(author);
+        Vector2 targetPosition = pm.get(target);
 
         Entity player = new Entity();
 
@@ -86,8 +88,8 @@ public class EntityBuilder {
         float vY = (float) ((targetY - position.y) /
                 Math.sqrt(((targetY - position.y) * (targetY - position.y)) + ((targetX - position.x) * (targetX - position.x))));
 
-        vX *= weaponModel.getSpeed() * 2;
-        vY *= weaponModel.getSpeed() * 2;
+        vX *= weaponModel.getSpeed();
+        vY *= weaponModel.getSpeed();
 
         Vector2 direction = targetPosition.cpy().sub(position);
         float degrees = (float) (Math.atan2(
@@ -99,15 +101,15 @@ public class EntityBuilder {
         spriteComponent.setRotation(degrees + 90);
 
         player.add(new PositionComponent(position))
-                .add(new VelocityComponent(vX, vY))
+                .add(new VelocityComponent(vX, vY, true))
                 .add(spriteComponent)
-                .add(new BulletComponent(author, targetPosition, weaponModel.getDamage()));
+                .add(new BulletComponent(author, target, targetPosition, weaponModel.getDamage()));
         return player;
     }
 
-    public void addBulletToEngine(Entity entity, Vector2 targetPosition, WeaponModel weaponModel) {
-        engine.addEntity(bullet(entity, targetPosition, weaponModel));
-        engine.getSystem(SoundsSystem.class).playShoot(targetPosition);
+    public void addBulletToEngine(Entity entity, Entity target, WeaponModel weaponModel) {
+        engine.addEntity(bullet(entity, target, weaponModel));
+        engine.getSystem(SoundsSystem.class).playShoot(pm.get(target));
     }
 
     public Vector2 getPointNear(Vector2 basePosition, float precision) {
@@ -124,20 +126,22 @@ public class EntityBuilder {
         Entity entity = new Entity();
 
         WeaponModel w = new WeaponModel();
-        w.setSpeed(14);
+        w.setSpeed(6);
         w.setDamage(2);
-        w.setPrecision(10);
+        w.setPrecision(20);
         w.setBulletQuantity(30);
 
-        MoodComponent moodComponent = new MoodComponent(mobType.group, spawnComponent.getRelations(), spawnComponent.getSpawnModel().isAngry());
-        moodComponent.ignorePlayer = spawnComponent.getSpawnModel().isIgnorePlayer();
+        HealthComponent healthComponent = new HealthComponent();
+        healthComponent.setImmortal(spawnComponent.getSpawnModel().getParams().contains("immortal"));
+
+        MoodComponent moodComponent = new MoodComponent(mobType.group, spawnComponent.getRelations(), spawnComponent.getSpawnModel().getParams());
 
         StatesComponent statesComponent = new StatesComponent(entity, spawnComponent.getDispatcher(), StalkerState.INITIAL, StalkerState.GUARDING);
         spawnComponent.getDispatcher().addListener(statesComponent, MessagingCodes.ATTACKED);
 
         entity.add(new PositionComponent(spawnComponent.getTargeting().getTarget()))
                 .add(new VelocityComponent())
-                .add(new HealthComponent())
+                .add(healthComponent)
                 .add(new VisionComponent())
                 .add(moodComponent)
                 .add(new GraphMotionComponent(null))
@@ -170,7 +174,7 @@ public class EntityBuilder {
                 .add(new WeaponComponent(w, this))
                 .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
                 .add(statesComponent)
-                .add(new MoodComponent(-1, null, true))
+                .add(new MoodComponent(-1, null, Collections.singleton("angry")))
                 .add(new TargetMovingComponent(targeting));
 
         Gdx.app.log("WorldSystem", "New entity created.");

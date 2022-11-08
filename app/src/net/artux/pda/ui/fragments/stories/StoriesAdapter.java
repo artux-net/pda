@@ -44,6 +44,6 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoryHolder> {
 
 
     public interface OnStoryClickListener {
-        void onClick(int id);
+        void onClick(StoryItem item);
     }
 }

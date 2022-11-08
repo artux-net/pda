@@ -1,4 +1,4 @@
-package net.artux.pda.ui.fragments.quest;
+package net.artux.pda.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +16,6 @@ import com.bumptech.glide.Glide;
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentQuest3Binding;
 import net.artux.pda.model.items.ItemModel;
-import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
 import net.artux.pda.ui.viewmodels.ItemsViewModel;
 import net.artux.pda.ui.viewmodels.SellerViewModel;

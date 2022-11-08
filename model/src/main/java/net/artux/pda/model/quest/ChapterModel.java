@@ -1,11 +1,12 @@
 package net.artux.pda.model.quest;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class ChapterModel {
+public class ChapterModel implements Serializable {
 
     private List<Stage> stages;
     private List<Sound> music;

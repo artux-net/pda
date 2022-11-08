@@ -3,8 +3,10 @@ package net.artux.pda.app;
 import android.app.Application;
 
 import net.artux.pda.R;
+import net.artux.pda.utils.URLHelper;
 
 import java.util.List;
+import java.util.Properties;
 
 import javax.inject.Inject;
 
@@ -15,9 +17,9 @@ import timber.log.Timber;
 public class PDAApplication extends Application {
 
     @Inject
-    protected DataManager dataManager;
-    @Inject
     protected List<Timber.Tree> forest;
+    @Inject
+    protected Properties properties;
 
     public static int[] group_avatars = {
             R.drawable.g0,
@@ -39,10 +41,10 @@ public class PDAApplication extends Application {
             Timber.i("%s planted", tree.getClass().getSimpleName());
         }
         Timber.i("App started.");
+        URLHelper.init(properties);
     }
 
-    public DataManager getDataManager() {
-        return dataManager;
+    public Properties getProperties() {
+        return properties;
     }
-
 }

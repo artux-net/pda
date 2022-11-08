@@ -6,6 +6,8 @@ import net.artux.pda.model.items.MedicineModel;
 
 public class HealthComponent implements Component {
 
+    private boolean immortal = false;
+
     public float value;
     public float stamina;
     public float radiation;
@@ -15,12 +17,17 @@ public class HealthComponent implements Component {
         stamina = 100;
     }
 
+    public void setImmortal(boolean immortal) {
+        this.immortal = immortal;
+    }
+
     public boolean isDead() {
         return value < 1;
     }
 
     public void damage(float damage) {
-        value -= damage;
+        if (!immortal)
+            value -= damage;
     }
 
     public void treat(float med) {

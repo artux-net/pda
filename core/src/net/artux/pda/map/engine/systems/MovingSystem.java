@@ -98,7 +98,8 @@ public class MovingSystem extends BaseSystem {
                         positionComponent.getPosition().y = newY;
                 }
             }
-            velocityComponent.set(0, 0);
+            if (!velocityComponent.isConstant())
+                velocityComponent.set(0, 0);
         }
     }
 
@@ -110,5 +111,5 @@ public class MovingSystem extends BaseSystem {
     public boolean insideMap(float x, float y) {
         return (x <= GlobalData.mapWidth && x >= 0) && (y <= GlobalData.mapHeight && y >= 0);
     }
-    
+
 }

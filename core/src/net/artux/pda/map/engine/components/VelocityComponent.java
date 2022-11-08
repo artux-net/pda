@@ -5,16 +5,23 @@ import com.badlogic.gdx.math.Vector2;
 
 public class VelocityComponent extends Vector2 implements Component {
 
+    private final boolean constant;
     public boolean running;
     public float mass;
     private float damping = 0;
 
     public VelocityComponent() {
         super();
+        constant = false;
     }
 
-    public VelocityComponent(float x, float y) {
+    public VelocityComponent(float x, float y, boolean constant) {
         super(x, y);
+        this.constant = constant;
+    }
+
+    public boolean isConstant() {
+        return constant;
     }
 
     public VelocityComponent linearDamping(float damp) {

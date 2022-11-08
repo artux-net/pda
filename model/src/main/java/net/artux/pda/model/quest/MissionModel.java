@@ -1,12 +1,13 @@
 package net.artux.pda.model.quest;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class MissionModel {
+public class MissionModel implements Serializable {
     private String title;
     private String name;
     private List<CheckpointModel> checkpoints;

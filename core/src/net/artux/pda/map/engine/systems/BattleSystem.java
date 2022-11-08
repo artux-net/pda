@@ -21,10 +21,9 @@ import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
+import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.data.PlayerData;
-import net.artux.pda.map.engine.entities.EntityBuilder;
-import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.map.utils.PlatformInterface;
@@ -38,13 +37,12 @@ public class BattleSystem extends BaseSystem implements Disposable {
     private ImmutableArray<Entity> bullets;
 
     private final PlatformInterface platformInterface;
-    private final EntityBuilder entityBuilder;
     private final AssetManager assetManager;
 
-    private SoundsSystem soundsSystem;
     private MapOrientationSystem mapOrientationSystem;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<VisionComponent> vm = ComponentMapper.getFor(VisionComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
     private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
@@ -57,11 +55,10 @@ public class BattleSystem extends BaseSystem implements Disposable {
 
     private Slot weaponSlot;
 
-    public BattleSystem(AssetManager assetManager, EntityBuilder entityBuilder, PlatformInterface platformInterface) {
-        super(Family.all(HealthComponent.class, PositionComponent.class, WeaponComponent.class).get());
+    public BattleSystem(AssetManager assetManager, PlatformInterface platformInterface) {
+        super(Family.all(HealthComponent.class, VisionComponent.class, PositionComponent.class, WeaponComponent.class).get());
         this.assetManager = assetManager;
         this.platformInterface = platformInterface;
-        this.entityBuilder = entityBuilder;
     }
 
     @Override
@@ -70,7 +67,6 @@ public class BattleSystem extends BaseSystem implements Disposable {
 
         bullets = engine.getEntitiesFor(Family.all(PositionComponent.class, VelocityComponent.class, BulletComponent.class).get());
 
-        soundsSystem = engine.getSystem(SoundsSystem.class);
         mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
 
         InteractionSystem interactionSystem = engine.getSystem(InteractionSystem.class);
@@ -152,66 +148,40 @@ public class BattleSystem extends BaseSystem implements Disposable {
                     weaponSlot.setText(entityWeapon.getSelected().getTitle());
                 }
             }
+            MoodComponent moodComponent = mm.get(player);
+            VisionComponent visionComponent = vm.get(player);
+
+            if (moodComponent.hasEnemy()) {
+                if (visionComponent.isSeeing(moodComponent.getEnemy()))
+                    if (playerShoot && entityWeapon.shoot())
+                        entityWeapon.sendBullet(player, moodComponent.getEnemy());
+            }
         }
 
-        for (int i = 0; i < getEntities().size(); i++) {
-            Entity entity = getEntities().get(i);
+        for (Entity bullet : bullets) {
+            BulletComponent bulletComponent = bcm.get(bullet);
+            PositionComponent bulletPosition = pm.get(bullet);
+            Vector2 targetPosition = bulletComponent.getTargetPosition();
 
-            PositionComponent entityPositionComponent = pm.get(entity);
-            HealthComponent entityHealth = hm.get(entity);
-            Vector2 position = entityPositionComponent.getPosition();
-            WeaponComponent entityWeapon = wm.get(entity);
-            MoodComponent moodComponent = mm.get(entity);
+            PositionComponent targetEntityPosition = pm.get(bulletComponent.getTarget());
+            MoodComponent targetEntityMood = mm.get(bulletComponent.getTarget());
+            HealthComponent targetEntityHealth = hm.get(bulletComponent.getTarget());
 
-            Entity enemy = moodComponent.enemy;
-            if (enemy != null) {
-                PositionComponent enemyPosition = pm.get(enemy);
-                Vector2 targetPosition = enemyPosition.getPosition();
-                HealthComponent enemyHealth = hm.get(enemy);
+            float dstToTarget = bulletPosition.dst(targetPosition);
+            if (targetEntityPosition.epsilonEquals(bulletPosition, 4f)) {
+                targetEntityHealth.damage(bulletComponent.getDamage());
 
-                if (player != entity) {
-                    if (entityWeapon.getSelected() != null) {
-                        if (mapOrientationSystem.isGraphActive()) {
-                            FlatTiledNode entityNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(entityPositionComponent.getPosition());
-                            FlatTiledNode enemyNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(enemyPosition.getPosition());
-                            if (!mapOrientationSystem.collides(entityNode.getPosition(), enemyNode.getPosition())) {
-                                if (entityWeapon.shoot())
-                                    shoot(entity, entityWeapon, targetPosition);
-                            }
-                        } else {
-                            if (entityWeapon.shoot())
-                                shoot(entity, entityWeapon, targetPosition);
-                        }
-                    }
-                } else if (playerShoot) {
-                    if (entityWeapon.getSelected() != null) {
-                        //todo count walls
-                        if (entityWeapon.shoot())
-                            shoot(player, entityWeapon, targetPosition);
+                if (!targetEntityMood.hasEnemy()) {
+                    targetEntityMood.setEnemy(bulletComponent.getAuthor());
+                    MoodComponent playerMood = mm.get(player);
+                    if (bulletComponent.getAuthor() == player && !targetEntityMood.isEnemy(playerMood)) {
+                        playerMood.setRelation(targetEntityMood, -10);
                     }
                 }
-                if (enemyHealth.isDead())
-                    moodComponent.setEnemy(null);
-            }
-
-            for (Entity bullet : bullets) {
-                BulletComponent bulletComponent = bcm.get(bullet);
-                PositionComponent bulletPositionComponent = pm.get(bullet);
-                float dstToTarget = bulletPositionComponent.getPosition().dst(bulletComponent.getTarget());
-                if (position.epsilonEquals(bulletPositionComponent.getPosition(), 4f) && position.epsilonEquals(bulletComponent.getTarget(), 4f)) {
-                    entityHealth.damage(bulletComponent.getDamage());
-                    if (!moodComponent.hasEnemy()) {
-                        moodComponent.setEnemy(bulletComponent.getAuthor());
-                        MoodComponent playerMood = mm.get(player);
-                        if (bulletComponent.getAuthor() == player && !moodComponent.isEnemy(playerMood)) {
-                            playerMood.setRelation(moodComponent, -10);
-                        }
-                    }
-                } else if (dstToTarget > bulletComponent.getLastDstToTarget())
-                    getEngine().removeEntity(bullet);
-                else
-                    bulletComponent.setLastDstToTarget(dstToTarget);
-            }
+            } else if (dstToTarget > bulletComponent.getLastDstToTarget())
+                getEngine().removeEntity(bullet);
+            else
+                bulletComponent.setLastDstToTarget(dstToTarget);
         }
     }
 
@@ -234,48 +204,5 @@ public class BattleSystem extends BaseSystem implements Disposable {
     @Override
     public void dispose() {
         sr.dispose();
-    }
-
-  /*  @Override
-    public void draw(Batch batch, float parentAlpha) {
-        batch.end();
-        for (int i = 0; i < entities.size; i++) {
-            Entity entity = entities.get(i);
-
-            PositionComponent entityPosition = pm.get(entity);
-            WeaponComponent entityWeapon = wm.get(entity);
-            MoodComponent moodComponent = mm.get(entity);
-            Entity enemy = moodComponent.enemy;
-
-            if (enemy != null) {
-                PositionComponent enemyPosition = pm.get(enemy);
-                if (entityWeapon.getSelected() != null && entityWeapon.isShootLastFrame()) {
-                    drawShoot(batch, enemyPosition.getPosition(), entityPosition.getPosition());
-                }
-            }
-        }
-        batch.begin();
-
-    }*/
-
-    /*private void drawShoot(Batch batch, Vector2 enemyPosition, Vector2 entityPosition) {
-        sr.setColor(Color.ORANGE);
-        sr.setProjectionMatrix(batch.getProjectionMatrix());
-
-        sr.begin(ShapeRenderer.ShapeType.Filled);
-
-        Vector2 diff = enemyPosition.cpy().sub(entityPosition);
-        Vector2 delayed = entityPosition.cpy().add(diff.scl(0.3f));
-
-        *//*sr.rectLine(delayed,
-                getPointNear(enemyPosition, entityWeapon.getSelected().precision), 1);*//* // разбос
-        sr.rectLine(delayed, enemyPosition, 1);
-        sr.end();
-
-    }
-*/
-    private void shoot(Entity entity, WeaponComponent entityWeapon, Vector2 targetPosition) {
-        getEngine().addEntity(entityBuilder.bullet(entity, targetPosition, entityWeapon.getSelected()));
-        soundsSystem.playShoot(targetPosition);
     }
 }

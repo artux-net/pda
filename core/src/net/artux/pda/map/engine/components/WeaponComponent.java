@@ -2,7 +2,6 @@ package net.artux.pda.map.engine.components;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.model.items.ItemModel;
@@ -135,8 +134,8 @@ public class WeaponComponent implements Component {
         return shootLastFrame;
     }
 
-    public void sendBullet(Entity entity, Vector2 targetPosition) {
-        entityBuilder.addBulletToEngine(entity, targetPosition, getSelected());
+    public void sendBullet(Entity entity, Entity target) {
+        entityBuilder.addBulletToEngine(entity, target, getSelected());
     }
 
     void reload() {

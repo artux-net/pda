@@ -16,11 +16,19 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import net.artux.pda.R;
+import net.artux.pda.common.PropertyFields;
 import net.artux.pda.databinding.FragmentListBinding;
+import net.artux.pda.model.quest.StoryItem;
+import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.viewmodels.StoryViewModel;
+
+import java.util.Optional;
+import java.util.Properties;
+
+import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -29,6 +37,8 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
 
     private FragmentListBinding binding;
     private StoryViewModel storyViewModel;
+    @Inject
+    protected Properties properties;
 
     @Nullable
     @Override
@@ -76,19 +86,9 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
 
 
     @Override
-    public void onClick(int id) {
-        if (id > -1) {
-            Intent intent = new Intent(requireContext(), QuestActivity.class);
-
-            StoryStateModel storyStateModel = storyViewModel.getStoryData().getValue().getStateByStoryId(id);
-            intent.putExtra("storyId", id);
-            if (storyStateModel != null) {
-                intent.putExtra("chapterId", storyStateModel.getChapterId());
-                intent.putExtra("stageId", storyStateModel.getStageId());
-            }
-            requireActivity().startActivity(intent);
-            requireActivity().finish();
-        } else if (id == -1) {
+    public void onClick(StoryItem storyItem) {
+        int id = storyItem.getId();
+        if (id == -1) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
             builder.setTitle("Формат ввода {storyId}:{chapterId}:{stageId}");
 
@@ -96,7 +96,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             input.setInputType(InputType.TYPE_CLASS_TEXT);
             builder.setView(input);
             builder.setPositiveButton("Загрузить", (dialog, which) -> {
-                String[] keys = input.getText().toString().split(":");
+                String[] keys = input.getText().toString().replaceAll("[^0-9]+", ":").split(":");
                 if (keys.length == 3) {
                     try {
                         Intent intent = new Intent(getActivity(), QuestActivity.class);
@@ -113,6 +113,34 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             });
             builder.setNegativeButton("Закрыть", (dialog, which) -> dialog.cancel());
             builder.show();
+        } else if (id > -1) {
+            Intent intent = new Intent(requireContext(), QuestActivity.class);
+            StoryDataModel dataModel = storyViewModel.getStoryData().getValue();
+            boolean sequenceWalkthrough = Boolean.parseBoolean(properties
+                    .getProperty(PropertyFields.STORIES_SEQUENCE, "true"));
+            Optional<StoryItem> firstStory = storyViewModel.getStories().getValue().stream().findFirst();
+
+
+            if (firstStory.isPresent() && firstStory.get() != storyItem && sequenceWalkthrough) {
+                StoryStateModel stateModel = dataModel.getStateByStoryId(id - 1);
+                if (stateModel == null || !stateModel.isOver()) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
+                    builder.setTitle("Нет доступа");
+                    builder.setMessage("Прохождение этой истории недоступно пока не пройдены предыдущие");
+                    builder.setNegativeButton(R.string.okay, (dialog, which) -> dialog.cancel());
+                    builder.show();
+                    return;
+                }
+            }
+
+            StoryStateModel storyStateModel = dataModel.getStateByStoryId(id);
+            intent.putExtra("storyId", id);
+            if (storyStateModel != null) {
+                intent.putExtra("chapterId", storyStateModel.getChapterId());
+                intent.putExtra("stageId", storyStateModel.getStageId());
+            }
+            requireActivity().startActivity(intent);
+            requireActivity().finish();
         }
     }
 

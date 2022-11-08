@@ -39,6 +39,6 @@ public class StoryHolder extends RecyclerView.ViewHolder implements View.OnClick
 
     @Override
     public void onClick(View view) {
-        listener.onClick(storyItem.getId());
+        listener.onClick(storyItem);
     }
 }

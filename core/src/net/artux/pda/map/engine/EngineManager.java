@@ -114,7 +114,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addSystem(new ArtifactSystem());
         engine.addSystem(new MapLoggerSystem());
         engine.addSystem(new RenderSystem(stage, assetsFinder));
-        engine.addSystem(new BattleSystem(assetsFinder.getManager(), entityBuilder, platformInterface));
+        engine.addSystem(new BattleSystem(assetsFinder.getManager(), platformInterface));
         engine.addSystem(new StatesSystem());
         engine.addSystem(new MovementTargetingSystem());
         engine.addSystem(new VisionSystem(assetsFinder.getManager()));

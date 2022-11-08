@@ -14,6 +14,8 @@ import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
+import java.util.Properties;
+
 public class GdxAdapter extends ApplicationAdapter {
 
     private final GameStateManager gsm;
@@ -102,6 +104,11 @@ public class GdxAdapter extends ApplicationAdapter {
 
         public Builder map(GameMap map) {
             gdxAdapter.dataRepository.setGameMap(map);
+            return this;
+        }
+
+        public Builder props(Properties properties) {
+            gdxAdapter.dataRepository.setProperties(properties);
             return this;
         }
 

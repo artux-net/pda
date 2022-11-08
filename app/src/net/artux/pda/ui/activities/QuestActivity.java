@@ -35,7 +35,6 @@ import net.artux.pda.databinding.FragmentNotificationBinding;
 import net.artux.pda.gdx.MapEngine;
 import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pda.ui.fragments.quest.SellerActivity;
 import net.artux.pda.ui.fragments.quest.StageFragment;
 import net.artux.pda.ui.viewmodels.StoryViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
@@ -209,8 +208,10 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
 
             // загрузка последней стадии или намеренной
             storyViewModel.beginWithStage(storyId, chapter, stage, sync);
+            Timber.i("Quest started with %d,%d,%d", storyId, chapter, stage);
         } else
             storyViewModel.beginWithStage(keys[0], keys[1], keys[2], true);
+
     }
 
     public void setTitle(String title) {

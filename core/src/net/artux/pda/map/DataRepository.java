@@ -14,6 +14,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 
 public class DataRepository {
@@ -26,10 +27,12 @@ public class DataRepository {
     private StoryModel storyModel;
     private UserModel userModel;
 
+    private Properties properties;
     private final PlatformInterface platformInterface;
 
     public DataRepository(PlatformInterface platformInterface) {
         this.platformInterface = platformInterface;
+        this.properties = new Properties();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -39,6 +42,14 @@ public class DataRepository {
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public void setProperties(Properties properties) {
+        this.properties = properties;
+    }
+
+    public Properties getProperties() {
+        return properties;
     }
 
     public StoryDataModel getStoryDataModel() {

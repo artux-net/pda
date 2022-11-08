@@ -7,8 +7,10 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.engine.components.GraphMotionComponent;
+import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
@@ -22,7 +24,7 @@ import java.util.TimerTask;
 
 public enum StalkerState implements State<Entity> {
 
-    INITIAL(){
+    INITIAL() {
         @Override
         public void update(Entity entity) {
             StatesComponent statesComponent = sm.get(entity);
@@ -38,7 +40,7 @@ public enum StalkerState implements State<Entity> {
             gmm.get(entity).setMovementTarget(targetMovingComponent.targeting.getTarget());
             statesComponent.changeState(MOVING);
         }
-        },
+    },
 
     //can not be initial
     STANDING() {
@@ -106,7 +108,7 @@ public enum StalkerState implements State<Entity> {
                 Entity enemy = mm.get(entity).getEnemy();
                 if (wm.get(entity).getSelected() != null) {
                     WeaponModel weaponModel = wm.get(entity).getSelected();
-                    float dst = pm.get(enemy).getPosition().dst(pm.get(entity).getPosition());
+                    float dst = pm.get(enemy).dst(pm.get(entity));
                     if (dst < distanceToAttack(weaponModel.getPrecision())) {
                         //shoot
                     } else if (dst < 10) {
@@ -125,32 +127,53 @@ public enum StalkerState implements State<Entity> {
         //global
 
         @Override
-        public void enter(Entity entity) {
-            super.enter(entity);
-            sm.get(entity).changeState(MOVING_FOR_SHOOT);
-        }
-
-        @Override
         public void update(Entity entity) {
             MoodComponent moodComponent = mm.get(entity);
-            if (!mm.get(entity).hasEnemy() || pm.get(entity).dst(pm.get(moodComponent.getEnemy())) > 150) {
-                mm.get(entity).setEnemy(null);
-                sm.get(entity).setGlobalState(GUARDING);
+            StatesComponent statesComponent = sm.get(entity);
+            VisionComponent visionComponent = visionMapper.get(entity);
+
+            if (moodComponent.hasEnemy()) {
+                Entity enemy = moodComponent.getEnemy();
+                HealthComponent healthComponent = hm.get(enemy);
+                if (healthComponent.isDead()) {
+                    moodComponent.setEnemy(null);
+                    return;
+                }
+
+                WeaponComponent weaponComponent = wm.get(entity);
+
+                if (weaponComponent.getSelected() != null) {
+                    WeaponModel weaponModel = weaponComponent.getSelected();
+                    PositionComponent enemyPosition = pm.get(enemy);
+                    PositionComponent entityPosition = pm.get(entity);
+
+                    float dst = entityPosition.dst(enemyPosition);
+                    if (dst > 200) {
+                        moodComponent.setEnemy(null);
+                        return;
+                    }
+
+                    if (!visionComponent.isSeeing(enemy)
+                            || dst > distanceToAttack(weaponModel.getPrecision())) {
+                        gmm.get(entity).setMovementTarget(enemyPosition);
+                    } else if (dst > 20 && dst < distanceToAttack(weaponModel.getPrecision())) {
+                        gmm.get(entity).setMovementTarget(null);
+                        if (weaponComponent.shoot())
+                            weaponComponent.sendBullet(entity, enemy);
+                    } else {
+                        Vector2 tempTarget = enemyPosition.cpy().sub(entityPosition);
+                        gmm.get(entity).setMovementTarget(entityPosition.cpy().sub(tempTarget));
+                    }
+                }
+            } else {
+                moodComponent.setEnemy(null);
+                statesComponent.setGlobalState(GUARDING);
             }
         }
-
-
     },
 
     GUARDING() {
         //global
-
-        @Override
-        public void enter(Entity entity) {
-            super.enter(entity);
-            sm.get(entity).changeState(STANDING);
-        }
-
         @Override
         public void update(Entity entity) {
             MoodComponent moodComponent = mm.get(entity);
@@ -186,6 +209,7 @@ public enum StalkerState implements State<Entity> {
     }
 
     protected ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
+    protected ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     protected ComponentMapper<VelocityComponent> vmm = ComponentMapper.getFor(VelocityComponent.class);
     protected ComponentMapper<VisionComponent> visionMapper = ComponentMapper.getFor(VisionComponent.class);
     protected ComponentMapper<TargetMovingComponent> tmm = ComponentMapper.getFor(TargetMovingComponent.class);

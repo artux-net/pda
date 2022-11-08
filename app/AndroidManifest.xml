@@ -62,7 +62,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" />
         <activity
-            android:name=".ui.fragments.quest.SellerActivity"
+            android:name=".ui.activities.SellerActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" />
         <activity

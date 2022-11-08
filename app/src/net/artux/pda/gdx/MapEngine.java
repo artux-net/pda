@@ -17,6 +17,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import net.artux.pda.app.ForegroundService;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.map.GameMap;
@@ -26,13 +27,11 @@ import net.artux.pda.model.quest.story.StoryStateModel;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.activities.QuestActivity;
-import net.artux.pda.ui.fragments.quest.SellerActivity;
+import net.artux.pda.ui.activities.SellerActivity;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import timber.log.Timber;
 
@@ -74,21 +73,14 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
         StoryDataModel dataModel = (StoryDataModel) intent.getSerializableExtra("data");
         GameMap map = (GameMap) intent.getSerializableExtra("map");
 
-        try {
-            Properties properties = new Properties();
-            properties.load(getAssets().open("config/core.properties"));
-            System.setProperties(properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         lastStoryState = dataModel.getCurrentState();
 
         GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
                 .map(map)
                 .user(member)
                 .story(storyModel)
-                .storyData(dataModel);
+                .storyData(dataModel)
+                .props(((PDAApplication)getApplication()).getProperties());
 
         gdxAdapter = (GdxAdapter) builder.build();
         initialize(gdxAdapter, new AndroidApplicationConfiguration());

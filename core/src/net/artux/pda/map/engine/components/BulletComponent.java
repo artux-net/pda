@@ -7,13 +7,15 @@ import com.badlogic.gdx.math.Vector2;
 public class BulletComponent implements Component {
 
     private final Entity author;
-    private Vector2 target;
+    private Entity target;
+    private Vector2 targetPosition;
     private float damage;
     private float lastDstToTarget;
 
-    public BulletComponent(Entity author, Vector2 target, float damage) {
+    public BulletComponent(Entity author, Entity target, Vector2 targetPosition, float damage) {
         this.author = author;
         this.target = target;
+        this.targetPosition = targetPosition;
         this.damage = damage;
         lastDstToTarget = 1000;
     }
@@ -22,7 +24,11 @@ public class BulletComponent implements Component {
         return author;
     }
 
-    public Vector2 getTarget() {
+    public Vector2 getTargetPosition() {
+        return targetPosition;
+    }
+
+    public Entity getTarget() {
         return target;
     }
 

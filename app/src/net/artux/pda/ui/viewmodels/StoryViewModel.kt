@@ -82,7 +82,7 @@ class StoryViewModel @javax.inject.Inject constructor(
     }
 
     private suspend fun suspendUpdateData() {
-        repository.getStoryData()
+        storyData.value = repository.getStoryData()
             .map { mapper.dataModel(it) }
             .onSuccess { storyData.postValue(it) }
             .getOrThrow()
@@ -119,7 +119,9 @@ class StoryViewModel @javax.inject.Inject constructor(
                     } else
                         status.postValue(StatusModel(Exception("Can not find stage with id: $stageId in chapter: $currentChapterId")))
                 }
-                .onFailure { status.postValue(StatusModel(it)) }
+                .onFailure {
+                    status.postValue(StatusModel(it))
+                }
             loadingState.postValue(false)
         }
     }
@@ -190,7 +192,7 @@ class StoryViewModel @javax.inject.Inject constructor(
                             )
                         )
                         stage.postValue(stageMapper.model(chapterStage, storyData.value))
-                    }
+                    } else status.postValue(StatusModel(Exception("Story Data null")))
                 }
             }
         }

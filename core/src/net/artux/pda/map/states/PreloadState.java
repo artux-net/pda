@@ -16,19 +16,16 @@ import java.util.List;
 public class PreloadState extends State {
 
     private final String baseUrl;
-
     private final int triesLimit = 3;
-
     private final String fileCachePath = "cache/";
+    private final List<String> remoteAssets;
+    private long preloadTime;
 
     public PreloadState(final GameStateManager gsm, DataRepository dataRepository) {
         super(gsm, dataRepository);
-        baseUrl = System.getProperty(PropertyFields.RESOURCE_URL);
+        baseUrl = dataRepository.getProperties().getProperty(PropertyFields.RESOURCE_URL);
+        remoteAssets = new LinkedList<>();
     }
-
-    List<String> remoteAssets = new LinkedList<>();
-
-    long preloadTime;
 
     public void startLoad() {
         GameMap map = dataRepository.getGameMap();
@@ -61,13 +58,10 @@ public class PreloadState extends State {
                 public void handleHttpResponse(Net.HttpResponse httpResponse) {
                     if (httpResponse.getStatus().getStatusCode() == 200) {
                         final byte[] bytes = httpResponse.getResult();
-                        Gdx.app.postRunnable(new Runnable() {
-                            @Override
-                            public void run() {
-                                file.writeBytes(bytes, false);
-                                Gdx.app.error("Preload", path + " loaded, caching.");
-                                checkForStartPlay();
-                            }
+                        Gdx.app.postRunnable(() -> {
+                            file.writeBytes(bytes, false);
+                            Gdx.app.error("Preload", path + " loaded, caching.");
+                            checkForStartPlay();
                         });
                     }
                 }

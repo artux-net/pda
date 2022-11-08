@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
@@ -55,7 +56,7 @@ public class NetworkModule {
             return chain.proceed(requestBuilder.build());
         });
 
-        if (BuildConfig.DEBUG){
+        if (BuildConfig.DEBUG) {
             httpClient
                     .connectTimeout(10, TimeUnit.SECONDS)
                     .writeTimeout(10, TimeUnit.SECONDS)

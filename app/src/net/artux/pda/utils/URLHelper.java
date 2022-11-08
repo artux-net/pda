@@ -1,34 +1,31 @@
 package net.artux.pda.utils;
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-
 import net.artux.pda.common.PropertyFields;
+
+import java.util.Properties;
 
 public class URLHelper {
 
-    private static final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
     private static String resourceUrl;
     private static String apiUrl;
-    {
-        resourceUrl = remoteConfig.getString(PropertyFields.RESOURCE_URL);
-        apiUrl = remoteConfig.getString(PropertyFields.API_URL);
+
+    public static void init(Properties properties) {
+        resourceUrl = properties.getProperty(PropertyFields.RESOURCE_URL);
+        apiUrl = properties.getProperty(PropertyFields.API_URL);
     }
 
-    public static String getResourceURL(String part){
+    public static String getResourceURL(String part) {
         if (part == null)
             return null;
         String background_url;
         if (!part.contains("http")) {
-            if (part.startsWith("/"))
-                background_url = resourceUrl + part;
-            else
-                background_url = resourceUrl + "/" + part;
+            background_url = resourceUrl + part;
         } else
             background_url = part;
         return background_url;
     }
 
-    public static String getApiUrl(String part){
+    public static String getApiUrl(String part) {
         if (part == null)
             return null;
         String background_url;
