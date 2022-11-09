@@ -34,6 +34,7 @@ import net.artux.pda.map.engine.systems.MovingSystem;
 import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
+import net.artux.pda.map.engine.systems.SpawnSystem;
 import net.artux.pda.map.engine.systems.StatesSystem;
 import net.artux.pda.map.engine.systems.VisionSystem;
 import net.artux.pda.map.engine.systems.WorldSystem;
@@ -120,6 +121,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addSystem(new VisionSystem(assetsFinder.getManager()));
         engine.addSystem(new MovingSystem());
         engine.addSystem(new DeadCheckerSystem(playState.getUserInterface(), dataRepository, assetsFinder.getManager()));
+        engine.addSystem(new SpawnSystem(dataRepository));
 
         clicksSystem = engine.getSystem(ClicksSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);

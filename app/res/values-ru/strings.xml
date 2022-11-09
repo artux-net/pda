@@ -13,7 +13,7 @@
     <string name="error_incorrect_password">Не корректный пароль</string>
     <string name="error_field_required">Это поле пустое</string>
     <string name="action_register">РЕГИСТРАЦИЯ</string>
-    <string name="action_forgot_password">Забыл пароль</string>
+    <string name="action_forgot_password">Забыли пароль?</string>
 
     <!-- Strings related to register -->
     <string name="prompt_login">Логин</string>
@@ -114,4 +114,5 @@
     <string name="notification_message">Сообщение</string>
     <string name="notification_alert">Уведомление</string>
     <string name="any_select_action">Выберете действие</string>
+    <string name="detector_desc">Тип: %1$s</string>
 </resources>

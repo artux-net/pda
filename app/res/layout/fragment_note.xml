@@ -18,11 +18,13 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editNoteTitle"
+            android:maxLines="1"
+            android:inputType="text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignStart="@id/deleteButton"
-            android:hint="Введите заголовок.."/>
+            android:hint="@string/noteTitleInput"/>
 
         <ImageButton
             android:id="@+id/deleteButton"
@@ -40,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:hint="Заметка.."/>
+        android:hint="@string/noteContentInput"/>
 
     <TextView
         android:id="@+id/noteTime"

@@ -99,7 +99,9 @@ public class DataRepository {
     public void applyActions(Map<String, List<String>> actions) {
         HashMap<String, List<String>> summaryMap
                 = new HashMap<>(QuestUtil.difference(oldStoryDataModel, storyDataModel));
-        summaryMap.putAll(actions);
-        platformInterface.applyActions(summaryMap);
+        if (actions != null && actions.size() > 0) {
+            summaryMap.putAll(actions);
+            platformInterface.applyActions(summaryMap);
+        }
     }
 }

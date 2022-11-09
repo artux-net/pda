@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentNoteBinding;
 import net.artux.pda.model.profile.NoteModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
@@ -49,7 +50,10 @@ public class NoteFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         noteViewModel = new ViewModelProvider(requireActivity()).get(NoteViewModel.class);
-
+        if (navigationPresenter!=null) {
+            navigationPresenter.setTitle(getResources().getString(R.string.notes));
+            navigationPresenter.setLoadingState(true);
+        }
         noteViewModel.getActiveNote().observe(getViewLifecycleOwner(), this::bindNote);
         binding.deleteButton.setOnClickListener(view1 -> noteViewModel.deleteNote());
         binding.editNoteContent.addTextChangedListener(new TextWatcher() {

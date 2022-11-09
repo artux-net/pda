@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.DataRepository;
@@ -21,7 +22,7 @@ public class SpawnSystem extends IteratingSystem implements Disposable {
     private ImmutableArray<Entity> spawns;
     private final DataRepository dataRepository;
 
-    private ComponentMapper<SpawnComponent> sm = ComponentMapper.getFor(SpawnComponent.class);
+    private final ComponentMapper<SpawnComponent> sm = ComponentMapper.getFor(SpawnComponent.class);
 
     private Timer timer;
 
@@ -45,6 +46,7 @@ public class SpawnSystem extends IteratingSystem implements Disposable {
 
             spawnComponent.getEntities().removeIf(e -> getEntities().indexOf(e, true) < 0);
             if (spawnComponent.getEntities().size() < 1 && !spawnComponent.isActionsDone()) {
+                Gdx.app.log("Spawn actions", "Actions sent");
                 dataRepository.applyActions(spawnComponent.getSpawnModel().getActions());
                 spawnComponent.setActionsDone(true);
             }

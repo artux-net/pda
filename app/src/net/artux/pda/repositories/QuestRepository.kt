@@ -1,5 +1,6 @@
 package net.artux.pda.repositories
 
+import net.artux.pda.model.Summary
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.*
 import retrofit2.Call
@@ -17,6 +18,7 @@ class QuestRepository @Inject constructor(
     private val defaultApi: DefaultApi,
     private val storyDataCache: Cache<StoryData>,
     private val storyCache: Cache<StoryDto>,
+    private val summaryCache: Cache<Summary>,
     private val questCache: Cache<Story>
 ) {
 
@@ -24,6 +26,7 @@ class QuestRepository @Inject constructor(
         storyDataCache.clear()
         questCache.clear()
         storyCache.clear()
+        summaryCache.clear()
     }
 
     fun getCachedStoryData(): Result<StoryData> {

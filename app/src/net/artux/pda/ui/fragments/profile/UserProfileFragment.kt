@@ -73,7 +73,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             binding.profileRang.text =
                 getString(R.string.rang_p, ProfileHelper.getRang(model.xp, view.context))
             binding.profileRating.text =
-                getString(R.string.rating_p, model.xp.toString())
+                getString(R.string.xp_p, model.xp.toString())
 
             binding.profileFriends.text =
                 view.context.getString(R.string.friends, model.friends.toString())
