@@ -21,16 +21,14 @@ public class AnomalyComponent implements Component {
     }
 
     public String desc(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Объект: ");
-        stringBuilder.append("Аномалия");
-        stringBuilder.append('\n');
-        stringBuilder.append("Наименование: ");
-        stringBuilder.append(name);
-        stringBuilder.append('\n');
-        stringBuilder.append("Размер: ");
-        stringBuilder.append(size * 2);
-        return stringBuilder.toString();
+        return "Объект: " +
+                "Аномалия" +
+                '\n' +
+                "Наименование: " +
+                name +
+                '\n' +
+                "Размер: " +
+                size * 2;
     }
 
 }

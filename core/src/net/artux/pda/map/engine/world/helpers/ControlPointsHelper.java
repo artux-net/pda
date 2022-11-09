@@ -42,12 +42,13 @@ public class ControlPointsHelper {
             if(QuestUtil.check(spawnModel.getCondition(), storyDataModel)) {
                 MobType mobType = mobsTypes.getMobType(spawnModel.getId());
 
-                SpawnComponent spawnComponent = new SpawnComponent(spawnModel, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]));
+                List<Entity> pointEntities = new LinkedList<>();
+                SpawnComponent spawnComponent = new SpawnComponent(spawnModel, mobsTypes.getRelations(mobType.group).toArray(new Integer[0]), pointEntities);
 
                 Entity controlPoint = new Entity();
                 float size = spawnModel.getR() * 2 * 0.9f;
 
-                List<Entity> pointEntities = new LinkedList<>();
+
                 for (int i = 0; i < spawnModel.getN(); i++) {
                     Entity entity = entityBuilder.spawnStalker(spawnComponent, mobType);
                     engine.addEntity(entity);

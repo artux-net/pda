@@ -77,52 +77,6 @@ public enum StalkerState implements State<Entity> {
         }
     },
 
-    MOVING_FOR_SHOOT() {
-        @Override
-        public void update(Entity entity) {
-            StatesComponent statesComponent = sm.get(entity);
-            GraphMotionComponent graphMotionComponent = gmm.get(entity);
-            VisionComponent visionComponent = visionMapper.get(entity);
-            if (mm.get(entity).getEnemy() != null) {
-                Entity enemy = mm.get(entity).getEnemy();
-                if (wm.get(entity).getSelected() != null) {
-                    WeaponModel weaponModel = wm.get(entity).getSelected();
-                    float dst = pm.get(enemy).dst(pm.get(entity));
-                    if (dst < distanceToAttack(weaponModel.getPrecision())
-                            && visionComponent.isSeeing(enemy)) {
-                        graphMotionComponent.setMovementTarget(null);
-                        statesComponent.changeState(SHOOT);
-                    } else {
-                        graphMotionComponent.setMovementTarget(pm.get(enemy));
-                    }
-                }
-            }
-        }
-    },
-
-    SHOOT() {
-        @Override
-        public void update(Entity entity) {
-            StatesComponent statesComponent = sm.get(entity);
-            if (mm.get(entity).getEnemy() != null) {
-                Entity enemy = mm.get(entity).getEnemy();
-                if (wm.get(entity).getSelected() != null) {
-                    WeaponModel weaponModel = wm.get(entity).getSelected();
-                    float dst = pm.get(enemy).dst(pm.get(entity));
-                    if (dst < distanceToAttack(weaponModel.getPrecision())) {
-                        //shoot
-                    } else if (dst < 10) {
-                        // отодвинутся от врага
-                        //TODO
-                        //statesComponent.
-                    } else {
-                        statesComponent.changeState(MOVING_FOR_SHOOT);
-                    }
-                }
-            }
-        }
-    },
-
     ATTACKING() {
         //global
 

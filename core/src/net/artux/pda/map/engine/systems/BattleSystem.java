@@ -152,9 +152,10 @@ public class BattleSystem extends BaseSystem implements Disposable {
             VisionComponent visionComponent = vm.get(player);
 
             if (moodComponent.hasEnemy()) {
-                if (visionComponent.isSeeing(moodComponent.getEnemy()))
-                    if (playerShoot && entityWeapon.shoot())
-                        entityWeapon.sendBullet(player, moodComponent.getEnemy());
+                if (!mm.get(moodComponent.enemy).untarget)
+                    if (visionComponent.isSeeing(moodComponent.getEnemy()))
+                        if (playerShoot && entityWeapon.shoot())
+                            entityWeapon.sendBullet(player, moodComponent.getEnemy());
             }
         }
 
