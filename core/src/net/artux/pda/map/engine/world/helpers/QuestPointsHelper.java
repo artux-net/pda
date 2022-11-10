@@ -10,14 +10,15 @@ import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.QuestComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
+import net.artux.pda.map.engine.components.TransferComponent;
 import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.utils.Mappers;
-import net.artux.pda.model.map.GameMap;
-import net.artux.pda.model.map.Point;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.QuestUtil;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.model.map.Point;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 
@@ -62,9 +63,11 @@ public class QuestPointsHelper {
                 entity.add(new QuestComponent());
                 texture = assetManager.get("quest1.png", Texture.class);
                 break;
-            case 7:
+            case 7: {
                 texture = assetManager.get("transfer.png", Texture.class);
-                break;
+                entity.add(new TransferComponent());
+            }
+            break;
         }
         int size = 23;
         if (texture != null)

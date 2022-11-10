@@ -36,11 +36,13 @@ import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.engine.systems.SpawnSystem;
 import net.artux.pda.map.engine.systems.StatesSystem;
+import net.artux.pda.map.engine.systems.TimerSystem;
 import net.artux.pda.map.engine.systems.VisionSystem;
 import net.artux.pda.map.engine.systems.WorldSystem;
 import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
+import net.artux.pda.map.engine.world.helpers.RandomSpawnerHelper;
 import net.artux.pda.map.states.PlayState;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.map.utils.PlatformInterface;
@@ -105,7 +107,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
 
         if (controlPoints)
-            ControlPointsHelper.createControlPointsEntities(engine, entityBuilder, assetsFinder.getManager());
+            ControlPointsHelper.createControlPointsEntities(engine, entityBuilder);
         if (questPoints)
             QuestPointsHelper.createQuestPointsEntities(engine, assetsFinder.getManager(), platformInterface);
         if (anomalies)
@@ -122,6 +124,9 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         engine.addSystem(new MovingSystem());
         engine.addSystem(new DeadCheckerSystem(playState.getUserInterface(), dataRepository, assetsFinder.getManager()));
         engine.addSystem(new SpawnSystem(dataRepository));
+        engine.addSystem(new TimerSystem());
+
+        RandomSpawnerHelper.init(engine, dataRepository, entityBuilder);
 
         clicksSystem = engine.getSystem(ClicksSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);

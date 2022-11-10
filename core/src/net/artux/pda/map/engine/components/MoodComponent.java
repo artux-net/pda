@@ -21,6 +21,7 @@ public class MoodComponent implements Component {
     public boolean immortal;
     public boolean untarget;
     public boolean angry;
+    public boolean alwaysIgnored;
     public boolean angryOnPlayer;
     public boolean ignorePlayer;
 
@@ -37,6 +38,7 @@ public class MoodComponent implements Component {
     public MoodComponent(int group, Integer[] relations, Set<String> params) {
         this.group = group;
         this.relations = relations;
+        this.alwaysIgnored = params.contains("alwaysIgnored");
         this.angry = params.contains("angry");
         immortal = params.contains("immortal");
         untarget = params.contains("untarget");
@@ -46,6 +48,8 @@ public class MoodComponent implements Component {
 
     public boolean isEnemy(MoodComponent moodComponent) {
         boolean response;
+        if (moodComponent.alwaysIgnored)
+            return false;
         if (ignorePlayer && moodComponent.player)
             return false;
         if (angryOnPlayer && moodComponent.player)
@@ -55,7 +59,6 @@ public class MoodComponent implements Component {
         else
             //usual compare
             response = moodComponent.group < 0 // is animal
-                    || angry
                     || moodComponent.group < relations.length && relations[moodComponent.group] < -2 && group != moodComponent.group; // is person
 
         return response;

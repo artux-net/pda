@@ -10,11 +10,15 @@ import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 
 import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.MessagingCodes;
 import net.artux.pda.map.engine.components.BulletComponent;
+import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.GraphMotionComponent;
+import net.artux.pda.map.engine.components.GroupComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -30,15 +34,21 @@ import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.player.UserVelocityInput;
 import net.artux.pda.map.engine.components.states.StalkerState;
+import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
-import net.artux.pda.map.model.MobType;
+import net.artux.pda.map.model.BotType;
+import net.artux.pda.map.model.BotsTypes;
+import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
+import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class EntityBuilder {
 
@@ -49,8 +59,11 @@ public class EntityBuilder {
     private final Texture bulletTexture;
     private final Engine engine;
     private final MessageManager messageManager;
+    private final BotsTypes botsTypes;
 
     public EntityBuilder(AssetManager assetManager, Engine engine) {
+        JsonReader reader = new JsonReader(Gdx.files.internal("mobs.json").reader());
+        botsTypes = new Gson().fromJson(reader, BotsTypes.class);
         this.assetManager = assetManager;
         this.engine = engine;
         this.contentGenerator = new ContentGenerator();
@@ -122,50 +135,73 @@ public class EntityBuilder {
         return new Vector2(basePosition.x + x, basePosition.y + y);
     }
 
-    public Entity spawnStalker(SpawnComponent spawnComponent, MobType mobType) {
+    public void generateSpawn(SpawnModel spawnModel) {
+        BotType botType = botsTypes.getMobType(spawnModel.getId());
+        MoodComponent botMood = botType.getMood(spawnModel.getParams());
+
+        List<Entity> pointEntities = new LinkedList<>();
+        SpawnComponent spawnComponent = new SpawnComponent("Контрольная точка", spawnModel);
+        GroupComponent groupComponent = new GroupComponent(botType, pointEntities, spawnModel.getParams());
+        spawnComponent.setGroup(groupComponent);
+
+        for (int i = 0; i < spawnModel.getN(); i++) {
+            Entity entity = spawnStalker(groupComponent);
+            engine.addEntity(entity);
+            pointEntities.add(entity);
+        }
+
+        Entity controlPoint = new Entity();
+        float size = spawnModel.getR() * 2 * 0.9f;
+        controlPoint.add(new PositionComponent(Mappers.vector2(spawnModel.getPos())))
+                .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size))
+                .add(spawnComponent)
+                .add(new ClickComponent(() -> engine.getSystem(RenderSystem.class)
+                        .showText(spawnComponent.desc(), Mappers.vector2(spawnModel.getPos()))));
+        engine.addEntity(controlPoint);
+    }
+
+    public Entity spawnStalker(GroupComponent group) {
         Entity entity = new Entity();
 
         WeaponModel w = new WeaponModel();
-        w.setSpeed(6);
-        w.setDamage(2);
-        w.setPrecision(20);
+        w.setSpeed(random(5, 10));
+        w.setDamage(random(3, 5));
+        w.setPrecision(random(15, 25));
         w.setBulletQuantity(30);
 
         HealthComponent healthComponent = new HealthComponent();
-        healthComponent.setImmortal(spawnComponent.getSpawnModel().getParams().contains("immortal"));
+        healthComponent.setImmortal(group.getParams().contains("immortal"));
 
-        MoodComponent moodComponent = new MoodComponent(mobType.group, spawnComponent.getRelations(), spawnComponent.getSpawnModel().getParams());
+        StatesComponent statesComponent = new StatesComponent(entity, group.getDispatcher(), StalkerState.INITIAL, StalkerState.GUARDING);
+        group.getDispatcher().addListener(statesComponent, MessagingCodes.ATTACKED);
 
-        StatesComponent statesComponent = new StatesComponent(entity, spawnComponent.getDispatcher(), StalkerState.INITIAL, StalkerState.GUARDING);
-        spawnComponent.getDispatcher().addListener(statesComponent, MessagingCodes.ATTACKED);
-
-        entity.add(new PositionComponent(spawnComponent.getTargeting().getTarget()))
-                .add(new VelocityComponent())
-                .add(healthComponent)
-                .add(new VisionComponent())
-                .add(moodComponent)
+        entity.add(new PositionComponent(group.getTargeting().getTarget()))
                 .add(new GraphMotionComponent(null))
+                .add(new VelocityComponent())
+                .add(new VisionComponent())
+                .add(healthComponent)
+                .add(group.getMood())
                 .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<>()))
                 .add(new WeaponComponent(w, this))
                 .add(statesComponent)
-                .add(new TargetMovingComponent(spawnComponent.getTargeting()))
+                .add(new TargetMovingComponent(group.getTargeting()))
                 .add(new RelationalSpriteComponent(8, 8));
 
         return entity;
     }
 
-    public Entity randomStalker(Vector2 position, TargetMovingComponent.Targeting targeting) {
+    public Entity randomStalker(TargetMovingComponent.Targeting targeting) {
         Entity entity = new Entity();
 
         WeaponModel w = new WeaponModel();
-        w.setSpeed(30);
-        w.setDamage(1);
-        w.setPrecision(10);
-        w.setBulletQuantity(15);
+        w.setSpeed(random(5, 10));
+        w.setDamage(random(3, 5));
+        w.setPrecision(random(15, 25));
+        w.setBulletQuantity(30);
 
         StatesComponent statesComponent = new StatesComponent(entity, null, StalkerState.INITIAL, StalkerState.GUARDING);
 
-        entity.add(new PositionComponent(position))
+        entity.add(new PositionComponent(targeting.getTarget()))
                 .add(new VisionComponent())
                 .add(new RelationalSpriteComponent(8, 8))
                 .add(new VelocityComponent())
@@ -181,4 +217,7 @@ public class EntityBuilder {
         return entity;
     }
 
+    public void spawnAttackGroup(Vector2 randomTransferPosition, TargetMovingComponent.Targeting targeting) {
+
+    }
 }
