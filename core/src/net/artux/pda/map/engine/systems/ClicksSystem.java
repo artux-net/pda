@@ -9,7 +9,6 @@ import com.badlogic.ashley.utils.ImmutableArray;
 
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.SpriteComponent;
 
 public class ClicksSystem extends EntitySystem {
 
@@ -17,12 +16,11 @@ public class ClicksSystem extends EntitySystem {
 
     private ComponentMapper<ClickComponent> cm = ComponentMapper.getFor(ClickComponent.class);
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        entities = engine.getEntitiesFor(Family.all(ClickComponent.class, PositionComponent.class, SpriteComponent.class).get());
+        entities = engine.getEntitiesFor(Family.all(ClickComponent.class, PositionComponent.class).get());
     }
 
     @Override
@@ -30,13 +28,12 @@ public class ClicksSystem extends EntitySystem {
         super.update(deltaTime);
     }
 
-    public boolean clicked(float x, float y){
+    public boolean clicked(float x, float y) {
         for (int i = 0; i < entities.size(); i++) {
             ClickComponent clickComponent = cm.get(entities.get(i));
             PositionComponent positionComponent = pm.get(entities.get(i));
-            SpriteComponent spriteComponent = sm.get(entities.get(i));
 
-            if (positionComponent.getPosition().epsilonEquals(x, y, spriteComponent.sprite.getHeight() / 2)) {
+            if (positionComponent.getPosition().epsilonEquals(x, y, clickComponent.clickRadius)) {
                 clickComponent.clickListener.clicked();
                 return true;
             }

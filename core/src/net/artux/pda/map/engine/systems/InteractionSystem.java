@@ -51,7 +51,7 @@ public class InteractionSystem extends BaseSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        mobs = engine.getEntitiesFor(Family.all(SpriteComponent.class, MoodComponent.class, PositionComponent.class).get());
+        mobs = engine.getEntitiesFor(Family.all(MoodComponent.class, PositionComponent.class).get());
         soundsSystem = engine.getSystem(SoundsSystem.class);
         cameraSystem = engine.getSystem(CameraSystem.class);
     }

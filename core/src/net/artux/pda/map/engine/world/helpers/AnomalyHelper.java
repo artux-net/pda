@@ -44,7 +44,7 @@ public class AnomalyHelper {
             anomaly.add(new PositionComponent(finalPosition))
                     .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size))
                     .add(anomalyComponent)
-                    .add(new ClickComponent(new ClickComponent.ClickListener() {
+                    .add(new ClickComponent(size / 2, new ClickComponent.ClickListener() {
                         @Override
                         public void clicked() {
                             engine.getSystem(RenderSystem.class)

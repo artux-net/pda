@@ -16,8 +16,8 @@ repositories {
 
 task downloadAPI {
     def f = new File('app/api.json')
-   /* new URL('https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest')
-            .withInputStream { i -> f.withOutputStream { it << i } }*/
+    new URL('https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest')
+            .withInputStream { i -> f.withOutputStream { it << i } }
 }
 
 swaggerSources {
@@ -174,7 +174,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
 
-
     implementation "com.github.bumptech.glide:glide:$glide_version"
     annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
 
@@ -201,9 +200,9 @@ task copyAndroidNatives {
             def outputDir = null
             if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
             if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-            if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
-            if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-            if(outputDir != null) {
+            if (jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
+            if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+            if (outputDir != null) {
                 copy {
                     from zipTree(jar)
                     into outputDir

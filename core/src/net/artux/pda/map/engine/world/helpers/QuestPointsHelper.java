@@ -43,7 +43,7 @@ public class QuestPointsHelper {
         Entity entity = new Entity();
         entity.add(new PositionComponent(Mappers.vector2(point.getPos())))
                 .add(new InteractiveComponent(point.getName(), point.getType(), userInterface -> platformInterface.send(point.getData())))
-                .add(new ClickComponent(() -> engine.getSystem(RenderSystem.class)
+                .add(new ClickComponent(23, () -> engine.getSystem(RenderSystem.class)
                         .showText("Метка: " + point.getName(), Mappers.vector2(point.getPos()))));
 
         Texture texture = null;

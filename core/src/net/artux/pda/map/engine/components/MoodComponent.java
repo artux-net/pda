@@ -12,7 +12,7 @@ import java.util.Set;
 public class MoodComponent implements Component {
 
     public int group = -1;
-    public Integer[] relations;
+    public final Integer[] relations;
 
     public boolean player;
 
@@ -37,6 +37,8 @@ public class MoodComponent implements Component {
 
     public MoodComponent(int group, Integer[] relations, Set<String> params) {
         this.group = group;
+        if (relations.length != Gang.values().length)
+            throw new RuntimeException("Wrong length");
         this.relations = relations;
         this.alwaysIgnored = params.contains("alwaysIgnored");
         this.angry = params.contains("angry");

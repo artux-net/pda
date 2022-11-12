@@ -8,14 +8,13 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.map.SpawnModel;
 
-public class SpawnComponent implements Component, TargetMovingComponent.Targeting {
+public class SpawnComponent implements Component, GroupTargetMovingComponent.Targeting {
 
-    public String title;
     private final SpawnModel spawnModel;
     private GroupComponent groupComponent;
     private boolean actionsDone;
 
-    public SpawnComponent(String title, SpawnModel spawnModel) {
+    public SpawnComponent(SpawnModel spawnModel) {
         this.spawnModel = spawnModel;
     }
 
@@ -32,6 +31,10 @@ public class SpawnComponent implements Component, TargetMovingComponent.Targetin
         return groupComponent == null || groupComponent.getEntities().size() < 1;
     }
 
+    public Vector2 getPosition() {
+        return Mappers.vector2(spawnModel.getPos());
+    }
+
     public void setActionsDone(boolean actionsDone) {
         this.actionsDone = actionsDone;
     }
@@ -44,9 +47,6 @@ public class SpawnComponent implements Component, TargetMovingComponent.Targetin
         return spawnModel;
     }
 
-    public int getGroupId() {
-        return spawnModel.getId();
-    }
 
     @Override
     public Vector2 getTarget() {
@@ -62,7 +62,7 @@ public class SpawnComponent implements Component, TargetMovingComponent.Targetin
 
     public String desc() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Объект: ").append(title);
+        stringBuilder.append("Объект: ").append(spawnModel.getTitle());
         stringBuilder.append('\n');
         if (isEmpty())
             stringBuilder.append("Не занята");

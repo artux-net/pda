@@ -14,7 +14,6 @@ import net.artux.pda.app.PDAApplication;
 import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.GangRelation;
 
-import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 
 public class GroupRelationsAdapter extends RecyclerView.Adapter<GroupRelationsAdapter.GroupHolder> {
@@ -27,15 +26,8 @@ public class GroupRelationsAdapter extends RecyclerView.Adapter<GroupRelationsAd
     }
 
     private void updateContent() {
-        Class<GangRelation> z = GangRelation.class;
-        for (Field f : z.getDeclaredFields()) {
-            Gang gang = Gang.valueOf(f.getName().toUpperCase());
-            f.setAccessible(true);
-            try {
-                list.put(gang.getId(), (Integer) f.get(objectRelation));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+        for (Gang gang : Gang.values()) {
+            list.put(gang.getId(), (Integer) objectRelation.getFor(gang));
         }
     }
 

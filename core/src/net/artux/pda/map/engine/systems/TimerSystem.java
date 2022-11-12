@@ -2,17 +2,25 @@ package net.artux.pda.map.engine.systems;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
-import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.engine.components.TimeComponent;
+
+import java.time.Instant;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class TimerSystem extends EntitySystem implements Disposable {
+public class TimerSystem extends IteratingSystem implements Disposable {
 
     private final Timer timer;
+    private final ComponentMapper<TimeComponent> cm = ComponentMapper.getFor(TimeComponent.class);
 
     public TimerSystem() {
+        super(Family.all(TimeComponent.class).get());
         timer = new Timer();
     }
 
@@ -39,6 +47,15 @@ public class TimerSystem extends EntitySystem implements Disposable {
     public void dispose() {
         timer.cancel();
         timer.purge();
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+        TimeComponent timeComponent = cm.get(entity);
+        if (timeComponent.isExpired(Instant.now())) {
+            timeComponent.getListener().onExpire();
+            getEngine().removeEntity(entity);
+        }
     }
 
     public interface TimerListener {

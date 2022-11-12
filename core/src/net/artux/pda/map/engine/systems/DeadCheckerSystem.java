@@ -20,8 +20,11 @@ import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
+import net.artux.pda.map.engine.components.TimeComponent;
 import net.artux.pda.map.ui.UserInterface;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Random;
 
@@ -66,29 +69,32 @@ public class DeadCheckerSystem extends BaseSystem {
                     if (entity != player) {
                         StalkerComponent stalkerComponent = entity.getComponent(StalkerComponent.class);
                         deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, new InteractiveComponent.InteractListener() {
-                            @Override
-                            public void interact(UserInterface userInterface) {
-                                switch (random.nextInt(4)){
-                                    case 0:
-                                        dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("85:1")));
-                                        break;
-                                    case 1:
-                                        dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("83:2")));
-                                        break;
-                                    case 2:
-                                        dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("84:1")));
-                                        break;
-                                    case 3:
-                                        dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("85:2")));
-                                        break;
-                                    case 4:
-                                        dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("83:1")));
-                                        break;
-                                }
+                                    @Override
+                                    public void interact(UserInterface userInterface) {
+                                        switch (random.nextInt(4)) {
+                                            case 0:
+                                                dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("85:1")));
+                                                break;
+                                            case 1:
+                                                dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("83:2")));
+                                                break;
+                                            case 2:
+                                                dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("84:1")));
+                                                break;
+                                            case 3:
+                                                dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("85:2")));
+                                                break;
+                                            case 4:
+                                                dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("83:1")));
+                                                break;
+                                        }
 
-                                getEngine().removeEntity(deadEntity);
-                            }
-                        })).add(stalkerComponent);
+                                        getEngine().removeEntity(deadEntity);
+                                    }
+                                }))
+                                .add(new TimeComponent(Instant.now().plus(1, ChronoUnit.MINUTES),
+                                        () -> getEngine().removeEntity(entity)))
+                                .add(stalkerComponent);
                     } else {
                         getEngine().removeEntity(player);
                         getEngine().removeSystem(getEngine().getSystem(PlayerSystem.class));

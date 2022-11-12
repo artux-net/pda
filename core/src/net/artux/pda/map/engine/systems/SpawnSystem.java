@@ -7,7 +7,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.components.GroupComponent;
@@ -57,16 +56,18 @@ public class SpawnSystem extends IteratingSystem {
                 }
 
                 GroupComponent minDstGroup = null;
-                float minDst = 100;
+                float minDst = 50;
                 for (Entity entity : groupEntities) {
                     GroupComponent group = gm.get(entity);
-                    float dst = group.getCenterPoint().dst(spawnPosition);
-                    if (minDstGroup == null
-                            || dst < minDst) {
-                        minDstGroup = group;
-                        minDst = dst;
+                    if (!(group.getTargeting() instanceof SpawnComponent)) {
+                        float dst = group.getCenterPoint().dst(spawnPosition);
+                        if (minDstGroup == null
+                                || dst < minDst) {
+                            minDstGroup = group;
+                            minDst = dst;
+                        }
+                        spawnComponent.setGroup(group);
                     }
-                    spawnComponent.setGroup(group);
                 }
 
             }
@@ -79,4 +80,17 @@ public class SpawnSystem extends IteratingSystem {
 
     }
 
+    public Entity getEmptySpawn() {
+        for (Entity entity : spawns) {
+            SpawnComponent spawnComponent = sm.get(entity);
+            if (spawnComponent.isEmpty()) {
+                return entity;
+            }
+        }
+        return null;
+    }
+
+    public Entity getRandomSpawn() {
+        return spawns.random();
+    }
 }

@@ -9,7 +9,7 @@ public enum Gang {
     MONOLITH(5),
     MERCENARIES(6),
     SCIENTISTS(7),
-    CLEARSKY(8);
+    CLEAR_SKY(8);
 
     private final int id;
 

@@ -5,12 +5,14 @@ import com.badlogic.ashley.core.Component;
 public class ClickComponent implements Component {
 
     public ClickListener clickListener;
+    public final int clickRadius;
 
-    public ClickComponent(ClickListener clickListener) {
+    public ClickComponent(int clickRadius, ClickListener clickListener) {
+        this.clickRadius = clickRadius;
         this.clickListener = clickListener;
     }
 
-    public interface ClickListener{
+    public interface ClickListener {
 
         void clicked();
 

@@ -25,7 +25,7 @@ public class GangRelation implements Serializable {
                 return loners;
             case BANDITS:
                 return bandits;
-            case CLEARSKY:
+            case CLEAR_SKY:
                 return clearSky;
             case LIBERTY:
                 return liberty;

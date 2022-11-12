@@ -70,10 +70,9 @@ class QuestRepository @Inject constructor(
     suspend fun getChapter(storyId: Int, chapterId: Int): Result<Chapter> {
         val story = getStory(storyId)
         story.onSuccess {
-            for (chapter in it.chapterList) {
-                if (chapter.id == chapterId.toLong())
-                    return Result.success(chapter)
-            }
+            val chapter = it.chapters[chapterId.toString()]
+            return if (chapter != null) Result.success(chapter)
+            else Result.failure(Exception("Chapter not found!"))
         }
         return Result.failure(Exception("Chapter not found in cached story"))
     }
@@ -128,10 +127,10 @@ class QuestRepository @Inject constructor(
     suspend fun getMap(storyId: Int, mapId: Int): Result<GameMap> {
         val story = getStory(storyId)
         story.onSuccess {
-            for (map in it.mapList) {
-                if (map.id == mapId.toLong())
-                    return Result.success(map)
-            }
+            val map = it.maps[mapId.toString()]
+            if (map!=null)
+                return Result.success(map)
+            return Result.failure(Exception("Map not found!"))
         }
         return Result.failure(Exception("Map not found in cached story"))
     }

@@ -19,6 +19,7 @@ import net.artux.pda.map.engine.components.BulletComponent;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.GroupComponent;
+import net.artux.pda.map.engine.components.GroupTargetMovingComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -27,7 +28,6 @@ import net.artux.pda.map.engine.components.SpawnComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
-import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
@@ -36,19 +36,19 @@ import net.artux.pda.map.engine.components.player.UserVelocityInput;
 import net.artux.pda.map.engine.components.states.StalkerState;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
-import net.artux.pda.map.model.BotType;
-import net.artux.pda.map.model.BotsTypes;
+import net.artux.pda.map.model.GangRelations;
 import net.artux.pda.map.utils.Mappers;
-import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.UserModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class EntityBuilder {
 
@@ -59,11 +59,11 @@ public class EntityBuilder {
     private final Texture bulletTexture;
     private final Engine engine;
     private final MessageManager messageManager;
-    private final BotsTypes botsTypes;
+    private final GangRelations gangRelations;
 
     public EntityBuilder(AssetManager assetManager, Engine engine) {
-        JsonReader reader = new JsonReader(Gdx.files.internal("mobs.json").reader());
-        botsTypes = new Gson().fromJson(reader, BotsTypes.class);
+        JsonReader reader = new JsonReader(Gdx.files.internal("config/mobs.json").reader());
+        gangRelations = new Gson().fromJson(reader, GangRelations.class);
         this.assetManager = assetManager;
         this.engine = engine;
         this.contentGenerator = new ContentGenerator();
@@ -92,10 +92,11 @@ public class EntityBuilder {
 
         Entity player = new Entity();
 
-        targetPosition = getPointNear(targetPosition, weaponModel.getPrecision());
+        targetPosition = getPointNear(targetPosition.cpy(), weaponModel.getPrecision());
 
         float targetX = targetPosition.x;
         float targetY = targetPosition.y;
+
         float vX = (float) ((targetX - position.x) /
                 Math.sqrt(((targetX - position.x) * (targetX - position.x)) + ((targetY - position.y) * (targetY - position.y))));
         float vY = (float) ((targetY - position.y) /
@@ -136,31 +137,36 @@ public class EntityBuilder {
     }
 
     public void generateSpawn(SpawnModel spawnModel) {
-        BotType botType = botsTypes.getMobType(spawnModel.getId());
-        MoodComponent botMood = botType.getMood(spawnModel.getParams());
+        Gang gang = spawnModel.getGroup();
+        if (gang != null) {
+            SpawnComponent spawnComponent = new SpawnComponent(spawnModel);
+            spawnComponent.setGroup(generateGroup(spawnComponent.getPosition(), gang, gangRelations.get(gang), spawnModel.getN(), spawnModel.getParams()));
 
+            Entity controlPoint = new Entity();
+            float size = spawnModel.getR() * 2 * 0.9f;
+            if (!spawnModel.getParams().contains("hide")) {
+                controlPoint.add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size));
+            }
+            controlPoint.add(new PositionComponent(Mappers.vector2(spawnModel.getPos())))
+                    .add(spawnComponent)
+                    .add(new ClickComponent(spawnModel.getR(), () -> engine.getSystem(RenderSystem.class)
+                            .showText(spawnComponent.desc(), Mappers.vector2(spawnModel.getPos()))));
+            engine.addEntity(controlPoint);
+        }
+    }
+
+    public GroupComponent generateGroup(Vector2 pos, Gang gang, Integer[] relations, int n, Set<String> params) {
         List<Entity> pointEntities = new LinkedList<>();
-        SpawnComponent spawnComponent = new SpawnComponent("Контрольная точка", spawnModel);
-        GroupComponent groupComponent = new GroupComponent(botType, pointEntities, spawnModel.getParams());
-        spawnComponent.setGroup(groupComponent);
-
-        for (int i = 0; i < spawnModel.getN(); i++) {
-            Entity entity = spawnStalker(groupComponent);
+        GroupComponent groupComponent = new GroupComponent(gang, relations, pointEntities, params);
+        for (int i = 0; i < n; i++) {
+            Entity entity = spawnStalker(getPointNear(pos, 1), groupComponent);
             engine.addEntity(entity);
             pointEntities.add(entity);
         }
-
-        Entity controlPoint = new Entity();
-        float size = spawnModel.getR() * 2 * 0.9f;
-        controlPoint.add(new PositionComponent(Mappers.vector2(spawnModel.getPos())))
-                .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size))
-                .add(spawnComponent)
-                .add(new ClickComponent(() -> engine.getSystem(RenderSystem.class)
-                        .showText(spawnComponent.desc(), Mappers.vector2(spawnModel.getPos()))));
-        engine.addEntity(controlPoint);
+        return groupComponent;
     }
 
-    public Entity spawnStalker(GroupComponent group) {
+    public Entity spawnStalker(Vector2 position, GroupComponent group) {
         Entity entity = new Entity();
 
         WeaponModel w = new WeaponModel();
@@ -175,23 +181,25 @@ public class EntityBuilder {
         StatesComponent statesComponent = new StatesComponent(entity, group.getDispatcher(), StalkerState.INITIAL, StalkerState.GUARDING);
         group.getDispatcher().addListener(statesComponent, MessagingCodes.ATTACKED);
 
-        entity.add(new PositionComponent(group.getTargeting().getTarget()))
+        entity.add(new PositionComponent(position))
                 .add(new GraphMotionComponent(null))
                 .add(new VelocityComponent())
                 .add(new VisionComponent())
                 .add(healthComponent)
+                .add(group)
                 .add(group.getMood())
                 .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<>()))
                 .add(new WeaponComponent(w, this))
                 .add(statesComponent)
-                .add(new TargetMovingComponent(group.getTargeting()))
+                .add(new GroupTargetMovingComponent(group))
                 .add(new RelationalSpriteComponent(8, 8));
 
         return entity;
     }
 
-    public Entity randomStalker(TargetMovingComponent.Targeting targeting) {
+    public Entity randomStalker(GroupTargetMovingComponent.Targeting targeting) {
         Entity entity = new Entity();
+/*
 
         WeaponModel w = new WeaponModel();
         w.setSpeed(random(5, 10));
@@ -211,13 +219,25 @@ public class EntityBuilder {
                 .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
                 .add(statesComponent)
                 .add(new MoodComponent(-1, null, Collections.singleton("angry")))
-                .add(new TargetMovingComponent(targeting));
+                .add(new GroupTargetMovingComponent(targeting));
+*/
 
         Gdx.app.log("WorldSystem", "New entity created.");
         return entity;
     }
 
-    public void spawnAttackGroup(Vector2 randomTransferPosition, TargetMovingComponent.Targeting targeting) {
+    public void generateTakeSpawnGroup(Vector2 randomTransferPosition, Vector2 attackTarget) {
+        Gang gang = gangRelations.random();
+        GroupComponent group = generateGroup(randomTransferPosition, gang, gangRelations.get(gang), random(4, 7), Collections.emptySet());
+        group.setTargeting(() -> attackTarget);
+    }
 
+    public void generateAttackSpawnGroup(Vector2 randomTransferPosition, SpawnComponent spawnComponent) {
+        Gang currentGang = spawnComponent.getSpawnModel().getGroup();
+        Gang enemyGang = gangRelations.findEnemyByGang(currentGang);
+        if (enemyGang != null) {
+            GroupComponent group = generateGroup(randomTransferPosition, enemyGang, gangRelations.get(enemyGang), random(4, 7), Collections.emptySet());
+            group.setTargeting(spawnComponent::getPosition);
+        }
     }
 }

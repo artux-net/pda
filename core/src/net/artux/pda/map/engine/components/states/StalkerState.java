@@ -10,11 +10,11 @@ import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.engine.components.GraphMotionComponent;
+import net.artux.pda.map.engine.components.GroupTargetMovingComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
-import net.artux.pda.map.engine.components.TargetMovingComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
@@ -36,8 +36,8 @@ public enum StalkerState implements State<Entity> {
         @Override
         public void update(Entity entity) {
             StatesComponent statesComponent = sm.get(entity);
-            TargetMovingComponent targetMovingComponent = tmm.get(entity);
-            gmm.get(entity).setMovementTarget(targetMovingComponent.targeting.getTarget());
+            GroupTargetMovingComponent groupTargetMovingComponent = tmm.get(entity);
+            gmm.get(entity).setMovementTarget(groupTargetMovingComponent.nextTarget());
             statesComponent.changeState(MOVING);
         }
     },
@@ -166,7 +166,7 @@ public enum StalkerState implements State<Entity> {
     protected ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     protected ComponentMapper<VelocityComponent> vmm = ComponentMapper.getFor(VelocityComponent.class);
     protected ComponentMapper<VisionComponent> visionMapper = ComponentMapper.getFor(VisionComponent.class);
-    protected ComponentMapper<TargetMovingComponent> tmm = ComponentMapper.getFor(TargetMovingComponent.class);
+    protected ComponentMapper<GroupTargetMovingComponent> tmm = ComponentMapper.getFor(GroupTargetMovingComponent.class);
     protected ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
     protected ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     protected ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);

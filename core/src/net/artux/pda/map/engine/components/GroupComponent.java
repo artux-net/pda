@@ -6,7 +6,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.model.BotType;
+import net.artux.pda.model.user.Gang;
 
 import java.util.List;
 import java.util.Set;
@@ -15,18 +15,18 @@ public class GroupComponent implements Component {
 
     ComponentMapper<PositionComponent> positionComponentComponentMapper = ComponentMapper.getFor(PositionComponent.class);
 
-    private final BotType botType;
+    private final Gang gang;
     private final MessageDispatcher dispatcher;
     private final MoodComponent mood;
     private final List<Entity> entities;
-    private TargetMovingComponent.Targeting targeting;
+    private GroupTargetMovingComponent.Targeting targeting;
     private Set<String> params;
 
-    public GroupComponent(BotType botType, List<Entity> entities, Set<String> params) {
-        this.botType = botType;
-        this.mood = botType.getMood(params);
+    public GroupComponent(Gang gang, Integer[] relations, List<Entity> entities, Set<String> params) {
+        this.gang = gang;
         this.entities = entities;
         this.params = params;
+        this.mood = new MoodComponent(gang.getId(), relations, params);
         this.dispatcher = new MessageDispatcher();
         dispatcher.setDebugEnabled(true);
     }
@@ -35,7 +35,7 @@ public class GroupComponent implements Component {
         return params;
     }
 
-    public void setTargeting(TargetMovingComponent.Targeting targeting) {
+    public void setTargeting(GroupTargetMovingComponent.Targeting targeting) {
         this.targeting = targeting;
     }
 
@@ -62,12 +62,12 @@ public class GroupComponent implements Component {
         return dispatcher;
     }
 
-    public TargetMovingComponent.Targeting getTargeting() {
+    public GroupTargetMovingComponent.Targeting getTargeting() {
         return targeting;
     }
 
     @Override
     public String toString() {
-        return botType.name + '\n' + "Количество: " + entities.size();
+        return gang.toString() + '\n' + "Количество: " + entities.size();
     }
 }
