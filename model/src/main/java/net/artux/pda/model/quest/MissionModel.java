@@ -1,7 +1,6 @@
 package net.artux.pda.model.quest;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
 import lombok.Data;
@@ -18,7 +17,7 @@ public class MissionModel implements Serializable {
 
     public CheckpointModel getCurrentCheckpoint(String... params) {
         for (CheckpointModel checkpointModel : checkpoints) {
-            if (Arrays.stream(params).anyMatch(s -> checkpointModel.getParameter().equals(s)))
+            if (checkpointModel.isActual(params))
                 return checkpointModel;
         }
         return null;

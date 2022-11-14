@@ -17,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
@@ -30,14 +32,16 @@ import com.badlogic.gdx.utils.TimeUtils;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.InteractiveComponent;
-import net.artux.pda.model.map.GameMap;
-import net.artux.pda.model.map.Point;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.ui.bars.Utils;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
 import net.artux.pda.map.ui.blocks.ControlBlock;
 import net.artux.pda.map.ui.blocks.MessagesBlock;
-import net.artux.pda.model.QuestUtil;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.model.quest.CheckpointModel;
+import net.artux.pda.model.quest.MissionModel;
+import net.artux.pda.model.quest.StoryModel;
+import net.artux.pda.model.quest.story.ParameterModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 
@@ -45,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -76,6 +81,7 @@ public class UserInterface extends Group implements Disposable {
     private AssistantBlock assistantBlock;
     private ControlBlock controlBlock;
     private Touchpad touchpad;
+    private final Skin skin;
 
     private AssetManager assetManager;
     private DataRepository dataRepository;
@@ -85,6 +91,7 @@ public class UserInterface extends Group implements Disposable {
         super();
         this.dataRepository = dataRepository;
         this.assetManager = assetsFinder.getManager();
+        skin = new Skin(Gdx.files.internal("data/skin/uiskin.json"));
         long loadTime = TimeUtils.millis();
 
         GameMap map = dataRepository.getGameMap();
@@ -222,7 +229,7 @@ public class UserInterface extends Group implements Disposable {
         return backpackMenu;
     }
 
-    public void switchBackpack(){
+    public void switchBackpack() {
         if (getChildren().indexOf(backpackMenu, false) == -1)
             addActor(backpackMenu);
         else
@@ -276,54 +283,74 @@ public class UserInterface extends Group implements Disposable {
         menu = new Group();
         Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
 
-        Image image = new Image(Utils.getColoredDrawable(1, 1, primaryColor));
+        Image image = new Image(Utils.getColoredDrawable(1, 1, backgroundColor));
         image.setSize(w / 4 + 20, h);
         menu.addActor(image);
-        Label text = new Label("Метки", new Label.LabelStyle(font, Color.WHITE));
+        Label text = new Label("Задания", new Label.LabelStyle(font, Color.WHITE));
         text.setX(w / 8 - text.getWidth() / 2);
         text.setY(h - 100);
         menu.addActor(text);
 
         VerticalGroup menuTable = new VerticalGroup();
-        menuTable.setFillParent(true);
-        menuTable.align(Align.top);
+        menuTable.align(Align.top | Align.left);
+        menuTable.columnAlign(Align.left);
 
         GameMap map = dataRepository.getGameMap();
         StoryDataModel dataModel = dataRepository.getStoryDataModel();
         StoryStateModel storyStateModel = dataModel.getCurrentState();
 
-        if (map != null)
-            for (final Point point : map.getPoints()) {
-                if (point.getType() < 2 || point.getType() > 3)
-                    if (storyStateModel != null && QuestUtil.check(point.getCondition(), dataModel)) {
-                        if (point.getData().containsKey("chapter")) {
-                            int chapterId = storyStateModel.getChapterId();
-                            if ((Integer.parseInt(point.getData().get("chapter")) == chapterId
-                                    || Integer.parseInt(point.getData().get("chapter")) == 0)) {
-                                menuTable.addActor(getLabel(point.getName(), labelStyle));
-                            }
-                        } else {
+        StoryModel storyModel = dataRepository.getStoryModel();
+        List<MissionModel> missionModels = storyModel.getMissions();
+
+      /*  for (final Point point : map.getPoints()) {
+            if (point.getType() < 2 || point.getType() > 3)
+                if (storyStateModel != null && QuestUtil.check(point.getCondition(), dataModel)) {
+                    if (point.getData().containsKey("chapter")) {
+                        int chapterId = storyStateModel.getChapterId();
+                        if ((Integer.parseInt(point.getData().get("chapter")) == chapterId
+                                || Integer.parseInt(point.getData().get("chapter")) == 0)) {
                             menuTable.addActor(getLabel(point.getName(), labelStyle));
                         }
+                    } else {
+                        menuTable.addActor(getLabel(point.getName(), labelStyle));
                     }
+                }*/
+
+        String[] params = dataModel.getParameters().stream()
+                .map(ParameterModel::getKey).toArray(String[]::new);
+
+        if (map != null)
+            for (final MissionModel point : dataRepository.getStoryModel().getCurrentMissions(params)) {
+                menuTable.addActor(getLabel("---------------------", labelStyle));
+                menuTable.addActor(getLabel("Задание: " + point.getTitle(), labelStyle));
+                boolean actualGone = false;
+                for (int i = 0; i < point.getCheckpoints().size(); i++) {
+                    CheckpointModel check = point.getCheckpoints().get(i);
+                    if (check.isActual(params))
+                        actualGone = true;
+                    if (actualGone)
+                        menuTable.addActor(getLabel("-> " + check.getTitle(), labelStyle));
+                    else
+                        menuTable.addActor(getLabel("X " + check.getTitle(), labelStyle));
+                }
+                menuTable.addActor(getLabel("---------------------", labelStyle));
             }
 
-        /*skin = new Skin(Gdx.files.internal("data/skin/uiskin.json"));
 
         ScrollPane scrollPane = new ScrollPane(menuTable, skin);
         scrollPane.setFadeScrollBars(false);
         scrollPane.setSize(w / 4, h - 100);
+        scrollPane.setScrollingDisabled(true, false);
         scrollPane.setScrollbarsVisible(true);
         menu.addActor(scrollPane);
 
         this.menu.setX(w);
-        addActor(menu);*/
+        addActor(menu);
     }
 
     private Label getLabel(String title, Label.LabelStyle labelStyle) {
         Label label = new Label(title, labelStyle);
-        label.setWrap(true);
-        label.setAlignment(Align.center);
+        label.setAlignment(Align.left);
         label.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -342,10 +369,18 @@ public class UserInterface extends Group implements Disposable {
     @Override
     public void act(float delta) {
         super.act(delta);
-        if (menu != null)
+        if (menu != null) {
             if (isMenuOpen && menu.getX() > w * 0.75)
-                menu.setX(menu.getX() - 15);
-            else if (!isMenuOpen && menu.getX() <= w + 100) menu.setX(menu.getX() + 15);
+                menu.setX(menu.getX() - 35);
+            else if (!isMenuOpen && menu.getX() <= w + 100) menu.setX(menu.getX() + 35);
+            if (isMenuOpen) {
+                controlBlock.setVisible(false);
+                assistantBlock.setVisible(false);
+            }else {
+                controlBlock.setVisible(true);
+                assistantBlock.setVisible(true);
+            }
+        }
     }
 
     public Label.LabelStyle getLabelStyle() {
@@ -356,6 +391,7 @@ public class UserInterface extends Group implements Disposable {
     public void dispose() {
         if (messagesBlock != null)
             messagesBlock.dispose();
+        skin.dispose();
         debugMenu.dispose();
         uiFrame.dispose();
         timer.purge();

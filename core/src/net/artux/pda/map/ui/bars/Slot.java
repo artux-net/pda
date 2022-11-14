@@ -14,8 +14,15 @@ public class Slot extends TextButton {
         left();
         bottom();
         row();
-        secondLabel = new Label("0", userInterface.getLabelStyle());
-        add(secondLabel);
+        this.secondLabel = new Label("0", userInterface.getLabelStyle());
+        add(this.secondLabel);
+    }
+
+    public Slot(String text, UserInterface userInterface, TextButtonStyle style) {
+        super(text, style);
+        left();
+        bottom();
+        row();
     }
 
     public Label getSecondLabel() {

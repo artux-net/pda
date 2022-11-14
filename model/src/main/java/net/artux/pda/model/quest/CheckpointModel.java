@@ -8,6 +8,14 @@ import lombok.Data;
 public class CheckpointModel implements Serializable {
     private String parameter;
     private String title;
-    private Integer chapterId;
-    private Integer stageId;
+    private Integer chapter;
+    private Integer stage;
+
+    public boolean isActual(String... params){
+        for (String param : params){
+            if (param.equals(parameter))
+                return true;
+        }
+        return false;
+    }
 }

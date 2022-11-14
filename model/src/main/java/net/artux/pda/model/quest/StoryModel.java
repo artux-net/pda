@@ -52,8 +52,8 @@ public class StoryModel implements Serializable {
                     String chapterString = data.get("chapter");
                     String stageString = data.get("stage");
                     if (chapterString != null && stageString != null
-                            && chapterString.equals(checkpointModel.getChapterId().toString())
-                            && stageString.equals(checkpointModel.getStageId().toString())) {
+                            && chapterString.equals(checkpointModel.getChapter().toString())
+                            && stageString.equals(checkpointModel.getStage().toString())) {
                         targetMap = map;
                         targetPoint = point;
                     }

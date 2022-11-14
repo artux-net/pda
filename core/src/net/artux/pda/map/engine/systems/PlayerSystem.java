@@ -96,11 +96,8 @@ public class PlayerSystem extends BaseSystem implements Disposable {
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.font = userInterface.getLabelStyle().font;
         textButtonStyle.fontColor = userInterface.getLabelStyle().fontColor;
-        textButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
-        backpackSlot = new Slot(userInterface, textButtonStyle);
-        backpackSlot.setText("Рюкзак");
-        backpackSlot.layout();
-        backpackSlot.setLabelText("");
+        textButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot_wide.png", Texture.class));
+        backpackSlot = new Slot("Рюкзак", userInterface, textButtonStyle);
 
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
