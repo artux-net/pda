@@ -97,8 +97,10 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
 
     @Override
     public void dispose() {
-        worldGraph.dispose();
         mapBorder.dispose();
+        if (mapBorder.isMobTilesActive()) {
+            worldGraph.dispose();
+        }
     }
 
     private boolean isInsideMap(Vector2 position) {

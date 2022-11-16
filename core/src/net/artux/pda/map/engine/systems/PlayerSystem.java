@@ -28,7 +28,6 @@ import net.artux.pda.map.engine.components.player.UserVelocityInput;
 import net.artux.pda.map.ui.BackpackMenu;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.HUD;
-import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
 import net.artux.pda.model.items.MedicineModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
@@ -48,7 +47,7 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     private final AssetManager assetManager;
     private InteractionSystem interactionSystem;
 
-    private Slot backpackSlot;
+    private TextButton backpackSlot;
     private HUD hud;
 
     public PlayerSystem(AssetManager assetManager) {
@@ -97,12 +96,12 @@ public class PlayerSystem extends BaseSystem implements Disposable {
         textButtonStyle.font = userInterface.getLabelStyle().font;
         textButtonStyle.fontColor = userInterface.getLabelStyle().fontColor;
         textButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot_wide.png", Texture.class));
-        backpackSlot = new Slot("Рюкзак", userInterface, textButtonStyle);
+        backpackSlot = new TextButton("Рюкзак", textButtonStyle);
 
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
         style.imageUp = new TextureRegionDrawable(assetManager.get("ui/bar/ic_radiation.png", Texture.class));
-        assistantBlock.getButtonsTable().add(backpackSlot);
+        assistantBlock.getButtonsTable().add(backpackSlot).width(200);
         backpackSlot.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

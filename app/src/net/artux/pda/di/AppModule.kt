@@ -1,6 +1,7 @@
 package net.artux.pda.di
 
 import android.content.Context
+import android.os.Environment
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -40,11 +41,11 @@ class AppModule {
     fun logForest(@ApplicationContext context: Context): List<Timber.Tree> {
         val list = LinkedList<Timber.Tree>()
         list.add(if (BuildConfig.DEBUG) DebugTree() else CrashReportingTree())
-        var filePath = context.filesDir.absolutePath + "/logs";
+        val filePath = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath
         list.add(
             FileLoggerTree.Builder()
-                .withFileName("file.log")
-                .withDirName(filePath)
+                .withFileName("pda.log")
+                .withDirName(filePath!!)
                 .withSizeLimit(20000)
                 .withFileLimit(3)
                 .appendToFile(true)

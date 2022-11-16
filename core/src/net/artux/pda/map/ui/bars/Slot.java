@@ -20,6 +20,7 @@ public class Slot extends TextButton {
 
     public Slot(String text, UserInterface userInterface, TextButtonStyle style) {
         super(text, style);
+        pad(30f);
         left();
         bottom();
         row();

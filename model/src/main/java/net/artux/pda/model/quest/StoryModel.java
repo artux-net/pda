@@ -25,10 +25,11 @@ public class StoryModel implements Serializable {
 
     public List<MissionModel> getCurrentMissions(String... params) {
         List<MissionModel> missionModels = new LinkedList<>();
-        for (MissionModel missionModel : missions) {
-            if (missionModel.hasParams(params))
-                missionModels.add(missionModel);
-        }
+        if (missions != null)
+            for (MissionModel missionModel : missions) {
+                if (missionModel.hasParams(params))
+                    missionModels.add(missionModel);
+            }
         return missionModels;
     }
 
