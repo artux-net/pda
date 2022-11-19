@@ -191,7 +191,7 @@ class StoryViewModel @javax.inject.Inject constructor(
                                 storyData.value
                             )
                         )
-                        if (chapterStage.actions.containsKey("force"))
+                        if (chapterStage.actions != null && chapterStage.actions.containsKey("force"))
                             sync()
                         stage.postValue(stageMapper.model(chapterStage, storyData.value))
                     } else status.postValue(StatusModel(Exception("Story Data null")))

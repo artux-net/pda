@@ -20,7 +20,7 @@ public class SpawnModel implements Serializable {
     private int r;
     private int n;
     private String pos;
-    private HashMap<String, String> data;
+    private HashMap<String, List<String>> data;
     private HashMap<String, List<String>> actions;
     private HashMap<String, List<String>> condition;
 
