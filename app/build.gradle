@@ -15,9 +15,14 @@ repositories {
 }
 
 task downloadAPI {
+    def url = new URL('https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest')
+    def uc = url.openConnection();
+    def userPass = "pass";
+    def basicAuth = "Basic " + new String(Base64.getEncoder().encode(userPass.getBytes()));
+    uc.setRequestProperty ("Authorization", basicAuth);
+
     def f = new File('app/api.json')
-    new URL('https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest')
-            .withInputStream { i -> f.withOutputStream { it << i } }
+    uc.getInputStream().transferTo(new FileOutputStream(f))
 }
 
 swaggerSources {
