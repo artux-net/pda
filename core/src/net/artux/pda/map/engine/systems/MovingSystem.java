@@ -9,9 +9,12 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
-import net.artux.pda.map.engine.components.player.UserVelocityInput;
 import net.artux.pda.map.engine.data.GlobalData;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class MovingSystem extends BaseSystem {
 
     private final float MOVEMENT = 20f;
@@ -21,14 +24,14 @@ public class MovingSystem extends BaseSystem {
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
-    private ComponentMapper<UserVelocityInput> uvm = ComponentMapper.getFor(UserVelocityInput.class);
 
     private MapOrientationSystem mapOrientationSystem;
 
-    public static boolean playerWalls = true;
-    public static boolean speedup = true;
+    public static boolean playerWalls = false;
+    public static boolean speedup = false;
     public static boolean alwaysRun = false;
 
+    @Inject
     public MovingSystem() {
         super(Family.all(VelocityComponent.class, PositionComponent.class).get());
     }
@@ -43,14 +46,9 @@ public class MovingSystem extends BaseSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
         {
-            Entity entity = player;
+            VelocityComponent velocityComponent = vm.get(getPlayer());
+            velocityComponent.setVelocity(velocityComponent.cpy());
 
-            VelocityComponent velocityComponent = vm.get(entity);
-            UserVelocityInput userVelocityInput = uvm.get(entity);
-
-            velocityComponent.setVelocity(userVelocityInput.getVelocity());
-            if (speedup)
-                velocityComponent.scl(PLAYER_MULTIPLICATION);
             if (alwaysRun)
                 velocityComponent.setRunning(true);
         }
@@ -62,6 +60,8 @@ public class MovingSystem extends BaseSystem {
             VelocityComponent velocityComponent = vm.get(entity);
             Vector2 stepVector;
             Vector2 currentVelocity = velocityComponent.cpy();
+            if (speedup && entity == getPlayer())
+                currentVelocity.scl(PLAYER_MULTIPLICATION);
 
             if (hm.has(entity)) {
                 HealthComponent healthComponent = hm.get(entity);
@@ -69,7 +69,7 @@ public class MovingSystem extends BaseSystem {
                 float staminaDifference = 0;
                 if (velocityComponent.isRunning() && healthComponent.stamina > 0) {
                     stepVector = currentVelocity.scl(deltaTime).scl(RUN_MOVEMENT);
-                    if (!alwaysRun && entity == player)
+                    if (!alwaysRun && entity == getPlayer())
                         staminaDifference = -0.1f;
                 } else {
                     if (healthComponent.stamina < 100)
@@ -86,7 +86,7 @@ public class MovingSystem extends BaseSystem {
             if (!stepVector.isZero()) {
                 float newX = positionComponent.getX() + stepVector.x;
                 float newY = positionComponent.getY() + stepVector.y;
-                if (uvm.has(entity) && playerWalls) {
+                if (entity == getPlayer() && playerWalls) {
                     if (insideMap(newX, positionComponent.getY()))
                         positionComponent.getPosition().x += stepVector.x * mapOrientationSystem.getMapBorder().getK(newX, positionComponent.getY());
                     if (insideMap(positionComponent.getX(), newY))
@@ -98,7 +98,7 @@ public class MovingSystem extends BaseSystem {
                         positionComponent.getPosition().y = newY;
                 }
             }
-            if (!velocityComponent.isConstant() && entity != player)
+            if (!velocityComponent.isConstant() && entity != getPlayer())
                 velocityComponent.set(0, 0);
         }
     }

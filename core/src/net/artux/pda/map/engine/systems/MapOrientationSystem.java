@@ -19,6 +19,10 @@ import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 import net.artux.pda.map.engine.pathfinding.TiledRaycastCollisionDetector;
 import net.artux.pda.model.map.GameMap;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class MapOrientationSystem extends EntitySystem implements Disposable {
 
     private FlatTiledGraph worldGraph;
@@ -30,6 +34,7 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
     private TiledRaycastCollisionDetector<FlatTiledNode> collisionDetector;
     private final Ray<Vector2> ray;
 
+    @Inject
     public MapOrientationSystem(AssetsFinder assetsFinder, GameMap map) {
         ray = new Ray<>(Vector2.Zero, Vector2.Zero);
         this.mapBorder = new MapBorder(assetsFinder, map);

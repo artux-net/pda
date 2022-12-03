@@ -1,5 +1,6 @@
 package net.artux.pda.repositories
 
+import net.artux.pda.common.PropertyFields
 import net.artux.pda.model.user.UserRelation
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.*
@@ -16,6 +17,7 @@ import kotlin.coroutines.suspendCoroutine
 @Singleton
 class UserRepository @Inject constructor(
     private val webservice: DefaultApi,
+    private val properties: Properties,
     private val userCache: Cache<Profile>,
     private val dataCache: Cache<StoryData>,
     private val memberCache: Cache<UserDto>
@@ -104,6 +106,8 @@ class UserRepository @Inject constructor(
                     Timber.i("Got response")
                     if (data != null) {
                         memberCache.put("user", data)
+                        if (data.role != Profile.RoleEnum.USER.name)
+                            properties.setProperty(PropertyFields.TESTER_MODE, true.toString())
                         it.resume(Result.success(data))
                     } else {
                         val error = response.toString()
@@ -163,7 +167,7 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun getFriends(uuid: UUID, userRelation: UserRelation) : Result<List<SimpleUserDto>> {
+    suspend fun getFriends(uuid: UUID, userRelation: UserRelation): Result<List<SimpleUserDto>> {
         return suspendCoroutine {
             webservice.getFriends(uuid, userRelation.name)
                 .enqueue(object : Callback<List<SimpleUserDto>> {
@@ -186,7 +190,7 @@ class UserRepository @Inject constructor(
         }
     }
 
-    suspend fun getUserRequests() : Result<List<SimpleUserDto>> {
+    suspend fun getUserRequests(): Result<List<SimpleUserDto>> {
         return suspendCoroutine {
             webservice.friendsRequests
                 .enqueue(object : Callback<List<SimpleUserDto>> {

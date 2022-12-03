@@ -15,6 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class SoundsSystem extends BaseSystem {
 
     private final List<Music> detections = new ArrayList<>();
@@ -26,7 +30,7 @@ public class SoundsSystem extends BaseSystem {
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 
-
+    @Inject
     public SoundsSystem(AssetManager assetManager) {
         super(Family.all(SoundComponent.class).get());
         this.assetManager = assetManager;
@@ -94,7 +98,7 @@ public class SoundsSystem extends BaseSystem {
     }
 
     public void playShoot(Vector2 position) {
-        PositionComponent positionComponent = pm.get(player);
+        PositionComponent positionComponent = pm.get(getPlayer());
         float dst = position.dst(positionComponent.getPosition());
         float volume = (500 - dst) / 500;
         if (volume > 0)

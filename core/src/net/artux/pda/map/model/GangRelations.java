@@ -9,16 +9,25 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class GangRelations {
 
-    private final HashMap<Gang, Integer[]> relations;
+    private HashMap<Gang, Integer[]> relations;
 
-    public GangRelations(HashMap<Gang, Integer[]> relations) {
-        this.relations = relations;
+    @Inject
+    public GangRelations() {
+
     }
 
     public MoodComponent getMoodBy(Gang gang, Set<String> params) {
         return new MoodComponent(gang.getId(), get(gang), params);
+    }
+
+    public HashMap<Gang, Integer[]> getRelations() {
+        return relations;
     }
 
     public Gang findEnemyByGang(Gang gang) {

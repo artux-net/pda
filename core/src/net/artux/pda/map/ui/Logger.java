@@ -1,6 +1,5 @@
 package net.artux.pda.map.ui;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -10,18 +9,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.engine.Triple;
-import net.artux.pda.map.engine.systems.PlayerSystem;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Logger extends VerticalGroup implements Disposable {
+public class Logger extends VerticalGroup {
     private final Label.LabelStyle labelStyle;
     long lastTimeCounted;
     private float sinceChange;
@@ -30,7 +27,7 @@ public class Logger extends VerticalGroup implements Disposable {
     private final List<Triple<Method, Object, String>> dataCollection = new ArrayList<>();
     public static boolean visible = true;
 
-    public Logger(Engine engine, Skin skin) {
+    public Logger(Skin skin) {
         super();
 
         lastTimeCounted = TimeUtils.millis();
@@ -39,22 +36,6 @@ public class Logger extends VerticalGroup implements Disposable {
         BitmapFont font = skin.getFont("font");
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
         columnAlign(Align.right);
-
-        PlayerSystem playerSystem = engine.getSystem(PlayerSystem.class);
-
-        put("FPS", this, "getFrameRate");
-        put("Native Heap", Gdx.app, "getNativeHeap");
-        put("Java Heap", Gdx.app, "getJavaHeap");
-        put("Player position", playerSystem, "getPosition");
-        put("Здоровье", playerSystem, "getHealth");
-        put("Опыт", playerSystem.getPlayerComponent().gdxData, "getXp");
-        put("Params", playerSystem.getPlayerComponent().gdxData, "getParameters");
-        put("Temp", playerSystem.getPlayerComponent().gdxData.getCurrentState(), "toString");
-        //put("Stories stat", Arrays.toString(playerSystem.getPlayerMember().getData().getStories().toArray()), "toString");
-
-        put("Screen width", Gdx.app.getGraphics(), "getWidth");
-        put("Height", Gdx.app.getGraphics(), "getHeight");
-        put("Density", Gdx.app.getGraphics(), "getDensity");
     }
 
     @Override
@@ -68,7 +49,6 @@ public class Logger extends VerticalGroup implements Disposable {
                     try {
                         if (tr.getSecond() != null && tr.getFirst() != null)
                             ((Label) l).setText(tr.getThird() + ": " + tr.getFirst().invoke(tr.getSecond()).toString());
-
                         else
                             ((Label) l).setText(tr.getThird() + ": null");
                     } catch (IllegalAccessException | InvocationTargetException e) {
@@ -122,10 +102,6 @@ public class Logger extends VerticalGroup implements Disposable {
                 addActor(label);
             }
         }
-    }
-
-    public void dispose() {
-        dataCollection.clear();
     }
 
     public float getFrameRate() {

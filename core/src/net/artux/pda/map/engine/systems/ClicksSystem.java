@@ -1,26 +1,25 @@
 package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.ashley.systems.IteratingSystem;
 
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 
-public class ClicksSystem extends EntitySystem {
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-    private ImmutableArray<Entity> entities;
+@Singleton
+public class ClicksSystem extends IteratingSystem {
 
     private ComponentMapper<ClickComponent> cm = ComponentMapper.getFor(ClickComponent.class);
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 
-    @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-        entities = engine.getEntitiesFor(Family.all(ClickComponent.class, PositionComponent.class).get());
+    @Inject
+    public ClicksSystem() {
+        super(Family.all(ClickComponent.class, PositionComponent.class).get());
     }
 
     @Override
@@ -28,10 +27,15 @@ public class ClicksSystem extends EntitySystem {
         super.update(deltaTime);
     }
 
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
+    }
+
     public boolean clicked(float x, float y) {
-        for (int i = 0; i < entities.size(); i++) {
-            ClickComponent clickComponent = cm.get(entities.get(i));
-            PositionComponent positionComponent = pm.get(entities.get(i));
+        for (int i = 0; i < getEntities().size(); i++) {
+            ClickComponent clickComponent = cm.get(getEntities().get(i));
+            PositionComponent positionComponent = pm.get(getEntities().get(i));
 
             if (positionComponent.getPosition().epsilonEquals(x, y, clickComponent.clickRadius)) {
                 clickComponent.clickListener.clicked();

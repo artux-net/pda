@@ -26,6 +26,8 @@ public abstract class State {
         return gsm;
     }
 
+    public abstract void resume();
+
     protected abstract void handleInput();
 
     protected abstract void stop();

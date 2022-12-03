@@ -25,7 +25,10 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun properties(@ApplicationContext context: Context, remoteConfig: FirebaseRemoteConfig): Properties {
+    fun properties(
+        @ApplicationContext context: Context,
+        remoteConfig: FirebaseRemoteConfig
+    ): Properties {
         val properties = Properties()
         try {
             properties.load(context.assets.open("config/app.properties"))

@@ -1,9 +1,7 @@
 package net.artux.pda.map.engine.components;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.Entity;
 
-import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
@@ -16,7 +14,6 @@ public class WeaponComponent implements Component {
 
     private WeaponModel weaponModel;
     private ItemModel bulletModel;
-    private final EntityBuilder entityBuilder;
 
     private StoryDataModel dataModel;
 
@@ -31,8 +28,7 @@ public class WeaponComponent implements Component {
         return shootLastFrame;
     }
 
-    public WeaponComponent(StoryDataModel dataModel, EntityBuilder entityBuilder) {
-        this.entityBuilder = entityBuilder;
+    public WeaponComponent(StoryDataModel dataModel) {
         updateData(dataModel);
     }
 
@@ -44,9 +40,8 @@ public class WeaponComponent implements Component {
         reload();
     }
 
-    public WeaponComponent(WeaponModel weaponModel, EntityBuilder entityBuilder) {
+    public WeaponComponent(WeaponModel weaponModel) {
         this.weaponModel = weaponModel;
-        this.entityBuilder = entityBuilder;
         player = false;
         reload();
     }
@@ -132,10 +127,6 @@ public class WeaponComponent implements Component {
         } else shootLastFrame = false;
 
         return shootLastFrame;
-    }
-
-    public void sendBullet(Entity entity, Entity target) {
-        entityBuilder.addBulletToEngine(entity, target, getSelected());
     }
 
     void reload() {

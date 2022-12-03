@@ -5,13 +5,6 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
@@ -21,22 +14,24 @@ import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.ui.UserInterface;
-import net.artux.pda.map.ui.blocks.ControlBlock;
 
-import java.util.LinkedList;
-import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class InteractionSystem extends BaseSystem {
 
-    private Stage stage;
     private final UserInterface userInterface;
     private SoundsSystem soundsSystem;
     private CameraSystem cameraSystem;
 
-    public InteractionSystem(Stage stage, UserInterface userInterface) {
+    @Inject
+    public InteractionSystem(UserInterface userInterface, SoundsSystem soundsSystem, CameraSystem cameraSystem) {
         super(Family.all(InteractiveComponent.class, PositionComponent.class).get());
-        this.stage = stage;
         this.userInterface = userInterface;
+
+        this.soundsSystem = soundsSystem;
+        this.cameraSystem = cameraSystem;
     }
 
     private ImmutableArray<Entity> mobs;
@@ -46,80 +41,62 @@ public class InteractionSystem extends BaseSystem {
     private ComponentMapper<RelationalSpriteComponent> rsm = ComponentMapper.getFor(RelationalSpriteComponent.class);
     private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
-    private List<String> activeActions = new LinkedList<>();
+    private InteractiveComponent activeInteraction;
 
+    private boolean activated = false;
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
+        activated = false;
         mobs = engine.getEntitiesFor(Family.all(MoodComponent.class, PositionComponent.class).get());
-        soundsSystem = engine.getSystem(SoundsSystem.class);
-        cameraSystem = engine.getSystem(CameraSystem.class);
+    }
+
+    public InteractiveComponent getActiveInteraction() {
+        return activeInteraction;
     }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        activeActions.clear();
+        activeInteraction = null;
         for (int i = 0; i < getEntities().size(); i++) {
             PositionComponent positionComponent = pm.get(getEntities().get(i));
             final InteractiveComponent interactiveComponent = im.get(getEntities().get(i));
 
-            PositionComponent playerPosition = pm.get(player);
+            PositionComponent playerPosition = pm.get(getPlayer());
 
             String name = "q-" + interactiveComponent.type;
             if (playerPosition.getPosition().dst(positionComponent.getPosition()) < 35f) {
                 if (interactiveComponent.type != InteractiveComponent.Type.ACTION) {
-                    activeActions.add(name);
-                    if (userInterface.getControlBlock().findActor(name) == null) {
+                    activeInteraction = interactiveComponent;
+                    /*if (Arrays.stream(stage.getActors().items)
+                            .filter(actor -> actor.getName().equals(name)).findFirst()
+                            .orElse(null) == null) {
                         final Label text = new Label(interactiveComponent.title, userInterface.getLabelStyle());
                         text.setPosition(positionComponent.getX(), positionComponent.getY());
                         text.setName(name);
                         stage.addActor(text);
-                        userInterface.getControlBlock().row();
-
-                        String icon;
-                        switch (interactiveComponent.type) {
-
-                            case FINDING:
-                                icon = "ui/icons/icon_search.png";
-                                break;
-                            case TRANSFER:
-                                icon = "ui/icons/ic_transfer.png";
-                                break;
-                            default:
-                                icon = "ui/icons/icon_dialog.png";
-                                break;
-                        }
-
-                        userInterface.addInteractButton(name, icon, new ChangeListener() {
-                            @Override
-                            public void changed(ChangeEvent event, Actor actor) {
-                                interactiveComponent.listener.interact(userInterface);
-                                text.remove();
-                                ControlBlock controlBlock = userInterface.getControlBlock();
-                                Cell<Actor> cell = controlBlock.getCell(actor);
-                                actor.remove();
-                                controlBlock.getCells().removeValue(cell, true);
-                                controlBlock.invalidate();
-                            }
-                        });
-                    }
+                    }*/
                 } else {
-                    interactiveComponent.listener.interact(userInterface);
+                    if (!activated) {
+                        System.out.println("Activated by player " + getPlayer());
+                        System.out.println("In system " + this);
+                        activated = true;
+                        interactiveComponent.listener.interact();
+                    }
                 }
             }
         }
 
-        removeActorsFromStage(stage);
-        removeActor(userInterface.getControlBlock());
+        //todo
+        /*removeActorsFromStage(stage);
+        removeActor(userInterface.getControlBlock());*/
 
         int counter = 0;
         for (int i = 0; i < mobs.size(); i++) {
             Entity mob = mobs.get(i);
             PositionComponent positionComponent = pm.get(mob);
-
-
-            PositionComponent playerPosition = pm.get(player);
+            PositionComponent playerPosition = pm.get(getPlayer());
 
             float dst = positionComponent.dst(playerPosition);
 
@@ -158,17 +135,11 @@ public class InteractionSystem extends BaseSystem {
 
     }
 
-    public void addButton(String icon, InteractiveComponent.InteractListener listener) {
-        userInterface.getControlBlock().row();
-        userInterface.addInteractButton("", icon, listener);
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
 
-    public void addButton(String icon, EventListener listener) {
-        userInterface.getControlBlock().row();
-        userInterface.addInteractButton("", icon, listener);
-    }
-
-    private void removeActor(Table container) {
+    /* private void removeActor(Table container) {
         for (Actor actor : container.getChildren()) {
             if (actor.getName() != null && !activeActions.contains(actor.getName()) && actor.getName().contains("q-")) {
                 Cell<Actor> cell = container.getCell(actor);
@@ -186,7 +157,7 @@ public class InteractionSystem extends BaseSystem {
                 actor.remove();
             }
         }
-    }
+    }*/
 
     public UserInterface getUserInterface() {
         return userInterface;

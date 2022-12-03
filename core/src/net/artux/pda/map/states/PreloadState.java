@@ -7,10 +7,13 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.di.core.CoreComponent;
 import net.artux.pda.model.map.GameMap;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 
 public class PreloadState extends State {
@@ -20,14 +23,17 @@ public class PreloadState extends State {
     private final String fileCachePath = "cache/";
     private final List<String> remoteAssets;
     private long preloadTime;
+    private final CoreComponent statesComponent;
 
-    public PreloadState(final GameStateManager gsm, DataRepository dataRepository) {
+    @Inject
+    public PreloadState(final GameStateManager gsm, DataRepository dataRepository, CoreComponent statesComponent) {
         super(gsm, dataRepository);
         baseUrl = dataRepository.getProperties().getProperty(PropertyFields.RESOURCE_URL);
         remoteAssets = new LinkedList<>();
+        this.statesComponent = statesComponent;
     }
 
-    public void startLoad() {
+    public void resume() {
         GameMap map = dataRepository.getGameMap();
         preloadTime = TimeUtils.millis();
         if (map != null) {
@@ -43,7 +49,7 @@ public class PreloadState extends State {
             }
 
         } else
-            gsm.getPlatformInterface().error("Can not start with null map", new NullPointerException());
+            dataRepository.getPlatformInterface().error("Can not start with null map", new NullPointerException());
     }
 
     public void loadTexture(final String path, final int tries) {
@@ -69,14 +75,14 @@ public class PreloadState extends State {
                 @Override
                 public void failed(Throwable t) {
                     if (tries > triesLimit) {
-                        gsm.getPlatformInterface().error("Could not load " + url, t);
+                        dataRepository.getPlatformInterface().error("Could not load " + url, t);
                     } else loadTexture(path, tries + 1);
                 }
 
                 @Override
                 public void cancelled() {
                     if (tries > triesLimit) {
-                        gsm.getPlatformInterface().error("Loading stopped " + url, new RuntimeException());
+                        dataRepository.getPlatformInterface().error("Loading stopped " + url, new RuntimeException());
                     } else loadTexture(path, tries + 1);
                 }
             });
@@ -102,10 +108,10 @@ public class PreloadState extends State {
                 if (!started) {
                     started = true;
                     Gdx.app.log("Preload", "Ok, try to load Play State. Preload took " + (TimeUtils.millis() - preloadTime) + " ms.");
-                    gsm.set(new PlayState(gsm, dataRepository));
+                    gsm.set(statesComponent.getPlayState());
                 }
             } catch (Throwable e) {
-                gsm.getPlatformInterface().error("Can not start PlayState", e);
+                dataRepository.getPlatformInterface().error("Can not start PlayState", e);
             }
         }
     }

@@ -23,7 +23,7 @@ import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 import net.artux.pda.ui.activities.QuestActivity;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.viewmodels.StoryViewModel;
+import net.artux.pda.ui.viewmodels.StoriesViewModel;
 
 import java.util.Optional;
 import java.util.Properties;
@@ -36,7 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnStoryClickListener {
 
     private FragmentListBinding binding;
-    private StoryViewModel storyViewModel;
+    private StoriesViewModel storiesViewModel;
     @Inject
     protected Properties properties;
 
@@ -56,8 +56,8 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
         binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.list.setAdapter(adapter);
 
-        storyViewModel = new ViewModelProvider(requireActivity()).get(StoryViewModel.class);
-        storyViewModel.getStories().observe(getViewLifecycleOwner(), stories -> {
+        storiesViewModel = new ViewModelProvider(requireActivity()).get(StoriesViewModel.class);
+        storiesViewModel.getStories().observe(getViewLifecycleOwner(), stories -> {
             navigationPresenter.setLoadingState(false);
             if (stories.size() > 0) {
                 binding.list.setVisibility(View.VISIBLE);
@@ -70,7 +70,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
         });
         navigationPresenter.setLoadingState(true);
 
-        storyViewModel.updateData().observe(getViewLifecycleOwner(), memberResult -> {
+        storiesViewModel.updateData().observe(getViewLifecycleOwner(), memberResult -> {
             if (memberResult.getCurrentState() != null) {
                 StoryStateModel storyState = memberResult.getCurrentState();
                 Intent intent = new Intent(getActivity(), QuestActivity.class);
@@ -80,7 +80,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 intent.putExtra("stageId", storyState.getStageId());
                 requireActivity().startActivity(intent);
                 requireActivity().finish();
-            } else storyViewModel.updateStories();
+            } else storiesViewModel.updateStories();
         });
     }
 
@@ -115,32 +115,35 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             builder.show();
         } else if (id > -1) {
             Intent intent = new Intent(requireContext(), QuestActivity.class);
-            StoryDataModel dataModel = storyViewModel.getStoryData().getValue();
-            boolean sequenceWalkthrough = Boolean.parseBoolean(properties
-                    .getProperty(PropertyFields.STORIES_SEQUENCE, "true"));
-            Optional<StoryItem> firstStory = storyViewModel.getStories().getValue().stream().findFirst();
+            StoryDataModel dataModel = storiesViewModel.getStoryData().getValue();
+            if (dataModel != null) {
+                boolean sequenceWalkthrough = Boolean.parseBoolean(properties
+                        .getProperty(PropertyFields.STORIES_SEQUENCE, "true"));
+                if (properties.getProperty(PropertyFields.TESTER_MODE).equals("true"))
+                    sequenceWalkthrough = false;
+                Optional<StoryItem> firstStory = storiesViewModel.getStories().getValue().stream().findFirst();
 
-
-            if (firstStory.isPresent() && firstStory.get() != storyItem && sequenceWalkthrough) {
-                StoryStateModel stateModel = dataModel.getStateByStoryId(id - 1);
-                if (stateModel == null || !stateModel.isOver()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
-                    builder.setTitle("Нет доступа");
-                    builder.setMessage("Прохождение этой истории недоступно пока не пройдены предыдущие");
-                    builder.setNegativeButton(R.string.okay, (dialog, which) -> dialog.cancel());
-                    builder.show();
-                    return;
+                if (firstStory.isPresent() && firstStory.get() != storyItem && sequenceWalkthrough) {
+                    StoryStateModel stateModel = dataModel.getStateByStoryId(id - 1);
+                    if (stateModel == null || !stateModel.isOver()) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
+                        builder.setTitle("Нет доступа");
+                        builder.setMessage("Прохождение этой истории недоступно пока не пройдены предыдущие");
+                        builder.setNegativeButton(R.string.okay, (dialog, which) -> dialog.cancel());
+                        builder.show();
+                        return;
+                    }
                 }
-            }
 
-            StoryStateModel storyStateModel = dataModel.getStateByStoryId(id);
-            intent.putExtra("storyId", id);
-            if (storyStateModel != null) {
-                intent.putExtra("chapterId", storyStateModel.getChapterId());
-                intent.putExtra("stageId", storyStateModel.getStageId());
+                StoryStateModel storyStateModel = dataModel.getStateByStoryId(id);
+                intent.putExtra("storyId", id);
+                if (storyStateModel != null) {
+                    intent.putExtra("chapterId", storyStateModel.getChapterId());
+                    intent.putExtra("stageId", storyStateModel.getStageId());
+                }
+                requireActivity().startActivity(intent);
+                requireActivity().finish();
             }
-            requireActivity().startActivity(intent);
-            requireActivity().finish();
         }
     }
 

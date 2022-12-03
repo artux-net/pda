@@ -26,6 +26,11 @@ import net.artux.pda.map.engine.entities.RelationType;
 
 import java.util.HashMap;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+@Singleton
 public class RenderSystem extends BaseSystem implements Drawable {
 
     private Stage stage;
@@ -43,7 +48,8 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
     public static boolean showAll = false;
 
-    public RenderSystem(Stage stage, AssetsFinder assetsFinder) {
+    @Inject
+    public RenderSystem(@Named("gameStage") Stage stage, AssetsFinder assetsFinder) {
         super(Family.all(SpriteComponent.class, PositionComponent.class).get());
         this.stage = stage;
 
@@ -133,7 +139,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
             Entity entity = relationalEntities.get(i);
             PositionComponent positionComponent = pm.get(entity);
 
-            MoodComponent moodComponent = mm.get(player);
+            MoodComponent moodComponent = mm.get(getPlayer());
             MoodComponent entityMoodComponent = mm.get(entity);
 
             Sprite sprite = relationalSprites.get(RelationType.by(moodComponent.getRelation(entityMoodComponent)));

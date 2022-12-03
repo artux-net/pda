@@ -1,7 +1,6 @@
 package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
@@ -15,6 +14,10 @@ import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.engine.pathfinding.TiledSmoothableGraphPath;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class MapLoggerSystem extends IteratingSystem implements Drawable, Disposable {
 
     private final ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
@@ -27,16 +30,13 @@ public class MapLoggerSystem extends IteratingSystem implements Drawable, Dispos
     public static boolean showTiles = false;
     public static boolean showPaths = false;
 
-    public MapLoggerSystem() {
+    @Inject
+    public MapLoggerSystem(MapOrientationSystem mapOrientationSystem) {
         super(Family.all(GraphMotionComponent.class).get());
         sr = new ShapeRenderer();
+        this.mapOrientationSystem = mapOrientationSystem;
     }
 
-    @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-        mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
-    }
 
     @Override
     public void update(float deltaTime) {

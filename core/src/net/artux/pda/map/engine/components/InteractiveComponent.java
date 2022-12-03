@@ -2,8 +2,6 @@ package net.artux.pda.map.engine.components;
 
 import com.badlogic.ashley.core.Component;
 
-import net.artux.pda.map.ui.UserInterface;
-
 public class InteractiveComponent implements Component {
 
     public String title;
@@ -32,7 +30,7 @@ public class InteractiveComponent implements Component {
     }
 
     public interface InteractListener{
-        void interact(UserInterface userInterface);
+        void interact();
     }
 
     public enum Type{

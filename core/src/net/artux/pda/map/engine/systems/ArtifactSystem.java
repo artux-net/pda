@@ -8,23 +8,29 @@ import com.badlogic.ashley.core.Family;
 import net.artux.pda.map.engine.components.ArtifactComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
+import net.artux.pda.map.ui.UserInterface;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class ArtifactSystem extends BaseSystem {
 
     private SoundsSystem soundsSystem;
-    private MessagesSystem messagesSystem;
+    private UserInterface userInterface;
     private ComponentMapper<PositionComponent> pcm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<PlayerComponent> pm = ComponentMapper.getFor(PlayerComponent.class);
 
-    public ArtifactSystem() {
+    @Inject
+    public ArtifactSystem(SoundsSystem soundsSystem, UserInterface userInterface) {
         super(Family.all(ArtifactComponent.class, PositionComponent.class).get());
+        this.soundsSystem = soundsSystem;
+        this.userInterface = userInterface;
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        soundsSystem = engine.getSystem(SoundsSystem.class);
-        messagesSystem = engine.getSystem(MessagesSystem.class);
     }
 
     private final float distanceForDetector = 100;
@@ -36,19 +42,19 @@ public class ArtifactSystem extends BaseSystem {
         super.update(deltaTime);
         for (int i = 0; i < getEntities().size(); i++) {
             PositionComponent positionComponent = pcm.get(getEntities().get(i));
-            PositionComponent playerComponent = pcm.get(player);
+            PositionComponent playerComponent = pcm.get(getPlayer());
             float dst = positionComponent.getPosition().dst(playerComponent.getPosition());
             if (dst < distanceForDetector) {
                 float timeLimit = dst / distanceForDetector;
                 timeCount += deltaTime;
-                if (timeCount > timeLimit * 5){
+                if (timeCount > timeLimit * 5) {
                     soundsSystem.playSound();
                     timeCount = 0;
                 }
 
                 if (dst < 1) {
                     getEngine().removeEntity(getEntities().get(i));
-                    messagesSystem.addMessage("Найден артефакт", "Уведомление");
+                    //userInterface.addMessage("Найден артефакт", "Уведомление");
                 }
             }
 

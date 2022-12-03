@@ -27,8 +27,8 @@ public class StoryHolder extends RecyclerView.ViewHolder implements View.OnClick
         this.storyItem = storyItem;
         ((TextView) itemView.findViewById(R.id.storyTitle)).setText(storyItem.getTitle());
         ((TextView) itemView.findViewById(R.id.storyDesc)).setText(storyItem.getDesc());
-        if (storyItem.getIconUrl() != null) {
-            String iconUrl = URLHelper.getResourceURL(storyItem.getIconUrl());
+        if (storyItem.getIcon() != null) {
+            String iconUrl = URLHelper.getResourceURL(storyItem.getIcon());
 
             Glide.with(itemView)
                     .load(iconUrl)

@@ -17,6 +17,10 @@ import net.artux.pda.map.engine.components.VisionComponent;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class SpawnSystem extends IteratingSystem {
 
     private ImmutableArray<Entity> spawns;
@@ -27,6 +31,7 @@ public class SpawnSystem extends IteratingSystem {
     private final ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private final ComponentMapper<GroupComponent> gm = ComponentMapper.getFor(GroupComponent.class);
 
+    @Inject
     public SpawnSystem(DataRepository dataRepository) {
         super(Family.all(VisionComponent.class, PositionComponent.class, VelocityComponent.class).get());
         this.dataRepository = dataRepository;

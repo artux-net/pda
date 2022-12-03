@@ -28,6 +28,7 @@ public class DataRepository {
     private UserModel userModel;
 
     private Properties properties;
+
     private final PlatformInterface platformInterface;
 
     public DataRepository(PlatformInterface platformInterface) {

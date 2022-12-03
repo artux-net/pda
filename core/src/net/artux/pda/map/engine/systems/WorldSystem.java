@@ -20,12 +20,15 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
-import net.artux.pda.map.engine.entities.EntityBuilder;
 
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class WorldSystem extends EntitySystem implements Disposable {
 
     private ImmutableArray<Entity> anomalies;
@@ -43,15 +46,15 @@ public class WorldSystem extends EntitySystem implements Disposable {
 
     private CameraSystem cameraSystem;
     private SoundsSystem soundsSystem;
-    private MapOrientationSystem mapOrientationSystem;
     private Timer timer;
-    private final EntityBuilder entityBuilder;
     public static boolean radiation = true;
 
-    public WorldSystem(AssetManager assetManager, EntityBuilder entityBuilder) {
+    @Inject
+    public WorldSystem(AssetManager assetManager, CameraSystem cameraSystem, SoundsSystem soundsSystem) {
         this.assetManager = assetManager;
-        this.entityBuilder = entityBuilder;
         timer = new Timer();
+        this.cameraSystem = cameraSystem;
+        this.soundsSystem = soundsSystem;
     }
 
     @Override
@@ -59,9 +62,6 @@ public class WorldSystem extends EntitySystem implements Disposable {
         super.addedToEngine(engine);
         anomalies = engine.getEntitiesFor(Family.all(AnomalyComponent.class, PositionComponent.class).get());
         entities = engine.getEntitiesFor(Family.all(HealthComponent.class, PositionComponent.class, VelocityComponent.class).get());
-        cameraSystem = engine.getSystem(CameraSystem.class);
-        soundsSystem = engine.getSystem(SoundsSystem.class);
-        mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
         generateGroup();
     }
 

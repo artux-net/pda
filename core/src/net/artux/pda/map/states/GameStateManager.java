@@ -4,23 +4,20 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 
-import net.artux.pda.map.utils.PlatformInterface;
-
 import java.util.Stack;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class GameStateManager {
 
-    private final PlatformInterface platformInterface;
     private final Stack<net.artux.pda.map.states.State> states;
     private final InputMultiplexer multiplexer = new InputMultiplexer();
 
-    public GameStateManager(PlatformInterface platformInterface) {
+    @Inject
+    public GameStateManager() {
         states = new Stack<>();
-        this.platformInterface = platformInterface;
-    }
-
-    public PlatformInterface getPlatformInterface() {
-        return platformInterface;
     }
 
     public void push(net.artux.pda.map.states.State state) {
@@ -28,6 +25,10 @@ public class GameStateManager {
             states.peek().stop();
         states.push(state);
         states.peek().handleInput();
+    }
+
+    public void resume() {
+        states.peek().resume();
     }
 
     public State peek() {
@@ -38,6 +39,7 @@ public class GameStateManager {
         states.pop().dispose();
         states.push(state);
         states.peek().handleInput();
+        states.peek().resume();
     }
 
     public void dispose() {

@@ -28,9 +28,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Random;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class DeadCheckerSystem extends BaseSystem {
 
-    private UserInterface ui;
+    private Group gameZone;
     private Label.LabelStyle labelStyle;
     private boolean deadMessage;
     private DataRepository dataRepository;
@@ -41,9 +45,10 @@ public class DeadCheckerSystem extends BaseSystem {
     private AssetManager assetManager;
     private Random random = new Random();
 
+    @Inject
     public DeadCheckerSystem(UserInterface userInterface, DataRepository dataRepository, AssetManager assetManager) {
         super(Family.all(HealthComponent.class, PositionComponent.class).get());
-        this.ui = userInterface;
+        this.gameZone = userInterface;
         this.assetManager = assetManager;
         this.dataRepository = dataRepository;
         labelStyle = userInterface.getLabelStyle();
@@ -66,11 +71,11 @@ public class DeadCheckerSystem extends BaseSystem {
                     deadEntity.add(new PositionComponent(positionComponent.getPosition()))
                             .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4));
 
-                    if (entity != player) {
+                    if (entity != getPlayer()) {
                         StalkerComponent stalkerComponent = entity.getComponent(StalkerComponent.class);
                         deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, new InteractiveComponent.InteractListener() {
                                     @Override
-                                    public void interact(UserInterface userInterface) {
+                                    public void interact() {
                                         switch (random.nextInt(4)) {
                                             case 0:
                                                 dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("85:1")));
@@ -96,7 +101,7 @@ public class DeadCheckerSystem extends BaseSystem {
                                         () -> getEngine().removeEntity(entity)))
                                 .add(stalkerComponent);
                     } else {
-                        getEngine().removeEntity(player);
+                        getEngine().removeEntity(getPlayer());
                         getEngine().removeSystem(getEngine().getSystem(PlayerSystem.class));
                     }
 
@@ -105,8 +110,9 @@ public class DeadCheckerSystem extends BaseSystem {
                 getEngine().removeEntity(entity);
             }
         }
-        if (!getEngine().getEntities().contains(player, false)) {
+        if (!isPlayerActive()) {
             if (!deadMessage) {
+                System.out.println("Dead message from :" + this);
                 dataRepository.applyActions(Collections.singletonMap("xp", Collections.singletonList("-5")));
                 Group deadMessageGroup = new Group();
 
@@ -126,7 +132,7 @@ public class DeadCheckerSystem extends BaseSystem {
                         super.clicked(event, x, y);
                     }
                 });
-                ui.addActor(deadMessageGroup);
+                gameZone.addActor(deadMessageGroup);
 
                 deadMessage = true;
             }

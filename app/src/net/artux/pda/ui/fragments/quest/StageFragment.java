@@ -21,7 +21,7 @@ import net.artux.pda.databinding.FragmentQuest1Binding;
 import net.artux.pda.model.quest.StageModel;
 import net.artux.pda.model.quest.StageType;
 import net.artux.pda.model.quest.TransferModel;
-import net.artux.pda.ui.viewmodels.StoryViewModel;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.ui.views.TypeWriterTextView;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class StageFragment extends Fragment {
     private ColorStateList colorStateList;
 
     private StageModel stage;
-    private StoryViewModel storyViewModel;
+    private QuestViewModel questViewModel;
 
     private FragmentQuest0Binding usualStageBinding;
     private FragmentQuest1Binding chapterOverBinding;
@@ -62,7 +62,7 @@ public class StageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        storyViewModel = new ViewModelProvider(requireActivity()).get(StoryViewModel.class);
+        questViewModel = new ViewModelProvider(requireActivity()).get(QuestViewModel.class);
         if (usualStageBinding != null) {
             TypeWriterTextView mainText = usualStageBinding.sceneText;
             sceneResponses = usualStageBinding.sceneResponses;
@@ -85,7 +85,7 @@ public class StageFragment extends Fragment {
             else
                 button.setText(requireActivity().getString(R.string.okay));
 
-            button.setOnClickListener(v -> storyViewModel.chooseTransfer((transfers.get(0))));
+            button.setOnClickListener(v -> questViewModel.chooseTransfer((transfers.get(0))));
         }
 
     }
@@ -103,7 +103,7 @@ public class StageFragment extends Fragment {
             if (getActivity() != null) {
                 button.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.black_overlay));
                 button.setOnClickListener(v ->
-                        storyViewModel.chooseTransfer(transfer));
+                        questViewModel.chooseTransfer(transfer));
             }
             sceneResponses.addView(button);
         }

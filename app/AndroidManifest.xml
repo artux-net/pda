@@ -68,7 +68,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" />
         <activity
-            android:name=".gdx.MapEngine"
+            android:name=".gdx.CoreFragment"
             android:exported="true"
             android:launchMode="singleInstance"
             android:screenOrientation="sensorLandscape">

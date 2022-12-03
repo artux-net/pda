@@ -1,5 +1,6 @@
 package net.artux.pda.map.engine;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
@@ -15,53 +16,38 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.di.core.CoreComponent;
+import net.artux.pda.map.engine.components.HealthComponent;
+import net.artux.pda.map.engine.components.MoodComponent;
+import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.entities.EntityBuilder;
-import net.artux.pda.map.engine.systems.ArtifactSystem;
-import net.artux.pda.map.engine.systems.BattleSystem;
 import net.artux.pda.map.engine.systems.CameraSystem;
-import net.artux.pda.map.engine.systems.ClicksSystem;
-import net.artux.pda.map.engine.systems.DataSystem;
-import net.artux.pda.map.engine.systems.DeadCheckerSystem;
 import net.artux.pda.map.engine.systems.Drawable;
 import net.artux.pda.map.engine.systems.InteractionSystem;
-import net.artux.pda.map.engine.systems.MapLoggerSystem;
-import net.artux.pda.map.engine.systems.MapOrientationSystem;
-import net.artux.pda.map.engine.systems.MessagesSystem;
-import net.artux.pda.map.engine.systems.MovementTargetingSystem;
-import net.artux.pda.map.engine.systems.MovingSystem;
-import net.artux.pda.map.engine.systems.PlayerSystem;
-import net.artux.pda.map.engine.systems.RenderSystem;
-import net.artux.pda.map.engine.systems.SoundsSystem;
-import net.artux.pda.map.engine.systems.SpawnSystem;
-import net.artux.pda.map.engine.systems.StatesSystem;
-import net.artux.pda.map.engine.systems.TimerSystem;
-import net.artux.pda.map.engine.systems.VisionSystem;
-import net.artux.pda.map.engine.systems.WorldSystem;
 import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
-import net.artux.pda.map.engine.world.helpers.RandomSpawnerHelper;
-import net.artux.pda.map.states.PlayState;
 import net.artux.pda.map.utils.Mappers;
-import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
 import java.beans.PropertyChangeListener;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class EngineManager extends InputListener implements Drawable, Disposable {
 
     private GameMap map;
     private UserModel userModel;
-
+    private Entity player;
     private Engine engine;
     private final DataRepository dataRepository;
-
-    private final ClicksSystem clicksSystem;
-    private final CameraSystem cameraSystem;
 
     private boolean controlPoints = true;
     private boolean questPoints = true;
@@ -78,59 +64,39 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
                 playerComponent.gdxData = dataModel;
                 weaponComponent.updateData(dataModel);
-                engine.getSystem(PlayerSystem.class).updateData(dataModel);
+                //engine.getSystem(PlayerSystem.class).updateData(dataModel);
                 //engine.getSystem(PlayerSystem.class).savePreferences();
             }
         }
     };
 
-    public EngineManager(AssetsFinder assetsFinder, Stage stage, PlayState playState) {
-        this.engine = new Engine();
-        dataRepository = playState.getDataRepository();
-        PlatformInterface platformInterface = playState.getGSM().getPlatformInterface();
+    @Inject
+    public EngineManager(CoreComponent coreComponent) {
+        dataRepository = coreComponent.getDataRepository();
         this.map = dataRepository.getGameMap();
         this.userModel = dataRepository.getUserModel();
+
+        engine = coreComponent.getEngine();
+
+        Stage stage = coreComponent.gameStage();
+
         StoryDataModel gdxData = dataRepository.getStoryDataModel();
         long loadTime = TimeUtils.millis();
 
-        EntityBuilder entityBuilder = new EntityBuilder(assetsFinder.getManager(), engine);
-        engine.addEntity(entityBuilder.player(Mappers.vector2(map.getDefPos()), gdxData, userModel));
-
-        engine.addSystem(new MapOrientationSystem(assetsFinder, map));
-        engine.addSystem(new ClicksSystem());
-        engine.addSystem(new CameraSystem(stage.getCamera()));
-        engine.addSystem(new SoundsSystem(assetsFinder.getManager()));
-        engine.addSystem(new WorldSystem(assetsFinder.getManager(), entityBuilder));
-        engine.addSystem(new DataSystem(map, userModel));
-        engine.addSystem(new InteractionSystem(stage, playState.getUserInterface()));
-        engine.addSystem(new PlayerSystem(assetsFinder.getManager()));
-
+        EntityBuilder entityBuilder = coreComponent.getEntityBuilder();
+        player = entityBuilder.player(Mappers.vector2(map.getDefPos()), gdxData, userModel);
+        System.out.println("Player created in engine: " + engine);
+        System.out.println("Player " + player);
+        engine.addEntity(player);
 
         if (controlPoints)
-            ControlPointsHelper.createControlPointsEntities(engine, entityBuilder);
+            ControlPointsHelper.createControlPointsEntities(coreComponent);
         if (questPoints)
-            QuestPointsHelper.createQuestPointsEntities(engine, assetsFinder.getManager(), platformInterface);
+            QuestPointsHelper.createQuestPointsEntities(coreComponent);
         if (anomalies)
-            AnomalyHelper.createAnomalies(engine, assetsFinder.getManager());
+            AnomalyHelper.createAnomalies(coreComponent);
 
-        engine.addSystem(new MessagesSystem(playState.getUserInterface()));
-        engine.addSystem(new ArtifactSystem());
-        engine.addSystem(new MapLoggerSystem());
-        engine.addSystem(new RenderSystem(stage, assetsFinder));
-        engine.addSystem(new BattleSystem(assetsFinder.getManager(), platformInterface));
-        engine.addSystem(new StatesSystem());
-        engine.addSystem(new MovementTargetingSystem());
-        engine.addSystem(new VisionSystem(assetsFinder.getManager()));
-        engine.addSystem(new MovingSystem());
-        engine.addSystem(new DeadCheckerSystem(playState.getUserInterface(), dataRepository, assetsFinder.getManager()));
-        engine.addSystem(new SpawnSystem(dataRepository));
-        engine.addSystem(new TimerSystem());
-
-        RandomSpawnerHelper.init(engine, dataRepository, entityBuilder);
-
-        clicksSystem = engine.getSystem(ClicksSystem.class);
-        cameraSystem = engine.getSystem(CameraSystem.class);
-        engine.getSystem(PlayerSystem.class).updateData(gdxData);
+//        RandomSpawnerHelper.init(coreComponent);
 
         stage.addListener(this);
         syncCameraPosition(stage);
@@ -168,5 +134,21 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
     public Engine getEngine() {
         return engine;
+    }
+
+    public void updateEverything() {
+
+        updateOnlyPlayer();
+    }
+
+    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
+    private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
+    private ComponentMapper<PlayerComponent> pmm = ComponentMapper.getFor(PlayerComponent.class);
+
+    public void updateOnlyPlayer() {
+        pm.get(player).set(Mappers.vector2(dataRepository.getGameMap().getDefPos()));
+        engine.getSystem(InteractionSystem.class).setActivated(false);
     }
 }

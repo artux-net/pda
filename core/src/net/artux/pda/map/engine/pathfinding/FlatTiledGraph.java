@@ -4,8 +4,6 @@ import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import net.artux.pda.map.engine.data.GlobalData;
-
 public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
     public static final int tileSize = 8;
 
@@ -18,8 +16,8 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
     public FlatTiledNode startNode;
 
     public FlatTiledGraph(MapBorder mapBorder) {
-        this.sizeX = GlobalData.mapWidth / tileSize;
-        this.sizeY = GlobalData.mapHeight / tileSize;
+        this.sizeX = mapBorder.getMapWidth()/ tileSize;
+        this.sizeY = mapBorder.getMapHeight() / tileSize;
         this.nodes = new Array<>(sizeX * sizeY);
         diagonal = true;
 

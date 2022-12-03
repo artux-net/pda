@@ -15,6 +15,10 @@ import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.engine.pathfinding.TiledManhattanDistance;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class MovementTargetingSystem extends IteratingSystem {
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
@@ -26,14 +30,15 @@ public class MovementTargetingSystem extends IteratingSystem {
     private PathSmoother<FlatTiledNode, Vector2> pathSmoother;
     MapOrientationSystem mapOrientationSystem;
 
-    public MovementTargetingSystem() {
+    @Inject
+    public MovementTargetingSystem(MapOrientationSystem mapOrientationSystem) {
         super(Family.all(VelocityComponent.class, PositionComponent.class, GraphMotionComponent.class).get());
+        this.mapOrientationSystem = mapOrientationSystem;
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
 
         heuristic = mapOrientationSystem.getHeuristic();
         pathFinder = mapOrientationSystem.getPathFinder();

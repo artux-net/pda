@@ -21,7 +21,7 @@ import timber.log.Timber
 import java.util.*
 
 @HiltViewModel
-class StoryViewModel @javax.inject.Inject constructor(
+class QuestViewModel @javax.inject.Inject constructor(
     var summaryRepository: SummaryRepository,
     var userRepository: UserRepository,
     var repository: QuestRepository,
@@ -36,7 +36,6 @@ class StoryViewModel @javax.inject.Inject constructor(
     var notification: MutableLiveData<NotificationModel> = MutableLiveData()
     var background: MutableLiveData<String> = MutableLiveData()
 
-    var stories: MutableLiveData<List<StoryItem>> = MutableLiveData()
     var chapter: MutableLiveData<ChapterModel> = MutableLiveData()
     var map: MutableLiveData<GameMap> = MutableLiveData()
     var data: MutableLiveData<Map<String, String>> = MutableLiveData()
@@ -51,34 +50,10 @@ class StoryViewModel @javax.inject.Inject constructor(
     var currentStoryId: Int = -1
     var currentChapterId: Int = -1
 
-    fun updateStories() {
-        viewModelScope.launch {
-            repository.updateStories()
-                .map { mapper.stories(it) }
-                .onSuccess {
-                    val item = StoryItem()
-                    item.id = -1
-                    item.title = "Загрузка стадии на выбор"
-                    item.desc = ".."
-                    it.add(item)
-                    stories.postValue(it)
-                }
-                .onFailure { status.postValue(StatusModel(it)) }
-        }
-    }
-
     fun getCurrentStory(): StoryModel {
         return repository.getCachedStory(currentStoryId)
             .map { mapper.story(it) }
             .getOrThrow()
-    }
-
-    fun updateData(): MutableLiveData<StoryDataModel> {
-        storyData = MutableLiveData()
-        viewModelScope.launch {
-            suspendUpdateData()
-        }
-        return storyData
     }
 
     private suspend fun suspendUpdateData() {
@@ -270,12 +245,6 @@ class StoryViewModel @javax.inject.Inject constructor(
 
     fun clear() {
         repository.clearCache()
-    }
-
-    fun updateDataFromCache() {
-        repository.getCachedStoryData()
-            .map { mapper.dataModel(it) }
-            .onSuccess { storyData.postValue(it) }
     }
 
 }

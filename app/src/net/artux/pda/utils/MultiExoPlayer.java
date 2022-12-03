@@ -2,6 +2,7 @@ package net.artux.pda.utils;
 
 import android.content.Context;
 
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -18,7 +19,7 @@ public class MultiExoPlayer {
 
     private final Context context;
     private final List<Sound> sounds;
-    private final HashMap<Sound, SimpleExoPlayer> player = new HashMap<>();
+    private final HashMap<Sound, ExoPlayer> player = new HashMap<>();
     boolean muted;
 
     public MultiExoPlayer(Context context, List<Sound> soundList) {
@@ -33,7 +34,7 @@ public class MultiExoPlayer {
                     context,
                     MyDownloadService.class,
                     downloadRequest,
-                    *//* foreground= *//* true);
+                     foreground=  true);
             //myDownloadService.send//addDownload(downloadRequest);
         }*/
     }
@@ -55,22 +56,22 @@ public class MultiExoPlayer {
                 Sound sound = getSound(id);
 
                 if (sound != null) {
-            /*DataSource.Factory cacheDataSourceFactory =
-                    new CacheDataSource.Factory()
-                            .setCache(myDownloadService.getDownloadCache())
-                            .setUpstreamDataSourceFactory(myDownloadService.getDataSourceFactory())
-                            .setCacheWriteDataSinkFactory(null); // Disable writing.
+                   /* DataSource.Factory cacheDataSourceFactory =
+                            new CacheDataSource.Factory()
+                                    .setCache(myDownloadService.getDownloadCache())
+                                    .setUpstreamDataSourceFactory(myDownloadService.getDataSourceFactory())
+                                    .setCacheWriteDataSinkFactory(null); // Disable writing.
 
 
-            ProgressiveMediaSource mediaSource =
-                    new ProgressiveMediaSource.Factory(cacheDataSourceFactory)
-                            .createMediaSource(MediaItem.fromUri(sound.getUrl()));*/
+                    ProgressiveMediaSource mediaSource =
+                            new ProgressiveMediaSource.Factory(cacheDataSourceFactory)
+                                    .createMediaSource(MediaItem.fromUri(sound.getUrl()));*/
                     if (!player.containsKey(sound)) {
                         System.out.println("1");
                         addSound(sound);
                     } else {
                         System.out.println("2");
-                        SimpleExoPlayer play = player.get(sound);
+                        ExoPlayer play = player.get(sound);
                         if (play != null)
                             if (!(play.getPlaybackState() == Player.STATE_READY && play.getPlayWhenReady()))
                                 play.play();
@@ -102,11 +103,11 @@ public class MultiExoPlayer {
     }
 
     void reset(int[] ids) {
-        Iterator<Map.Entry<Sound, SimpleExoPlayer>> iterator = player.entrySet().iterator();
+        Iterator<Map.Entry<Sound, ExoPlayer>> iterator = player.entrySet().iterator();
         List<Sound> remove = new ArrayList<>();
         while (iterator.hasNext()) {
             boolean f = true;
-            Map.Entry<Sound, SimpleExoPlayer> e = iterator.next();
+            Map.Entry<Sound, ExoPlayer> e = iterator.next();
             if (ids != null && ids.length != 0)
                 for (int id : ids) {
                     Sound s = getSound(id);
@@ -122,7 +123,7 @@ public class MultiExoPlayer {
         }
 
         for (Sound i : remove) {
-            SimpleExoPlayer p = player.get(i);
+            ExoPlayer p = player.get(i);
             if (p != null) {
                 System.out.println("released:" + i.getId());
                 p.release();
@@ -133,7 +134,7 @@ public class MultiExoPlayer {
     }
 
     public void release() {
-        for (SimpleExoPlayer exoPlayer : player.values()) {
+        for (ExoPlayer exoPlayer : player.values()) {
             if (exoPlayer != null)
                 exoPlayer.release();
         }
@@ -141,7 +142,7 @@ public class MultiExoPlayer {
 
     public void unmute() {
         muted = false;
-        for (Map.Entry<Sound, SimpleExoPlayer> s : player.entrySet())
+        for (Map.Entry<Sound, ExoPlayer> s : player.entrySet())
             if (s.getValue() != null)
                 for (String param : s.getKey().getParams())
                     if (param.equals("loop")) {
@@ -156,7 +157,7 @@ public class MultiExoPlayer {
 
     public void mute() {
         muted = true;
-        for (SimpleExoPlayer exoPlayer : player.values()) {
+        for (ExoPlayer exoPlayer : player.values()) {
             if (exoPlayer != null)
                 exoPlayer.setVolume(0);
         }

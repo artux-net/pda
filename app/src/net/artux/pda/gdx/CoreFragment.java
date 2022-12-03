@@ -1,23 +1,24 @@
 package net.artux.pda.gdx;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
-import android.widget.Toast;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.badlogic.gdx.backends.android.AndroidApplication;
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 
 import net.artux.pda.app.ForegroundService;
 import net.artux.pda.app.PDAApplication;
+import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.map.GameMap;
@@ -26,8 +27,7 @@ import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.MainActivity;
-import net.artux.pda.ui.activities.QuestActivity;
-import net.artux.pda.ui.activities.SellerActivity;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +35,7 @@ import java.util.Map;
 
 import timber.log.Timber;
 
-public class MapEngine extends AndroidApplication implements PlatformInterface {
+public class CoreFragment extends AndroidFragmentApplication implements PlatformInterface {
 
     public static final String RECEIVER_INTENT = "RECEIVER_INTENT";
     public static final String RECEIVE_STORY_DATA = "RECEIVER_DATA";
@@ -45,6 +45,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
     private ForegroundService foregroundService;
     private boolean bound = false;
     private GdxAdapter gdxAdapter;
+    private QuestViewModel questViewModel;
 
     private final ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -60,51 +61,49 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
         }
     };
 
-    private BroadcastReceiver dataChangeReceiver;
-
-
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Intent intent = getIntent();
-        UserModel member = (UserModel) intent.getSerializableExtra("user");
-        StoryModel storyModel = (StoryModel) intent.getSerializableExtra("story");
-        StoryDataModel dataModel = (StoryDataModel) intent.getSerializableExtra("data");
-        GameMap map = (GameMap) intent.getSerializableExtra("map");
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Bundle args = getArguments();
+        UserModel user = (UserModel) args.getSerializable("user");
+        StoryModel storyModel = (StoryModel) args.getSerializable("story");
+        StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
+        GameMap map = (GameMap) args.getSerializable("map");
 
         lastStoryState = dataModel.getCurrentState();
 
         GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
                 .map(map)
-                .user(member)
+                .user(user)
                 .story(storyModel)
                 .storyData(dataModel)
-                .props(((PDAApplication)getApplication()).getProperties());
-
+                .props(((PDAApplication) requireActivity().getApplication()).getProperties());
         gdxAdapter = (GdxAdapter) builder.build();
-        initialize(gdxAdapter, new AndroidApplicationConfiguration());
-
-        dataChangeReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.hasExtra(RECEIVE_STORY_DATA)) {
-                    StoryDataModel storyDataModel = (StoryDataModel) intent.getSerializableExtra(RECEIVE_STORY_DATA);
-                    gdxAdapter.getDataRepository().setStoryDataModel(storyDataModel);
-                    getIntent().putExtra("data", storyDataModel);
-                } else if (intent.hasExtra(RECEIVE_ERROR)) {
-                    Throwable throwable = (Throwable) intent.getSerializableExtra(RECEIVE_ERROR);
-                    Timber.e(throwable, "Sync map error");
-                }
-            }
-        };
+        Timber.i("Core view created");
+        return initializeForView(gdxAdapter);
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        ViewModelProvider provider = new ViewModelProvider(requireActivity());
+        questViewModel = provider.get(QuestViewModel.class);
+    }
+
+    @Override
+    public void onResume() {
+        Timber.i("Core resumed");
+        Bundle args = getArguments();
+        UserModel user = (UserModel) args.getSerializable("user");
+        StoryModel storyModel = (StoryModel) args.getSerializable("story");
+        StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
+        GameMap map = (GameMap) args.getSerializable("map");
+        DataRepository dataRepository = gdxAdapter.getDataRepository();
+        dataRepository.setStoryDataModel(dataModel);
+        dataRepository.setGameMap(map);
+        dataRepository.setStoryModel(storyModel);
+        dataRepository.setUserModel(user);
+        super.onResume();
     }
 
     @Override
@@ -118,31 +117,31 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
                     String chapterId = data.get("chapter");
                     String stageId = data.get("stage");
                     if (chapterId != null && stageId != null) {
-                        intent = new Intent(this, QuestActivity.class);
+                        questViewModel.beginWithStage(Integer.parseInt(chapterId), Integer.parseInt(stageId));
+                       /* intent = new Intent(this, QuestActivity.class);
                         intent.putExtra("storyId", storyId);
-                        intent.putExtra("chapterId", Integer.parseInt(chapterId));
-                        intent.putExtra("stageId", Integer.parseInt(stageId));
-                        Timber.d("Start QuestActivity - %s - %s", data.get("chapter"), data.get("stage"));
+                        intent.putExtra("chapterId", );
+                        intent.putExtra("stageId", );
+                        Timber.d("Start QuestActivity - %s - %s", data.get("chapter"), data.get("stage"));*/
                     }
                 } else if (data.containsKey("seller")) {
                     String sellerId = data.get("seller");
                     String mapId = data.get("map");
 
                     if (sellerId != null && mapId != null) {
-                        intent = new Intent(this, SellerActivity.class);
+                        /*intent = new Intent(this, SellerActivity.class);
                         intent.putExtra("seller", Integer.parseInt(sellerId));
                         intent.putExtra("map", Integer.parseInt(mapId));
                         intent.putExtra("pos", data.get("pos"));
-                        Timber.d("Start seller activity - %s", data.get("seller"));
+                        Timber.d("Start seller activity - %s", data.get("seller"));*/
                     }
                 } else if (data.containsKey("openPda")) {
                     Timber.d("Start MainActivity");
-                    intent = new Intent(this, MainActivity.class);
+                    intent = new Intent(getActivity(), MainActivity.class);
                 }
 
                 if (intent != null) {
                     startActivity(intent);
-                    finish();
                 }
             }
         });
@@ -150,7 +149,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
 
     @Override
     public void applyActions(Map<String, List<String>> actions) {
-        foregroundService.applyActions(actions);
+        //questViewModel..applyActions(actions);
     }
 
     @Override
@@ -162,7 +161,7 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
     public void toast(String msg) {
         if (Looper.myLooper() == null)
             Looper.prepare();
-        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -170,39 +169,46 @@ public class MapEngine extends AndroidApplication implements PlatformInterface {
         Timber.e(t, msg);
         if (Looper.myLooper() == null)
             Looper.prepare();
-        Toast.makeText(getApplicationContext(), "Critical error with map, try again later", Toast.LENGTH_SHORT).show();
+        /*Toast.makeText(getApplicationContext(), "Critical error with map, try again later", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-        finish();
+        finish();*/
     }
 
     @Override
     public void restart() {
-        startActivity(getIntent());
+        onResume();
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
-        Intent intent = new Intent(this, ForegroundService.class);
+        /*Intent intent = new Intent(this, ForegroundService.class);
         bindService(intent, connection, BIND_AUTO_CREATE);
         LocalBroadcastManager.getInstance(this).registerReceiver((dataChangeReceiver),
                 new IntentFilter(RECEIVER_INTENT)
-        );
+        );*/
     }
 
     @Override
-    protected void onStop() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(dataChangeReceiver);
+    public void onPause() {
+        super.onPause();
+        Timber.i("Core pause");
+    }
+
+    @Override
+    public void onStop() {
+       // LocalBroadcastManager.getInstance(this).unregisterReceiver(dataChangeReceiver);
         super.onStop();
-        if (bound) {
+        Timber.i("Core stop");
+       /* if (bound) {
             unbindService(connection);
             bound = false;
-        }
+        }*/
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         Timber.d("Destroyed CoreStarter");
         super.onDestroy();
     }

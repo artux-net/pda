@@ -5,13 +5,14 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 
+import net.artux.pda.map.di.core.CoreComponent;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.QuestComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
+import net.artux.pda.map.engine.components.StatusComponent;
 import net.artux.pda.map.engine.components.TransferComponent;
-import net.artux.pda.map.engine.systems.DataSystem;
 import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.utils.Mappers;
@@ -24,25 +25,31 @@ import net.artux.pda.model.quest.story.StoryStateModel;
 
 public class QuestPointsHelper {
 
-    public static void createQuestPointsEntities(Engine engine, AssetManager assetManager, PlatformInterface platformInterface) {
-        GameMap map = engine.getSystem(DataSystem.class).getMap();
+    public static void createQuestPointsEntities(CoreComponent coreComponent) {
+        Engine engine = coreComponent.getEngine();
+        AssetManager assetManager = coreComponent.getAssetsManager();
+        PlatformInterface platformInterface = coreComponent.getDataRepository().getPlatformInterface();
+        GameMap map = coreComponent.getDataRepository().getGameMap();
         StoryDataModel dataModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().gdxData;
         StoryStateModel storyStateModel = dataModel.getCurrentState();
+
+
         for (Point point : map.getPoints()) {
-            //TODO sync with ui
-            if (QuestUtil.check(point.getCondition(), dataModel))
-                if (point.getData().containsKey("chapter")) {
-                    if ((Integer.parseInt(point.getData().get("chapter")) == storyStateModel.getChapterId()
-                            || Integer.parseInt(point.getData().get("chapter")) == 0))
-                        addPoint(engine, assetManager, point, platformInterface);
-                } else addPoint(engine, assetManager, point, platformInterface);
+            if (point.getData().containsKey("static"))
+                engine.addEntity(addPoint(engine, assetManager, point, platformInterface, dataModel));
+            else if (point.getData().containsKey("chapter")) {
+                if ((Integer.parseInt(point.getData().get("chapter")) == storyStateModel.getChapterId()
+                        || Integer.parseInt(point.getData().get("chapter")) == 0))
+                    engine.addEntity(addPoint(engine, assetManager, point, platformInterface, dataModel));
+            } else engine.addEntity(addPoint(engine, assetManager, point, platformInterface, dataModel));
         }
     }
 
-    private static void addPoint(final Engine engine, AssetManager assetManager, final Point point, PlatformInterface platformInterface) {
+    private static Entity addPoint(final Engine engine, AssetManager assetManager, final Point point, PlatformInterface platformInterface, StoryDataModel dataModel) {
         Entity entity = new Entity();
-        entity.add(new PositionComponent(Mappers.vector2(point.getPos())))
-                .add(new InteractiveComponent(point.getName(), point.getType(), userInterface -> platformInterface.send(point.getData())))
+        entity.add(new StatusComponent(QuestUtil.check(point.getCondition(), dataModel)))
+                .add(new PositionComponent(Mappers.vector2(point.getPos())))
+                .add(new InteractiveComponent(point.getName(), point.getType(), () -> platformInterface.send(point.getData())))
                 .add(new ClickComponent(23, () -> engine.getSystem(RenderSystem.class)
                         .showText("Метка: " + point.getName(), Mappers.vector2(point.getPos()))));
 
@@ -73,7 +80,7 @@ public class QuestPointsHelper {
         if (texture != null)
             entity.add(new SpriteComponent(texture, size, size));
 
-        engine.addEntity(entity);
+        return entity;
     }
 
 }

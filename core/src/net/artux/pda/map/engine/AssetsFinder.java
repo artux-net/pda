@@ -13,26 +13,36 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.ui.FontManager;
+import net.artux.pda.map.utils.NetFileResolver;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+
+import javax.inject.Inject;
 
 public class AssetsFinder implements Disposable {
 
     public static final String cachePath = "cache/";
 
-    private AssetManager assetManager;
+    public AssetManager assetManager;
+    public AssetManager remoteAssetManager;
     private final Map<String, Texture> textureMap;
     private final FontManager fontManager;
 
-    public AssetsFinder() {
+    @Inject
+    public AssetsFinder(Properties properties) {
         fontManager = new FontManager();
         textureMap = new HashMap<>();
+        remoteAssetManager = new AssetManager(new NetFileResolver(properties));
     }
 
     public AssetManager getManager() {
         long loadTime = TimeUtils.millis();
-        Gdx.app.log("Assets", "Loading assets.");
+        ObjectMap<String, Object> fontsMap = new ObjectMap<>();
+        fontsMap.put("font", fontManager.getDisposableFont(FontManager.LIBERAL_FONT, 24));
+        fontsMap.put("title", fontManager.getDisposableFont(FontManager.IMPERIAL_FONT, 28));
+        //Gdx.app.log("Assets", "Loading assets.");
         if (assetManager == null) {
             assetManager = new AssetManager();
 
@@ -58,18 +68,13 @@ public class AssetsFinder implements Disposable {
             assetManager.load("gray.png", Texture.class);
             assetManager.load("controlPoint.png", Texture.class);
 
-            ObjectMap<String, Object> fontsMap = new ObjectMap<>();
-            fontsMap.put("font", fontManager.getDisposableFont(FontManager.LIBERAL_FONT, 24));
-            fontsMap.put("title", fontManager.getDisposableFont(FontManager.IMPERIAL_FONT, 28));
-
             SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("skins/cloud/cloud-form-ui.atlas", fontsMap);
             assetManager.load("skins/cloud/cloud-form-ui.json", Skin.class, skinParameter);
 
             FileHandle sounds = assetManager.getFileHandleResolver().resolve("sounds");
             loadRecursively(assetManager, sounds, true, Music.class);
-
             assetManager.finishLoading();
-            Gdx.app.log("Assets", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
+            //Gdx.app.log("Assets", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
         }
         return assetManager;
     }

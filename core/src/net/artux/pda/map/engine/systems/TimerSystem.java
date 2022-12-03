@@ -14,11 +14,16 @@ import java.time.Instant;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class TimerSystem extends IteratingSystem implements Disposable {
 
     private final Timer timer;
     private final ComponentMapper<TimeComponent> cm = ComponentMapper.getFor(TimeComponent.class);
 
+    @Inject
     public TimerSystem() {
         super(Family.all(TimeComponent.class).get());
         timer = new Timer();

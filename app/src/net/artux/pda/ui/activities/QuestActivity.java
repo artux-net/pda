@@ -1,8 +1,5 @@
 package net.artux.pda.ui.activities;
 
-import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -20,11 +17,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.gson.Gson;
@@ -32,11 +31,11 @@ import com.google.gson.GsonBuilder;
 
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentNotificationBinding;
-import net.artux.pda.gdx.MapEngine;
+import net.artux.pda.gdx.CoreFragment;
 import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.ui.fragments.quest.StageFragment;
-import net.artux.pda.ui.viewmodels.StoryViewModel;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
 import net.artux.pda.utils.MultiExoPlayer;
 import net.artux.pda.utils.URLHelper;
@@ -52,7 +51,7 @@ import timber.log.Timber;
 
 
 @AndroidEntryPoint
-public class QuestActivity extends AppCompatActivity implements View.OnClickListener {
+public class QuestActivity extends FragmentActivity implements View.OnClickListener, AndroidFragmentApplication.Callbacks {
 
     private TextView tvTime;
     private ImageSwitcher switcher;
@@ -66,8 +65,9 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
             .withZone(ZoneId.systemDefault());
     private MultiExoPlayer multiExoPlayer;
+    private CoreFragment coreFragment;
 
-    private StoryViewModel storyViewModel;
+    private QuestViewModel questViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +75,9 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_quest);
 
         ViewModelProvider provider = new ViewModelProvider(this);
-        storyViewModel = provider.get(StoryViewModel.class);
+        questViewModel = provider.get(QuestViewModel.class);
 
-        storyViewModel.getChapter().observe(this, chapter -> {
+        questViewModel.getChapter().observe(this, chapter -> {
             if (chapter != null) {
                 multiExoPlayer = new MultiExoPlayer(QuestActivity.this, chapter.getMusic());
                 //preload images
@@ -94,33 +94,53 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             }
         });
 
-        storyViewModel.getStage().observe(this, stageModel -> {
+        questViewModel.getStage().observe(this, stageModel -> {
             setTitle(stageModel.getTitle());
+            findViewById(R.id.navbar).setVisibility(View.VISIBLE);
             FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
             StageFragment stageFragment = StageFragment.createInstance(stageModel);
-            mFragmentTransaction.replace(R.id.containerView, stageFragment);
-            mFragmentTransaction.commitAllowingStateLoss();
+            if (coreFragment != null && coreFragment.isAdded()){
+                mFragmentTransaction.hide(coreFragment);
+                mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.STARTED);
+            }
+            mFragmentTransaction
+                    .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                    .add(R.id.containerView, stageFragment)
+                    .addToBackStack("stage")
+                    .commit();
         });
 
-        storyViewModel.getMap().observe(this, map -> {
-            Intent intent = new Intent(QuestActivity.this, MapEngine.class);
-            intent.setFlags(FLAG_ACTIVITY_NEW_TASK | FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra("map", map);
-            intent.putExtra("data", storyViewModel.getStoryData().getValue());
-            intent.putExtra("user", provider.get(UserViewModel.class).getFromCache());
-            intent.putExtra("story", provider.get(StoryViewModel.class).getCurrentStory());
-            QuestActivity.this.startActivity(intent);
-            QuestActivity.this.finish();
+        questViewModel.getMap().observe(this, map -> {
+            findViewById(R.id.navbar).setVisibility(View.GONE);
+            FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
+            if (coreFragment == null)
+                coreFragment = new CoreFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("map", map);
+            args.putSerializable("data", questViewModel.getStoryData().getValue());
+            args.putSerializable("user", provider.get(UserViewModel.class).getFromCache());
+            args.putSerializable("story", provider.get(QuestViewModel.class).getCurrentStory());
+            coreFragment.setArguments(args);
+            if (coreFragment.isAdded()){
+                mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.RESUMED);
+                mFragmentTransaction.show(coreFragment);
+            }
+            mFragmentTransaction
+                    .replace(R.id.containerView, coreFragment)
+                    .addToBackStack("core");
+
+            mFragmentTransaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+            mFragmentTransaction.commit();
         });
 
-        storyViewModel.getLoadingState().observe(this, flag -> {
+        questViewModel.getLoadingState().observe(this, flag -> {
             if (flag)
                 findViewById(R.id.loadingProgressBar).setVisibility(View.VISIBLE);
             else
                 findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
         });
 
-        storyViewModel.getStatus().observe(this, statusModel -> {
+        questViewModel.getStatus().observe(this, statusModel -> {
             if (!statusModel.isSuccess()) {
                 Timber.e(statusModel.getDescription());
                 Intent intent = new Intent(QuestActivity.this, MainActivity.class);
@@ -134,7 +154,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
                         .show();
         });
 
-        storyViewModel.getData().observe(this, data -> {
+        questViewModel.getData().observe(this, data -> {
             if (data.containsKey("seller")) {
                 Intent intent = new Intent(QuestActivity.this, SellerActivity.class);
                 intent.putExtra("seller", Integer.parseInt(data.get("seller")));
@@ -150,7 +170,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             }
         });
 
-        storyViewModel.getNotification().observe(this, notificationModel -> {
+        questViewModel.getNotification().observe(this, notificationModel -> {
             if (notificationModel != null) {
                 FragmentNotificationBinding binding = FragmentNotificationBinding.inflate(getLayoutInflater());
                 switch (notificationModel.getType()) {
@@ -175,7 +195,7 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             }
         });
 
-        storyViewModel.getBackground().observe(this, this::setBackground);
+        questViewModel.getBackground().observe(this, this::setBackground);
 
         tvTime = findViewById(R.id.sceneTime);
         musicImage = findViewById(R.id.musicSetup);
@@ -207,10 +227,10 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             int stage = getIntent().getIntExtra("stageId", 0);
 
             // загрузка последней стадии или намеренной
-            storyViewModel.beginWithStage(storyId, chapter, stage, sync);
+            questViewModel.beginWithStage(storyId, chapter, stage, sync);
             Timber.i("Quest started with %d,%d,%d", storyId, chapter, stage);
         } else
-            storyViewModel.beginWithStage(keys[0], keys[1], keys[2], true);
+            questViewModel.beginWithStage(keys[0], keys[1], keys[2], true);
 
     }
 
@@ -254,17 +274,17 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             startActivity(new Intent(this, MainActivity.class));
             finish();
         } else if (id == R.id.exitButton)
-            storyViewModel.exitStory();
+            questViewModel.exitStory();
         else if (id == R.id.log) {
-            Stage stage = storyViewModel.getCurrentStage();
-            StoryDataModel dataModel = storyViewModel.getStoryData().getValue();
+            Stage stage = questViewModel.getCurrentStage();
+            StoryDataModel dataModel = questViewModel.getStoryData().getValue();
 
             GsonBuilder gsonBuilder = new GsonBuilder();
             gsonBuilder.setPrettyPrinting();
 
             assert dataModel != null;
-            String logStage = "Story: " + storyViewModel.getCurrentStoryId() + "\n" +
-                    "Chapter: " + storyViewModel.getCurrentChapterId() + "\n \n" +
+            String logStage = "Story: " + questViewModel.getCurrentStoryId() + "\n" +
+                    "Chapter: " + questViewModel.getCurrentChapterId() + "\n \n" +
                     "Parameters: " + gsonBuilder.create().toJson(dataModel.getParameters()) + "\n \n" +
                     "Stage: " + gsonBuilder.create().toJson(stage);
 
@@ -329,4 +349,8 @@ public class QuestActivity extends AppCompatActivity implements View.OnClickList
             multiExoPlayer.release();
     }
 
+    @Override
+    public void exit() {
+
+    }
 }

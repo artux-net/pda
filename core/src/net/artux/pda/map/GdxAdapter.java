@@ -6,6 +6,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import net.artux.pda.map.di.AppModule;
+import net.artux.pda.map.di.core.CoreComponent;
+import net.artux.pda.map.di.core.DaggerCoreComponent;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.PreloadState;
 import net.artux.pda.map.utils.PlatformInterface;
@@ -18,32 +21,37 @@ import java.util.Properties;
 
 public class GdxAdapter extends ApplicationAdapter {
 
-    private final GameStateManager gsm;
-    private final DataRepository dataRepository;
+    private GameStateManager gsm;
+    private CoreComponent coreComponent;
     private long startHeap;
 
     public GdxAdapter(PlatformInterface platformInterface) {
-        gsm = new GameStateManager(platformInterface);
-        dataRepository = new DataRepository(platformInterface);
+        coreComponent = DaggerCoreComponent.builder().appModule(new AppModule(platformInterface)).build();
     }
 
     public DataRepository getDataRepository() {
-        return dataRepository;
+        return coreComponent.getDataRepository();
     }
 
     @Override
     public void create() {
+        gsm = coreComponent.getGSM();
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         Gdx.app.log("GDX", "GDX load stared, version " + Gdx.app.getVersion());
         long loadMills = TimeUtils.millis();
         startHeap = Gdx.app.getNativeHeap();
         Gdx.app.debug("GDX", "Before load, heap " + startHeap);
-        PreloadState preloadState = new PreloadState(gsm, dataRepository);
+        PreloadState preloadState = coreComponent.getPreloadState();
         gsm.push(preloadState);
-        preloadState.startLoad();
         Gdx.app.debug("GDX", "Loaded, heap " + Gdx.app.getNativeHeap());
-
         Gdx.app.log("GDX", "GDX loading took " + (TimeUtils.millis() - loadMills) + " ms.");
+        resume();
+    }
+
+    @Override
+    public void resume() {
+        super.resume();
+        gsm.resume();
     }
 
     @Override
@@ -88,27 +96,27 @@ public class GdxAdapter extends ApplicationAdapter {
         }
 
         public Builder user(UserModel userModel) {
-            gdxAdapter.dataRepository.setUserModel(userModel);
+            gdxAdapter.coreComponent.getDataRepository().setUserModel(userModel);
             return this;
         }
 
         public Builder storyData(StoryDataModel dataModel) {
-            gdxAdapter.dataRepository.setStoryDataModel(dataModel);
+            gdxAdapter.coreComponent.getDataRepository().setStoryDataModel(dataModel);
             return this;
         }
 
         public Builder story(StoryModel dataModel) {
-            gdxAdapter.dataRepository.setStoryModel(dataModel);
+            gdxAdapter.coreComponent.getDataRepository().setStoryModel(dataModel);
             return this;
         }
 
         public Builder map(GameMap map) {
-            gdxAdapter.dataRepository.setGameMap(map);
+            gdxAdapter.coreComponent.getDataRepository().setGameMap(map);
             return this;
         }
 
         public Builder props(Properties properties) {
-            gdxAdapter.dataRepository.setProperties(properties);
+            gdxAdapter.coreComponent.getDataRepository().setProperties(properties);
             return this;
         }
 

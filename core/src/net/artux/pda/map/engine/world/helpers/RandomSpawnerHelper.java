@@ -8,11 +8,12 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.common.PropertyFields;
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.di.core.CoreComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpawnComponent;
 import net.artux.pda.map.engine.components.TransferComponent;
 import net.artux.pda.map.engine.entities.EntityBuilder;
+import net.artux.pda.map.engine.entities.EntityProcessorSystem;
 import net.artux.pda.map.engine.systems.CameraSystem;
 import net.artux.pda.map.engine.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.systems.SpawnSystem;
@@ -25,12 +26,16 @@ public class RandomSpawnerHelper {
     private static ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private static ComponentMapper<SpawnComponent> sm = ComponentMapper.getFor(SpawnComponent.class);
 
-    public static void init(Engine engine, DataRepository dataRepository, EntityBuilder entityBuilder) {
+    public static void init(CoreComponent coreComponent) {
+        Engine engine = coreComponent.getEngine();
+        EntityProcessorSystem entityProcessorSystem = coreComponent.getEntityProcessor();
+        EntityBuilder entityBuilder = coreComponent.getEntityBuilder();
+
         TimerSystem timerSystem = engine.getSystem(TimerSystem.class);
         CameraSystem cameraSystem = engine.getSystem(CameraSystem.class);
         SpawnSystem spawnSystem = engine.getSystem(SpawnSystem.class);
         MapOrientationSystem mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
-        Properties properties = dataRepository.getProperties();
+        Properties properties = coreComponent.getDataRepository().getProperties();
         ImmutableArray<Entity> transfers = engine.getEntitiesFor(Family.all(PositionComponent.class, TransferComponent.class).get());
         ImmutableArray<Entity> spawns = engine.getEntitiesFor(Family.all(PositionComponent.class, SpawnComponent.class).get());
 
@@ -48,18 +53,19 @@ public class RandomSpawnerHelper {
                 Entity targetSpawn = spawnSystem.getEmptySpawn();
                 if (targetSpawn != null) {
                     Vector2 spawnPosition = pm.get(targetSpawn);
-                    entityBuilder.generateTakeSpawnGroup(randomTransferPosition, spawnPosition);
+                    entityProcessorSystem.generateTakeSpawnGroup(randomTransferPosition, spawnPosition);
                     return;
                 }
                 targetSpawn = spawnSystem.getRandomSpawn();
                 if (targetSpawn != null)
-                    entityBuilder.generateAttackSpawnGroup(randomTransferPosition, sm.get(targetSpawn));
+                    entityProcessorSystem.generateAttackSpawnGroup(randomTransferPosition, sm.get(targetSpawn));
             }
         });
 
         float singleFreq = Float.parseFloat((String) properties.get(PropertyFields.SINGLE_BOT_FREQ));
-        timerSystem.addTimerAction(singleFreq, () -> entityBuilder.randomStalker(()
-                -> mapOrientationSystem.getRandomFreePoint(cameraSystem.getCamera())));
+        timerSystem.addTimerAction(singleFreq, () -> entityProcessorSystem
+                .addEntity(entityBuilder.randomStalker(()
+                -> mapOrientationSystem.getRandomFreePoint(cameraSystem.getCamera()))));
     }
 
 }

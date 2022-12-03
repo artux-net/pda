@@ -13,11 +13,18 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.GlobalData;
+import net.artux.pda.map.utils.Mappers;
+import net.artux.pda.model.map.GameMap;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class CameraSystem extends BaseSystem implements GestureDetector.GestureListener {
 
     private OrthographicCamera camera;
     private ClicksSystem clicksSystem;
+    private GameMap map;
 
     private ComponentMapper<PlayerComponent> cm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
@@ -35,16 +42,21 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     boolean detached;
     boolean specialZoom = false;
 
-    public CameraSystem(Camera camera) {
+    @Inject
+    public CameraSystem(Camera camera, ClicksSystem clicksSystem, GameMap map) {
         super(Family.all().get());
         this.camera = (OrthographicCamera) camera;
+        this.clicksSystem = clicksSystem;
+        this.map = map;
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         camera.zoom = initialZoom;
-        clicksSystem = engine.getSystem(ClicksSystem.class);
+
+        camera.position.x = Mappers.vector2(map.getDefPos()).x;
+        camera.position.y = Mappers.vector2(map.getDefPos()).y;
     }
 
     @Override
@@ -52,8 +64,8 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
         super.update(deltaTime);
 
         if (isPlayerActive()) {
-            PositionComponent positionComponent = pm.get(player);
-            VelocityComponent velocityComponent = vm.get(player);
+            PositionComponent positionComponent = pm.get(getPlayer());
+            VelocityComponent velocityComponent = vm.get(getPlayer());
 
             if (!detached) {
                 cameraV2Position.x = camera.position.x;
@@ -183,7 +195,7 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
         if (clicksSystem != null)
-            clicksSystem.clicked(x, y);
+            return clicksSystem.clicked(x, y);
         return false;
     }
 

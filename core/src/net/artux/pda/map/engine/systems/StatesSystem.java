@@ -9,12 +9,17 @@ import com.badlogic.gdx.ai.msg.MessageManager;
 
 import net.artux.pda.map.engine.components.StatesComponent;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class StatesSystem extends IteratingSystem {
 
     private ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
 
     private final MessageManager messageManager = MessageManager.getInstance();
 
+    @Inject
     public StatesSystem() {
         super(Family.all(StatesComponent.class).get());
     }

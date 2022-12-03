@@ -4,13 +4,15 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 
 public abstract class BaseSystem extends IteratingSystem {
 
-    protected Entity player;
+    private Entity player;
+    private final Family playerFamily = Family.all(PlayerComponent.class, PositionComponent.class).get();
 
     public BaseSystem(Family family) {
         super(family);
@@ -19,11 +21,35 @@ public abstract class BaseSystem extends IteratingSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        player = engine.getEntitiesFor(Family.all(PlayerComponent.class, PositionComponent.class).get()).first();
+        ImmutableArray<Entity> players = getEngine().getEntitiesFor(playerFamily);
+        if (players.size() > 0)
+            player = players.first();
     }
 
     protected boolean isPlayerActive() {
-        return getEngine().getEntities().contains(player, true);
+        return getPlayer() != null;
     }
 
+    protected Entity getPlayer() {
+        if (player != null)
+            return player;
+        else {
+            ImmutableArray<Entity> players = getEngine().getEntitiesFor(playerFamily);
+            if (players.size() > 0) {
+                player = players.first();
+                return player;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+        if (player == null) {
+            ImmutableArray<Entity> players = getEngine().getEntitiesFor(playerFamily);
+            if (players.size() > 0)
+                player = players.first();
+        }
+    }
 }

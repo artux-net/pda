@@ -1,7 +1,6 @@
 package net.artux.pda.map.ui.bars;
 
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
@@ -24,10 +23,9 @@ public class HUD extends Table {
     private PlayerSystem playerSystem;
     private Label distanceLabel;
 
-    public HUD(AssetManager assetManager, Engine engine, UserInterface userInterface) {
+    public HUD(AssetManager assetManager, PlayerSystem playerSystem, UserInterface userInterface) {
         super();
-        playerSystem = engine.getSystem(PlayerSystem.class);
-
+        this.playerSystem = playerSystem;
         top();
         left();
 
@@ -78,7 +76,7 @@ public class HUD extends Table {
         int dist = playerSystem.getDistance();
         if (dist > 5) {
             distanceLabel.setText(dist + " м.");
-        }else
+        } else
             distanceLabel.setText("");
     }
 

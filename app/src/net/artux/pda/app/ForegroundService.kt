@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import net.artux.pda.gdx.MapEngine
+import net.artux.pda.gdx.CoreFragment
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.repositories.QuestRepository
 import net.artux.pdanetwork.model.CommandBlock
@@ -61,13 +61,13 @@ open class ForegroundService : Service() {
             questRepository.syncMember(CommandBlock().actions(actions))
                 .map { storyMapper.dataModel(it) }
                 .onSuccess {
-                    val intent = Intent(MapEngine.RECEIVER_INTENT)
-                    intent.putExtra(MapEngine.RECEIVE_STORY_DATA, it)
+                    val intent = Intent(CoreFragment.RECEIVER_INTENT)
+                    intent.putExtra(CoreFragment.RECEIVE_STORY_DATA, it)
                     LocalBroadcastManager.getInstance(this@ForegroundService).sendBroadcast(intent)
                 }
                 .onFailure {
-                    val intent = Intent(MapEngine.RECEIVER_INTENT)
-                    intent.putExtra(MapEngine.RECEIVE_ERROR, it)
+                    val intent = Intent(CoreFragment.RECEIVER_INTENT)
+                    intent.putExtra(CoreFragment.RECEIVE_ERROR, it)
                     LocalBroadcastManager.getInstance(this@ForegroundService).sendBroadcast(intent)
                 }
         }

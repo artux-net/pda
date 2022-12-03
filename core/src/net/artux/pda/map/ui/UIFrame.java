@@ -23,6 +23,9 @@ import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.ui.bars.Utils;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 public class UIFrame extends Group implements Disposable {
 
     private final ShapeRenderer shapeRenderer;
@@ -58,9 +61,9 @@ public class UIFrame extends Group implements Disposable {
         table.setSize(w * 10, h * 10);
 
         counter = new Label("0", new Label.LabelStyle(font, Color.ORANGE));
-        counter.setPosition(w - frame, 0);
+        counter.setPosition(w - standartFrameSize, 0);
         counter.setAlignment(Align.center);
-        counter.setSize(frame, frame);
+        counter.setSize(standartFrameSize, standartFrameSize);
         addActor(counter);
 
         float headerWidth = headerRightX - headerLeftX;
@@ -85,7 +88,7 @@ public class UIFrame extends Group implements Disposable {
 
         addActor(rightGroup);
 
-        solidTextureRegion = Utils.getColoredRegion(1,1, primaryColor);
+        solidTextureRegion = Utils.getColoredRegion(1, 1, primaryColor);
 
         PolygonRegion polyRegHeaderFrame = new PolygonRegion(solidTextureRegion,
                 new float[]{
@@ -122,15 +125,15 @@ public class UIFrame extends Group implements Disposable {
     }
 
 
-    float frame = h / 28f;
-    float topFrameHeight = frame * 2;
+    float standartFrameSize = h / 28f;
+    float topFrameHeight = standartFrameSize * 2;
     float additionalSizes = topFrameHeight * 0.3f;
     float headerBottomY = h - topFrameHeight + (additionalSizes) / 2;
 
     float headerHeight;
-    float headerLeftX = frame / 5;
+    float headerLeftX = standartFrameSize / 5;
     float headerRightX = w - headerLeftX - (w / 80f);
-    float leftBarWidth = w - getHeaderLeftX() - frame;
+    float leftBarWidth = w - getHeaderLeftX() - standartFrameSize;
 
     PolygonSprite headerBarSprite;
     PolygonSprite bottomBarSprite;
@@ -159,8 +162,8 @@ public class UIFrame extends Group implements Disposable {
         shapeRenderer.setProjectionMatrix(getStage().getBatch().getProjectionMatrix());
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.rect(0, 0, getHeaderLeftX(), h);
-        shapeRenderer.rect(0, 0, w, frame);
-        shapeRenderer.rect(w - frame, 0, frame, h);
+        shapeRenderer.rect(0, 0, w, standartFrameSize);
+        shapeRenderer.rect(w - standartFrameSize, 0, standartFrameSize, h);
         shapeRenderer.rect(0, h - topFrameHeight, w, topFrameHeight);
         shapeRenderer.end();
 
@@ -187,14 +190,14 @@ public class UIFrame extends Group implements Disposable {
             bottomBarLeftX = getHeaderLeftX();
         }
 
-        if (bottomBarLeftX + barWidth > w - frame) {
-            barWidth -= bottomBarLeftX + barWidth - (w - frame);
+        if (bottomBarLeftX + barWidth > w - standartFrameSize) {
+            barWidth -= bottomBarLeftX + barWidth - (w - standartFrameSize);
         }
 
         polyBatch.begin();
 
         float bottomBarDownY = additionalSizes / 2;
-        float bottomBarUpY = bottomBarDownY + frame - additionalSizes;
+        float bottomBarUpY = bottomBarDownY + standartFrameSize - additionalSizes;
 
         PolygonRegion bottomBar = new PolygonRegion(solidTextureRegion,
                 new float[]{
@@ -212,15 +215,15 @@ public class UIFrame extends Group implements Disposable {
         //right bar
         float heightK = (visibleCameraCorners[2].y - visibleCameraCorners[1].y) / GlobalData.mapHeight;
 
-        float barHeight = h - frame - topFrameHeight;
+        float barHeight = getSideBarHeight();
         if (heightK < 1)
             barHeight *= heightK;
 
-        float rightBarDownY = frame + (GlobalData.cameraPosY / GlobalData.mapHeight) * (h - frame - topFrameHeight) - barHeight * 0.5f;
+        float rightBarDownY = standartFrameSize + (GlobalData.cameraPosY / GlobalData.mapHeight) * (getSideBarHeight()) - barHeight * 0.5f;
 
-        if (rightBarDownY < frame) {
-            barHeight -= frame - rightBarDownY;
-            rightBarDownY = frame;
+        if (rightBarDownY < standartFrameSize) {
+            barHeight -= standartFrameSize - rightBarDownY;
+            rightBarDownY = standartFrameSize;
         }
 
         if (rightBarDownY + barHeight > h - topFrameHeight) {
@@ -228,7 +231,7 @@ public class UIFrame extends Group implements Disposable {
         }
 
         float rightBarLeftX = getHeaderLeftX() + leftBarWidth + additionalSizes / 2;
-        float rightBarRightX = rightBarLeftX + frame - additionalSizes;
+        float rightBarRightX = rightBarLeftX + standartFrameSize - additionalSizes;
 
 
         PolygonRegion rightBar = new PolygonRegion(solidTextureRegion,
@@ -251,6 +254,22 @@ public class UIFrame extends Group implements Disposable {
 
         batch.begin();
         super.draw(batch, parentAlpha);
+    }
+
+    public float getSideBarHeight(){
+        return h - standartFrameSize - topFrameHeight;
+    }
+
+    public float getRightSideBarWidth(){
+        return h - standartFrameSize - topFrameHeight;
+    }
+
+    public float getBottomBarHeight(){
+        return h - standartFrameSize - topFrameHeight;
+    }
+
+    public float getTopBarHeight(){
+        return h - standartFrameSize - topFrameHeight;
     }
 
     @Override
