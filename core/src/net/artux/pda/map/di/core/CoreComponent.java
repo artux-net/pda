@@ -14,7 +14,6 @@ import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.entities.EntityProcessorSystem;
 import net.artux.pda.map.states.GameStateManager;
 import net.artux.pda.map.states.PlayState;
-import net.artux.pda.map.states.PreloadState;
 import net.artux.pda.map.ui.UserInterface;
 
 import java.util.Set;
@@ -29,8 +28,6 @@ import dagger.Component;
 public interface CoreComponent {
 
     PlayState getPlayState();
-
-    PreloadState getPreloadState();
 
     Engine getEngine();
 

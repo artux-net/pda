@@ -13,7 +13,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.ui.FontManager;
-import net.artux.pda.map.utils.NetFileResolver;
+import net.artux.pda.map.utils.NetFile;
+import net.artux.pda.map.utils.NetTextureAssetLoader;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,12 +30,14 @@ public class AssetsFinder implements Disposable {
     public AssetManager remoteAssetManager;
     private final Map<String, Texture> textureMap;
     private final FontManager fontManager;
+    private final Properties properties;
 
     @Inject
     public AssetsFinder(Properties properties) {
         fontManager = new FontManager();
         textureMap = new HashMap<>();
-        remoteAssetManager = new AssetManager(new NetFileResolver(properties));
+        this.properties = properties;
+        remoteAssetManager = new AssetManager();
     }
 
     public AssetManager getManager() {
@@ -74,9 +77,15 @@ public class AssetsFinder implements Disposable {
             FileHandle sounds = assetManager.getFileHandleResolver().resolve("sounds");
             loadRecursively(assetManager, sounds, true, Music.class);
             assetManager.finishLoading();
+            assetManager.setLoader(NetFile.class, new NetTextureAssetLoader(properties));
             //Gdx.app.log("Assets", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
         }
         return assetManager;
+    }
+
+    public void finishLoading() {
+        if (assetManager != null)
+            assetManager.finishLoading();
     }
 
     public FontManager getFontManager() {
