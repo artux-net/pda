@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.components.BulletComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
@@ -17,9 +18,8 @@ import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.entities.EntityProcessorSystem;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class BattleSystem extends BaseSystem {
 
     private ImmutableArray<Entity> bullets;

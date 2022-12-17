@@ -7,27 +7,23 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.AppModule;
+import net.artux.pda.map.di.CoreComponent;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.entities.EntityProcessorSystem;
-import net.artux.pda.map.states.GameStateManager;
-import net.artux.pda.map.states.PlayState;
+import net.artux.pda.map.states.GameStateController;
 import net.artux.pda.map.ui.UserInterface;
 
 import java.util.Set;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import dagger.Component;
 
-@Singleton
-@Component(modules = {EngineModule.class, AppModule.class, UserInterfaceModule.class})
-public interface CoreComponent {
-
-    PlayState getPlayState();
+@PerGameMap
+@Component(modules = {EngineModule.class, UserInterfaceModule.class}, dependencies = CoreComponent.class)
+public interface MapComponent {
 
     Engine getEngine();
 
@@ -43,7 +39,7 @@ public interface CoreComponent {
 
     UserInterface getUserInterface();
 
-    GameStateManager getGSM();
+    GameStateController getGSC();
 
     AssetsFinder getAssetsFinder();
 

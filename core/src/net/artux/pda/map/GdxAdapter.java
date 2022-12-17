@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.di.AppModule;
-import net.artux.pda.map.di.core.CoreComponent;
-import net.artux.pda.map.di.core.DaggerCoreComponent;
-import net.artux.pda.map.states.GameStateManager;
-import net.artux.pda.map.states.PlayState;
+import net.artux.pda.map.di.CoreComponent;
+import net.artux.pda.map.di.DaggerCoreComponent;
+import net.artux.pda.map.states.GameStateController;
+import net.artux.pda.map.states.State;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
@@ -21,12 +21,13 @@ import java.util.Properties;
 
 public class GdxAdapter extends ApplicationAdapter {
 
-    private GameStateManager gsm;
-    private CoreComponent coreComponent;
+    private final GameStateController gsc;
+    private final CoreComponent coreComponent;
     private long startHeap;
 
     public GdxAdapter(PlatformInterface platformInterface) {
         coreComponent = DaggerCoreComponent.builder().appModule(new AppModule(platformInterface)).build();
+        gsc = coreComponent.getGSC();
     }
 
     public DataRepository getDataRepository() {
@@ -35,14 +36,13 @@ public class GdxAdapter extends ApplicationAdapter {
 
     @Override
     public void create() {
-        gsm = coreComponent.getGSM();
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         Gdx.app.log("GDX", "GDX load stared, version " + Gdx.app.getVersion());
         long loadMills = TimeUtils.millis();
         startHeap = Gdx.app.getNativeHeap();
         Gdx.app.debug("GDX", "Before load, heap " + startHeap);
-        PlayState playState = coreComponent.getPlayState();
-        gsm.push(playState);
+        State firstState = coreComponent.getPreloadState();
+        gsc.push(firstState);
         Gdx.app.debug("GDX", "Loaded, heap " + Gdx.app.getNativeHeap());
         Gdx.app.log("GDX", "GDX loading took " + (TimeUtils.millis() - loadMills) + " ms.");
         resume();
@@ -51,13 +51,13 @@ public class GdxAdapter extends ApplicationAdapter {
     @Override
     public void resume() {
         super.resume();
-        gsm.resume();
+        gsc.resume();
     }
 
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
-        gsm.resize(width, height);
+        gsc.resize(width, height);
     }
 
     @Override
@@ -65,8 +65,8 @@ public class GdxAdapter extends ApplicationAdapter {
         Gdx.gl.glClearColor(0, 0, 0, 0.5f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        gsm.update(Gdx.graphics.getDeltaTime());
-        gsm.render();
+        gsc.update(Gdx.graphics.getDeltaTime());
+        gsc.render();
     }
 
     private boolean disposed;
@@ -76,7 +76,8 @@ public class GdxAdapter extends ApplicationAdapter {
         Gdx.app.debug("GDX", "Disposing, heap " + Gdx.app.getNativeHeap());
         super.dispose();
         if (!disposed) {
-            gsm.dispose();
+            coreComponent.getAssetsFinder().dispose();
+            gsc.dispose();
             disposed = true;
             System.gc();
         }

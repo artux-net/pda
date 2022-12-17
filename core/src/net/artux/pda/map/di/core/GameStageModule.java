@@ -22,14 +22,14 @@ import dagger.Provides;
 public class GameStageModule {
 
     @Provides
-    @Singleton
+    @PerGameMap
     @Named("gameStage")
     public Stage getStage() {
         return new Stage(new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
     }
 
     @Provides
-    @Singleton
+    @PerGameMap
     public Camera getCamera(@Named("gameStage") Stage stage) {
         return stage.getCamera();
     }

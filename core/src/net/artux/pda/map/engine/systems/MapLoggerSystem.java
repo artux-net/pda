@@ -9,15 +9,15 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.engine.pathfinding.TiledSmoothableGraphPath;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class MapLoggerSystem extends IteratingSystem implements Drawable, Disposable {
 
     private final ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);

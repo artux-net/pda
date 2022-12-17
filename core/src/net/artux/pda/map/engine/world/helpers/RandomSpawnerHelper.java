@@ -8,7 +8,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.common.PropertyFields;
-import net.artux.pda.map.di.core.CoreComponent;
+import net.artux.pda.map.di.core.MapComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpawnComponent;
 import net.artux.pda.map.engine.components.TransferComponent;
@@ -26,7 +26,7 @@ public class RandomSpawnerHelper {
     private static ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private static ComponentMapper<SpawnComponent> sm = ComponentMapper.getFor(SpawnComponent.class);
 
-    public static void init(CoreComponent coreComponent) {
+    public static void init(MapComponent coreComponent) {
         Engine engine = coreComponent.getEngine();
         EntityProcessorSystem entityProcessorSystem = coreComponent.getEntityProcessor();
         EntityBuilder entityBuilder = coreComponent.getEntityBuilder();

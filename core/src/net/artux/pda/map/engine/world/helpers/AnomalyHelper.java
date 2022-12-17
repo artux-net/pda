@@ -9,7 +9,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.di.core.CoreComponent;
+import net.artux.pda.map.di.core.MapComponent;
 import net.artux.pda.map.engine.components.AnomalyComponent;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -25,7 +25,7 @@ public class AnomalyHelper {
 
     private static final String[] names = {"Жарка", "Электра", "Трамплин", "Туман", "Огниво"};
 
-    public static void createAnomalies(CoreComponent coreComponent) {
+    public static void createAnomalies(MapComponent coreComponent) {
         Engine engine = coreComponent.getEngine();
         AssetManager assetManager = coreComponent.getAssetsManager();
         Random random = new Random(Calendar.getInstance().get(Calendar.MINUTE) / 5);

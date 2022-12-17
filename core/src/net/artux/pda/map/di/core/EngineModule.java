@@ -5,15 +5,13 @@ import com.badlogic.ashley.core.EntitySystem;
 
 import java.util.Set;
 
-import javax.inject.Singleton;
-
 import dagger.Module;
 import dagger.Provides;
 
 @Module(includes = EngineSystemsModule.class)
 public class EngineModule {
 
-    @Singleton
+    @PerGameMap
     @Provides
     public Engine getEngine(Set<EntitySystem> systems) {
         Engine engine = new Engine();

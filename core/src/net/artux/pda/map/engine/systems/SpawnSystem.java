@@ -9,6 +9,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 
 import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.components.GroupComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpawnComponent;
@@ -18,9 +19,8 @@ import net.artux.pda.map.engine.components.VisionComponent;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class SpawnSystem extends IteratingSystem {
 
     private ImmutableArray<Entity> spawns;

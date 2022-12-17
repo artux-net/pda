@@ -76,7 +76,6 @@ public class AssetsFinder implements Disposable {
 
             FileHandle sounds = assetManager.getFileHandleResolver().resolve("sounds");
             loadRecursively(assetManager, sounds, true, Music.class);
-            assetManager.finishLoading();
             assetManager.setLoader(NetFile.class, new NetTextureAssetLoader(properties));
             //Gdx.app.log("Assets", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
         }

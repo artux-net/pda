@@ -7,11 +7,12 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.ai.utils.Ray;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.pathfinding.FlatTiledGraph;
 import net.artux.pda.map.engine.pathfinding.FlatTiledNode;
 import net.artux.pda.map.engine.pathfinding.MapBorder;
@@ -20,9 +21,8 @@ import net.artux.pda.map.engine.pathfinding.TiledRaycastCollisionDetector;
 import net.artux.pda.model.map.GameMap;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class MapOrientationSystem extends EntitySystem implements Disposable {
 
     private FlatTiledGraph worldGraph;
@@ -35,7 +35,7 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
     private final Ray<Vector2> ray;
 
     @Inject
-    public MapOrientationSystem(AssetsFinder assetsFinder, GameMap map) {
+    public MapOrientationSystem(AssetManager assetsFinder, GameMap map) {
         ray = new Ray<>(Vector2.Zero, Vector2.Zero);
         this.mapBorder = new MapBorder(assetsFinder, map);
 

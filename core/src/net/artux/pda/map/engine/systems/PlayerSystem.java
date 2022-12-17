@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -28,9 +29,8 @@ import net.artux.pda.map.ui.blocks.AssistantBlock;
 import net.artux.pda.model.items.MedicineModel;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class PlayerSystem extends BaseSystem implements Disposable {
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);

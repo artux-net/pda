@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.ui.bars.Utils;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
@@ -38,9 +39,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class UserInterface extends Group implements Disposable {
 
     private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.US);

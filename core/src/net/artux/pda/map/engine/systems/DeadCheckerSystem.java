@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -29,9 +30,8 @@ import java.util.Collections;
 import java.util.Random;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class DeadCheckerSystem extends BaseSystem {
 
     private Group gameZone;

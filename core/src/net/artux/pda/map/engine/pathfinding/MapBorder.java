@@ -1,11 +1,12 @@
 package net.artux.pda.map.engine.pathfinding;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.utils.NetFile;
 import net.artux.pda.model.map.GameMap;
 
 public class MapBorder implements Disposable {
@@ -18,9 +19,9 @@ public class MapBorder implements Disposable {
     private int tileWidth;
     private int tileHeight;
 
-    public MapBorder(AssetsFinder finder, GameMap map) {
-        mobLayout = finder.getLocal(map.getTilesTexture());
-        playerLayout = finder.getLocal(map.getBoundsTexture());
+    public MapBorder(AssetManager finder, GameMap map) {
+        mobLayout = (Texture) finder.get(map.getTilesTexture(), NetFile.class).file;//todo get from asset manager
+        playerLayout = (Texture) finder.get(map.getBoundsTexture(), NetFile.class).file;
 
         if (mobLayout != null) {
             prepareTexture(mobLayout);

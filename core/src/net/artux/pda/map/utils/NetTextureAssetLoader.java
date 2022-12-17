@@ -33,41 +33,52 @@ public class NetTextureAssetLoader extends AsynchronousAssetLoader<NetFile, NetT
 
     @Override
     public void loadAsync(AssetManager manager, String path, FileHandle file, TextureParameter parameter) {
-        if (!file.exists() && path != null && !path.equals("")) {
-            final String url = baseUrl + path;
-            Gdx.app.error("Preload", path + " missed, try to load from net.");
-            Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.GET);
-            request.setUrl(url);
-            Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
-                @Override
-                public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                    if (httpResponse.getStatus().getStatusCode() == 200) {
-                        final byte[] bytes = httpResponse.getResult();
-                        file.writeBytes(bytes, false);
-                        Gdx.app.error(TAG, path + " loaded, caching.");
-                        file.notify();
+        synchronized (file) {
+            if (!file.exists() && path != null && !path.equals("")) {
+                final String url = baseUrl + path;
+                Gdx.app.error("Preload", path + " missed, try to load from net.");
+                Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.GET);
+                request.setUrl(url);
+
+                Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {
+                    @Override
+                    public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                        synchronized (file) {
+                            if (httpResponse.getStatus().getStatusCode() == 200) {
+                                final byte[] bytes = httpResponse.getResult();
+                                file.writeBytes(bytes, false);
+                                Gdx.app.debug(TAG, path + " loaded, caching.");
+                            }
+                            file.notify();
+                        }
+
                     }
+
+                    @Override
+                    public void failed(Throwable t) {
+                        synchronized (file) {
+                            Gdx.app.error(TAG, "Could not load " + url, t);
+                            file.notify();
+                        }
+                    }
+
+                    @Override
+                    public void cancelled() {
+                        synchronized (file) {
+                            file.notify();
+                        }
+                    }
+                });
+
+                try {
+                    file.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
 
-                @Override
-                public void failed(Throwable t) {
-                    Gdx.app.error(TAG, "Could not load " + url, t);
-                    file.notify();
-                }
-
-                @Override
-                public void cancelled() {
-                    file.notify();
-                }
-            });
-            try {
-                file.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                if (!file.exists())
+                    Gdx.app.error(TAG, "Loading failed " + url, new RuntimeException());
             }
-
-            if (!file.exists())
-                Gdx.app.error(TAG, "Loading failed " + url, new RuntimeException());
         }
 
         info.filename = path;
@@ -117,18 +128,28 @@ public class NetTextureAssetLoader extends AsynchronousAssetLoader<NetFile, NetT
         String filename;
         TextureData data;
         Texture texture;
-    };
+    }
+
+    ;
 
     TextureLoaderInfo info = new TextureLoaderInfo();
 
     static public class TextureParameter extends AssetLoaderParameters<NetFile> {
-        /** the format of the final Texture. Uses the source images format if null **/
+        /**
+         * the format of the final Texture. Uses the source images format if null
+         **/
         public Pixmap.Format format = null;
-        /** whether to generate mipmaps **/
+        /**
+         * whether to generate mipmaps
+         **/
         public boolean genMipMaps = false;
-        /** The texture to put the {@link TextureData} in, optional. **/
+        /**
+         * The texture to put the {@link TextureData} in, optional.
+         **/
         public Texture texture = null;
-        /** TextureData for textures created on the fly, optional. When set, all format and genMipMaps are ignored */
+        /**
+         * TextureData for textures created on the fly, optional. When set, all format and genMipMaps are ignored
+         */
         public TextureData textureData = null;
         public Texture.TextureFilter minFilter = Texture.TextureFilter.Nearest;
         public Texture.TextureFilter magFilter = Texture.TextureFilter.Nearest;

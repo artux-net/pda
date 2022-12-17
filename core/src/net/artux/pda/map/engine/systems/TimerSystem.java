@@ -8,6 +8,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.components.TimeComponent;
 
 import java.time.Instant;
@@ -15,9 +16,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class TimerSystem extends IteratingSystem implements Disposable {
 
     private final Timer timer;

@@ -9,10 +9,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.core.CoreComponent;
+import net.artux.pda.map.di.CoreComponent;
+import net.artux.pda.map.di.core.DaggerMapComponent;
+import net.artux.pda.map.di.core.MapComponent;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.LevelBackground;
@@ -22,9 +23,7 @@ import net.artux.pda.map.utils.NetFile;
 import net.artux.pda.model.map.GameMap;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
 public class PlayState extends State {
 
     private final static String TAG = "PlayState";
@@ -38,52 +37,70 @@ public class PlayState extends State {
     private final AssetsFinder assetsFinder;
     private final AssetManager assetManager;
     private final UserInterface userInterface;
-    private boolean loaded = false;
+    private final CoreComponent coreComponent;
+    private final MapComponent mapComponent;
     Texture background;
 
     @Inject
-    public PlayState(final GameStateManager gsm, DataRepository dataRepository, CoreComponent coreComponent) {
+    public PlayState(final GameStateController gsm, DataRepository dataRepository, GameMap gameMap, CoreComponent coreComponent) {
         super(gsm, dataRepository);
-        engineManager = coreComponent.getManager();
-        assetsFinder = coreComponent.getAssetsFinder();
-        stage = coreComponent.gameStage();
-        uistage = coreComponent.uiStage();
-        userInterface = coreComponent.getUserInterface();
-        coreComponent.initInterface();
+        this.gameMap = gameMap;
+        this.coreComponent = coreComponent;
 
+        assetsFinder = coreComponent.getAssetsFinder();
         assetManager = assetsFinder.getManager();
-        loaded = false;
+        assetManager.finishLoading();//make sure everything loaded
+
+        mapComponent = DaggerMapComponent.builder()
+                .coreComponent(coreComponent)
+                .build();
+
+        engineManager = mapComponent.getManager();///n
+        stage = mapComponent.gameStage();//n
+        uistage = mapComponent.uiStage();//n
+        userInterface = mapComponent.getUserInterface();
+        mapComponent.initInterface();
+
+        loadMap();
+    }
+
+    private void loadMap() {
+        background = (Texture) assetManager.get(gameMap.getTexture(), NetFile.class).file;
+        GlobalData.mapWidth = background.getWidth();
+        GlobalData.mapHeight = background.getHeight();
+        mapTexture = new Image(background);
+        if (!stage.getActors().contains(mapTexture, false))
+            stage.addActor(mapTexture);
+
+        Texture levelTexture = (Texture) assetManager.get(gameMap.getBlurTexture(), NetFile.class).file;
+        if (levelBackground == null) {
+            levelBackground = new LevelBackground(levelTexture, stage.getCamera());
+        }
+    }
+
+
+    public GameMap getGameMap() {
+        return gameMap;
     }
 
     @Override
     public void resume() {
+        Gdx.input.getInputProcessor()
+                .touchUp(0, 0, 0, 0); //resets all inputs after pause
         Gdx.app.log(TAG, "OnResume");
         GameMap map = dataRepository.getGameMap();
-        Gdx.input.getInputProcessor().touchUp(0, 0, 0, 0);
-        //resets all inputs after pause
-        if (gameMap == null || gameMap.getId() != map.getId()) {
-            assetManager.load(map.getTexture(), NetFile.class);
-            assetManager.load(map.getBlurTexture(), NetFile.class);
+
+        if (gameMap.getId() != map.getId()) {
+            Gdx.app.log(TAG, "Update map, old: " + gameMap.getId() + " new map: " + map.getId());
             //todo update map
-            if (gameMap != null) {
-                Gdx.app.log(TAG, "Update map, old: " + gameMap.getId() + " new map: " + map.getId());
-
-            } else {
-                Gdx.app.log(TAG, "Set map: " + map.getId());
-            }
-            gameMap = map;
-            long loadTime = TimeUtils.millis();
-
-
-            Gdx.app.log("Main textures", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
+            gsm.set(coreComponent.getPreloadState());
 
             //update entities
             //update spawns
             //update points
-            engineManager.updateEverything();
+            //engineManager.updateEverything();
         }
         engineManager.updateOnlyPlayer();//update player
-
     }
 
     @Override
@@ -115,36 +132,17 @@ public class PlayState extends State {
 
     @Override
     public void render() {
-        if (assetManager.update()) {
-            if (!loaded) {
-                assetManager.finishLoading();
-                background = (Texture) assetManager.get(gameMap.getTexture(), NetFile.class).file;
-                GlobalData.mapWidth = background.getWidth();
-                GlobalData.mapHeight = background.getHeight();
-                //stage.getActors().removeValue(mapTexture, false);
-               /* mapTexture = new Image(background);
-                if (!stage.getActors().contains(mapTexture, false))
-                    stage.addActor(mapTexture);*/
+        SpriteBatch batch = (SpriteBatch) stage.getBatch();
+        batch.begin();
+        if (levelBackground != null)
+            levelBackground.render(batch);
+        batch.draw(background, 0, 0);
+        batch.end();
 
-                /*Texture levelTexture = (Texture) assetManager.get(gameMap.getBlurTexture(), NetFile.class).file;
-                if (levelBackground == null) {
-                    levelBackground = new LevelBackground(levelTexture, stage.getCamera());
-                }*/
-                loaded = true;
-            } else {
-                SpriteBatch batch = (SpriteBatch) stage.getBatch();
-                batch.begin();
-                if (levelBackground != null)
-                    levelBackground.render(batch);
-                batch.draw(background, 0,0);
-                batch.end();
-;
-                stage.draw();
-                stage.getBatch().begin();
-                engineManager.draw(stage.getBatch(), 1);
-                stage.getBatch().end();
-            }
-        }
+        stage.draw();
+        stage.getBatch().begin();
+        engineManager.draw(stage.getBatch(), 1);
+        stage.getBatch().end();
         uistage.draw(); // ui always last
     }
 
@@ -158,7 +156,6 @@ public class PlayState extends State {
         stage.dispose();
         uistage.dispose();
         engineManager.dispose();
-        assetsFinder.dispose();
         if (userInterface != null)
             userInterface.dispose();
     }

@@ -55,4 +55,9 @@ public class AppModule {
         return dataRepository.getGameMap();
     }
 
+    @Provides
+    public AppModule getAppModule(){
+        return this;
+    }
+
 }

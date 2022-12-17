@@ -8,6 +8,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SoundComponent;
 
@@ -16,9 +17,8 @@ import java.util.List;
 import java.util.Random;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class SoundsSystem extends BaseSystem {
 
     private final List<Music> detections = new ArrayList<>();

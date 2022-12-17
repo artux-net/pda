@@ -10,13 +10,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class GameStateManager {
+public class GameStateController {
 
     private final Stack<net.artux.pda.map.states.State> states;
     private final InputMultiplexer multiplexer = new InputMultiplexer();
 
     @Inject
-    public GameStateManager() {
+    public GameStateController() {
         states = new Stack<>();
     }
 
@@ -28,7 +28,7 @@ public class GameStateManager {
     }
 
     public void resume() {
-        states.peek().resume();
+                states.peek().resume();
     }
 
     public State peek() {

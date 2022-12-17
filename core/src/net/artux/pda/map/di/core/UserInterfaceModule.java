@@ -214,7 +214,6 @@ public class UserInterfaceModule {
         });
         weaponSlot.getCell(weaponSlot.getSecondLabel()).align(Align.left);
         float height = hudTable.getHeight() * 0.9f;
-        hudTable.add(weaponSlot).height(height).padLeft(20);
         weaponSlot.addListener(new ClickListener() {
             private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
@@ -225,7 +224,7 @@ public class UserInterfaceModule {
                 entityWeapon.switchWeapons();
             }
         });
-        hudTable.add(weaponSlot);
+        hudTable.add(weaponSlot).padLeft(20);
 
         return hudTable;
     }
@@ -393,7 +392,7 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initDebugMode(@Named("gameZone") Group gameZone, UIFrame uiFrame, Skin skin, Label.LabelStyle labelStyle,
+    public Actor initDebugMode(@Named("gameZone") Group gameZone, UIFrame uiFrame, UserInterface userInterface, Skin skin, Label.LabelStyle labelStyle,
                                Engine engine, AssetManager assetManager, Properties properties) {
         if (properties.getProperty(PropertyFields.TESTER_MODE, "false").equals("true")) {
             Button.ButtonStyle bugStyle = new Button.ButtonStyle();
@@ -441,12 +440,12 @@ public class UserInterfaceModule {
                 }
             }, MapLoggerSystem.showPlayerWalls);
 
-            /*debugMenu.addCheckBox("Показать границы UI элементов", new ChangeListener() {
+            debugMenu.addCheckBox("Показать границы UI элементов", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     userInterface.setDebug(((CheckBox) actor).isChecked(), true);
                 }
-            }, false);*/
+            }, false);
 
             debugMenu.addCheckBox("Отобразить карту ИИ", new ChangeListener() {
                 @Override

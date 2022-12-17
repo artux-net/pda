@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.RandomPosition;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.GroupComponent;
@@ -33,9 +34,8 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class EntityProcessorSystem extends EntitySystem {
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);

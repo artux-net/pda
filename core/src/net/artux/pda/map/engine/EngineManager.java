@@ -16,7 +16,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.core.CoreComponent;
+import net.artux.pda.map.di.core.MapComponent;
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -38,9 +39,8 @@ import net.artux.pda.model.user.UserModel;
 import java.beans.PropertyChangeListener;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class EngineManager extends InputListener implements Drawable, Disposable {
 
     private GameMap map;
@@ -71,30 +71,29 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     };
 
     @Inject
-    public EngineManager(CoreComponent coreComponent) {
-        dataRepository = coreComponent.getDataRepository();
+    public EngineManager(MapComponent mapComponent) {
+        this.dataRepository = mapComponent.getDataRepository();
         this.map = dataRepository.getGameMap();
         this.userModel = dataRepository.getUserModel();
+        this.engine = mapComponent.getEngine();
 
-        engine = coreComponent.getEngine();
-
-        Stage stage = coreComponent.gameStage();
+        Stage stage = mapComponent.gameStage();
 
         StoryDataModel gdxData = dataRepository.getStoryDataModel();
         long loadTime = TimeUtils.millis();
 
-        EntityBuilder entityBuilder = coreComponent.getEntityBuilder();
+        EntityBuilder entityBuilder = mapComponent.getEntityBuilder();
         player = entityBuilder.player(Mappers.vector2(map.getDefPos()), gdxData, userModel);
         System.out.println("Player created in engine: " + engine);
         System.out.println("Player " + player);
         engine.addEntity(player);
 
         if (controlPoints)
-            ControlPointsHelper.createControlPointsEntities(coreComponent);
+            ControlPointsHelper.createControlPointsEntities(mapComponent);
         if (questPoints)
-            QuestPointsHelper.createQuestPointsEntities(coreComponent);
+            QuestPointsHelper.createQuestPointsEntities(mapComponent);
         if (anomalies)
-            AnomalyHelper.createAnomalies(coreComponent);
+            AnomalyHelper.createAnomalies(mapComponent);
 
 //        RandomSpawnerHelper.init(coreComponent);
 

@@ -7,23 +7,19 @@ import net.artux.pda.map.DataRepository;
 
 public abstract class State {
 
-    protected final GameStateManager gsm;
+    protected final GameStateController gsm;
     protected final DataRepository dataRepository;
 
     protected float w = Gdx.graphics.getWidth();
     protected float h = Gdx.graphics.getHeight();
 
-    public State(GameStateManager gsm, DataRepository dataRepository) {
+    public State(GameStateController gsm, DataRepository dataRepository) {
         this.gsm = gsm;
         this.dataRepository = dataRepository;
     }
 
     public DataRepository getDataRepository() {
         return dataRepository;
-    }
-
-    public GameStateManager getGSM() {
-        return gsm;
     }
 
     public abstract void resume();

@@ -7,12 +7,12 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.ai.msg.MessageManager;
 
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.components.StatesComponent;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class StatesSystem extends IteratingSystem {
 
     private ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);

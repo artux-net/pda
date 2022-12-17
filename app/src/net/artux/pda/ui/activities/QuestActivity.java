@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
@@ -103,9 +104,16 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
                 mFragmentTransaction.hide(coreFragment);
                 mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.STARTED);
             }
+
+            for (Fragment fragment : getSupportFragmentManager().getFragments()){
+                if (fragment instanceof StageFragment){
+                    mFragmentTransaction.remove(fragment);
+                }
+            }
+
             mFragmentTransaction
                     .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-                    .add(R.id.containerView, stageFragment)
+                    .add(R.id.containerView, stageFragment, "stage")
                     .addToBackStack("stage")
                     .commit();
         });

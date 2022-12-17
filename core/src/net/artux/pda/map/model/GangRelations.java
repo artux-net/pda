@@ -2,6 +2,7 @@ package net.artux.pda.map.model;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.model.user.Gang;
 
@@ -10,9 +11,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class GangRelations {
 
     private HashMap<Gang, Integer[]> relations;

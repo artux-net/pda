@@ -9,6 +9,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.pda.map.di.core.PerGameMap;
 import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.MessagingCodes;
 import net.artux.pda.map.engine.components.BulletComponent;
@@ -34,9 +35,8 @@ import net.artux.pda.model.user.UserModel;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Singleton
+@PerGameMap
 public class EntityBuilder {
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);

@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 
-import net.artux.pda.map.di.core.CoreComponent;
+import net.artux.pda.map.di.core.MapComponent;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -25,7 +25,7 @@ import net.artux.pda.model.quest.story.StoryStateModel;
 
 public class QuestPointsHelper {
 
-    public static void createQuestPointsEntities(CoreComponent coreComponent) {
+    public static void createQuestPointsEntities(MapComponent coreComponent) {
         Engine engine = coreComponent.getEngine();
         AssetManager assetManager = coreComponent.getAssetsManager();
         PlatformInterface platformInterface = coreComponent.getDataRepository().getPlatformInterface();
