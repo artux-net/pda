@@ -6,11 +6,11 @@ public class InteractiveComponent implements Component {
 
     public String title;
     public Type type;
-    public InteractListener listener;
+    public final InteractListener listener;
 
     public InteractiveComponent(String title, int type, InteractListener listener) {
         this.title = title;
-        switch (type){
+        switch (type) {
             case 5:
                 this.type = Type.FINDING;
                 break;
@@ -29,11 +29,15 @@ public class InteractiveComponent implements Component {
         this.listener = listener;
     }
 
-    public interface InteractListener{
+    public void interact() {
+        listener.interact();
+    }
+
+    public interface InteractListener {
         void interact();
     }
 
-    public enum Type{
+    public enum Type {
         DIALOG,
         ACTION,
         FINDING,

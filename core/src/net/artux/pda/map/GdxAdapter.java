@@ -62,7 +62,7 @@ public class GdxAdapter extends ApplicationAdapter {
 
     @Override
     public void render() {
-        Gdx.gl.glClearColor(0, 0, 0, 0.5f);
+        Gdx.gl.glClearColor(0.086f, 0.09f, 0.098f, 0.5f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         gsc.update(Gdx.graphics.getDeltaTime());

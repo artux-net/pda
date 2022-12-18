@@ -1,5 +1,6 @@
 package net.artux.pda.map.states;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -21,6 +22,7 @@ public class PreloadState extends State {
     private final AssetManager assetManager;
     private final BitmapFont font;
     private final Stage stage;
+    private final GameMap gameMap;
     private final DecimalFormat df = new DecimalFormat("##.##%");
 
     @Inject
@@ -30,12 +32,12 @@ public class PreloadState extends State {
         font = coreComponent.getAssetsFinder().getFontManager().getFont(22);
         stage = new Stage();
         assetManager = coreComponent.getAssetsManager();
+        gameMap = dataRepository.getGameMap();
 
         loadMap();
     }
 
     private void loadMap() {
-        GameMap gameMap = dataRepository.getGameMap();
         assetManager.load(gameMap.getTexture(), NetFile.class);
         assetManager.load(gameMap.getBoundsTexture(), NetFile.class);
         assetManager.load(gameMap.getBlurTexture(), NetFile.class);
@@ -71,6 +73,7 @@ public class PreloadState extends State {
         } else {
             float progress = assetManager.getProgress();
             font.draw(batch, df.format(progress), 50, 50);
+            font.draw(batch, gameMap.getTitle(), Gdx.graphics.getWidth()/2f,Gdx.graphics.getHeight()/2f);
         }
         batch.end();
     }

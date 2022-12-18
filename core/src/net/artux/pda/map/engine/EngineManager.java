@@ -148,6 +148,6 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
     public void updateOnlyPlayer() {
         pm.get(player).set(Mappers.vector2(dataRepository.getGameMap().getDefPos()));
-        engine.getSystem(InteractionSystem.class).setActivated(false);
+        engine.getSystem(InteractionSystem.class).setProcessing(true);
     }
 }

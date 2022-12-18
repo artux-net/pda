@@ -177,7 +177,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     @Override
     public void restart() {
-        onResume();
+        gdxAdapter.create();
     }
 
     @Override

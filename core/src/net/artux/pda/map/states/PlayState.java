@@ -153,6 +153,11 @@ public class PlayState extends State {
 
     @Override
     public void dispose() {
+        assetManager.unload(gameMap.getTexture());
+        assetManager.unload(gameMap.getTilesTexture());
+        assetManager.unload(gameMap.getBoundsTexture());
+        assetManager.unload(gameMap.getBlurTexture());
+
         stage.dispose();
         uistage.dispose();
         engineManager.dispose();

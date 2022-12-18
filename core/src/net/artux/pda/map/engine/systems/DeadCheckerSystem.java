@@ -38,6 +38,7 @@ public class DeadCheckerSystem extends BaseSystem {
     private Label.LabelStyle labelStyle;
     private boolean deadMessage;
     private DataRepository dataRepository;
+    private UserInterface userInterface;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
@@ -50,6 +51,7 @@ public class DeadCheckerSystem extends BaseSystem {
         super(Family.all(HealthComponent.class, PositionComponent.class).get());
         this.gameZone = userInterface;
         this.assetManager = assetManager;
+        this.userInterface = userInterface;
         this.dataRepository = dataRepository;
         labelStyle = userInterface.getLabelStyle();
         labelStyle.fontColor = Color.RED;
@@ -125,7 +127,7 @@ public class DeadCheckerSystem extends BaseSystem {
                 textButton.align(Align.center);
                 textButton.getLabel().setAlignment(Align.center);
                 deadMessageGroup.addActor(textButton);
-                deadMessageGroup.addListener(new ClickListener() {
+                userInterface.addListener(new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         dataRepository.getPlatformInterface().restart();

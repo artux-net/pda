@@ -43,11 +43,9 @@ public class InteractionSystem extends BaseSystem {
     private ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
     private InteractiveComponent activeInteraction;
 
-    private boolean activated = false;
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        activated = false;
         mobs = engine.getEntitiesFor(Family.all(MoodComponent.class, PositionComponent.class).get());
     }
 
@@ -69,7 +67,8 @@ public class InteractionSystem extends BaseSystem {
             if (playerPosition.getPosition().dst(positionComponent.getPosition()) < 35f) {
                 if (interactiveComponent.type != InteractiveComponent.Type.ACTION) {
                     activeInteraction = interactiveComponent;
-                    interactiveComponent.listener.interact();
+                    setProcessing(false);
+                    interactiveComponent.interact();
                     /*if (Arrays.stream(stage.getActors().items)
                             .filter(actor -> actor.getName().equals(name)).findFirst()
                             .orElse(null) == null) {
@@ -79,12 +78,10 @@ public class InteractionSystem extends BaseSystem {
                         stage.addActor(text);
                     }*/
                 } else {
-                    if (!activated) {
-                        System.out.println("Activated by player " + getPlayer());
-                        System.out.println("In system " + this);
-                        activated = true;
-                        interactiveComponent.listener.interact();
-                    }
+                    System.out.println("Activated by player " + getPlayer());
+                    System.out.println("In system " + this);
+                    setProcessing(false);
+                    interactiveComponent.interact();
                 }
             }
         }
@@ -134,10 +131,6 @@ public class InteractionSystem extends BaseSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
 
-    }
-
-    public void setActivated(boolean activated) {
-        this.activated = activated;
     }
 
     /* private void removeActor(Table container) {

@@ -36,7 +36,10 @@ public class GameStateController {
     }
 
     public void set(State state) {
-        states.pop().dispose();
+        State current = states.pop();
+        current.stop();
+        current.dispose();
+        clearInputProcessors();
         states.push(state);
         states.peek().handleInput();
         states.peek().resume();
@@ -73,5 +76,9 @@ public class GameStateController {
     public void removeInputProcessor(InputProcessor inputProcessor) {
         if (multiplexer.getProcessors().contains(inputProcessor, false))
             multiplexer.removeProcessor(inputProcessor);
+    }
+
+    public void clearInputProcessors(){
+        multiplexer.clear();
     }
 }

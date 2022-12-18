@@ -35,6 +35,4 @@ public interface CoreComponent {
 
     Properties getProperties();
 
-    //MapComponent getMapComponent();
-
 }

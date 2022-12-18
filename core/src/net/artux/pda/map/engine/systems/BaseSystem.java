@@ -1,17 +1,20 @@
 package net.artux.pda.map.engine.systems;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 
+import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 
 public abstract class BaseSystem extends IteratingSystem {
 
     private Entity player;
+    private ComponentMapper<HealthComponent> healthMapper = ComponentMapper.getFor(HealthComponent.class);
     private final Family playerFamily = Family.all(PlayerComponent.class, PositionComponent.class).get();
 
     public BaseSystem(Family family) {
@@ -27,6 +30,8 @@ public abstract class BaseSystem extends IteratingSystem {
     }
 
     protected boolean isPlayerActive() {
+        if (healthMapper.get(getPlayer()).isDead())
+            return false;
         return getPlayer() != null;
     }
 

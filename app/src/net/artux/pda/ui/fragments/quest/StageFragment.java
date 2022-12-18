@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import net.artux.pda.R;
+import net.artux.pda.app.PDAApplication;
+import net.artux.pda.common.PropertyFields;
 import net.artux.pda.databinding.FragmentQuest0Binding;
 import net.artux.pda.databinding.FragmentQuest1Binding;
 import net.artux.pda.model.quest.StageModel;
@@ -25,6 +27,7 @@ import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.ui.views.TypeWriterTextView;
 
 import java.util.List;
+import java.util.Properties;
 
 public class StageFragment extends Fragment {
 
@@ -70,6 +73,12 @@ public class StageFragment extends Fragment {
 
             mainText.setmText(stage.getContent());
             mainText.setListener(() -> setSceneResponses(stage.getTransfers()));
+
+            Properties properties = ((PDAApplication)getActivity().getApplication())
+                    .getProperties();
+            if (properties.getProperty(PropertyFields.TESTER_MODE, "false").equals("true")){
+                mainText.setEffect(false);
+            }
 
             usualStageBinding.scrollScene.setOnClickListener(v -> mainText.setEffect(false));
         } else {
