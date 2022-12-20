@@ -6,7 +6,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 
-import net.artux.pda.map.di.core.PerGameMap;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -15,6 +15,10 @@ import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.ui.UserInterface;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -42,6 +46,7 @@ public class InteractionSystem extends BaseSystem {
     private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
     private InteractiveComponent activeInteraction;
+    private Set<InteractiveComponent> interactiveComponents = new HashSet<>();
 
     @Override
     public void addedToEngine(Engine engine) {
@@ -57,6 +62,7 @@ public class InteractionSystem extends BaseSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
         activeInteraction = null;
+        interactiveComponents.clear();
         for (int i = 0; i < getEntities().size(); i++) {
             PositionComponent positionComponent = pm.get(getEntities().get(i));
             final InteractiveComponent interactiveComponent = im.get(getEntities().get(i));
@@ -67,8 +73,7 @@ public class InteractionSystem extends BaseSystem {
             if (playerPosition.getPosition().dst(positionComponent.getPosition()) < 35f) {
                 if (interactiveComponent.type != InteractiveComponent.Type.ACTION) {
                     activeInteraction = interactiveComponent;
-                    setProcessing(false);
-                    interactiveComponent.interact();
+                    interactiveComponents.add(interactiveComponent);
                     /*if (Arrays.stream(stage.getActors().items)
                             .filter(actor -> actor.getName().equals(name)).findFirst()
                             .orElse(null) == null) {
@@ -131,6 +136,10 @@ public class InteractionSystem extends BaseSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
 
+    }
+
+    public Collection<InteractiveComponent> getInteractiveComponents() {
+        return interactiveComponents;
     }
 
     /* private void removeActor(Table container) {

@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
-import net.artux.pda.map.di.core.PerGameMap;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.RandomPosition;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.GroupComponent;

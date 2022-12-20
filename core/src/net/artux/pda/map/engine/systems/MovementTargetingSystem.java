@@ -9,7 +9,7 @@ import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.di.core.PerGameMap;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;

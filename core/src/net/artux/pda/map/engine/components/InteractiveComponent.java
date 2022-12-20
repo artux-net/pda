@@ -33,6 +33,10 @@ public class InteractiveComponent implements Component {
         listener.interact();
     }
 
+    public String getTitle() {
+        return title;
+    }
+
     public interface InteractListener {
         void interact();
     }

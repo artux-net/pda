@@ -9,7 +9,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.core.PerGameMap;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.GroupComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpawnComponent;

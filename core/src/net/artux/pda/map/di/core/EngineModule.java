@@ -3,6 +3,8 @@ package net.artux.pda.map.di.core;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 
+import net.artux.pda.map.di.scope.PerGameMap;
+
 import java.util.Set;
 
 import dagger.Module;

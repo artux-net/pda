@@ -7,7 +7,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.di.core.PerGameMap;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.BulletComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
@@ -97,10 +97,9 @@ public class BattleSystem extends BaseSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         WeaponComponent entityWeapon = wm.get(entity);
+        MoodComponent moodComponent = mm.get(entity);
+        VisionComponent visionComponent = vm.get(entity);
         entityWeapon.update(deltaTime);
-
-        MoodComponent moodComponent = mm.get(getPlayer());
-        VisionComponent visionComponent = vm.get(getPlayer());
 
         if (moodComponent.hasEnemy())
             if (visionComponent.isSeeing(moodComponent.getEnemy()))

@@ -1,4 +1,4 @@
-package net.artux.pda.map.di.core;
+package net.artux.pda.map.di.scope;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

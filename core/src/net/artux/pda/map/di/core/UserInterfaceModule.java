@@ -55,11 +55,13 @@ import net.artux.pda.map.ui.blocks.ControlBlock;
 import net.artux.pda.map.ui.blocks.MessagesBlock;
 import net.artux.pda.model.items.ItemModel;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
@@ -84,6 +86,12 @@ public class UserInterfaceModule {
     @Provides
     public Label.LabelStyle getLabelStyle(BitmapFont font) {
         return new Label.LabelStyle(font, Color.GRAY);
+    }
+
+    @Provides
+    @Named("assistantTable")
+    public Table getAssistantTable(UserInterface userInterface) {
+        return userInterface.getAssistantBlock();
     }
 
     @Provides
@@ -180,6 +188,94 @@ public class UserInterfaceModule {
 
         return touchpad;
     }
+
+    @IntoSet
+    @Provides
+    public Actor initAssistant(@Named("assistantTable") Table assistantBlock, UserInterface userInterface, InteractionSystem interactionSystem, AssetManager assetManager) {
+
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.font = userInterface.getLabelStyle().font;
+        textButtonStyle.fontColor = userInterface.getLabelStyle().fontColor;
+        textButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot_wide.png", Texture.class));
+        TextButton backpackSlot = new TextButton("Рюкзак", textButtonStyle);
+        backpackSlot.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                userInterface.switchBackpack();
+                super.clicked(event, x, y);
+            }
+        });
+
+        Table actionsTable = new Table();
+        assistantBlock.add(actionsTable);
+        actionsTable.add();
+
+        assistantBlock
+                .add(backpackSlot)
+                .width(200);
+
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
+        assistantBlock.addAction(new Action() {
+
+            @Override
+            public boolean act(float delta) {
+                Collection<InteractiveComponent> components = interactionSystem.getInteractiveComponents();
+                for (InteractiveComponent component : components) {
+                    if (assistantBlock.findActor(component.title) == null) {
+                        String icon;
+                        switch (component.type) {
+                            case FINDING:
+                                icon = "ui/icons/icon_search.png";
+                                break;
+                            case TRANSFER:
+                                icon = "ui/icons/ic_transfer.png";
+                                break;
+                            default:
+                                icon = "ui/icons/icon_dialog.png";
+                                break;
+                        }
+
+                        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+                        style.up = new TextureRegionDrawable(assetManager.get("ui/buttonBack.png", Texture.class));
+                        TextureRegion textureRegion = new TextureRegion(assetManager.get(icon, Texture.class));
+                        float pad = textureRegion.getRegionHeight() * 0.15f;
+                        style.imageUp = new TextureRegionDrawable(textureRegion);
+
+                        ImageButton button = new ImageButton(style);
+                        button.pad(pad);
+                        button.setName(component.title);
+                        button.addListener(new ClickListener() {
+                            @Override
+                            public void clicked(InputEvent event, float x, float y) {
+                                super.clicked(event, x, y);
+                                component.listener.interact();
+                            }
+                        });
+                        assistantBlock.add(button);
+                    }
+                }
+                removeActors(assistantBlock, components.stream().map(InteractiveComponent::getTitle).collect(Collectors.toList()));
+                return false;
+            }
+
+            private void removeActors(Table container, Collection<String> activeActions) {
+                for (Actor actor : container.getChildren()) {
+                    if (actor.getName() != null && !activeActions.contains(actor.getName())) {
+                        Cell<Actor> cell = container.getCell(actor);
+                        actor.remove();
+                        // remove cell from table
+                        container.getCells().removeValue(cell, true);
+                        container.invalidate();
+                    }
+                }
+            }
+
+        });
+
+        return assistantBlock;
+    }
+
 
     @IntoSet
     @Provides

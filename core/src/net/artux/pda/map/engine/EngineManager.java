@@ -17,11 +17,8 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.core.MapComponent;
-import net.artux.pda.map.di.core.PerGameMap;
-import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.components.MoodComponent;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.entities.EntityBuilder;
@@ -49,8 +46,10 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private Engine engine;
     private final DataRepository dataRepository;
 
+    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class); //todo remove from here
+
     private boolean controlPoints = true;
-    private boolean questPoints = true;
+    private boolean questPoints = true; //
     private boolean anomalies = true;
 
     private final PropertyChangeListener storyDataListener = propertyChangeEvent -> {
@@ -135,16 +134,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         return engine;
     }
 
-    public void updateEverything() {
 
-        updateOnlyPlayer();
-    }
-
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
-    private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
-    private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
-    private ComponentMapper<PlayerComponent> pmm = ComponentMapper.getFor(PlayerComponent.class);
 
     public void updateOnlyPlayer() {
         pm.get(player).set(Mappers.vector2(dataRepository.getGameMap().getDefPos()));

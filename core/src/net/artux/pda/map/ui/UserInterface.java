@@ -4,22 +4,31 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.core.PerGameMap;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.ui.bars.Utils;
 import net.artux.pda.map.ui.blocks.AssistantBlock;
 import net.artux.pda.map.utils.PlatformInterface;
@@ -216,6 +225,34 @@ public class UserInterface extends Group implements Disposable {
         });
         return label;
     }
+
+    public void addInteractButton(String id, String iconPath, final InteractiveComponent.InteractListener listener) {
+        addInteractButton(id, iconPath, new ChangeListener() {
+            @Override
+            public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+                listener.interact();
+                Cell<Actor> cell = assistantBlock.getCell(actor);
+                actor.remove();
+                assistantBlock.getCells().removeValue(cell, true);
+                assistantBlock.invalidate();
+            }
+        });
+    }
+
+    public void addInteractButton(String id, String iconPath, EventListener listener) {
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.up = new TextureRegionDrawable(assetManager.get("ui/buttonBack.png", Texture.class));
+        TextureRegion textureRegion = new TextureRegion(assetManager.get(iconPath, Texture.class));
+        float pad = textureRegion.getRegionHeight() * 0.15f;
+        style.imageUp = new TextureRegionDrawable(textureRegion);
+
+        ImageButton button = new ImageButton(style);
+        button.pad(pad);
+        button.setName(id);
+        button.addListener(listener);
+        assistantBlock.add(button);
+    }
+
 
 
     public float getDensity() {

@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.CoreComponent;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.entities.EntityBuilder;

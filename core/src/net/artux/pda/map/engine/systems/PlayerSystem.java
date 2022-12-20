@@ -6,17 +6,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.di.core.PerGameMap;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -24,8 +17,6 @@ import net.artux.pda.map.engine.components.QuestComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
-import net.artux.pda.map.ui.UserInterface;
-import net.artux.pda.map.ui.blocks.AssistantBlock;
 import net.artux.pda.model.items.MedicineModel;
 
 import javax.inject.Inject;
@@ -41,15 +32,12 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     private ComponentMapper<VelocityComponent> vcm = ComponentMapper.getFor(VelocityComponent.class);
 
     private final float pixelsPerMeter = 3f;
-    private final AssetManager assetManager;
     private InteractionSystem interactionSystem;
 
-    private TextButton backpackSlot;
 
     @Inject
-    public PlayerSystem(AssetManager assetManager, InteractionSystem interactionSystem) {
+    public PlayerSystem(InteractionSystem interactionSystem) {
         super(Family.all(PositionComponent.class, QuestComponent.class).get());
-        this.assetManager = assetManager;
         this.interactionSystem = interactionSystem;
     }
 
@@ -64,28 +52,6 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-
-        UserInterface userInterface = interactionSystem.getUserInterface();
-        AssistantBlock assistantBlock = userInterface.getAssistantBlock();
-
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = userInterface.getLabelStyle().font;
-        textButtonStyle.fontColor = userInterface.getLabelStyle().fontColor;
-        textButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot_wide.png", Texture.class));
-        backpackSlot = new TextButton("Рюкзак", textButtonStyle);
-
-        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-        style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
-        style.imageUp = new TextureRegionDrawable(assetManager.get("ui/bar/ic_radiation.png", Texture.class));
-        assistantBlock.getButtonsTable().add(backpackSlot).width(200);
-        backpackSlot.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                userInterface.switchBackpack();
-                super.clicked(event, x, y);
-            }
-        });
-
         loadPreferences();
     }
 
