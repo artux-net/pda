@@ -75,7 +75,7 @@ public class MessagesBlock extends ScrollPane implements Disposable {
                     .get("avatars/a0.jpg", Texture.class));
 
         image.setScaling(Scaling.fillX);
-        mainGroup.add(image).width(w / 9f);
+        mainGroup.add(image).uniform();
 
         Table contentGroup = new Table().left().top();
         mainGroup.add(contentGroup);

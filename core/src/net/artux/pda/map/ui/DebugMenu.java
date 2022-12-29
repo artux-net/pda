@@ -1,6 +1,5 @@
 package net.artux.pda.map.ui;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -11,6 +10,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
 import net.artux.pda.map.ui.bars.Utils;
+import net.artux.pda.map.utils.Colors;
 
 public class DebugMenu extends Table {
 
@@ -34,10 +34,7 @@ public class DebugMenu extends Table {
         scrollPane.setScrollingDisabled(true, false);
         add(scrollPane).growX();
 
-
-        setBackground(Utils.getColoredDrawable(1, 1, Color.BLACK));
-
-
+        setBackground(Utils.getColoredDrawable(1, 1, Colors.backgroundColor));
     }
 
     public void addCheckBox(String title, ChangeListener changeListener, boolean checked) {

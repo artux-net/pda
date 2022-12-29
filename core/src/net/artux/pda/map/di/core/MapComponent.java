@@ -8,8 +8,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.CoreComponent;
+import net.artux.pda.map.di.core.ui.UserInterfaceModule;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.engine.ConditionEntityManager;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.entities.EntityProcessorSystem;
@@ -17,6 +19,7 @@ import net.artux.pda.map.states.GameStateController;
 import net.artux.pda.map.ui.UserInterface;
 
 import java.util.Set;
+import java.util.Timer;
 
 import javax.inject.Named;
 
@@ -54,4 +57,7 @@ public interface MapComponent {
 
     Set<Actor> initInterface();
 
+    ConditionEntityManager getConditionManager();
+
+    Timer getTimer();
 }

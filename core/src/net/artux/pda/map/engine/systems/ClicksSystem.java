@@ -7,6 +7,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.ClickComponent;
+import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 
 import javax.inject.Inject;
@@ -19,7 +20,7 @@ public class ClicksSystem extends IteratingSystem {
 
     @Inject
     public ClicksSystem() {
-        super(Family.all(ClickComponent.class, PositionComponent.class).get());
+        super(Family.all(ClickComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
     }
 
     @Override

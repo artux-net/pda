@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.EntitySystem;
 import net.artux.pda.map.di.scope.PerGameMap;
 
 import java.util.Set;
+import java.util.Timer;
 
 import dagger.Module;
 import dagger.Provides;
@@ -23,5 +24,12 @@ public class EngineModule {
         System.out.println(engine.getSystems().toString());
         return engine;
     }
+
+    @Provides
+    @PerGameMap
+    public Timer getTimer() {
+        return new Timer();
+    }
+
 
 }

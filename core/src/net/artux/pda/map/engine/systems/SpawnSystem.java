@@ -11,6 +11,7 @@ import com.badlogic.gdx.Gdx;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.GroupComponent;
+import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpawnComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
@@ -33,14 +34,18 @@ public class SpawnSystem extends IteratingSystem {
 
     @Inject
     public SpawnSystem(DataRepository dataRepository) {
-        super(Family.all(VisionComponent.class, PositionComponent.class, VelocityComponent.class).get());
+        super(Family.all(VisionComponent.class, PositionComponent.class, VelocityComponent.class).exclude(PassivityComponent.class).get());
         this.dataRepository = dataRepository;
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        spawns = engine.getEntitiesFor(Family.all(SpawnComponent.class, PositionComponent.class).exclude(VelocityComponent.class).get());
+        spawns = engine.getEntitiesFor(
+                Family
+                        .all(SpawnComponent.class, PositionComponent.class)
+                        .exclude(PassivityComponent.class, VelocityComponent.class)
+                        .get());
         groupEntities = engine.getEntitiesFor(Family.all(GroupComponent.class, PositionComponent.class).get());
     }
 

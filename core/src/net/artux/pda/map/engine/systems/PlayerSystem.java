@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Disposable;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
+import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.QuestComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
@@ -34,10 +35,9 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     private final float pixelsPerMeter = 3f;
     private InteractionSystem interactionSystem;
 
-
     @Inject
     public PlayerSystem(InteractionSystem interactionSystem) {
-        super(Family.all(PositionComponent.class, QuestComponent.class).get());
+        super(Family.all(PositionComponent.class, QuestComponent.class).exclude(PassivityComponent.class).get());
         this.interactionSystem = interactionSystem;
     }
 
@@ -45,7 +45,7 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     public void removedFromEngine(Engine engine) {
         super.removedFromEngine(engine);
 
-        //todo rthis
+        //todo this
         interactionSystem.getUserInterface().getGameZone().setVisible(false);
     }
 
@@ -151,7 +151,6 @@ public class PlayerSystem extends BaseSystem implements Disposable {
             healthComponent.radiation = preferences.getFloat("radiation", 0);
         }
     }
-
 
     public interface MedicineListener {
         void treat(MedicineModel model);

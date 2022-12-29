@@ -1,10 +1,7 @@
 package net.artux.pda.gdx;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 
-import net.artux.pda.app.ForegroundService;
 import net.artux.pda.app.PDAApplication;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.GdxAdapter;
@@ -43,24 +38,8 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     public static final String RECEIVE_ERROR = "RECEIVER_ERROR";
 
     private StoryStateModel lastStoryState;
-    private ForegroundService foregroundService;
-    private boolean bound = false;
     private GdxAdapter gdxAdapter;
     private QuestViewModel questViewModel;
-
-    private final ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            ForegroundService.ServiceBinder binder = (ForegroundService.ServiceBinder) service;
-            foregroundService = binder.getService();
-            bound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            bound = false;
-        }
-    };
 
     @Nullable
     @Override
@@ -89,6 +68,9 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
         super.onViewCreated(view, savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         questViewModel = provider.get(QuestViewModel.class);
+        questViewModel.getStoryData().observe(getViewLifecycleOwner(), storyDataModel -> {
+            gdxAdapter.getDataRepository().setStoryDataModel(storyDataModel);
+        });
     }
 
     @Override
@@ -150,7 +132,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     @Override
     public void applyActions(Map<String, List<String>> actions) {
-        //questViewModel..applyActions(actions);
+        questViewModel.sync(actions);
     }
 
     @Override

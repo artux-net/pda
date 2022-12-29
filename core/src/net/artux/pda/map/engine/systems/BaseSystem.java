@@ -38,14 +38,13 @@ public abstract class BaseSystem extends IteratingSystem {
     protected Entity getPlayer() {
         if (player != null)
             return player;
-        else {
-            ImmutableArray<Entity> players = getEngine().getEntitiesFor(playerFamily);
-            if (players.size() > 0) {
-                player = players.first();
-                return player;
-            }
-        }
-        return null;
+
+        ImmutableArray<Entity> players = getEngine().getEntitiesFor(playerFamily);
+        if (players.size() > 0) {
+            player = players.first();
+            return player;
+        } else
+            return null;
     }
 
     @Override

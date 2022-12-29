@@ -50,7 +50,7 @@ public class GameStageModule {
     @Provides
     public Logger getLogger(Skin skin, PlayerSystem playerSystem) {
         Logger logger = new Logger(skin);
-        logger.put("FPS", this, "getFrameRate");
+        logger.put("FPS", logger, "getFrameRate");
         logger.put("Native Heap", Gdx.app, "getNativeHeap");
         logger.put("Java Heap", Gdx.app, "getJavaHeap");
         logger.put("Player position", playerSystem, "getPosition");

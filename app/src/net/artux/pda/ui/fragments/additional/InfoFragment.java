@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.artux.pda.R;
+import net.artux.pda.app.PDAApplication;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
@@ -42,7 +43,11 @@ public class InfoFragment extends AdditionalBaseFragment {
         mXpView = view.findViewById(R.id.ratingInfo);
 
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
-            navigationPresenter.setAdditionalTitle("PDA #" + memberResult.getPdaId());
+            String infoTitle = "PDA #" + memberResult.getPdaId();
+            if (((PDAApplication)getActivity().getApplication()).isTesterMode()){
+                infoTitle += " TESTER MODE";
+            }
+            navigationPresenter.setAdditionalTitle(infoTitle);
             ProfileHelper.setAvatar(mAvatarView, memberResult.getAvatar());
             mLoginView.setText(memberResult.getName() + " " + memberResult.getNickname());
             AutofitHelper.create(mLoginView);

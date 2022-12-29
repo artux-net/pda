@@ -6,7 +6,6 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -16,6 +15,7 @@ import com.google.gson.stream.JsonReader;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.RandomPosition;
 import net.artux.pda.map.engine.components.ClickComponent;
+import net.artux.pda.map.engine.components.ConditionComponent;
 import net.artux.pda.map.engine.components.GroupComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpawnComponent;
@@ -43,14 +43,12 @@ public class EntityProcessorSystem extends EntitySystem {
     private final EntityBuilder builder;
     private final AssetManager assetManager;
     private final RenderSystem renderSystem;
-    private final MessageManager messageManager;
     private final GangRelations gangRelations;
 
     @Inject
     public EntityProcessorSystem(EntityBuilder entityBuilder, AssetManager assetManager, RenderSystem renderSystem) {
         super();
         builder = entityBuilder;
-        this.messageManager = MessageManager.getInstance();
         this.renderSystem = renderSystem;
         this.assetManager = assetManager;
         JsonReader reader = new JsonReader(Gdx.files.internal("config/mobs.json").reader());
@@ -72,6 +70,11 @@ public class EntityProcessorSystem extends EntitySystem {
             if (!spawnModel.getParams().contains("hide")) {
                 controlPoint.add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size));
             }
+            if (spawnModel.getCondition()!=null)
+                controlPoint.add(new ConditionComponent(spawnModel.getCondition()));
+            else
+                controlPoint.add(new ConditionComponent(Collections.emptyMap()));
+
             controlPoint.add(new PositionComponent(Mappers.vector2(spawnModel.getPos())))
                     .add(spawnComponent)
                     .add(new ClickComponent(spawnModel.getR(),

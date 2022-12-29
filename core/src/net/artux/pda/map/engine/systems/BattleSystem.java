@@ -11,6 +11,7 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.BulletComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
+import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.VisionComponent;
@@ -37,7 +38,8 @@ public class BattleSystem extends BaseSystem {
 
     @Inject
     public BattleSystem(EntityProcessorSystem entityProcessorSystem) {
-        super(Family.all(HealthComponent.class, VisionComponent.class, MoodComponent.class, PositionComponent.class, WeaponComponent.class).get());
+        super(Family.all(HealthComponent.class, VisionComponent.class,
+                MoodComponent.class, PositionComponent.class, WeaponComponent.class).exclude(PassivityComponent.class).get());
         this.entityProcessorSystem = entityProcessorSystem;
     }
 

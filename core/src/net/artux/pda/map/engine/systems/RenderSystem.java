@@ -20,6 +20,7 @@ import com.badlogic.gdx.utils.Align;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.MoodComponent;
+import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.RelationalSpriteComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
@@ -50,7 +51,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
     @Inject
     public RenderSystem(@Named("gameStage") Stage stage, AssetsFinder assetsFinder) {
-        super(Family.all(SpriteComponent.class, PositionComponent.class).get());
+        super(Family.all(SpriteComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
         this.stage = stage;
 
         font = assetsFinder.getFontManager().getFont(16);

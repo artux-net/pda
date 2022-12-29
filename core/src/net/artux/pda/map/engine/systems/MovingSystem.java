@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
+import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.data.GlobalData;
@@ -33,7 +34,7 @@ public class MovingSystem extends BaseSystem {
 
     @Inject
     public MovingSystem() {
-        super(Family.all(VelocityComponent.class, PositionComponent.class).get());
+        super(Family.all(VelocityComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
     }
 
     @Override

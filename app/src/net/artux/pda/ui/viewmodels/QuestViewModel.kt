@@ -218,6 +218,13 @@ class QuestViewModel @javax.inject.Inject constructor(
             .getOrNull()
     }
 
+    fun sync(map: Map<String, MutableList<String>>) {
+        actionsMap.putAll(map)
+        viewModelScope.launch {
+            sync()
+        }
+    }
+
     fun exitStory() {
         viewModelScope.launch {
             sync()

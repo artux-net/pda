@@ -1,25 +1,18 @@
-package net.artux.pda.map.di.core;
+package net.artux.pda.map.di.core.ui;
 
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
@@ -28,8 +21,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
-import net.artux.pda.common.PropertyFields;
-import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
@@ -40,27 +31,16 @@ import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.systems.BattleSystem;
 import net.artux.pda.map.engine.systems.InteractionSystem;
-import net.artux.pda.map.engine.systems.MapLoggerSystem;
-import net.artux.pda.map.engine.systems.MovingSystem;
 import net.artux.pda.map.engine.systems.PlayerSystem;
-import net.artux.pda.map.engine.systems.RenderSystem;
-import net.artux.pda.map.engine.systems.SoundsSystem;
-import net.artux.pda.map.ui.DebugMenu;
-import net.artux.pda.map.ui.Logger;
-import net.artux.pda.map.ui.UIFrame;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Slot;
-import net.artux.pda.map.ui.blocks.ControlBlock;
 import net.artux.pda.map.ui.blocks.MessagesBlock;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import javax.inject.Named;
@@ -70,82 +50,9 @@ import dagger.Provides;
 import dagger.multibindings.IntoSet;
 
 
-@Module
+@Module(includes = HeaderInterfaceModule.class)
 public class UserInterfaceModule {
 
-    @Provides
-    public UIFrame uiFrame(UserInterface userInterface) {
-        return userInterface.getUIFrame();
-    }
-
-    @Provides
-    public BitmapFont getFont(AssetsFinder assetsFinder) {
-        return assetsFinder.getFontManager().getFont(24);
-    }
-
-    @Provides
-    public Label.LabelStyle getLabelStyle(BitmapFont font) {
-        return new Label.LabelStyle(font, Color.GRAY);
-    }
-
-    @Provides
-    @Named("assistantTable")
-    public Table getAssistantTable(UserInterface userInterface) {
-        return userInterface.getAssistantBlock();
-    }
-
-    @Provides
-    @Named("gameZone")
-    public Group getGameZone(UserInterface userInterface) {
-        return userInterface.getGameZone();
-    }
-
-    @Provides
-    @Named("hudTable")
-    public Table getHudTable(@Named("gameZone") Group gameZone) {
-        float w = gameZone.getWidth();
-        float h = gameZone.getHeight();
-
-        Table hudTable = new Table();
-        hudTable.setPosition(0, h);
-        hudTable.align(Align.left | Align.top);
-        hudTable.defaults().align(Align.left);
-        hudTable.setWidth(w / 3);
-        gameZone.addActor(hudTable);
-        return hudTable;
-    }
-
-    @Provides
-    @Named("controlTable")
-    public Table getControlTable(@Named("gameZone") Group gameZone) {
-        float w = Gdx.graphics.getWidth();
-        float h = Gdx.graphics.getHeight();
-
-        ControlBlock controlBlock = new ControlBlock();
-        controlBlock.defaults()
-                .pad(10)
-                .height(h / 8)
-                .width(h / 8)
-                .right();
-        controlBlock.setPosition(w - w / 3 - h / 28f, h / 28f);
-        Color color = gameZone.getColor();
-        color.a = 0.7f;
-        controlBlock.setColor(color);
-        color.a = 1f;
-        gameZone.setColor(color);
-        gameZone.addActor(controlBlock);
-        return controlBlock;
-    }
-
-    @Provides
-    @Named("joyTable")
-    public Table getJoyTable(@Named("gameZone") Group gameZone) {
-        Table table = new Table();
-        table.align(Align.left);
-        table.setSize(gameZone.getWidth() / 2.5f, gameZone.getHeight() / 2);
-        gameZone.addActor(table);
-        return table;
-    }
 
     @IntoSet
     @Provides
@@ -175,6 +82,9 @@ public class UserInterfaceModule {
                     touchpad.setColor(color.r, color.g, color.b, 0.9f);
             }
         });
+        MessagesBlock messagesBlock = new MessagesBlock(assetsFinder);
+        joyTable.add(messagesBlock);
+        joyTable.row();
         joyTable.add(touchpad)
                 .width(gameZone.getHeight() / 2.5f)
                 .height(gameZone.getHeight() / 2.5f)
@@ -182,17 +92,12 @@ public class UserInterfaceModule {
                 .space(50f)
                 .pad(50f);
 
-        joyTable.row();
-        MessagesBlock messagesBlock = new MessagesBlock(assetsFinder);
-        joyTable.add(messagesBlock);
-
         return touchpad;
     }
 
     @IntoSet
     @Provides
     public Actor initAssistant(@Named("assistantTable") Table assistantBlock, UserInterface userInterface, InteractionSystem interactionSystem, AssetManager assetManager) {
-
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.font = userInterface.getLabelStyle().font;
         textButtonStyle.fontColor = userInterface.getLabelStyle().fontColor;
@@ -309,7 +214,6 @@ public class UserInterfaceModule {
             }
         });
         weaponSlot.getCell(weaponSlot.getSecondLabel()).align(Align.left);
-        float height = hudTable.getHeight() * 0.9f;
         weaponSlot.addListener(new ClickListener() {
             private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
@@ -342,6 +246,8 @@ public class UserInterfaceModule {
                 super.touchUp(event, x, y, pointer, button);
             }
         }));
+
+
         controlTable.row();
         controlTable.addAction(new Action() {
             InteractiveComponent activeComponent;
@@ -432,6 +338,7 @@ public class UserInterfaceModule {
                     moodComponent.setEnemy(playerEnemies.getFirst());
             }
         }));
+        controlTable.add().colspan(3);
 
         return controlTable;
     }
@@ -448,142 +355,6 @@ public class UserInterfaceModule {
         button.setName(id);
         button.addListener(listener);
         return button;
-    }
-
-    @IntoSet
-    @Provides
-    public Actor initHeader(UIFrame uiFrame, AssetManager assetManager, DataRepository dataRepository) {
-        TextureRegionDrawable pauseDrawable = new TextureRegionDrawable(assetManager.get("ui/exit.png", Texture.class));
-        Button.ButtonStyle pauseButtonStyle = new Button.ButtonStyle(pauseDrawable, pauseDrawable, pauseDrawable);
-        Button pauseButton = new Button(pauseButtonStyle);
-        pauseButton.addListener(new ClickListener() {
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                super.clicked(event, x, y);
-                Gdx.app.debug("UserInterface", "touched pause - user interface");
-                dataRepository.applyActions(Collections.emptyMap());
-                HashMap<String, String> data = new HashMap<>();
-                data.put("openPda", "");
-                dataRepository.getPlatformInterface().send(data);
-            }
-        });
-
-        Button.ButtonStyle occupationsButtonStyle = new Button.ButtonStyle();
-        occupationsButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/burger.png", Texture.class));
-        Button menuButton = new Button(occupationsButtonStyle);
-        menuButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                //isMenuOpen = !isMenuOpen;
-            }
-        });
-
-
-        uiFrame.getLeftHeaderTable().add(menuButton);
-        uiFrame.getRightHeaderTable().add(pauseButton);
-
-        return menuButton;
-    }
-
-    @IntoSet
-    @Provides
-    public Actor initDebugMode(@Named("gameZone") Group gameZone, UIFrame uiFrame, UserInterface userInterface, Skin skin, Label.LabelStyle labelStyle,
-                               Engine engine, AssetManager assetManager, Properties properties) {
-        if (properties.getProperty(PropertyFields.TESTER_MODE, "false").equals("true")) {
-            Button.ButtonStyle bugStyle = new Button.ButtonStyle();
-            bugStyle.up = new TextureRegionDrawable(assetManager.get("ui/bug.png", Texture.class));
-
-            final Button debugButton = new Button(bugStyle);
-            final DebugMenu debugMenu = new DebugMenu(skin, labelStyle);
-            debugMenu.setSize(gameZone.getWidth(), gameZone.getHeight());
-
-            debugButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    super.clicked(event, x, y);
-                    if (gameZone.getChildren().indexOf(debugMenu, false) == -1)
-                        gameZone.addActor(debugMenu);
-                    else
-                        gameZone.removeActor(debugMenu);
-                }
-            });
-
-            debugMenu.addCheckBox("Ускорение движения", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    MovingSystem.speedup = ((CheckBox) actor).isChecked();
-                }
-            }, MovingSystem.speedup);
-
-            debugMenu.addCheckBox("Вечный бег", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    MovingSystem.alwaysRun = ((CheckBox) actor).isChecked();
-                }
-            }, MovingSystem.alwaysRun);
-
-            debugMenu.addCheckBox("Учитывать столкновения", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    MovingSystem.playerWalls = ((CheckBox) actor).isChecked();
-                }
-            }, MovingSystem.playerWalls);
-            debugMenu.addCheckBox("Отобразить стены игрока", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    MapLoggerSystem.showPlayerWalls = ((CheckBox) actor).isChecked();
-                }
-            }, MapLoggerSystem.showPlayerWalls);
-
-            debugMenu.addCheckBox("Показать границы UI элементов", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    userInterface.setDebug(((CheckBox) actor).isChecked(), true);
-                }
-            }, false);
-
-            debugMenu.addCheckBox("Отобразить карту ИИ", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    MapLoggerSystem.showTiles = ((CheckBox) actor).isChecked();
-                }
-            }, MapLoggerSystem.showTiles);
-            debugMenu.addCheckBox("Пути ИИ", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    MapLoggerSystem.showPaths = ((CheckBox) actor).isChecked();
-                }
-            }, MapLoggerSystem.showPaths);
-
-            debugMenu.addCheckBox("Показывать все сущности", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    RenderSystem.showAll = ((CheckBox) actor).isChecked();
-                }
-            }, RenderSystem.showAll);
-
-            debugMenu.addCheckBox("Логгер", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    Logger.visible = ((CheckBox) actor).isChecked();
-                }
-            }, Logger.visible);
-
-            debugMenu.addCheckBox("Фоновая музыка", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    if (((CheckBox) actor).isChecked())
-                        engine.getSystem(SoundsSystem.class).startBackgroundMusic();
-                    else
-                        engine.getSystem(SoundsSystem.class).stopMusic();
-                }
-            }, true);
-
-            uiFrame.getLeftHeaderTable().add(debugButton);
-            return debugButton;
-        }
-        return new Actor();
     }
 
 }

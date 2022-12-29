@@ -7,17 +7,16 @@ import com.badlogic.gdx.graphics.Texture;
 
 import net.artux.pda.map.di.core.MapComponent;
 import net.artux.pda.map.engine.components.ClickComponent;
+import net.artux.pda.map.engine.components.ConditionComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.QuestComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.StatusComponent;
 import net.artux.pda.map.engine.components.TransferComponent;
 import net.artux.pda.map.engine.systems.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.map.utils.PlatformInterface;
-import net.artux.pda.model.QuestUtil;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.Point;
 import net.artux.pda.model.quest.story.StoryDataModel;
@@ -27,28 +26,29 @@ public class QuestPointsHelper {
 
     public static void createQuestPointsEntities(MapComponent coreComponent) {
         Engine engine = coreComponent.getEngine();
-        AssetManager assetManager = coreComponent.getAssetsManager();
-        PlatformInterface platformInterface = coreComponent.getDataRepository().getPlatformInterface();
         GameMap map = coreComponent.getDataRepository().getGameMap();
         StoryDataModel dataModel = engine.getSystem(PlayerSystem.class).getPlayerComponent().gdxData;
         StoryStateModel storyStateModel = dataModel.getCurrentState();
 
-
         for (Point point : map.getPoints()) {
             if (point.getData().containsKey("static"))
-                engine.addEntity(addPoint(engine, assetManager, point, platformInterface, dataModel));
+                engine.addEntity(pointEntity(coreComponent, point));
             else if (point.getData().containsKey("chapter")) {
                 if ((Integer.parseInt(point.getData().get("chapter")) == storyStateModel.getChapterId()
                         || Integer.parseInt(point.getData().get("chapter")) == 0))
-                    engine.addEntity(addPoint(engine, assetManager, point, platformInterface, dataModel));
-            } else engine.addEntity(addPoint(engine, assetManager, point, platformInterface, dataModel));
+                    engine.addEntity(pointEntity(coreComponent, point));
+            } else engine.addEntity(pointEntity(coreComponent, point));
         }
     }
 
-    private static Entity addPoint(final Engine engine, AssetManager assetManager, final Point point, PlatformInterface platformInterface, StoryDataModel dataModel) {
-        Entity entity = new Entity();
-        entity.add(new StatusComponent(QuestUtil.check(point.getCondition(), dataModel)))
+    private static Entity pointEntity(MapComponent coreComponent, final Point point) {
+        Engine engine = coreComponent.getEngine();
+        AssetManager assetManager = coreComponent.getAssetsManager();
+        PlatformInterface platformInterface = coreComponent.getDataRepository().getPlatformInterface();
+
+        Entity entity = new Entity()
                 .add(new PositionComponent(Mappers.vector2(point.getPos())))
+                .add(new ConditionComponent(point.getCondition()))
                 .add(new InteractiveComponent(point.getName(), point.getType(), () -> platformInterface.send(point.getData())))
                 .add(new ClickComponent(23, () -> engine.getSystem(RenderSystem.class)
                         .showText("Метка: " + point.getName(), Mappers.vector2(point.getPos()))));

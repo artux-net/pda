@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
@@ -26,8 +27,8 @@ import javax.inject.Inject;
 public class InteractionSystem extends BaseSystem {
 
     private final UserInterface userInterface;
-    private SoundsSystem soundsSystem;
-    private CameraSystem cameraSystem;
+    private final SoundsSystem soundsSystem;
+    private final CameraSystem cameraSystem;
 
     @Inject
     public InteractionSystem(UserInterface userInterface, SoundsSystem soundsSystem, CameraSystem cameraSystem) {
@@ -46,12 +47,16 @@ public class InteractionSystem extends BaseSystem {
     private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
     private InteractiveComponent activeInteraction;
-    private Set<InteractiveComponent> interactiveComponents = new HashSet<>();
+    private final Set<InteractiveComponent> interactiveComponents = new HashSet<>();
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        mobs = engine.getEntitiesFor(Family.all(MoodComponent.class, PositionComponent.class).get());
+        mobs = engine.getEntitiesFor(
+                Family
+                        .all(MoodComponent.class, PositionComponent.class)
+                        .exclude(PassivityComponent.class)
+                        .get());
     }
 
     public InteractiveComponent getActiveInteraction() {
@@ -63,6 +68,7 @@ public class InteractionSystem extends BaseSystem {
         super.update(deltaTime);
         activeInteraction = null;
         interactiveComponents.clear();
+
         for (int i = 0; i < getEntities().size(); i++) {
             PositionComponent positionComponent = pm.get(getEntities().get(i));
             final InteractiveComponent interactiveComponent = im.get(getEntities().get(i));
@@ -135,7 +141,6 @@ public class InteractionSystem extends BaseSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-
     }
 
     public Collection<InteractiveComponent> getInteractiveComponents() {

@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.MoodComponent;
+import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VisionComponent;
 
@@ -34,7 +35,7 @@ public class VisionSystem extends BaseSystem implements Drawable {
 
     @Inject
     public VisionSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem) {
-        super(Family.all(VisionComponent.class, PositionComponent.class).get());
+        super(Family.all(VisionComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
         enemyTarget = new Sprite(assetManager.get("transfer.png", Texture.class));
         enemyTarget.setSize(16, 16);

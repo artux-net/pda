@@ -22,6 +22,8 @@ import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.utils.NetFile;
 import net.artux.pda.model.map.GameMap;
 
+import java.util.Timer;
+
 import javax.inject.Inject;
 
 public class PlayState extends State {
@@ -39,6 +41,7 @@ public class PlayState extends State {
     private final UserInterface userInterface;
     private final CoreComponent coreComponent;
     private final MapComponent mapComponent;
+    private final Timer timer;
     Texture background;
 
     @Inject
@@ -55,6 +58,7 @@ public class PlayState extends State {
                 .coreComponent(coreComponent)
                 .build();
 
+        timer = mapComponent.getTimer();
         engineManager = mapComponent.getManager();///n
         stage = mapComponent.gameStage();//n
         uistage = mapComponent.uiStage();//n
@@ -161,6 +165,8 @@ public class PlayState extends State {
         stage.dispose();
         uistage.dispose();
         engineManager.dispose();
+        timer.purge();
+        timer.cancel();
         if (userInterface != null)
             userInterface.dispose();
     }

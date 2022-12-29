@@ -3,6 +3,7 @@ package net.artux.pda.app;
 import android.app.Application;
 
 import net.artux.pda.R;
+import net.artux.pda.common.PropertyFields;
 import net.artux.pda.utils.URLHelper;
 
 import java.util.List;
@@ -46,5 +47,10 @@ public class PDAApplication extends Application {
 
     public Properties getProperties() {
         return properties;
+    }
+
+    public boolean isTesterMode(){
+        return properties.getProperty(PropertyFields.TESTER_MODE, "false")
+                .equals("true");
     }
 }

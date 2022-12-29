@@ -63,8 +63,6 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
                 playerComponent.gdxData = dataModel;
                 weaponComponent.updateData(dataModel);
-                //engine.getSystem(PlayerSystem.class).updateData(dataModel);
-                //engine.getSystem(PlayerSystem.class).savePreferences();
             }
         }
     };
@@ -83,8 +81,6 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
         EntityBuilder entityBuilder = mapComponent.getEntityBuilder();
         player = entityBuilder.player(Mappers.vector2(map.getDefPos()), gdxData, userModel);
-        System.out.println("Player created in engine: " + engine);
-        System.out.println("Player " + player);
         engine.addEntity(player);
 
         if (controlPoints)
@@ -96,6 +92,10 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
 //        RandomSpawnerHelper.init(coreComponent);
 
+        mapComponent.getConditionManager()
+                .update(gdxData);
+
+        dataRepository.addPropertyChangeListener(storyDataListener);
         stage.addListener(this);
         syncCameraPosition(stage);
         Gdx.app.log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");
@@ -133,8 +133,6 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     public Engine getEngine() {
         return engine;
     }
-
-
 
     public void updateOnlyPlayer() {
         pm.get(player).set(Mappers.vector2(dataRepository.getGameMap().getDefPos()));

@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.MessagingCodes;
+import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.BulletComponent;
 import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.GroupComponent;
@@ -54,26 +55,20 @@ public class EntityBuilder {
     }
 
     public Entity player(Vector2 position, StoryDataModel gdxData, UserModel userModel) {
-        Entity player = new Entity();
-
-        player.add(new PositionComponent(position))
+        return new Entity()
+                .add(new PositionComponent(position))
                 .add(new VelocityComponent())
                 .add(new VisionComponent())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
                 .add(new WeaponComponent(gdxData))
                 .add(new MoodComponent(userModel))
                 .add(new HealthComponent())
-
                 .add(new PlayerComponent(userModel, gdxData));
-        return player;
     }
 
     public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {
         PositionComponent position = pm.get(author);
         Vector2 targetPosition = pm.get(target);
-
-        Entity player = new Entity();
-
         targetPosition = getPointNear(targetPosition.cpy(), weaponModel.getPrecision());
 
         float targetX = targetPosition.x;
@@ -96,11 +91,11 @@ public class EntityBuilder {
         SpriteComponent spriteComponent = new SpriteComponent(bulletTexture, 15, 2);
         spriteComponent.setRotation(degrees + 90);
 
-        player.add(new PositionComponent(position))
+        return new Entity()
+                .add(new PositionComponent(position))
                 .add(new VelocityComponent(vX, vY, true))
                 .add(spriteComponent)
                 .add(new BulletComponent(author, target, targetPosition, weaponModel.getDamage()));
-        return player;
     }
 
     public Vector2 getPointNear(Vector2 basePosition, float precision) {
@@ -129,7 +124,8 @@ public class EntityBuilder {
         StatesComponent statesComponent = new StatesComponent(entity, group.getDispatcher(), StalkerState.INITIAL, StalkerState.GUARDING);
         group.getDispatcher().addListener(statesComponent, MessagingCodes.ATTACKED);
 
-        entity.add(new PositionComponent(position))
+        entity
+                .add(new PositionComponent(position))
                 .add(new GraphMotionComponent(null))
                 .add(new VelocityComponent())
                 .add(new VisionComponent())
