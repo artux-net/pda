@@ -32,11 +32,10 @@ public class MapLoggerSystem extends IteratingSystem implements Drawable, Dispos
 
     @Inject
     public MapLoggerSystem(MapOrientationSystem mapOrientationSystem) {
-        super(Family.all(GraphMotionComponent.class).get());
+        super(Family.all(GraphMotionComponent.class).get(), -100);
         sr = new ShapeRenderer();
         this.mapOrientationSystem = mapOrientationSystem;
     }
-
 
     @Override
     public void update(float deltaTime) {

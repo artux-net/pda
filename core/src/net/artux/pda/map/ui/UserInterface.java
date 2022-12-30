@@ -29,7 +29,6 @@ public class UserInterface extends Group implements Disposable {
 
     private final Group gameZone;
     private UIFrame uiFrame;
-    private BackpackMenu backpackMenu;
     private final Skin skin;
 
     private AssetManager assetManager;
@@ -57,9 +56,6 @@ public class UserInterface extends Group implements Disposable {
         stack.add(gameZone);
 
         addActor(stack);
-        backpackMenu = new BackpackMenu(this, assetManager.get("skins/cloud/cloud-form-ui.json"));
-        backpackMenu.setPosition(w / 4, h / 3);
-        backpackMenu.setSize(w / 2, h / 2);
 
         Gdx.app.log("UI", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
     }
@@ -70,13 +66,6 @@ public class UserInterface extends Group implements Disposable {
 
     public Label.LabelStyle getLabelStyle() {
         return new Label.LabelStyle(font, Color.WHITE);
-    }
-
-    public void switchBackpack() {
-        if (getChildren().indexOf(backpackMenu, false) == -1)
-            addActor(backpackMenu);
-        else
-            removeActor(backpackMenu);
     }
 
     @Override

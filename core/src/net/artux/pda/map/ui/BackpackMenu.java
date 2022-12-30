@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.systems.PlayerSystem;
+import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.ui.bars.Utils;
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.model.items.ItemModel;
@@ -40,9 +40,13 @@ public class BackpackMenu extends Table {
         content = new Table();
         content.defaults().align(Align.left);
         content.left();
+
         ScrollPane scrollPane = new ScrollPane(content, skin);
         scrollPane.setScrollingDisabled(true, false);
-        add(scrollPane).growX();
+
+        add(scrollPane)
+                .expand()
+                .fill();
 
         setBackground(Utils.getColoredDrawable(1, 1, Colors.backgroundColor));
     }

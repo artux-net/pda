@@ -21,6 +21,7 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
+import net.artux.pda.map.engine.systems.player.CameraSystem;
 
 import java.util.Random;
 import java.util.Timer;

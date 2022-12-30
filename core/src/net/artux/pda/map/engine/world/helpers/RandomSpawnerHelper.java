@@ -14,7 +14,7 @@ import net.artux.pda.map.engine.components.SpawnComponent;
 import net.artux.pda.map.engine.components.TransferComponent;
 import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.entities.EntityProcessorSystem;
-import net.artux.pda.map.engine.systems.CameraSystem;
+import net.artux.pda.map.engine.systems.player.CameraSystem;
 import net.artux.pda.map.engine.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.systems.SpawnSystem;
 import net.artux.pda.map.engine.systems.TimerSystem;

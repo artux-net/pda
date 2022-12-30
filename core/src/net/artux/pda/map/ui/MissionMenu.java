@@ -1,5 +1,7 @@
 package net.artux.pda.map.ui;
 
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -12,18 +14,15 @@ import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.systems.CameraSystem;
+import net.artux.pda.map.engine.components.PointComponent;
+import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.systems.player.CameraSystem;
+import net.artux.pda.map.engine.systems.player.MissionsSystem;
 import net.artux.pda.map.ui.bars.Utils;
 import net.artux.pda.map.utils.Colors;
-import net.artux.pda.map.utils.Mappers;
-import net.artux.pda.model.QuestUtil;
 import net.artux.pda.model.map.GameMap;
-import net.artux.pda.model.map.Point;
 import net.artux.pda.model.quest.CheckpointModel;
 import net.artux.pda.model.quest.MissionModel;
-import net.artux.pda.model.quest.story.ParameterModel;
-import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pda.model.quest.story.StoryStateModel;
 
 import javax.inject.Inject;
 
@@ -35,13 +34,17 @@ public class MissionMenu extends Table {
     private final VerticalGroup menuTable;
     private final Label.LabelStyle labelStyle;
     private final CameraSystem cameraSystem;
+    private final MissionsSystem missionsSystem;
+
+    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 
     @Inject
-    public MissionMenu(DataRepository dataRepository, CameraSystem cameraSystem, GameMap map, Label.LabelStyle labelStyle, Skin skin) {
+    public MissionMenu(DataRepository dataRepository, MissionsSystem missionsSystem, CameraSystem cameraSystem, GameMap map, Label.LabelStyle labelStyle, Skin skin) {
         super();
         this.map = map;
         this.labelStyle = labelStyle;
         this.cameraSystem = cameraSystem;
+        this.missionsSystem = missionsSystem;
         this.dataRepository = dataRepository;
 
         setFillParent(true);
@@ -73,8 +76,9 @@ public class MissionMenu extends Table {
         ScrollPane scrollPane = new ScrollPane(menuTable, skin);
         scrollPane.setClamp(false);
         scrollPane.setFadeScrollBars(false);
-        scrollPane.setScrollingDisabled(true, false);
+        scrollPane.setScrollingDisabled(false, false);
         scrollPane.setScrollbarsVisible(true);
+
         add(scrollPane)
                 .top()
                 .fill()
@@ -87,17 +91,14 @@ public class MissionMenu extends Table {
 
     void update(Type type) {
         menuTable.clear();
-        StoryDataModel storyDataModel = dataRepository.getStoryDataModel();
         if (type == Type.MISSIONS) {
-            String[] params = storyDataModel.getParameters().stream()
-                    .map(ParameterModel::getKey).toArray(String[]::new);
-            for (final MissionModel point : dataRepository.getStoryModel().getCurrentMissions(params)) {
+            for (final MissionModel point : missionsSystem.getMissions()) {
                 menuTable.addActor(getLabel("---------------------", labelStyle));
                 menuTable.addActor(getLabel("Задание: " + point.getTitle(), labelStyle));
                 boolean actualGone = false;
                 for (int i = 0; i < point.getCheckpoints().size(); i++) {
                     CheckpointModel check = point.getCheckpoints().get(i);
-                    if (check.isActual(params))
+                    if (check.isActual(missionsSystem.getParams()))
                         actualGone = true;
                     if (actualGone)
                         menuTable.addActor(getLabel("-> " + check.getTitle(), labelStyle));
@@ -107,43 +108,22 @@ public class MissionMenu extends Table {
                 menuTable.addActor(getLabel("---------------------", labelStyle));
             }
         } else {
-            StoryStateModel storyStateModel = storyDataModel.getCurrentState();
-            for (final Point point : map.getPoints()) {
-                if (point.getType() < 2 || point.getType() > 3)
-                    if (QuestUtil.check(point.getCondition(), storyDataModel)) {
-                        Label label = null;
-                        if (point.getData().containsKey("chapter")) {
-                            int chapterId = storyStateModel.getChapterId();
-                            if ((Integer.parseInt(point.getData().get("chapter")) == chapterId
-                                    || Integer.parseInt(point.getData().get("chapter")) == 0)) {
-                                label = getLabel(point.getName(), labelStyle);
-                                label.addListener(new ClickListener() {
-                                    @Override
-                                    public void clicked(InputEvent event, float x, float y) {
-                                        super.clicked(event, x, y);
-                                        Vector2 position = Mappers.vector2(point.getPos());
-                                        cameraSystem.setDetached(true);
-                                        cameraSystem.getCamera().position.x = position.x;
-                                        cameraSystem.getCamera().position.y = position.y;
-                                    }
-                                });
-                                menuTable.addActor(label);
-                            }
-                        } else {
-                            label = getLabel(point.getName(), labelStyle);
-                            label.addListener(new ClickListener() {
-                                @Override
-                                public void clicked(InputEvent event, float x, float y) {
-                                    super.clicked(event, x, y);
-                                    Vector2 position = Mappers.vector2(point.getPos());
-                                    cameraSystem.setDetached(true);
-                                    cameraSystem.getCamera().position.x = position.x;
-                                    cameraSystem.getCamera().position.y = position.y;
-                                }
-                            });
-                            menuTable.addActor(label);
-                        }
+            for (final Entity pointEntity : missionsSystem.getEntities()) {
+                PointComponent point = pm.
+                Label label = getLabel(point.getTitle(), labelStyle);
+                label.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        super.clicked(event, x, y);
+                        Vector2 position = point.getPosition();
+                        cameraSystem.setDetached(true);
+                        cameraSystem.getCamera().position.x = position.x;
+                        cameraSystem.getCamera().position.y = position.y;
+                        missionsSystem.setTargetEntity();
                     }
+                });
+
+                menuTable.addActor(label);
             }
         }
     }

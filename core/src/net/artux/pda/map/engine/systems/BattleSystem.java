@@ -16,6 +16,7 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
+import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.entities.EntityProcessorSystem;
 
 import javax.inject.Inject;
@@ -34,17 +35,11 @@ public class BattleSystem extends BaseSystem {
     private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
     private ComponentMapper<BulletComponent> bcm = ComponentMapper.getFor(BulletComponent.class);
 
-    private boolean playerShoot = false;
-
     @Inject
     public BattleSystem(EntityProcessorSystem entityProcessorSystem) {
         super(Family.all(HealthComponent.class, VisionComponent.class,
-                MoodComponent.class, PositionComponent.class, WeaponComponent.class).exclude(PassivityComponent.class).get());
+                MoodComponent.class, PositionComponent.class, WeaponComponent.class).exclude(PlayerComponent.class, PassivityComponent.class).get());
         this.entityProcessorSystem = entityProcessorSystem;
-    }
-
-    public void setPlayerShoot(boolean playerShoot) {
-        this.playerShoot = playerShoot;
     }
 
     @Override
@@ -56,19 +51,6 @@ public class BattleSystem extends BaseSystem {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        {
-            WeaponComponent entityWeapon = wm.get(getPlayer());
-            MoodComponent moodComponent = mm.get(getPlayer());
-            VisionComponent visionComponent = vm.get(getPlayer());
-
-            if (moodComponent.hasEnemy()) {
-                if (!mm.get(moodComponent.enemy).untarget)
-                    if (visionComponent.isSeeing(moodComponent.getEnemy()))
-                        if (playerShoot && entityWeapon.shoot())
-                            entityProcessorSystem.addBulletToEngine(getPlayer(), moodComponent.getEnemy(), entityWeapon.getSelected());
-            }
-        }
-
         for (Entity bullet : bullets) {
             BulletComponent bulletComponent = bcm.get(bullet);
             PositionComponent bulletPosition = pm.get(bullet);

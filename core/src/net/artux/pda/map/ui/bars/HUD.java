@@ -9,23 +9,31 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
 import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.systems.PlayerSystem;
+import net.artux.pda.map.engine.systems.player.MissionsSystem;
+import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.ui.UserInterface;
+
+import javax.inject.Inject;
 
 public class HUD extends Table {
 
+    private final PlayerSystem playerSystem;
     private Bar healthBar;
     private Bar staminaBar;
     private Bar radiationBar;
-    private PlayerSystem playerSystem;
+    private MissionsSystem missionsSystem;
     private Label distanceLabel;
+    private Image directionImage;
 
-    public HUD(AssetManager assetManager, PlayerSystem playerSystem, UserInterface userInterface) {
+    @Inject
+    public HUD(AssetManager assetManager, PlayerSystem playerSystem, MissionsSystem missionsSystem, UserInterface userInterface) {
         super();
         this.playerSystem = playerSystem;
+        this.missionsSystem = missionsSystem;
         top();
         left();
 
@@ -39,8 +47,8 @@ public class HUD extends Table {
         add(actor).size(iconSize);
         healthBar = new Bar(Color.RED);
         add(healthBar)
-                .fillX()
-                .expandX();
+                .growX()
+                .colspan(2);
 
         actor = new Image(assetManager.get("ui/bar/ic_stamina.png", Texture.class));
         actor.setScaling(Scaling.fill);
@@ -48,7 +56,8 @@ public class HUD extends Table {
         add(actor).size(iconSize);
         staminaBar = new Bar(Color.CYAN);
         add(staminaBar)
-                .growX();
+                .growX()
+                .colspan(2);
 
         row();
 
@@ -57,11 +66,25 @@ public class HUD extends Table {
         add(actor).size(iconSize);
         radiationBar = new Bar(Color.GREEN);
         add(radiationBar)
-                .growX();
+                .growX()
+                .colspan(2);
 
         distanceLabel = new Label("", userInterface.getLabelStyle());
         row();
-        add(distanceLabel).colspan(2).left();
+
+        add(distanceLabel)
+                .growX()
+                .left()
+                .colspan(2);
+
+        directionImage = new Image(assetManager.get("ui/direction.png", Texture.class));
+        directionImage.setScaling(Scaling.fit);
+        directionImage.setOrigin(Align.center);
+
+        add(directionImage)
+                .colspan(1)
+                .right()
+                .padRight(20);
     }
 
     @Override
@@ -73,11 +96,15 @@ public class HUD extends Table {
         staminaBar.updateValue(healthComponent.stamina);
         radiationBar.updateValue(healthComponent.radiation);
 
-        int dist = playerSystem.getDistance();
+        int dist = missionsSystem.getTargetDistance();
         if (dist > 5) {
             distanceLabel.setText(dist + " м.");
-        } else
+            directionImage.setVisible(true);
+            directionImage.setRotation((float) missionsSystem.getTargetAngle());
+        } else {
             distanceLabel.setText("");
+            directionImage.setVisible(false);
+        }
     }
 
 }

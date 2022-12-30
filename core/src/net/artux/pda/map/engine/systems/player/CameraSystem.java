@@ -1,4 +1,4 @@
-package net.artux.pda.map.engine.systems;
+package net.artux.pda.map.engine.systems.player;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
@@ -14,6 +14,7 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.GlobalData;
+import net.artux.pda.map.engine.systems.BaseSystem;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.map.GameMap;
 

@@ -10,10 +10,10 @@ import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.ConditionComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.QuestComponent;
+import net.artux.pda.map.engine.components.PointComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.TransferComponent;
-import net.artux.pda.map.engine.systems.PlayerSystem;
+import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.map.utils.PlatformInterface;
@@ -57,7 +57,7 @@ public class QuestPointsHelper {
         switch (point.getType()) {
             case 0:
             case 1:
-                entity.add(new QuestComponent());
+                entity.add(new PointComponent(point.getName(), point.getData()));
                 texture = assetManager.get("quest.png", Texture.class);
                 break;
             case 4:
@@ -67,10 +67,11 @@ public class QuestPointsHelper {
                 texture = assetManager.get("cache.png", Texture.class);
                 break;
             case 6:
-                entity.add(new QuestComponent());
+                entity.add(new PointComponent(point.getName(), point.getData()));
                 texture = assetManager.get("quest1.png", Texture.class);
                 break;
             case 7: {
+                entity.add(new PointComponent("Переход: " + point.getName(), point.getData()));
                 texture = assetManager.get("transfer.png", Texture.class);
                 entity.add(new TransferComponent());
             }

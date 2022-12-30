@@ -5,14 +5,16 @@ import com.badlogic.ashley.core.EntitySystem;
 import net.artux.pda.map.engine.entities.EntityProcessorSystem;
 import net.artux.pda.map.engine.systems.ArtifactSystem;
 import net.artux.pda.map.engine.systems.BattleSystem;
-import net.artux.pda.map.engine.systems.CameraSystem;
-import net.artux.pda.map.engine.systems.ClicksSystem;
+import net.artux.pda.map.engine.systems.player.CameraSystem;
+import net.artux.pda.map.engine.systems.player.ClicksSystem;
 import net.artux.pda.map.engine.systems.DeadCheckerSystem;
-import net.artux.pda.map.engine.systems.InteractionSystem;
+import net.artux.pda.map.engine.systems.player.InteractionSystem;
+import net.artux.pda.map.engine.systems.MapLoggerSystem;
 import net.artux.pda.map.engine.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.systems.MovementTargetingSystem;
 import net.artux.pda.map.engine.systems.MovingSystem;
-import net.artux.pda.map.engine.systems.PlayerSystem;
+import net.artux.pda.map.engine.systems.player.PlayerBattleSystem;
+import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.engine.systems.SpawnSystem;
@@ -34,7 +36,15 @@ public abstract class EngineSystemsModule {
 
     @IntoSet
     @Binds
+    public abstract EntitySystem playerBattleSystem(PlayerBattleSystem playerBattleSystem);
+
+    @IntoSet
+    @Binds
     public abstract EntitySystem mapOrientationSystem(MapOrientationSystem mapOrientationSystem);
+
+    @IntoSet
+    @Binds
+    public abstract EntitySystem mapLoggerSystem(MapLoggerSystem mapLoggerSystem);
 
     @IntoSet
     @Binds

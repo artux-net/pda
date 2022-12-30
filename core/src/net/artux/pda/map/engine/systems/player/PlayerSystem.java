@@ -1,4 +1,4 @@
-package net.artux.pda.map.engine.systems;
+package net.artux.pda.map.engine.systems.player;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
@@ -14,10 +14,12 @@ import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.QuestComponent;
+import net.artux.pda.map.engine.components.PointComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
+import net.artux.pda.map.engine.systems.BaseSystem;
+import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.model.items.MedicineModel;
 
 import javax.inject.Inject;
@@ -32,21 +34,18 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     private ComponentMapper<PlayerComponent> pmm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<VelocityComponent> vcm = ComponentMapper.getFor(VelocityComponent.class);
 
-    private final float pixelsPerMeter = 3f;
-    private InteractionSystem interactionSystem;
+    private final UserInterface userInterface;
 
     @Inject
-    public PlayerSystem(InteractionSystem interactionSystem) {
-        super(Family.all(PositionComponent.class, QuestComponent.class).exclude(PassivityComponent.class).get());
-        this.interactionSystem = interactionSystem;
+    public PlayerSystem(UserInterface userInterface) {
+        super(Family.all(PositionComponent.class, PointComponent.class).exclude(PassivityComponent.class).get());
+        this.userInterface = userInterface;
     }
 
     @Override
     public void removedFromEngine(Engine engine) {
         super.removedFromEngine(engine);
-
-        //todo this
-        interactionSystem.getUserInterface().getGameZone().setVisible(false);
+        userInterface.getGameZone().setVisible(false);
     }
 
     @Override
@@ -115,12 +114,6 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     public Vector2 getPosition() {
         PositionComponent playerPosition = pm.get(getPlayer());
         return playerPosition.getPosition();
-    }
-
-    public int getDistance() {
-        if (getEntities() != null && getEntities().size() > 0) {
-            return (int) (getPosition().dst(pm.get(getEntities().first()).getPosition()) / pixelsPerMeter);//TODO select target
-        } else return -1;
     }
 
     @Override

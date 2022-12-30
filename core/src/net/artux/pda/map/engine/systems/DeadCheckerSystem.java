@@ -22,6 +22,7 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.TimeComponent;
+import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.ui.UserInterface;
 
 import java.time.Instant;

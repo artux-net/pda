@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.systems.PlayerSystem;
+import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
 

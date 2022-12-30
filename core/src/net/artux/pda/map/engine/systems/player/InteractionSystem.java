@@ -1,4 +1,4 @@
-package net.artux.pda.map.engine.systems;
+package net.artux.pda.map.engine.systems.player;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
@@ -7,14 +7,16 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
+import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.RelationalSpriteComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.PlayerData;
+import net.artux.pda.map.engine.systems.BaseSystem;
+import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.ui.UserInterface;
 
 import java.util.Collection;

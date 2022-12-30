@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -75,14 +74,14 @@ public class HeaderInterfaceModule {
 
         Button.ButtonStyle occupationsButtonStyle = new Button.ButtonStyle();
         occupationsButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/burger.png", Texture.class));
-        Button menuButton = new Button(occupationsButtonStyle);
+        Button missionsButton = new Button(occupationsButtonStyle);
 
         Group missionsContainer = new Group();
         missionsContainer.setHeight(gameZone.getHeight());
         missionsContainer.setWidth(gameZone.getWidth()/4);
         missionsContainer.addActor(missionMenu);
 
-        menuButton.addListener(new ClickListener() {
+        missionsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
@@ -104,16 +103,15 @@ public class HeaderInterfaceModule {
             }
         }, 0, 2000);
 
-        uiFrame.getLeftHeaderTable().add(menuButton);
+        uiFrame.getLeftHeaderTable().add(missionsButton);
         uiFrame.getRightHeaderTable().add(pauseButton);
 
-        return menuButton;
+        return missionsButton;
     }
 
     @IntoSet
     @Provides
-    public Actor initDebugMode(@Named("gameZone") Group gameZone, @Named("assistantTable") Table assistantTable,
-                               Logger logger, UIFrame uiFrame, UserInterface userInterface,
+    public Actor initDebugMode(Logger logger, UIFrame uiFrame, UserInterface userInterface,
                                Skin skin, Label.LabelStyle labelStyle,
                                Engine engine, AssetManager assetManager, Properties properties) {
         if (properties.getProperty(PropertyFields.TESTER_MODE, "false").equals("true")) {

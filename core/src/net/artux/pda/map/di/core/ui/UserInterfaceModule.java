@@ -29,9 +29,10 @@ import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.data.PlayerData;
-import net.artux.pda.map.engine.systems.BattleSystem;
-import net.artux.pda.map.engine.systems.InteractionSystem;
-import net.artux.pda.map.engine.systems.PlayerSystem;
+import net.artux.pda.map.engine.systems.player.InteractionSystem;
+import net.artux.pda.map.engine.systems.player.PlayerBattleSystem;
+import net.artux.pda.map.engine.systems.player.PlayerSystem;
+import net.artux.pda.map.ui.BackpackMenu;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Slot;
@@ -97,17 +98,22 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initAssistant(@Named("assistantTable") Table assistantBlock, UserInterface userInterface, InteractionSystem interactionSystem, AssetManager assetManager) {
+    public Actor initAssistant(@Named("assistantTable") Table assistantBlock, BackpackMenu backpackMenu,
+                               UserInterface userInterface, InteractionSystem interactionSystem, AssetManager assetManager) {
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
         textButtonStyle.font = userInterface.getLabelStyle().font;
         textButtonStyle.fontColor = userInterface.getLabelStyle().fontColor;
         textButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot_wide.png", Texture.class));
         TextButton backpackSlot = new TextButton("Рюкзак", textButtonStyle);
+
         backpackSlot.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                userInterface.switchBackpack();
                 super.clicked(event, x, y);
+                if (userInterface.getStack().getChildren().contains(backpackMenu, false))
+                    userInterface.getStack().removeActor(backpackMenu);
+                else
+                    userInterface.getStack().add(backpackMenu);
             }
         });
 
@@ -184,8 +190,7 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initHud(@Named("hudTable") Table hudTable, UserInterface userInterface, PlayerSystem playerSystem, AssetManager assetManager) {
-        HUD hud = new HUD(assetManager, playerSystem, userInterface);
+    public Actor initHud(HUD hud, @Named("hudTable") Table hudTable, UserInterface userInterface, PlayerSystem playerSystem, AssetManager assetManager) {
         hudTable.add(hud);
 
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
@@ -231,7 +236,7 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initControlTable(@Named("controlTable") Table controlTable, PlayerSystem playerSystem, BattleSystem battleSystem,
+    public Actor initControlTable(@Named("controlTable") Table controlTable, PlayerSystem playerSystem, PlayerBattleSystem battleSystem,
                                   InteractionSystem interactionSystem, AssetManager assetManager) {
         controlTable.add(addInteractButton(assetManager, "", "ui/icons/icon_shoot.png", new ClickListener() {
             @Override
