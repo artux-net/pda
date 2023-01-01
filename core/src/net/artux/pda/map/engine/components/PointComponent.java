@@ -14,33 +14,30 @@ public class PointComponent implements Component {
     private final int stage;
     private final Vector2 position;
 
-    public PointComponent(Point point, String title, int chapter, int stage) {
-        this.title = title;
-        switch (point.getType()) {
-            case -1:
-            case 7:
-                this.type = Type.TRANSFER;
-                break;
-            default:
-                this.type = Type.DIALOG;
-                break;
-        }
-        this.chapter = chapter;
-        this.stage = stage;
-        position = Mappers.vector2(point.getPos());
-    }
-
     public PointComponent(Point point) {
         this.title = point.getName();
         switch (point.getType()) {
-            case -1:
+            case 0:
+            case 1:
+                type = Type.QUEST;
+                break;
+            case 4:
+                type = Type.SELLER;
+                break;
+            case 5:
+                type = Type.CACHE;
+                break;
+            case 6:
+                type = Type.ADDITIONAL_QUEST;
+                break;
             case 7:
-                this.type = Type.TRANSFER;
+                type = Type.TRANSFER;
                 break;
             default:
-                this.type = Type.DIALOG;
+                type = Type.HIDDEN;
                 break;
         }
+
         this.chapter = Integer.parseInt(point.getData().get("chapter"));
         this.stage = Integer.parseInt(point.getData().get("stage"));
         position = Mappers.vector2(point.getPos());
@@ -71,8 +68,12 @@ public class PointComponent implements Component {
         return 31 * chapter * stage;
     }
 
-    enum Type {
-        DIALOG,
+    public enum Type {
+        HIDDEN,
+        QUEST,
+        SELLER,
+        CACHE,
+        ADDITIONAL_QUEST,
         TRANSFER
     }
 }

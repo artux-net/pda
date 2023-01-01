@@ -1,7 +1,6 @@
 package net.artux.pda.map.engine.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.math.Vector2;
@@ -33,14 +32,9 @@ public class MovingSystem extends BaseSystem {
     public static boolean alwaysRun = false;
 
     @Inject
-    public MovingSystem() {
+    public MovingSystem(MapOrientationSystem mapOrientationSystem) {
         super(Family.all(VelocityComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
-    }
-
-    @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-        mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
+        this.mapOrientationSystem = mapOrientationSystem;
     }
 
     @Override

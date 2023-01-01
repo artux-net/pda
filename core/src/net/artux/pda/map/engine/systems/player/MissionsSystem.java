@@ -33,13 +33,16 @@ public class MissionsSystem extends BaseSystem implements Disposable {
 
     private final float pixelsPerMeter = 3f;
     private final DataRepository dataRepository;
+    private final CameraSystem cameraSystem;
+
     private MissionModel activeMission;
-    private Entity targetEntity;
+    private Vector2 targetPosition;
 
     @Inject
-    public MissionsSystem(DataRepository dataRepository) {
+    public MissionsSystem(DataRepository dataRepository, CameraSystem cameraSystem) {
         super(Family.all(PositionComponent.class, PointComponent.class).exclude(PassivityComponent.class).get());
         this.dataRepository = dataRepository;
+        this.cameraSystem = cameraSystem;
     }
 
     @Override
@@ -66,31 +69,35 @@ public class MissionsSystem extends BaseSystem implements Disposable {
         return points;
     }
 
-    public void setActiveMission(String id) {
+    public void setActiveMissionByName(String name) {
         List<MissionModel> missionModels = getMissions();
         for (MissionModel m : missionModels) {
-            if (m.getName().equals(id)) {
-                activeMission = m;
+            if (m.getName().equals(name)) {
+                setActiveMission(activeMission);
             }
         }
         if (activeMission == null && getEntities().size() > 0) {
             if (missionModels.size() > 0)
-                activeMission = missionModels.get(0);
+                setActiveMission(missionModels.get(0));
             else
-                targetEntity = getEntities().get(0);
+                setTargetPosition(pm.get(getEntities().first()));
         }
+    }
+
+    public void setActiveMission(MissionModel activeMission) {
+        this.activeMission = activeMission;
+
         if (activeMission != null) {
             CheckpointModel currentCheckpoint = activeMission.getCurrentCheckpoint(getParams());
             int chapter = currentCheckpoint.getChapter();
             int stage = currentCheckpoint.getChapter();
             for (Entity entity : getEntities()) {
                 if (qcm.get(entity).hashCode() == 31 * chapter * stage) {
-                    setTargetEntity(entity); //TODO count transfers and other maps
+                    setTargetPosition(pm.get(entity)); //TODO count transfers and other maps
                 }
             }
         }
     }
-
 
     @Override
     public void update(float deltaTime) {
@@ -108,8 +115,7 @@ public class MissionsSystem extends BaseSystem implements Disposable {
     }
 
     public int getTargetDistance() {
-        if (targetEntity != null) {
-            Vector2 targetPosition = pm.get(targetEntity);
+        if (targetPosition != null) {
             if (!targetPosition.isZero()) {
                 return (int) (getPosition().dst(targetPosition) / pixelsPerMeter);
             }
@@ -118,8 +124,7 @@ public class MissionsSystem extends BaseSystem implements Disposable {
     }
 
     public double getTargetAngle() {
-        if (targetEntity != null) {
-            Vector2 targetPosition = pm.get(targetEntity);
+        if (targetPosition != null) {
             if (!targetPosition.isZero()) {
                 Vector2 pos = getPosition();
                 return Math.atan2(
@@ -131,8 +136,13 @@ public class MissionsSystem extends BaseSystem implements Disposable {
         return 0;
     }
 
-    private void setTargetEntity(Entity entity) {
-        targetEntity = entity;
+    public void setTargetPosition(Vector2 position) {
+        targetPosition = position;
+
+        cameraSystem.setDetached(true);
+        cameraSystem.getCamera().position.x = position.x;
+        cameraSystem.getCamera().position.y = position.y;
+
     }
 
     @Override
@@ -154,7 +164,7 @@ public class MissionsSystem extends BaseSystem implements Disposable {
             Preferences preferences = Gdx.app.getPreferences("missions");
 
             String name = preferences.getString("active");
-            setActiveMission(name);
+            setActiveMissionByName(name);
         }
     }
 

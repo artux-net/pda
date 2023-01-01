@@ -23,5 +23,4 @@ public class MissionModel implements Serializable {
         return null;
     }
 
-
 }

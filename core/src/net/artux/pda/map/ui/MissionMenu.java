@@ -2,26 +2,29 @@ package net.artux.pda.map.ui;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 
-import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.PointComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.systems.player.CameraSystem;
 import net.artux.pda.map.engine.systems.player.MissionsSystem;
+import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
 import net.artux.pda.map.ui.bars.Utils;
+import net.artux.pda.map.ui.blocks.ImageTextButton;
+import net.artux.pda.map.ui.blocks.MissionBlock;
 import net.artux.pda.map.utils.Colors;
-import net.artux.pda.model.map.GameMap;
-import net.artux.pda.model.quest.CheckpointModel;
 import net.artux.pda.model.quest.MissionModel;
 
 import javax.inject.Inject;
@@ -29,26 +32,27 @@ import javax.inject.Inject;
 @PerGameMap
 public class MissionMenu extends Table {
 
-    private final DataRepository dataRepository;
-    private final GameMap map;
     private final VerticalGroup menuTable;
     private final Label.LabelStyle labelStyle;
-    private final CameraSystem cameraSystem;
     private final MissionsSystem missionsSystem;
+    private final AssetsFinder assetsFinder;
+    private final AssetManager assetManager;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<PointComponent> pcm = ComponentMapper.getFor(PointComponent.class);
 
     @Inject
-    public MissionMenu(DataRepository dataRepository, MissionsSystem missionsSystem, CameraSystem cameraSystem, GameMap map, Label.LabelStyle labelStyle, Skin skin) {
-        super();
-        this.map = map;
-        this.labelStyle = labelStyle;
-        this.cameraSystem = cameraSystem;
+    public MissionMenu(MissionsSystem missionsSystem, AssetsFinder assetsFinder,
+                       Skin skin) {
+        super(skin);
+        this.labelStyle = assetsFinder.getFontManager().getLabelStyle(38, Color.WHITE);
         this.missionsSystem = missionsSystem;
-        this.dataRepository = dataRepository;
+        this.assetsFinder = assetsFinder;
+        this.assetManager = assetsFinder.getManager();
 
         setFillParent(true);
         top();
+        defaults().pad(10f);
 
         Label text = new Label("Задания", labelStyle);
         add(text).uniform();
@@ -92,47 +96,40 @@ public class MissionMenu extends Table {
     void update(Type type) {
         menuTable.clear();
         if (type == Type.MISSIONS) {
-            for (final MissionModel point : missionsSystem.getMissions()) {
-                menuTable.addActor(getLabel("---------------------", labelStyle));
-                menuTable.addActor(getLabel("Задание: " + point.getTitle(), labelStyle));
-                boolean actualGone = false;
-                for (int i = 0; i < point.getCheckpoints().size(); i++) {
-                    CheckpointModel check = point.getCheckpoints().get(i);
-                    if (check.isActual(missionsSystem.getParams()))
-                        actualGone = true;
-                    if (actualGone)
-                        menuTable.addActor(getLabel("-> " + check.getTitle(), labelStyle));
-                    else
-                        menuTable.addActor(getLabel("X " + check.getTitle(), labelStyle));
-                }
-                menuTable.addActor(getLabel("---------------------", labelStyle));
-            }
-        } else {
-            for (final Entity pointEntity : missionsSystem.getEntities()) {
-                PointComponent point = pm.
-                Label label = getLabel(point.getTitle(), labelStyle);
-                label.addListener(new ClickListener() {
+            String[] params = missionsSystem.getParams();
+            for (final MissionModel missionModel : missionsSystem.getMissions()) {
+                MissionBlock missionBlock = new MissionBlock(getSkin(), missionModel, assetsFinder, params);
+                menuTable.addActor(missionBlock);
+                missionBlock.addListener(new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         super.clicked(event, x, y);
-                        Vector2 position = point.getPosition();
-                        cameraSystem.setDetached(true);
-                        cameraSystem.getCamera().position.x = position.x;
-                        cameraSystem.getCamera().position.y = position.y;
-                        missionsSystem.setTargetEntity();
+                        missionsSystem.setActiveMissionByName(missionModel.getName());
                     }
                 });
+            }
+        } else {
+            for (final Entity pointEntity : missionsSystem.getEntities()) {
+                PositionComponent position = pm.get(pointEntity);
+                PointComponent point = pcm.get(pointEntity);
 
-                menuTable.addActor(label);
+                Texture texture = QuestPointsHelper.getPointTexture(assetManager, point.getType());
+                if (texture != null) {
+                    Image pointIcon = new Image(texture);
+                    pointIcon.setScaling(Scaling.fit);
+
+                    ImageTextButton textButton = new ImageTextButton(pointIcon, point.getTitle(), labelStyle);
+                    textButton.addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            super.clicked(event, x, y);
+                            missionsSystem.setTargetPosition(position);
+                        }
+                    });
+                    menuTable.addActor(textButton);
+                }
             }
         }
-    }
-
-    private Label getLabel(String title, Label.LabelStyle labelStyle) {
-        Label label = new Label(title, labelStyle);
-        label.setAlignment(Align.left);
-        label.setWrap(true);
-        return label;
     }
 
     enum Type {

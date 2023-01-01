@@ -1,9 +1,11 @@
 package net.artux.pda.map.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Disposable;
 
 import java.util.HashMap;
@@ -24,6 +26,10 @@ public class FontManager implements Disposable {
     private static final String SYMBOLS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;:,{}\"´`'<>";
 
     private final HashMap<String, BitmapFont> fontHashMap = new HashMap<>();
+
+    public Label.LabelStyle getLabelStyle(int size, Color color){
+        return new Label.LabelStyle(getFont(size), color);
+    }
 
     public BitmapFont getFont(int size) {
         return getFont(IMPERIAL_FONT, size);
