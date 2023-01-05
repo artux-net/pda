@@ -9,12 +9,14 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Scaling;
 
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.DataRepository;
@@ -29,11 +31,11 @@ import net.artux.pda.map.ui.UIFrame;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.model.map.GameMap;
 
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -48,7 +50,8 @@ import dagger.multibindings.IntoSet;
 @Module(includes = RootInterfaceModule.class)
 public class HeaderInterfaceModule {
 
-    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm", Locale.US);
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+            .withZone(ZoneId.systemDefault());
 
     @IntoSet
     @Provides
@@ -72,9 +75,10 @@ public class HeaderInterfaceModule {
             }
         });
 
-        Button.ButtonStyle occupationsButtonStyle = new Button.ButtonStyle();
+        ImageButton.ImageButtonStyle occupationsButtonStyle = new ImageButton.ImageButtonStyle();
         occupationsButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/burger.png", Texture.class));
-        Button missionsButton = new Button(occupationsButtonStyle);
+        ImageButton missionsButton = new ImageButton(occupationsButtonStyle);
+        missionsButton.getImage().setScaling(Scaling.fit);
 
         Group missionsContainer = new Group();
         missionsContainer.setHeight(gameZone.getHeight());
@@ -89,29 +93,38 @@ public class HeaderInterfaceModule {
                     gameZone.addActor(missionsContainer);
                 else
                     gameZone.removeActor(missionsContainer);
+                missionMenu.update(MissionMenu.Type.MISSIONS);
             }
         });
 
         Label timeLabel = new Label("00:00", labelStyle);
-        uiFrame.getLeftHeaderTable().add(timeLabel);
-        uiFrame.getLeftHeaderTable().add(new Label(map.getTitle(), labelStyle));
+        uiFrame.getLeftHeaderTable()
+                .add(timeLabel)
+                .padLeft(20);
+
+        uiFrame.getLeftHeaderTable()
+                .add(new Label(map.getTitle(), labelStyle))
+                .padRight(20);
 
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                timeLabel.setText(simpleDateFormat.format(new Date())); // TODO eat memory every time
+                timeLabel.setText(timeFormatter.format(Instant.now()));
             }
         }, 0, 2000);
 
-        uiFrame.getLeftHeaderTable().add(missionsButton);
-        uiFrame.getRightHeaderTable().add(pauseButton);
+        uiFrame.getLeftHeaderTable().add(missionsButton)
+                .width(uiFrame.getLeftHeaderTable().getHeight())
+                .uniform();
+
+        uiFrame.getRightHeaderTable().add(pauseButton).uniform();
 
         return missionsButton;
     }
 
     @IntoSet
     @Provides
-    public Actor initDebugMode(Logger logger, UIFrame uiFrame, UserInterface userInterface,
+    public Actor initDebugMode(SoundsSystem soundsSystem, Logger logger, UIFrame uiFrame, UserInterface userInterface,
                                Skin skin, Label.LabelStyle labelStyle,
                                Engine engine, AssetManager assetManager, Properties properties) {
         if (properties.getProperty(PropertyFields.TESTER_MODE, "false").equals("true")) {
@@ -143,6 +156,13 @@ public class HeaderInterfaceModule {
                     MovingSystem.speedup = ((CheckBox) actor).isChecked();
                 }
             }, MovingSystem.speedup);
+
+            debugMenu.addCheckBox("Вертикальная синхронизация", new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    Gdx.graphics.setVSync(((CheckBox) actor).isChecked());
+                }
+            }, true);
 
             debugMenu.addCheckBox("Вечный бег", new ChangeListener() {
                 @Override
@@ -198,13 +218,10 @@ public class HeaderInterfaceModule {
                 }
             }, Logger.visible);
 
-            debugMenu.addCheckBox("Фоновая музыка", new ChangeListener() {
+            debugMenu.addCheckBox("Звуки и музыка", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    if (((CheckBox) actor).isChecked())
-                        engine.getSystem(SoundsSystem.class).startBackgroundMusic();
-                    else
-                        engine.getSystem(SoundsSystem.class).stopMusic();
+                    soundsSystem.changeState(((CheckBox) actor).isChecked());
                 }
             }, true);
 

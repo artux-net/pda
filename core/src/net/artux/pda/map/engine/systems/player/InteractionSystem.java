@@ -48,7 +48,6 @@ public class InteractionSystem extends BaseSystem {
     private ComponentMapper<RelationalSpriteComponent> rsm = ComponentMapper.getFor(RelationalSpriteComponent.class);
     private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
-    private InteractiveComponent activeInteraction;
     private final Set<InteractiveComponent> interactiveComponents = new HashSet<>();
 
     @Override
@@ -61,14 +60,10 @@ public class InteractionSystem extends BaseSystem {
                         .get());
     }
 
-    public InteractiveComponent getActiveInteraction() {
-        return activeInteraction;
-    }
 
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        activeInteraction = null;
         interactiveComponents.clear();
 
         for (int i = 0; i < getEntities().size(); i++) {
@@ -77,31 +72,15 @@ public class InteractionSystem extends BaseSystem {
 
             PositionComponent playerPosition = pm.get(getPlayer());
 
-            String name = "q-" + interactiveComponent.type;
             if (playerPosition.getPosition().dst(positionComponent.getPosition()) < 35f) {
                 if (interactiveComponent.type != InteractiveComponent.Type.ACTION) {
-                    activeInteraction = interactiveComponent;
                     interactiveComponents.add(interactiveComponent);
-                    /*if (Arrays.stream(stage.getActors().items)
-                            .filter(actor -> actor.getName().equals(name)).findFirst()
-                            .orElse(null) == null) {
-                        final Label text = new Label(interactiveComponent.title, userInterface.getLabelStyle());
-                        text.setPosition(positionComponent.getX(), positionComponent.getY());
-                        text.setName(name);
-                        stage.addActor(text);
-                    }*/
                 } else {
-                    System.out.println("Activated by player " + getPlayer());
-                    System.out.println("In system " + this);
                     setProcessing(false);
                     interactiveComponent.interact();
                 }
             }
         }
-
-        //todo
-        /*removeActorsFromStage(stage);
-        removeActor(userInterface.getControlBlock());*/
 
         int counter = 0;
         for (int i = 0; i < mobs.size(); i++) {
@@ -148,26 +127,6 @@ public class InteractionSystem extends BaseSystem {
     public Collection<InteractiveComponent> getInteractiveComponents() {
         return interactiveComponents;
     }
-
-    /* private void removeActor(Table container) {
-        for (Actor actor : container.getChildren()) {
-            if (actor.getName() != null && !activeActions.contains(actor.getName()) && actor.getName().contains("q-")) {
-                Cell<Actor> cell = container.getCell(actor);
-                actor.remove();
-                // remove cell from table
-                container.getCells().removeValue(cell, true);
-                container.invalidate();
-            }
-        }
-    }
-
-    private void removeActorsFromStage(Stage stage) {
-        for (Actor actor : stage.getActors()) {
-            if (actor.getName() != null && actor.getName().contains("q-") && !activeActions.contains(actor.getName())) {
-                actor.remove();
-            }
-        }
-    }*/
 
     public UserInterface getUserInterface() {
         return userInterface;

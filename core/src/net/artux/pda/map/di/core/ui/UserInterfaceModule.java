@@ -14,12 +14,13 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.HealthComponent;
@@ -54,7 +55,6 @@ import dagger.multibindings.IntoSet;
 @Module(includes = HeaderInterfaceModule.class)
 public class UserInterfaceModule {
 
-
     @IntoSet
     @Provides
     public Actor initJoyTable(@Named("joyTable") Table joyTable, @Named("gameZone") Group gameZone, AssetsFinder assetsFinder, PlayerSystem playerSystem) {
@@ -69,7 +69,7 @@ public class UserInterfaceModule {
         touchpad.setPosition(0, 0);
         touchpad.setBounds(50, 50, gameZone.getHeight() / 2.5f, gameZone.getHeight() / 2.5f);
         touchpad.addListener(new ChangeListener() {
-            private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
+            private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -98,33 +98,12 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initAssistant(@Named("assistantTable") Table assistantBlock, BackpackMenu backpackMenu,
-                               UserInterface userInterface, InteractionSystem interactionSystem, AssetManager assetManager) {
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.font = userInterface.getLabelStyle().font;
-        textButtonStyle.fontColor = userInterface.getLabelStyle().fontColor;
-        textButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot_wide.png", Texture.class));
-        TextButton backpackSlot = new TextButton("Рюкзак", textButtonStyle);
-
-        backpackSlot.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                if (userInterface.getStack().getChildren().contains(backpackMenu, false))
-                    userInterface.getStack().removeActor(backpackMenu);
-                else
-                    userInterface.getStack().add(backpackMenu);
-            }
-        });
-
+    public Actor initAssistant(@Named("assistantTable") Table assistantBlock,
+                               InteractionSystem interactionSystem, AssetManager assetManager) {
         Table actionsTable = new Table();
+        actionsTable.defaults().pad(10).space(20);
         assistantBlock.add(actionsTable);
         actionsTable.add();
-
-        assistantBlock
-                .add(backpackSlot)
-                .width(200);
-
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
         assistantBlock.addAction(new Action() {
@@ -132,8 +111,9 @@ public class UserInterfaceModule {
             @Override
             public boolean act(float delta) {
                 Collection<InteractiveComponent> components = interactionSystem.getInteractiveComponents();
+                removeActors(actionsTable, components.stream().map(InteractiveComponent::getTitle).collect(Collectors.toList()));
                 for (InteractiveComponent component : components) {
-                    if (assistantBlock.findActor(component.title) == null) {
+                    if (actionsTable.findActor(component.title) == null) {
                         String icon;
                         switch (component.type) {
                             case FINDING:
@@ -147,10 +127,11 @@ public class UserInterfaceModule {
                                 break;
                         }
 
-                        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-                        style.up = new TextureRegionDrawable(assetManager.get("ui/buttonBack.png", Texture.class));
                         TextureRegion textureRegion = new TextureRegion(assetManager.get(icon, Texture.class));
                         float pad = textureRegion.getRegionHeight() * 0.15f;
+
+                        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+                        style.up = new TextureRegionDrawable(assetManager.get("ui/buttonBack.png", Texture.class));
                         style.imageUp = new TextureRegionDrawable(textureRegion);
 
                         ImageButton button = new ImageButton(style);
@@ -163,22 +144,32 @@ public class UserInterfaceModule {
                                 component.listener.interact();
                             }
                         });
-                        assistantBlock.add(button);
+
+                        actionsTable
+                                .add(button)
+                                .pad(10);
                     }
                 }
-                removeActors(assistantBlock, components.stream().map(InteractiveComponent::getTitle).collect(Collectors.toList()));
+                actionsTable.pack();
                 return false;
             }
 
+            final Array<Cell<Actor>> cellsToRemove = new Array<>();
+
+            @SuppressWarnings("unchecked cast")
             private void removeActors(Table container, Collection<String> activeActions) {
-                for (Actor actor : container.getChildren()) {
-                    if (actor.getName() != null && !activeActions.contains(actor.getName())) {
-                        Cell<Actor> cell = container.getCell(actor);
+                for (Cell<Actor> cell : container.getCells()) {
+                    Actor actor = cell.getActor();
+                    if (actor != null
+                            && actor.getName() != null
+                            && !activeActions.contains(actor.getName())) {
                         actor.remove();
-                        // remove cell from table
-                        container.getCells().removeValue(cell, true);
-                        container.invalidate();
+                        cellsToRemove.add(cell);
                     }
+                }
+                if (cellsToRemove.size > 0) {
+                    if (container.getCells().removeAll(cellsToRemove, true))
+                        cellsToRemove.clear();
                 }
             }
 
@@ -190,18 +181,25 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initHud(HUD hud, @Named("hudTable") Table hudTable, UserInterface userInterface, PlayerSystem playerSystem, AssetManager assetManager) {
+    public Actor initHud(BackpackMenu backpackMenu, HUD hud, Slot weaponSlot, @Named("hudTable") Table hudTable,
+                         UserInterface userInterface, PlayerSystem playerSystem) {
         hudTable.add(hud);
+        hud.addListener(new ActorGestureListener() {
+            @Override
+            public void tap(InputEvent event, float x, float y, int count, int button) {
+                super.tap(event, x, y, count, button);
+                if (userInterface.getStack().getChildren().contains(backpackMenu, false))
+                    userInterface.getStack().removeActor(backpackMenu);
+                else {
+                    userInterface.getStack().add(backpackMenu);
+                    backpackMenu.update();
+                }
+            }
+        });
 
-        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.font = userInterface.getLabelStyle().font;
-        style.fontColor = userInterface.getLabelStyle().fontColor;
-        style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
-
-        Slot weaponSlot = new Slot(userInterface, style);
         weaponSlot.pad(20);
         weaponSlot.addAction(new Action() {
-            private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
+            private final ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
             @Override
             public boolean act(float delta) {
@@ -218,12 +216,12 @@ public class UserInterfaceModule {
                 return false;
             }
         });
-        weaponSlot.getCell(weaponSlot.getSecondLabel()).align(Align.left);
-        weaponSlot.addListener(new ClickListener() {
-            private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
+        weaponSlot.addListener(new ActorGestureListener() {
+            private final ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
             @Override
-            public void clicked(InputEvent event, float x, float y) {
+            public void tap(InputEvent event, float x, float y, int count, int button) {
+                super.tap(event, x, y, count, button);
                 Entity entity = playerSystem.getPlayer();
                 WeaponComponent entityWeapon = wm.get(entity);
                 entityWeapon.switchWeapons();
@@ -236,9 +234,9 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initControlTable(@Named("controlTable") Table controlTable, PlayerSystem playerSystem, PlayerBattleSystem battleSystem,
-                                  InteractionSystem interactionSystem, AssetManager assetManager) {
-        controlTable.add(addInteractButton(assetManager, "", "ui/icons/icon_shoot.png", new ClickListener() {
+    public Actor initControlTable(@Named("controlTable") Table controlTable, PlayerSystem playerSystem,
+                                  PlayerBattleSystem battleSystem, AssetManager assetManager) {
+        controlTable.add(addInteractButton(assetManager, "ui/icons/icon_shoot.png", new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 battleSystem.setPlayerShoot(true);
@@ -254,57 +252,12 @@ public class UserInterfaceModule {
 
 
         controlTable.row();
-        controlTable.addAction(new Action() {
-            InteractiveComponent activeComponent;
-            Actor lastActor;
-
-            @Override
-            public boolean act(float delta) {
-                InteractiveComponent interactiveComponent = interactionSystem.getActiveInteraction();
-                if (interactiveComponent == null) {
-                    activeComponent = null;
-                    controlTable.removeActor(lastActor);
-                } else if (lastActor == null) {
-                    controlTable.row();
-
-                    String icon;
-                    switch (interactiveComponent.type) {
-
-                        case FINDING:
-                            icon = "ui/icons/icon_search.png";
-                            break;
-                        case TRANSFER:
-                            icon = "ui/icons/ic_transfer.png";
-                            break;
-                        default:
-                            icon = "ui/icons/icon_dialog.png";
-                            break;
-                    }
-
-                    lastActor = addInteractButton(assetManager, "", icon, new ChangeListener() {
-                        @Override
-                        public void changed(ChangeEvent event, Actor actor) {
-                            interactiveComponent.listener.interact();
-                            Cell<Actor> cell = controlTable.getCell(actor);
-                            actor.remove();
-                            controlTable.getCells().removeValue(cell, true);
-                            controlTable.invalidate();
-                        }
-                    });
-                }
-                return true;
-            }
-        });
-
-
-        controlTable.row();
-        controlTable.add(addInteractButton(assetManager, "", "ui/icons/icon_run.png", new ClickListener() {
-            private ComponentMapper<VelocityComponent> vcm = ComponentMapper.getFor(VelocityComponent.class);
-            private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
+        controlTable.add(addInteractButton(assetManager, "ui/icons/icon_run.png", new ClickListener() {
+            private final ComponentMapper<VelocityComponent> vcm = ComponentMapper.getFor(VelocityComponent.class);
+            private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-
                 vcm.get(playerSystem.getPlayer()).running = false;
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -319,9 +272,9 @@ public class UserInterfaceModule {
         }));
 
         controlTable.row();
-        controlTable.add(addInteractButton(assetManager, "", "ui/icons/icon_target.png", new ChangeListener() {
-            private ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
-            private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+        controlTable.add(addInteractButton(assetManager, "ui/icons/icon_target.png", new ChangeListener() {
+            private final ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
+            private final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -348,7 +301,7 @@ public class UserInterfaceModule {
         return controlTable;
     }
 
-    private ImageButton addInteractButton(AssetManager assetManager, String id, String iconPath, EventListener listener) {
+    private ImageButton addInteractButton(AssetManager assetManager, String iconPath, EventListener listener) {
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.up = new TextureRegionDrawable(assetManager.get("ui/buttonBack.png", Texture.class));
         TextureRegion textureRegion = new TextureRegion(assetManager.get(iconPath, Texture.class));
@@ -357,7 +310,6 @@ public class UserInterfaceModule {
 
         ImageButton button = new ImageButton(style);
         button.pad(pad);
-        button.setName(id);
         button.addListener(listener);
         return button;
     }

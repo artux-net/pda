@@ -11,6 +11,7 @@ import net.artux.pda.model.map.GameMap;
 
 import java.util.Properties;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Component;
@@ -34,5 +35,8 @@ public interface CoreComponent {
     GameMap getGameMap();
 
     Properties getProperties();
+
+    @Named("testerMode")
+    Boolean isTesterMode();
 
 }

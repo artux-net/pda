@@ -77,28 +77,7 @@ class QuestRepository @Inject constructor(
         return Result.failure(Exception("Chapter not found in cached story"))
     }
 
-    suspend fun pullStory(storyId: Int): Result<Story> {
-        return suspendCoroutine {
-            defaultApi.getStory(storyId.toLong())
-                .enqueue(object : Callback<Story> {
-                    override fun onResponse(call: Call<Story>, response: Response<Story>) {
-                        val data = response.body()
-                        if (data != null) {
-                            questCache.put(("$storyId").toString(), data)
-                            it.resume(Result.success(data))
-                        } else
-                            it.resume(Result.failure(Exception("Chapter null: $response")))
-                    }
-
-                    override fun onFailure(call: Call<Story>, t: Throwable) {
-                        t.printStackTrace()
-                        it.resume(Result.failure(java.lang.Exception(t)))
-                    }
-                })
-        }
-    }
-
-    suspend fun getStory(storyId: Int): Result<Story> {
+    private suspend fun getStory(storyId: Int): Result<Story> {
         return suspendCoroutine {
             val story = questCache.get(storyId.toString())
             if (story != null)
@@ -128,7 +107,7 @@ class QuestRepository @Inject constructor(
         val story = getStory(storyId)
         story.onSuccess {
             val map = it.maps[mapId.toString()]
-            if (map!=null)
+            if (map != null)
                 return Result.success(map)
             return Result.failure(Exception("Map not found!"))
         }

@@ -44,7 +44,6 @@ class QuestViewModel @javax.inject.Inject constructor(
     var summaryMessages: LinkedList<UserMessage> = LinkedList()
     var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
 
-
     var actionsMap: LinkedHashMap<String, MutableList<String>> = LinkedHashMap()
 
     var currentStoryId: Int = -1
@@ -142,20 +141,9 @@ class QuestViewModel @javax.inject.Inject constructor(
                     } else
                         status.postValue(StatusModel("Указан тип стадии - карта, но не id не задан"))
                 }
-                5 -> {
-                    //переход в другую главу
-                    val chapter = chapterStage.data["chapter"]
-                    val stage = chapterStage.data["stage"]
-                    if (chapter != null && stage != null) {
-                        val chapterId: Int = chapter.toInt()
-                        val stageId: Int = stage.toInt()
-                        beginWithStage(chapterId, stageId)
-                    }
-                }
-                6 -> {
+                5, 6 -> {
                     // data - действие
-                    loadingState.postValue(true)
-                    data.postValue(chapterStage.data)
+                    processData(chapterStage.data)
                 }
                 else -> {
                     background.postValue(chapterStage.backgroundUrl)
@@ -252,6 +240,26 @@ class QuestViewModel @javax.inject.Inject constructor(
 
     fun clear() {
         repository.clearCache()
+    }
+
+    fun processData(data: Map<String, String>) {
+        loadingState.postValue(true)
+        if (data.containsKey("chapter")) {
+            val chapterId: String? = data["chapter"]
+            val stageId: String? = data["stage"]
+            if (chapterId != null && stageId != null) {
+                beginWithStage(chapterId.toInt(), stageId.toInt())
+            }
+        } else if (data.containsKey("over")) {
+            actionsMap["over"] = mutableListOf("")
+            exitStory()
+        } else if (data.containsKey("seller")) {
+            val sellerId: String? = data["seller"]
+            if (sellerId != null) {
+                this.data.postValue(data)
+            }
+        }
+
     }
 
 }

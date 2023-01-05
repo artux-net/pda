@@ -5,9 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
@@ -19,7 +19,7 @@ import net.artux.pda.map.ui.UserInterface;
 
 import javax.inject.Inject;
 
-public class HUD extends Table {
+public class HUD extends Button {
 
     private final PlayerSystem playerSystem;
     private Bar healthBar;
@@ -34,11 +34,15 @@ public class HUD extends Table {
         super();
         this.playerSystem = playerSystem;
         this.missionsSystem = missionsSystem;
+
         top();
         left();
 
         TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(assetManager.get("ui/bar/hudBackground.png", Texture.class));
-        setBackground(textureRegionDrawable);
+        ButtonStyle buttonStyle = new ButtonStyle();
+        buttonStyle.up = textureRegionDrawable;
+        setStyle(buttonStyle);
+
         setSize(textureRegionDrawable.getRegion().getRegionWidth(), textureRegionDrawable.getRegion().getRegionHeight());
         defaults().pad(5);
         float iconSize = Gdx.graphics.getHeight() / 60f;

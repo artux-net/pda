@@ -66,6 +66,8 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
             .withZone(ZoneId.systemDefault());
     private MultiExoPlayer multiExoPlayer;
+
+
     private CoreFragment coreFragment;
 
     private QuestViewModel questViewModel;
@@ -164,12 +166,16 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
 
         questViewModel.getData().observe(this, data -> {
             if (data.containsKey("seller")) {
-                Intent intent = new Intent(QuestActivity.this, SellerActivity.class);
-                intent.putExtra("seller", Integer.parseInt(data.get("seller")));
-                intent.putExtra("chapter", Integer.parseInt(data.get("chapter")));
-                intent.putExtra("stage", Integer.parseInt(data.get("stage")));
+                SellerFragment sellerFragment = SellerFragment.newInstance(Integer.parseInt(data.get("seller")));
+
+                findViewById(R.id.navbar).setVisibility(View.GONE);
+                FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
+                mFragmentTransaction
+                        .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                        .add(R.id.containerView, sellerFragment, "seller")
+                        .addToBackStack("seller")
+                        .commit();
                 Timber.d("Start seller activity - %s", data.get("seller"));
-                startActivity(intent);
             } else if (data.containsKey("exit")) {
                 Intent intent = new Intent(QuestActivity.this, MainActivity.class);
                 intent.putExtra("section", "stories");

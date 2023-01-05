@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.di.scope.PerGameMap;
@@ -21,12 +22,13 @@ import javax.inject.Inject;
 @PerGameMap
 public class SoundsSystem extends BaseSystem {
 
-    private final List<Music> detections = new ArrayList<>();
-    private final List<Music> weapons = new ArrayList<>();
+    private final List<Sound> detections = new ArrayList<>();
+    private final List<Sound> weapons = new ArrayList<>();
     private final List<Music> backgrounds = new ArrayList<>();
-    private Music anomaly;
+    private Sound anomaly;
     private final Random random = new Random();
     private final AssetManager assetManager;
+    private static float VOLUME = 1f;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
 
@@ -39,19 +41,16 @@ public class SoundsSystem extends BaseSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        detections.add(assetManager.get("sounds/contact_0.ogg", Music.class));
-        detections.add(assetManager.get("sounds/contact_1.ogg", Music.class));
+        detections.add(assetManager.get("audio/sounds/contact_0.ogg", Sound.class));
+        detections.add(assetManager.get("audio/sounds/contact_1.ogg", Sound.class));
 
-        weapons.add(assetManager.get("sounds/ak74_shoot_0.ogg", Music.class));
-        weapons.add(assetManager.get("sounds/ak74_shoot_1.ogg", Music.class));
-        anomaly = assetManager.get("sounds/d-beep.ogg", Music.class);
-        for (Music m : weapons) {
-            m.setVolume(0.01f);
-        }
+        weapons.add(assetManager.get("audio/sounds/ak74_shoot_0.ogg", Sound.class));
+        weapons.add(assetManager.get("audio/sounds/ak74_shoot_1.ogg", Sound.class));
+        anomaly = assetManager.get("audio/sounds/d-beep.ogg", Sound.class);
 
-        backgrounds.add(assetManager.get("sounds/music/1.ogg", Music.class));
-        backgrounds.add(assetManager.get("sounds/music/2.ogg", Music.class));
-        backgrounds.add(assetManager.get("sounds/music/3.ogg", Music.class));
+        backgrounds.add(assetManager.get("audio/music/1.ogg", Music.class));
+        backgrounds.add(assetManager.get("audio/music/2.ogg", Music.class));
+        backgrounds.add(assetManager.get("audio/music/3.ogg", Music.class));
         for (Music m : backgrounds) {
             m.setVolume(0.71f);
         }
@@ -86,34 +85,36 @@ public class SoundsSystem extends BaseSystem {
 
     }
 
+    public void changeState(boolean mute) {
+        if (!mute)
+            VOLUME = 1f;
+        else
+            VOLUME = 0f;
+
+        for (Music m : backgrounds) {
+            m.setVolume(0.71f * VOLUME);
+        }
+    }
+
+    public boolean isMuted() {
+        return VOLUME == 0f;
+    }
 
     public void playStalkerDetection() {
-        boolean playing = false;
-        for (Music m : detections) {
-            if (!playing)
-                playing = m.isPlaying();
-        }
-        if (!playing)
-            detections.get(random.nextInt(detections.size())).play();
+        detections.get(random.nextInt(detections.size())).play(VOLUME);
     }
 
     public void playShoot(Vector2 position) {
         PositionComponent positionComponent = pm.get(getPlayer());
         float dst = position.dst(positionComponent.getPosition());
         float volume = (500 - dst) / 500;
-        if (volume > 0)
-            for (Music m : weapons) {
-                m.setVolume(volume);
-            }
 
         int i = random.nextInt(weapons.size());
-        if (weapons.get(i).isPlaying())
-            weapons.get(i).setPosition(0);
-        else weapons.get(i).play();
+        weapons.get(i).play(volume * VOLUME);
     }
 
     public void playSound() {
-        anomaly.play();
+        anomaly.play(VOLUME);
     }
 
     public void playSoundAtDistance(SoundComponent soundComponent) {

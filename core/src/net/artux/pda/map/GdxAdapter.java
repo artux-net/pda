@@ -3,6 +3,7 @@ package net.artux.pda.map;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -23,6 +24,7 @@ public class GdxAdapter extends ApplicationAdapter {
 
     private final GameStateController gsc;
     private final CoreComponent coreComponent;
+    private AssetManager assetManager;
     private long startHeap;
 
     public GdxAdapter(PlatformInterface platformInterface) {
@@ -36,6 +38,7 @@ public class GdxAdapter extends ApplicationAdapter {
 
     @Override
     public void create() {
+        assetManager = coreComponent.getAssetsManager();
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         Gdx.app.log("GDX", "GDX load stared, version " + Gdx.app.getVersion());
         long loadMills = TimeUtils.millis();
@@ -64,7 +67,8 @@ public class GdxAdapter extends ApplicationAdapter {
     public void render() {
         Gdx.gl.glClearColor(0.086f, 0.09f, 0.098f, 0.5f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        if (!assetManager.isFinished())
+            assetManager.update(17);
         gsc.update(Gdx.graphics.getDeltaTime());
         gsc.render();
     }
@@ -76,8 +80,8 @@ public class GdxAdapter extends ApplicationAdapter {
         Gdx.app.debug("GDX", "Disposing, heap " + Gdx.app.getNativeHeap());
         super.dispose();
         if (!disposed) {
-            coreComponent.getAssetsFinder().dispose();
             gsc.dispose();
+            coreComponent.getAssetsFinder().dispose();
             disposed = true;
             System.gc();
         }

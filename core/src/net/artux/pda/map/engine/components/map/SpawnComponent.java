@@ -1,10 +1,12 @@
-package net.artux.pda.map.engine.components;
+package net.artux.pda.map.engine.components.map;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.pda.map.engine.components.GroupComponent;
+import net.artux.pda.map.engine.components.GroupTargetMovingComponent;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.map.SpawnModel;
 

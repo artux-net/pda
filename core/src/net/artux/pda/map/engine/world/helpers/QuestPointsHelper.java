@@ -7,12 +7,13 @@ import com.badlogic.gdx.graphics.Texture;
 
 import net.artux.pda.map.di.core.MapComponent;
 import net.artux.pda.map.engine.components.ClickComponent;
-import net.artux.pda.map.engine.components.ConditionComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
-import net.artux.pda.map.engine.components.PointComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.TransferComponent;
+import net.artux.pda.map.engine.components.map.ConditionComponent;
+import net.artux.pda.map.engine.components.map.PointComponent;
+import net.artux.pda.map.engine.components.map.QuestComponent;
+import net.artux.pda.map.engine.components.map.TransferComponent;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.utils.Mappers;
@@ -21,6 +22,8 @@ import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.Point;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.quest.story.StoryStateModel;
+
+import java.util.Collections;
 
 public class QuestPointsHelper {
 
@@ -48,11 +51,16 @@ public class QuestPointsHelper {
 
         Entity entity = new Entity()
                 .add(new PositionComponent(Mappers.vector2(point.getPos())))
-                .add(new ConditionComponent(point.getCondition()))
+
                 .add(new InteractiveComponent(point.getName(), point.getType(), () -> platformInterface.send(point.getData())))
                 .add(new ClickComponent(23, () -> engine.getSystem(RenderSystem.class)
                         .showText("Метка: " + point.getName(), Mappers.vector2(point.getPos()))));
 
+
+        if (point.getCondition() != null)
+            entity.add(new ConditionComponent(point.getCondition()));
+        else
+            entity.add(new ConditionComponent(Collections.emptyMap()));
 
         PointComponent pointComponent = new PointComponent(point);
         if (pointComponent.getType() == PointComponent.Type.TRANSFER)
@@ -63,6 +71,8 @@ public class QuestPointsHelper {
         if (texture != null) {
             entity.add(new SpriteComponent(texture, size, size));
             entity.add(pointComponent);
+            if (point.getData().containsKey("chapter") && point.getData().containsKey("stage"))
+                entity.add(new QuestComponent(point));
         }
 
         return entity;

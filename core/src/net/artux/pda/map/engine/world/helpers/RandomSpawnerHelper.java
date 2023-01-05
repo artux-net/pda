@@ -10,14 +10,14 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.di.core.MapComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.SpawnComponent;
-import net.artux.pda.map.engine.components.TransferComponent;
+import net.artux.pda.map.engine.components.map.SpawnComponent;
+import net.artux.pda.map.engine.components.map.TransferComponent;
 import net.artux.pda.map.engine.entities.EntityBuilder;
 import net.artux.pda.map.engine.entities.EntityProcessorSystem;
-import net.artux.pda.map.engine.systems.player.CameraSystem;
 import net.artux.pda.map.engine.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.systems.SpawnSystem;
 import net.artux.pda.map.engine.systems.TimerSystem;
+import net.artux.pda.map.engine.systems.player.CameraSystem;
 
 import java.util.Properties;
 

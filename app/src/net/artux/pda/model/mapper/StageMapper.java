@@ -45,8 +45,9 @@ public interface StageMapper {
             String title = null;
             String message = formatText(stage.getMessage(), storyDataModel);
             if (message.contains(":")) {
-                title = message.split(":")[0];
-                message = message.split(":")[1];
+                String[] parts = message.split(":", 2);
+                title = parts[0];
+                message = parts[1];
             }
             notificationModel.setTitle(title);
             notificationModel.setMessage(message);

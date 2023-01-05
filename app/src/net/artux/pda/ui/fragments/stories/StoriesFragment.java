@@ -68,6 +68,9 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 binding.viewMessage.setVisibility(View.VISIBLE);
             }
         });
+        storiesViewModel.getStatus().observe(getViewLifecycleOwner(), statusModel ->
+                Toast.makeText(requireContext(), statusModel.getDescription(), Toast.LENGTH_SHORT).show());
+
         navigationPresenter.setLoadingState(true);
 
         storiesViewModel.updateData().observe(getViewLifecycleOwner(), memberResult -> {
@@ -136,11 +139,20 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 }
 
                 StoryStateModel storyStateModel = dataModel.getStateByStoryId(id);
-                intent.putExtra("storyId", id);
-                if (storyStateModel != null) {
+                if (storyStateModel != null && storyStateModel.isOver()) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
+                    builder.setTitle("Нет доступа");
+                    builder.setMessage("История уже пройдена, приступайте к прохождению других.");
+                    builder.setNegativeButton(R.string.okay, (dialog, which) -> dialog.cancel());
+                    builder.setPositiveButton("Сбросить прохождение этой истории", (dialog, which) ->
+                            storiesViewModel.resetSingleStory(id));
+                    builder.show();
+                    return;
+                } else if (storyStateModel != null) {
                     intent.putExtra("chapterId", storyStateModel.getChapterId());
                     intent.putExtra("stageId", storyStateModel.getStageId());
                 }
+                intent.putExtra("storyId", id);
                 requireActivity().startActivity(intent);
                 requireActivity().finish();
             }

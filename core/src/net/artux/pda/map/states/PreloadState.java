@@ -68,7 +68,7 @@ public class PreloadState extends State {
     public void render() {
         Batch batch = stage.getBatch();
         batch.begin();
-        if (assetManager.update()) {
+        if (assetManager.isFinished()) {
             gsm.set(coreComponent.getPlayState());
         } else {
             float progress = assetManager.getProgress();

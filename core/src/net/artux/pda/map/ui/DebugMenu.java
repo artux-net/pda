@@ -39,12 +39,10 @@ public class DebugMenu extends Table {
 
     public void addCheckBox(String title, ChangeListener changeListener, boolean checked) {
         CheckBox checkBox = new CheckBox(title, getSkin());
-        //checkBox.getStyle().fontColor = Color.WHITE;
-        //.getStyle().font = Fonts.getFont(Fonts.Language.RUSSIAN, 25);
         content.row();
         content.add(checkBox);
         checkBox.getImage().setScaling(Scaling.fit);
-        checkBox.getImageCell().size(50, 50);
+        checkBox.getImageCell().size(60, 60);
         checkBox.addListener(changeListener);
         checkBox.setChecked(checked);
     }

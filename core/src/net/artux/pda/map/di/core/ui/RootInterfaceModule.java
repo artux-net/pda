@@ -1,12 +1,16 @@
 package net.artux.pda.map.di.core.ui;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.ui.FontManager;
 import net.artux.pda.map.ui.UIFrame;
 import net.artux.pda.map.ui.UserInterface;
 
@@ -32,6 +36,16 @@ public class RootInterfaceModule {
     @Provides
     public Label.LabelStyle getLabelStyle(BitmapFont font) {
         return new Label.LabelStyle(font, Color.WHITE);
+    }
+
+    @Provides
+    public TextButton.TextButtonStyle getTextButtonStyle(AssetsFinder assetsFinder) {
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        FontManager fontManager = assetsFinder.getFontManager();
+        style.font = fontManager.getFont(24);
+        style.fontColor = Color.WHITE;
+        style.up = new TextureRegionDrawable(assetsFinder.getManager().get("ui/slots/slot_wide.png", Texture.class));
+        return style;
     }
 
     @Provides

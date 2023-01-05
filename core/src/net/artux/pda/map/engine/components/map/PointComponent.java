@@ -1,4 +1,4 @@
-package net.artux.pda.map.engine.components;
+package net.artux.pda.map.engine.components.map;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
@@ -10,8 +10,6 @@ public class PointComponent implements Component {
 
     private final String title;
     private final Type type;
-    private final int chapter;
-    private final int stage;
     private final Vector2 position;
 
     public PointComponent(Point point) {
@@ -37,9 +35,6 @@ public class PointComponent implements Component {
                 type = Type.HIDDEN;
                 break;
         }
-
-        this.chapter = Integer.parseInt(point.getData().get("chapter"));
-        this.stage = Integer.parseInt(point.getData().get("stage"));
         position = Mappers.vector2(point.getPos());
     }
 
@@ -51,21 +46,8 @@ public class PointComponent implements Component {
         return title;
     }
 
-    public int getChapter() {
-        return chapter;
-    }
-
-    public int getStage() {
-        return stage;
-    }
-
     public Type getType() {
         return type;
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * chapter * stage;
     }
 
     public enum Type {

@@ -35,7 +35,7 @@ public class Logger extends VerticalGroup {
         frameRate = Gdx.graphics.getFramesPerSecond();
         BitmapFont font = skin.getFont("font");
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
-        columnAlign(Align.right);
+        columnAlign(Align.left);
     }
 
     @Override

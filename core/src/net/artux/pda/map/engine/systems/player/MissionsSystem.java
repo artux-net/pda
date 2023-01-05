@@ -12,8 +12,8 @@ import com.badlogic.gdx.utils.Disposable;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.PassivityComponent;
-import net.artux.pda.map.engine.components.PointComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.map.QuestComponent;
 import net.artux.pda.map.engine.systems.BaseSystem;
 import net.artux.pda.model.quest.CheckpointModel;
 import net.artux.pda.model.quest.MissionModel;
@@ -29,7 +29,7 @@ import javax.inject.Inject;
 public class MissionsSystem extends BaseSystem implements Disposable {
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
-    private ComponentMapper<PointComponent> qcm = ComponentMapper.getFor(PointComponent.class);
+    private ComponentMapper<QuestComponent> qcm = ComponentMapper.getFor(QuestComponent.class);
 
     private final float pixelsPerMeter = 3f;
     private final DataRepository dataRepository;
@@ -40,7 +40,7 @@ public class MissionsSystem extends BaseSystem implements Disposable {
 
     @Inject
     public MissionsSystem(DataRepository dataRepository, CameraSystem cameraSystem) {
-        super(Family.all(PositionComponent.class, PointComponent.class).exclude(PassivityComponent.class).get());
+        super(Family.all(PositionComponent.class, QuestComponent.class).exclude(PassivityComponent.class).get());
         this.dataRepository = dataRepository;
         this.cameraSystem = cameraSystem;
     }
@@ -48,6 +48,7 @@ public class MissionsSystem extends BaseSystem implements Disposable {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
+        setActiveMissionByName("");
         loadPreferences();
     }
 
@@ -61,8 +62,8 @@ public class MissionsSystem extends BaseSystem implements Disposable {
         return dataRepository.getStoryModel().getCurrentMissions(getParams());
     }
 
-    public List<PointComponent> getPoints() {
-        LinkedList<PointComponent> points = new LinkedList<>();
+    public List<QuestComponent> getPoints() {
+        LinkedList<QuestComponent> points = new LinkedList<>();
         for (Entity entity : getEntities()) {
             points.add(qcm.get(entity));
         }
@@ -76,10 +77,10 @@ public class MissionsSystem extends BaseSystem implements Disposable {
                 setActiveMission(activeMission);
             }
         }
-        if (activeMission == null && getEntities().size() > 0) {
+        if (activeMission == null) {
             if (missionModels.size() > 0)
                 setActiveMission(missionModels.get(0));
-            else
+            else if(getEntities().size() > 0)
                 setTargetPosition(pm.get(getEntities().first()));
         }
     }

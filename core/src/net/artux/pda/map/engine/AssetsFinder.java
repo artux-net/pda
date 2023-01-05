@@ -4,13 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.ui.FontManager;
 import net.artux.pda.map.utils.NetFile;
@@ -41,11 +41,10 @@ public class AssetsFinder implements Disposable {
     }
 
     public AssetManager getManager() {
-        long loadTime = TimeUtils.millis();
         ObjectMap<String, Object> fontsMap = new ObjectMap<>();
         fontsMap.put("font", fontManager.getDisposableFont(FontManager.LIBERAL_FONT, 24));
         fontsMap.put("title", fontManager.getDisposableFont(FontManager.IMPERIAL_FONT, 28));
-        //Gdx.app.log("Assets", "Loading assets.");
+        Gdx.app.log("Assets", "Setup assets.");
         if (assetManager == null) {
             assetManager = new AssetManager();
 
@@ -74,17 +73,15 @@ public class AssetsFinder implements Disposable {
             SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("skins/cloud/cloud-form-ui.atlas", fontsMap);
             assetManager.load("skins/cloud/cloud-form-ui.json", Skin.class, skinParameter);
 
-            FileHandle sounds = assetManager.getFileHandleResolver().resolve("sounds");
+            FileHandle sounds = assetManager.getFileHandleResolver().resolve("audio/sounds");
+            loadRecursively(assetManager, sounds, true, Sound.class);
+
+            sounds = assetManager.getFileHandleResolver().resolve("audio/music");
             loadRecursively(assetManager, sounds, true, Music.class);
+
             assetManager.setLoader(NetFile.class, new NetTextureAssetLoader(properties));
-            //Gdx.app.log("Assets", "Loading took " + (TimeUtils.millis() - loadTime) + " ms.");
         }
         return assetManager;
-    }
-
-    public void finishLoading() {
-        if (assetManager != null)
-            assetManager.finishLoading();
     }
 
     public FontManager getFontManager() {

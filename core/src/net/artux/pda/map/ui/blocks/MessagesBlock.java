@@ -69,13 +69,15 @@ public class MessagesBlock extends ScrollPane implements Disposable {
         Image image;
         if (icon.matches("^\\d*$"))
             image = new Image(assetManager
-                    .get("avatars/a" + (Integer.parseInt(icon)) + ".png", Texture.class));
+                    .get("avatars/a" + icon + ".png", Texture.class));
         else
             image = new Image(assetManager
                     .get("avatars/a0.jpg", Texture.class));
 
         image.setScaling(Scaling.fillX);
-        mainGroup.add(image).uniform();
+        mainGroup
+                .add(image)
+                .uniform();
 
         Table contentGroup = new Table().left().top();
         mainGroup.add(contentGroup);
@@ -120,6 +122,8 @@ public class MessagesBlock extends ScrollPane implements Disposable {
 
     @Override
     public void dispose() {
+
+        //todo dispose do not work
         timer.cancel();
         timer.purge();
     }

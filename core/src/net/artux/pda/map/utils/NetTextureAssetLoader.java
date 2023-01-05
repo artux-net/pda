@@ -130,8 +130,6 @@ public class NetTextureAssetLoader extends AsynchronousAssetLoader<NetFile, NetT
         Texture texture;
     }
 
-    ;
-
     TextureLoaderInfo info = new TextureLoaderInfo();
 
     static public class TextureParameter extends AssetLoaderParameters<NetFile> {

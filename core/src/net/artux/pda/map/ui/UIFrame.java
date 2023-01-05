@@ -23,9 +23,6 @@ import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.ui.bars.Utils;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 public class UIFrame extends Group implements Disposable {
 
     private final ShapeRenderer shapeRenderer;
@@ -126,7 +123,7 @@ public class UIFrame extends Group implements Disposable {
 
 
     float standartFrameSize = h / 28f;
-    float topFrameHeight = standartFrameSize * 2;
+    float topFrameHeight = standartFrameSize * 2.4f;
     float additionalSizes = topFrameHeight * 0.3f;
     float headerBottomY = h - topFrameHeight + (additionalSizes) / 2;
 

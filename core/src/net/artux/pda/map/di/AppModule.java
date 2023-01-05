@@ -2,6 +2,7 @@ package net.artux.pda.map.di;
 
 import com.badlogic.gdx.assets.AssetManager;
 
+import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.utils.PlatformInterface;
@@ -9,6 +10,7 @@ import net.artux.pda.model.map.GameMap;
 
 import java.util.Properties;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -26,6 +28,14 @@ public class AppModule {
     @Provides
     public Properties getProperties() {
         return dataRepository.getProperties();
+    }
+
+    @Provides
+    @Named("testerMode")
+    public boolean isInTesterMode() {
+        return getProperties()
+                .getProperty(PropertyFields.TESTER_MODE, "false")
+                .equals("true");
     }
 
     @Provides

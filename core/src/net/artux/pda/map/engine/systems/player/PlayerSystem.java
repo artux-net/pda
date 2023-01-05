@@ -12,9 +12,7 @@ import com.badlogic.gdx.utils.Disposable;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
-import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.PointComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
@@ -38,7 +36,7 @@ public class PlayerSystem extends BaseSystem implements Disposable {
 
     @Inject
     public PlayerSystem(UserInterface userInterface) {
-        super(Family.all(PositionComponent.class, PointComponent.class).exclude(PassivityComponent.class).get());
+        super(Family.one().get());
         this.userInterface = userInterface;
     }
 
@@ -112,8 +110,7 @@ public class PlayerSystem extends BaseSystem implements Disposable {
     }
 
     public Vector2 getPosition() {
-        PositionComponent playerPosition = pm.get(getPlayer());
-        return playerPosition.getPosition();
+        return pm.get(getPlayer());
     }
 
     @Override

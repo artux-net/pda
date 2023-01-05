@@ -1,4 +1,4 @@
-package net.artux.pda.map.engine.components;
+package net.artux.pda.map.engine.components.map;
 
 import com.badlogic.ashley.core.Component;
 

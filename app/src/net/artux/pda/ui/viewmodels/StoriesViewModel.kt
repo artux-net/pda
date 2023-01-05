@@ -14,6 +14,7 @@ import net.artux.pda.model.quest.StoryModel
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
 import net.artux.pda.repositories.UserRepository
+import net.artux.pdanetwork.model.CommandBlock
 import java.util.*
 
 @HiltViewModel
@@ -77,12 +78,11 @@ class StoriesViewModel @javax.inject.Inject constructor(
             .getOrThrow()
     }
 
-    fun resetData() {
+    fun resetSingleStory(id: Int) {
         viewModelScope.launch {
-            userRepository.clearMemberCache()
-            repository.clearCache()
-            userRepository.getMember()
-            repository.resetData()
+            val block = CommandBlock()
+                .actions(mapOf(Pair("reset", listOf("$id"))))
+            repository.syncMember(block)
                 .map { mapper.dataModel(it) }
                 .onSuccess {
                     storyData.postValue(it)
