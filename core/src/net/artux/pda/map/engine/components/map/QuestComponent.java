@@ -22,8 +22,8 @@ public class QuestComponent implements Component {
         return stage;
     }
 
-    @Override
-    public int hashCode() {
-        return 31 * chapter * stage;
+    public boolean contains(int chapter, int stage){
+        return this.chapter == chapter && this.stage == stage;
     }
+
 }

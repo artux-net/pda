@@ -72,7 +72,7 @@ public class MapBorder implements Disposable {
     }
 
     public int getTileType(float x, float y) {
-        int value = playerPixmap.getPixel((int) x, playerLayout.getHeight() - (int) y);
+        int value = mobPixmap.getPixel((int) x, playerLayout.getHeight() - (int) y);
 
         float r = ((value & 0xff000000) >>> 24) / 255f;
         float g = ((value & 0x00ff0000) >>> 16) / 255f;

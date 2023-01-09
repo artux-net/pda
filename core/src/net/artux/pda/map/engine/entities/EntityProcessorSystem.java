@@ -21,7 +21,6 @@ import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.map.ConditionComponent;
 import net.artux.pda.map.engine.components.map.SpawnComponent;
 import net.artux.pda.map.engine.systems.RenderSystem;
-import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.model.GangRelations;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.items.WeaponModel;
@@ -70,7 +69,7 @@ public class EntityProcessorSystem extends EntitySystem {
             if (!spawnModel.getParams().contains("hide")) {
                 controlPoint.add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size));
             }
-            if (spawnModel.getCondition()!=null)
+            if (spawnModel.getCondition() != null)
                 controlPoint.add(new ConditionComponent(spawnModel.getCondition()));
             else
                 controlPoint.add(new ConditionComponent(Collections.emptyMap()));
@@ -89,7 +88,7 @@ public class EntityProcessorSystem extends EntitySystem {
         List<Entity> pointEntities = new LinkedList<>();
         GroupComponent groupComponent = new GroupComponent(gang, relations, pointEntities, params);
         for (int i = 0; i < n; i++) {
-            Entity entity = builder.spawnStalker(RandomPosition.getRandomAround(pos, 1), groupComponent);
+            Entity entity = builder.spawnStalker(RandomPosition.getRandomAround(pos, 15), groupComponent);
             getEngine().addEntity(entity);
             pointEntities.add(entity);
         }
@@ -97,8 +96,9 @@ public class EntityProcessorSystem extends EntitySystem {
     }
 
     public void addBulletToEngine(Entity entity, Entity target, WeaponModel weaponModel) {
-        getEngine().addEntity(builder.bullet(entity, target, weaponModel));
-        getEngine().getSystem(SoundsSystem.class).playShoot(pm.get(target));
+        Entity bullet = builder.bullet(entity, target, weaponModel);
+        getEngine().addEntity(bullet);
+
     }
 
     public void generateTakeSpawnGroup(Vector2 randomTransferPosition, Vector2 attackTarget) {

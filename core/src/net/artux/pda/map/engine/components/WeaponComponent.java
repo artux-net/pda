@@ -1,16 +1,27 @@
 package net.artux.pda.map.engine.components;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
+import net.artux.pda.model.items.WeaponSound;
 import net.artux.pda.model.quest.story.StoryDataModel;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 public class WeaponComponent implements Component {
+
+    private static final String prefix = "audio/sounds/weapons/";
+
+    private static final String rifleDefaultShotSound = prefix + "rifle/ak74_shot.ogg";
+    private static final String rifleDefaultReloadSound = prefix + "rifle/ak74_reload.ogg";
+    private static final String pistolDefaultShotSound = prefix + "pistol/pm_shot.ogg";
+    private static final String pistolDefaultReloadSound = prefix + "pistol/pm_reload.ogg";
 
     private WeaponModel weaponModel;
     private ItemModel bulletModel;
@@ -24,32 +35,59 @@ public class WeaponComponent implements Component {
     boolean player;
     boolean shootLastFrame;
 
-    public boolean isShootLastFrame() {
-        return shootLastFrame;
-    }
+    private Sound shot;
+    private Sound reload;
 
-    public WeaponComponent(StoryDataModel dataModel) {
+
+    private final AssetManager assetManager;
+
+    public WeaponComponent(StoryDataModel dataModel, AssetManager assetManager) {
+        this.assetManager = assetManager;
         updateData(dataModel);
     }
 
     public void updateData(StoryDataModel dataModel) {
         this.dataModel = dataModel;
         setWeaponModel((WeaponModel) dataModel.getCurrentWearable(ItemType.RIFLE));
-
         player = true;
         reload();
     }
 
-    public WeaponComponent(WeaponModel weaponModel) {
-        this.weaponModel = weaponModel;
+    public WeaponComponent(WeaponModel weaponModel, AssetManager assetManager) {
+        this.assetManager = assetManager;
         player = false;
+        setWeaponModel(weaponModel);
         reload();
     }
 
     public void setWeaponModel(WeaponModel weaponModel) {
         this.weaponModel = weaponModel;
         if (weaponModel != null) {
-            setBulletModel(dataModel.getItemByBaseId(weaponModel.getBulletId()));
+            if (player)
+                setBulletModel(dataModel.getItemByBaseId(weaponModel.getBulletId()));
+
+            String reloadSoundName;
+            String shotSoundName;
+
+            if (weaponModel.getType() == ItemType.RIFLE) {
+                reloadSoundName = rifleDefaultReloadSound;
+                shotSoundName = rifleDefaultShotSound;
+            } else {
+                shotSoundName = pistolDefaultShotSound;
+                reloadSoundName = pistolDefaultReloadSound;
+            }
+
+            WeaponSound sounds = weaponModel.getSounds();
+            if (sounds != null) {
+                String type = weaponModel.getType().name().toLowerCase(Locale.ROOT);
+
+                reloadSoundName = prefix + type + "/" + sounds.getReload();
+                shotSoundName = prefix + type + "/" + sounds.getShot();
+            }
+
+            shot = assetManager.get(shotSoundName);
+            reload = assetManager.get(reloadSoundName);
+
             reload();
         }
     }
@@ -62,6 +100,14 @@ public class WeaponComponent implements Component {
         if (item != null && getSelected().getBulletId() == item.getBaseId()) {
             bulletModel = item;
         }
+    }
+
+    public Sound getReloadSound() {
+        return reload;
+    }
+
+    public Sound getShotSound() {
+        return shot;
     }
 
     public int getMagazine() {
@@ -114,8 +160,6 @@ public class WeaponComponent implements Component {
                 stack++;
                 shootLastFrame = true;
             } else if (magazine == 0) {
-                reloading = true;
-
                 reload();
                 timeout += 30 / weaponModel.getSpeed(); // перезарядка
                 shootLastFrame = false;
@@ -129,7 +173,8 @@ public class WeaponComponent implements Component {
         return shootLastFrame;
     }
 
-    void reload() {
+    public void reload() {
+        reloading = true;
         WeaponModel weaponModel = getSelected();
         if (weaponModel != null) {
             int take = weaponModel.getBulletQuantity();

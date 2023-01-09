@@ -102,13 +102,13 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
             findViewById(R.id.navbar).setVisibility(View.VISIBLE);
             FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
             StageFragment stageFragment = StageFragment.createInstance(stageModel);
-            if (coreFragment != null && coreFragment.isAdded()){
+            if (coreFragment != null && coreFragment.isAdded()) {
                 mFragmentTransaction.hide(coreFragment);
                 mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.STARTED);
             }
 
-            for (Fragment fragment : getSupportFragmentManager().getFragments()){
-                if (fragment instanceof StageFragment){
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                if (fragment instanceof StageFragment) {
                     mFragmentTransaction.remove(fragment);
                 }
             }
@@ -131,9 +131,13 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
             args.putSerializable("user", provider.get(UserViewModel.class).getFromCache());
             args.putSerializable("story", provider.get(QuestViewModel.class).getCurrentStory());
             coreFragment.setArguments(args);
-            if (coreFragment.isAdded()){
-                mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.RESUMED);
-                mFragmentTransaction.show(coreFragment);
+            if (coreFragment.isAdded()) {
+                if (coreFragment.isHidden()) {
+                    mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.RESUMED);
+                    mFragmentTransaction.show(coreFragment);
+                } else {
+                    coreFragment.onResume();
+                }
             }
             mFragmentTransaction
                     .replace(R.id.containerView, coreFragment)

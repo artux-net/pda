@@ -14,4 +14,6 @@ public class WeaponModel extends WearableModel {
     private int bulletQuantity;
     private int bulletId;
 
+    private WeaponSound sounds;
+
 }

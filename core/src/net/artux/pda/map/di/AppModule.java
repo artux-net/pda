@@ -66,7 +66,7 @@ public class AppModule {
     }
 
     @Provides
-    public AppModule getAppModule(){
+    public AppModule getAppModule() {
         return this;
     }
 

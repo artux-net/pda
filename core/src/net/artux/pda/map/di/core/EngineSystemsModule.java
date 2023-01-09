@@ -22,6 +22,7 @@ import net.artux.pda.map.engine.systems.player.ClicksSystem;
 import net.artux.pda.map.engine.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.systems.player.PlayerBattleSystem;
+import net.artux.pda.map.engine.systems.player.PlayerMovingSystem;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
 
 import dagger.Binds;
@@ -38,6 +39,10 @@ public abstract class EngineSystemsModule {
     @IntoSet
     @Binds
     public abstract EntitySystem missionsSystem(MissionsSystem missionsSystem);
+
+    @IntoSet
+    @Binds
+    public abstract EntitySystem playerMovingSystem(PlayerMovingSystem playerMovingSystem);
 
     @IntoSet
     @Binds

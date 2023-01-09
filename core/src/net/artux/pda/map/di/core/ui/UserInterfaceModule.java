@@ -23,6 +23,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.engine.StalkerMessageGenerator;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
@@ -37,7 +38,7 @@ import net.artux.pda.map.ui.BackpackMenu;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Slot;
-import net.artux.pda.map.ui.blocks.MessagesBlock;
+import net.artux.pda.map.ui.blocks.MessagesPlane;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.Collection;
@@ -57,7 +58,7 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initJoyTable(@Named("joyTable") Table joyTable, @Named("gameZone") Group gameZone, AssetsFinder assetsFinder, PlayerSystem playerSystem) {
+    public Actor initJoyTable(StalkerMessageGenerator stalkerMessageGenerator, MessagesPlane messagesPlane, @Named("joyTable") Table joyTable, @Named("gameZone") Group gameZone, AssetsFinder assetsFinder, PlayerSystem playerSystem) {
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
         AssetManager assetManager = assetsFinder.getManager();
         style.knob = new TextureRegionDrawable(assetManager.get("ui/touchpad/knob.png", Texture.class));
@@ -83,8 +84,7 @@ public class UserInterfaceModule {
                     touchpad.setColor(color.r, color.g, color.b, 0.9f);
             }
         });
-        MessagesBlock messagesBlock = new MessagesBlock(assetsFinder);
-        joyTable.add(messagesBlock);
+        joyTable.add(messagesPlane);
         joyTable.row();
         joyTable.add(touchpad)
                 .width(gameZone.getHeight() / 2.5f)
@@ -182,7 +182,7 @@ public class UserInterfaceModule {
     @IntoSet
     @Provides
     public Actor initHud(BackpackMenu backpackMenu, HUD hud, Slot weaponSlot, @Named("hudTable") Table hudTable,
-                         UserInterface userInterface, PlayerSystem playerSystem) {
+                         UserInterface userInterface, PlayerSystem playerSystem, PlayerBattleSystem playerBattleSystem) {
         hudTable.add(hud);
         hud.addListener(new ActorGestureListener() {
             @Override
@@ -225,6 +225,12 @@ public class UserInterfaceModule {
                 Entity entity = playerSystem.getPlayer();
                 WeaponComponent entityWeapon = wm.get(entity);
                 entityWeapon.switchWeapons();
+            }
+
+            @Override
+            public boolean longPress(Actor actor, float x, float y) {
+                playerBattleSystem.reload();
+                return true;
             }
         });
         hudTable.add(weaponSlot).padLeft(20);

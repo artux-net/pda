@@ -13,7 +13,6 @@ import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.RelationalSpriteComponent;
 import net.artux.pda.map.engine.components.SpriteComponent;
-import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.systems.BaseSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
@@ -34,7 +33,7 @@ public class InteractionSystem extends BaseSystem {
 
     @Inject
     public InteractionSystem(UserInterface userInterface, SoundsSystem soundsSystem, CameraSystem cameraSystem) {
-        super(Family.all(InteractiveComponent.class, PositionComponent.class).get());
+        super(Family.all(InteractiveComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
         this.userInterface = userInterface;
 
         this.soundsSystem = soundsSystem;
@@ -46,7 +45,6 @@ public class InteractionSystem extends BaseSystem {
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
     private ComponentMapper<RelationalSpriteComponent> rsm = ComponentMapper.getFor(RelationalSpriteComponent.class);
-    private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
     private final Set<InteractiveComponent> interactiveComponents = new HashSet<>();
 

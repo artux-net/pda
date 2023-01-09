@@ -21,9 +21,9 @@ import com.badlogic.gdx.utils.Scaling;
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.systems.MapLoggerSystem;
-import net.artux.pda.map.engine.systems.MovingSystem;
 import net.artux.pda.map.engine.systems.RenderSystem;
 import net.artux.pda.map.engine.systems.SoundsSystem;
+import net.artux.pda.map.engine.systems.player.PlayerMovingSystem;
 import net.artux.pda.map.ui.DebugMenu;
 import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.MissionMenu;
@@ -153,9 +153,9 @@ public class HeaderInterfaceModule {
             debugMenu.addCheckBox("Ускорение движения", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    MovingSystem.speedup = ((CheckBox) actor).isChecked();
+                    PlayerMovingSystem.speedup = ((CheckBox) actor).isChecked();
                 }
-            }, MovingSystem.speedup);
+            }, PlayerMovingSystem.speedup);
 
             debugMenu.addCheckBox("Вертикальная синхронизация", new ChangeListener() {
                 @Override
@@ -167,16 +167,16 @@ public class HeaderInterfaceModule {
             debugMenu.addCheckBox("Вечный бег", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    MovingSystem.alwaysRun = ((CheckBox) actor).isChecked();
+                    PlayerMovingSystem.alwaysRun = ((CheckBox) actor).isChecked();
                 }
-            }, MovingSystem.alwaysRun);
+            }, PlayerMovingSystem.alwaysRun);
 
             debugMenu.addCheckBox("Учитывать столкновения", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    MovingSystem.playerWalls = ((CheckBox) actor).isChecked();
+                    PlayerMovingSystem.playerWalls = ((CheckBox) actor).isChecked();
                 }
-            }, MovingSystem.playerWalls);
+            }, PlayerMovingSystem.playerWalls);
             debugMenu.addCheckBox("Отобразить стены игрока", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -223,7 +223,7 @@ public class HeaderInterfaceModule {
                 public void changed(ChangeEvent event, Actor actor) {
                     soundsSystem.changeState(((CheckBox) actor).isChecked());
                 }
-            }, true);
+            }, false);
 
             uiFrame.getLeftHeaderTable().add(debugButton);
             return debugButton;

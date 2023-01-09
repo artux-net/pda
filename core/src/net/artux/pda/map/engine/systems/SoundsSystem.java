@@ -23,7 +23,6 @@ import javax.inject.Inject;
 public class SoundsSystem extends BaseSystem {
 
     private final List<Sound> detections = new ArrayList<>();
-    private final List<Sound> weapons = new ArrayList<>();
     private final List<Music> backgrounds = new ArrayList<>();
     private Sound anomaly;
     private final Random random = new Random();
@@ -41,12 +40,9 @@ public class SoundsSystem extends BaseSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        detections.add(assetManager.get("audio/sounds/contact_0.ogg", Sound.class));
-        detections.add(assetManager.get("audio/sounds/contact_1.ogg", Sound.class));
-
-        weapons.add(assetManager.get("audio/sounds/ak74_shoot_0.ogg", Sound.class));
-        weapons.add(assetManager.get("audio/sounds/ak74_shoot_1.ogg", Sound.class));
-        anomaly = assetManager.get("audio/sounds/d-beep.ogg", Sound.class);
+        detections.add(assetManager.get("audio/sounds/pda/contact_0.ogg", Sound.class));
+        detections.add(assetManager.get("audio/sounds/pda/contact_1.ogg", Sound.class));
+        anomaly = assetManager.get("audio/sounds/pda/d-beep.ogg", Sound.class);
 
         backgrounds.add(assetManager.get("audio/music/1.ogg", Music.class));
         backgrounds.add(assetManager.get("audio/music/2.ogg", Music.class));
@@ -60,12 +56,7 @@ public class SoundsSystem extends BaseSystem {
     public void startBackgroundMusic() {
         stopMusic();
         Music m = backgrounds.get(random.nextInt(backgrounds.size()));
-        m.setOnCompletionListener(new Music.OnCompletionListener() {
-            @Override
-            public void onCompletion(Music music) {
-                startBackgroundMusic();
-            }
-        });
+        m.setOnCompletionListener(music -> startBackgroundMusic());
         m.play();
     }
 
@@ -104,21 +95,24 @@ public class SoundsSystem extends BaseSystem {
         detections.get(random.nextInt(detections.size())).play(VOLUME);
     }
 
-    public void playShoot(Vector2 position) {
-        PositionComponent positionComponent = pm.get(getPlayer());
-        float dst = position.dst(positionComponent.getPosition());
-        float volume = (500 - dst) / 500;
+    public void playSoundAtDistance(Sound sound, Vector2 position) {
+        if (sound != null) {
+            PositionComponent positionComponent = pm.get(getPlayer());
+            float dst = position.dst(positionComponent.getPosition());
+            float volume = (500 - dst) / 500;
 
-        int i = random.nextInt(weapons.size());
-        weapons.get(i).play(volume * VOLUME);
+            sound.play(volume * VOLUME);
+        }
+    }
+
+    public void playSound(Sound sound) {
+        if (sound != null) {
+            sound.play(VOLUME);
+        }
     }
 
     public void playSound() {
         anomaly.play(VOLUME);
-    }
-
-    public void playSoundAtDistance(SoundComponent soundComponent) {
-
     }
 
 }

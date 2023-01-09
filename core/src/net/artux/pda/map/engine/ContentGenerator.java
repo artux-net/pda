@@ -8,6 +8,8 @@ import com.badlogic.gdx.files.FileHandle;
 
 import net.artux.pda.model.UserMessage;
 
+import javax.inject.Inject;
+
 public class ContentGenerator {
 
     private final String folder = "templates/";
@@ -17,6 +19,7 @@ public class ContentGenerator {
     private final String[] actions;
     private final String[] locations;
 
+    @Inject
     public ContentGenerator() {
         names = readFile(folder + "names");
         nicks = readFile(folder + "nicks");

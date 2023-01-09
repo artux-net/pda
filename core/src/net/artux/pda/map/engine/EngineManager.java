@@ -4,8 +4,6 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -22,9 +20,11 @@ import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.entities.EntityBuilder;
-import net.artux.pda.map.engine.systems.player.CameraSystem;
 import net.artux.pda.map.engine.systems.Drawable;
+import net.artux.pda.map.engine.systems.player.CameraSystem;
 import net.artux.pda.map.engine.systems.player.InteractionSystem;
+import net.artux.pda.map.engine.systems.player.MissionsSystem;
+import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
@@ -55,20 +55,23 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private final PropertyChangeListener storyDataListener = propertyChangeEvent -> {
         if (propertyChangeEvent.getPropertyName().equals("storyData") && engine != null) {
             StoryDataModel dataModel = (StoryDataModel) propertyChangeEvent.getNewValue();
-            ImmutableArray<Entity> players = engine.getEntitiesFor(Family.one(PlayerComponent.class).get());
-            if (players.size() > 0) {
-                Entity player = players.first();
+            PlayerSystem playerSystem = engine.getSystem(PlayerSystem.class);
+            if (playerSystem==null)
+                return;
+            Entity player = playerSystem.getPlayer();
+            if (player != null) {
                 PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
                 WeaponComponent weaponComponent = player.getComponent(WeaponComponent.class);
 
                 playerComponent.gdxData = dataModel;
                 weaponComponent.updateData(dataModel);
+                engine.getSystem(MissionsSystem.class);
             }
         }
     };
 
     @Inject
-    public EngineManager(MapComponent mapComponent) {
+    public EngineManager(MapComponent mapComponent, MissionsSystem missionsSystem) {
         this.dataRepository = mapComponent.getDataRepository();
         this.map = dataRepository.getGameMap();
         this.userModel = dataRepository.getUserModel();
@@ -91,9 +94,9 @@ public class EngineManager extends InputListener implements Drawable, Disposable
             AnomalyHelper.createAnomalies(mapComponent);
 
 //        RandomSpawnerHelper.init(coreComponent);
-
         mapComponent.getConditionManager()
                 .update(gdxData);
+        missionsSystem.setActiveMission(missionsSystem.getActiveMission()); // finds points
 
         dataRepository.addPropertyChangeListener(storyDataListener);
         stage.addListener(this);

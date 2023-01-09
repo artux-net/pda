@@ -43,7 +43,8 @@ class SellerViewModel @Inject constructor(
     fun buyItem(uuid: UUID, quantity: Int) {
         viewModelScope.launch {
             actionWithItem(SellerRepository.OperationType.BUY, uuid, quantity)
-                .onSuccess { status.postValue(it) }
+                .onSuccess {
+                    status.postValue(it) }
                 .onFailure { status.postValue(StatusModel(it)) }
         }
     }

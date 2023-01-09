@@ -14,14 +14,25 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.PositionComponent;
 import net.artux.pda.map.engine.components.map.QuestComponent;
+import net.artux.pda.map.engine.pathfinding.own.Connection;
+import net.artux.pda.map.engine.pathfinding.own.Digraph;
+import net.artux.pda.map.engine.pathfinding.own.DijkstraPathFinder;
+import net.artux.pda.map.engine.pathfinding.own.GraphPath;
+import net.artux.pda.map.engine.pathfinding.own.Node;
 import net.artux.pda.map.engine.systems.BaseSystem;
+import net.artux.pda.map.utils.Mappers;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.model.map.Point;
 import net.artux.pda.model.quest.CheckpointModel;
 import net.artux.pda.model.quest.MissionModel;
+import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.ParameterModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -34,6 +45,8 @@ public class MissionsSystem extends BaseSystem implements Disposable {
     private final float pixelsPerMeter = 3f;
     private final DataRepository dataRepository;
     private final CameraSystem cameraSystem;
+    private final Digraph<GameMap> mapDigraph;
+    private final DijkstraPathFinder<GameMap> pathFinder;
 
     private MissionModel activeMission;
     private Vector2 targetPosition;
@@ -43,6 +56,9 @@ public class MissionsSystem extends BaseSystem implements Disposable {
         super(Family.all(PositionComponent.class, QuestComponent.class).exclude(PassivityComponent.class).get());
         this.dataRepository = dataRepository;
         this.cameraSystem = cameraSystem;
+
+        mapDigraph = buildSystemFromStory();
+        pathFinder = new DijkstraPathFinder<>();
     }
 
     @Override
@@ -80,24 +96,48 @@ public class MissionsSystem extends BaseSystem implements Disposable {
         if (activeMission == null) {
             if (missionModels.size() > 0)
                 setActiveMission(missionModels.get(0));
-            else if(getEntities().size() > 0)
+            else if (getEntities().size() > 0)
                 setTargetPosition(pm.get(getEntities().first()));
         }
+    }
+
+    public MissionModel getActiveMission() {
+        return activeMission;
     }
 
     public void setActiveMission(MissionModel activeMission) {
         this.activeMission = activeMission;
 
-        if (activeMission != null) {
-            CheckpointModel currentCheckpoint = activeMission.getCurrentCheckpoint(getParams());
-            int chapter = currentCheckpoint.getChapter();
-            int stage = currentCheckpoint.getChapter();
-            for (Entity entity : getEntities()) {
-                if (qcm.get(entity).hashCode() == 31 * chapter * stage) {
-                    setTargetPosition(pm.get(entity)); //TODO count transfers and other maps
-                }
+        if (activeMission == null)
+            return;
+
+        CheckpointModel currentCheckpoint = activeMission.getCurrentCheckpoint(getParams());
+        int chapter = currentCheckpoint.getChapter();
+        int stage = currentCheckpoint.getStage();
+        boolean found = false;
+        for (Entity questEntity : getEntities()) {
+            QuestComponent questComponent = qcm.get(questEntity);
+            PositionComponent position = pm.get(questEntity);
+            if (questComponent.contains(chapter, stage)) {
+                found = true;
+                setTargetPosition(position);
             }
         }
+        if (!found) {
+            GameMap currentMap = dataRepository.getGameMap();
+            GameMap requiredMap = getRequiredMap(chapter, stage);
+            if (requiredMap == currentMap || requiredMap == null)
+                return;
+
+            GraphPath<GameMap> path = pathFinder.find(mapDigraph, mapDigraph.offer(currentMap), mapDigraph.offer(requiredMap));
+            if (path == null)
+                return;
+
+            Optional<Connection<GameMap>> connection = path.getConnections().stream().findFirst();
+            connection.ifPresent(gameMapConnection -> setTargetPosition(Mappers
+                    .vector2(((Point) gameMapConnection.getUserObject()).getPos())));
+        }
+
     }
 
     @Override
@@ -108,6 +148,58 @@ public class MissionsSystem extends BaseSystem implements Disposable {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
 
+    }
+
+    private GameMap getRequiredMap(int chapter, int stage) {
+        StoryModel storyModel = dataRepository.getStoryModel();
+        for (GameMap map : storyModel.getMaps().values()) {
+            for (Point point : map.getPoints()) {
+                Map<String, String> currentData = point.getData();
+                String chapterString = currentData.get("chapter");
+                String stageString = currentData.get("stage");
+                if (chapterString != null && stageString != null) {
+                    int stageId = Integer.parseInt(stageString);
+                    int chapterId = Integer.parseInt(chapterString);
+                    if (chapterId == chapter && stageId == stage)
+                        return map;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Digraph<GameMap> buildSystemFromStory() {
+        StoryModel storyModel = dataRepository.getStoryModel();
+        Digraph<GameMap> mapDigraph = new Digraph<>();
+        for (GameMap map : storyModel.getMaps().values()) {
+            Node<GameMap> node = mapDigraph.offer(map);
+            for (Point point : map.getPoints()) {
+                if (point.getType() == 7) {
+                    Map<String, String> currentData = point.getData();
+                    String chapterString = currentData.get("chapter");
+                    String stageString = currentData.get("stage");
+                    String targetMap = currentData.get("map");//with map
+                    if (chapterString != null && stageString != null) {
+                        //with chapter
+                        int stage = Integer.parseInt(stageString);
+                        Map<String, String> data = storyModel
+                                .getChapter(chapterString)
+                                .getStage(stage).getData();
+                        if (data != null && data.containsKey("map"))
+                            targetMap = data.get("map");
+                    }
+                    if (targetMap != null) {
+                        GameMap targetGameMap = storyModel.getMap(Long.parseLong(targetMap));
+                        if (targetGameMap != null) {
+                            Node<GameMap> gameMapNode = mapDigraph.offer(targetGameMap);
+                            Connection<GameMap> connection = node.addConnection(gameMapNode, 1);
+                            connection.setUserObject(point);
+                        }
+                    }
+                }
+            }
+        }
+        return mapDigraph;
     }
 
     public Vector2 getPosition() {
@@ -138,12 +230,13 @@ public class MissionsSystem extends BaseSystem implements Disposable {
     }
 
     public void setTargetPosition(Vector2 position) {
-        targetPosition = position;
+        if (position != null) {
+            targetPosition = position;
 
-        cameraSystem.setDetached(true);
-        cameraSystem.getCamera().position.x = position.x;
-        cameraSystem.getCamera().position.y = position.y;
-
+            cameraSystem.setDetached(true);
+            cameraSystem.getCamera().position.x = position.x;
+            cameraSystem.getCamera().position.y = position.y;
+        }
     }
 
     @Override

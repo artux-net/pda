@@ -142,9 +142,10 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 if (storyStateModel != null && storyStateModel.isOver()) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
                     builder.setTitle("Нет доступа");
-                    builder.setMessage("История уже пройдена, приступайте к прохождению других.");
-                    builder.setNegativeButton(R.string.okay, (dialog, which) -> dialog.cancel());
-                    builder.setPositiveButton("Сбросить прохождение этой истории", (dialog, which) ->
+                    builder.setMessage("История уже пройдена, приступайте к прохождению других. " +
+                            "При сбросе прохождения этой истории другие истории могут оказаться недоступны.");
+                    builder.setNeutralButton(R.string.okay, (dialog, which) -> dialog.cancel());
+                    builder.setNegativeButton("Сбросить прохождение", (dialog, which) ->
                             storiesViewModel.resetSingleStory(id));
                     builder.show();
                     return;

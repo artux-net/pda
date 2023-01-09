@@ -1,10 +1,13 @@
 package net.artux.pda.map.states;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.CoreComponent;
@@ -30,62 +33,70 @@ public class PreloadState extends State {
         super(gsm, dataRepository);
         this.coreComponent = coreComponent;
         font = coreComponent.getAssetsFinder().getFontManager().getFont(22);
-        stage = new Stage();
         assetManager = coreComponent.getAssetsManager();
         gameMap = dataRepository.getGameMap();
 
         loadMap();
+
+        Label.LabelStyle labelStyle = new Label.LabelStyle(font, Color.WHITE);
+        stage = new Stage();
+        Table table = new Table();
+        table.setPosition(0, 0);
+        table.setSize(200, 200);
+        stage.addActor(table);
+
+        Label label = new Label(gameMap.getTitle(), labelStyle);
+        label.setAlignment(Align.center);
+        label.setSize(w, h);
+        stage.addActor(label);
+
+        Label progressLabel = new Label("0%", labelStyle);
+        progressLabel.addAction(new Action() {
+            @Override
+            public boolean act(float delta) {
+                float progress = assetManager.getProgress();
+                progressLabel.setText(df.format(progress));
+                return false;
+            }
+        });
+        table.add(progressLabel)
+                .left()
+                .bottom()
+                .pad(50f);
     }
 
     private void loadMap() {
         assetManager.load(gameMap.getTexture(), NetFile.class);
         assetManager.load(gameMap.getBoundsTexture(), NetFile.class);
-        assetManager.load(gameMap.getBlurTexture(), NetFile.class);
         assetManager.load(gameMap.getTilesTexture(), NetFile.class);
     }
 
-    public void resume() {
-
-    }
+    public void resume() {}
 
     @Override
-    protected void handleInput() {
-
-    }
+    protected void handleInput() {}
 
     @Override
-    protected void stop() {
-
-    }
-
+    protected void stop() {}
 
     @Override
     public void update(float dt) {
-
+        stage.act(dt);
     }
 
     @Override
     public void render() {
-        Batch batch = stage.getBatch();
-        batch.begin();
         if (assetManager.isFinished()) {
             gsm.set(coreComponent.getPlayState());
         } else {
-            float progress = assetManager.getProgress();
-            font.draw(batch, df.format(progress), 50, 50);
-            font.draw(batch, gameMap.getTitle(), Gdx.graphics.getWidth()/2f,Gdx.graphics.getHeight()/2f);
+            stage.draw();
         }
-        batch.end();
     }
 
     @Override
-    public void resize(int w, int h) {
-
-    }
+    public void resize(int w, int h) {}
 
     @Override
-    public void dispose() {
-
-    }
+    public void dispose() {}
 
 }

@@ -30,17 +30,14 @@ public class PlayState extends State {
 
     private final static String TAG = "PlayState";
     private GameMap gameMap;
-    private Image mapTexture;
     public Stage stage;
     public Stage uistage;
 
     private LevelBackground levelBackground;
     private final EngineManager engineManager;
-    private final AssetsFinder assetsFinder;
     private final AssetManager assetManager;
     private final UserInterface userInterface;
     private final CoreComponent coreComponent;
-    private final MapComponent mapComponent;
     private final Timer timer;
     Texture background;
 
@@ -50,18 +47,18 @@ public class PlayState extends State {
         this.gameMap = gameMap;
         this.coreComponent = coreComponent;
 
-        assetsFinder = coreComponent.getAssetsFinder();
+        AssetsFinder assetsFinder = coreComponent.getAssetsFinder();
         assetManager = assetsFinder.getManager();
         assetManager.finishLoading();//make sure everything loaded
 
-        mapComponent = DaggerMapComponent.builder()
+        MapComponent mapComponent = DaggerMapComponent.builder()
                 .coreComponent(coreComponent)
                 .build();
 
         timer = mapComponent.getTimer();
-        engineManager = mapComponent.getManager();///n
-        stage = mapComponent.gameStage();//n
-        uistage = mapComponent.uiStage();//n
+        engineManager = mapComponent.getManager();
+        stage = mapComponent.gameStage();
+        uistage = mapComponent.uiStage();
         userInterface = mapComponent.getUserInterface();
         mapComponent.initInterface();
 
@@ -72,11 +69,11 @@ public class PlayState extends State {
         background = (Texture) assetManager.get(gameMap.getTexture(), NetFile.class).file;
         GlobalData.mapWidth = background.getWidth();
         GlobalData.mapHeight = background.getHeight();
-        mapTexture = new Image(background);
+        Image mapTexture = new Image(background);
         if (!stage.getActors().contains(mapTexture, false))
             stage.addActor(mapTexture);
 
-        Texture levelTexture = (Texture) assetManager.get(gameMap.getBlurTexture(), NetFile.class).file;
+        Texture levelTexture = assetManager.get("textures/defaults/blur.png", Texture.class);
         if (levelBackground == null) {
             levelBackground = new LevelBackground(levelTexture, stage.getCamera());
         }
@@ -96,15 +93,9 @@ public class PlayState extends State {
 
         if (gameMap.getId() != map.getId()) {
             Gdx.app.log(TAG, "Update map, old: " + gameMap.getId() + " new map: " + map.getId());
-            //todo update map
             gsm.set(coreComponent.getPreloadState());
-
-            //update entities
-            //update spawns
-            //update points
-            //engineManager.updateEverything();
         }
-        engineManager.updateOnlyPlayer();//update player
+        engineManager.updateOnlyPlayer();
     }
 
     @Override
@@ -160,15 +151,13 @@ public class PlayState extends State {
         assetManager.unload(gameMap.getTexture());
         assetManager.unload(gameMap.getTilesTexture());
         assetManager.unload(gameMap.getBoundsTexture());
-        assetManager.unload(gameMap.getBlurTexture());
 
         stage.dispose();
         uistage.dispose();
         engineManager.dispose();
         timer.purge();
         timer.cancel();
-        if (userInterface != null)
-            userInterface.dispose();
+        userInterface.dispose();
     }
 
 }

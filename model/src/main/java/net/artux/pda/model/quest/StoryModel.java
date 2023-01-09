@@ -23,6 +23,10 @@ public class StoryModel implements Serializable {
         return chapters.get(id);
     }
 
+    public GameMap getMap(Long id) {
+        return maps.get(id);
+    }
+
     public List<MissionModel> getCurrentMissions(String... params) {
         List<MissionModel> missionModels = new LinkedList<>();
         if (missions != null)

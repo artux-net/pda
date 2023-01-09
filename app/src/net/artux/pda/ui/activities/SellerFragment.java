@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,13 +20,12 @@ import com.bumptech.glide.Glide;
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentQuest3Binding;
 import net.artux.pda.model.items.ItemModel;
-import net.artux.pda.model.items.SellerModel;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
-import net.artux.pda.ui.viewmodels.ItemsViewModel;
-import net.artux.pda.ui.viewmodels.SellerViewModel;
+import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.utils.URLHelper;
 
 import java.util.List;
+import java.util.Map;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -60,8 +58,7 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
 
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        ItemsViewModel itemsViewModel = provider.get(ItemsViewModel.class);
-        SellerViewModel sellerViewModel = provider.get(SellerViewModel.class);
+        QuestViewModel questViewModel = provider.get(QuestViewModel.class);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -73,7 +70,7 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
             background = view.findViewById(R.id.sellerBackground);
             binding.map.setOnClickListener(this);
 
-            itemsViewModel.getStoryData().observe(getViewLifecycleOwner(), dataModel -> {
+            questViewModel.getStoryData().observe(getViewLifecycleOwner(), dataModel -> {
                 List<ItemModel> items = dataModel.getAllItems();
                 if (items.size() > 0) {
                     userAdapter.setItems(items);
@@ -90,25 +87,23 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
                     numberPicker.setMinValue(1);
                     builder.setView(numberPicker);
                     builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                        sellerViewModel.buyItem(item.getId(), numberPicker.getValue());
+                        questViewModel.buyItem(item.getId(), numberPicker.getValue());
                     });
-                }else{
+                } else {
                     builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                        sellerViewModel.buyItem(item.getId(), 1);
+                        questViewModel.buyItem(item.getId(), 1);
                     });
                 }
 
-                float price = item.getPrice() * sellerViewModel.getBuyCoefficient();
+                float price = item.getPrice() * questViewModel.getBuyCoefficient();
                 builder.setTitle("Вы хотите купить " + item.getTitle() + "?");
                 builder.setMessage("Ориентировочная стоимость за штуку: " + price + " RU");
                 builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {
                 });
 
-
                 AlertDialog alertDialog = builder.create();
                 alertDialog.show();
             });
-            binding.sellerList.setAdapter(sellerAdapter);
 
             userAdapter = new ItemsAdapter();
             userAdapter.setOnClickListener(item -> {
@@ -119,15 +114,15 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
                     numberPicker.setMinValue(1);
                     builder.setView(numberPicker);
                     builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                        sellerViewModel.sellItem(item.getId(), numberPicker.getValue());
+                        questViewModel.sellItem(item.getId(), numberPicker.getValue());
                     });
-                }else{
+                } else {
                     builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                        sellerViewModel.sellItem(item.getId(), 1);
+                        questViewModel.sellItem(item.getId(), 1);
                     });
                 }
 
-                float price = item.getPrice() * sellerViewModel.getSellerCoefficient();
+                float price = item.getPrice() * questViewModel.getSellerCoefficient();
 
                 builder.setTitle("Вы хотите продать " + item.getTitle() + "?");
                 builder.setMessage("Ориентировочная стоимость за штуку: " + price + " RU");
@@ -138,29 +133,33 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
                 alertDialog.show();
             });
 
-            itemsViewModel.updateData();
-            sellerViewModel.update(sellerId);
+            questViewModel.sync(Map.of());
+            questViewModel.updateSeller(sellerId);
 
             sellerView.setLayoutManager(sellerAdapter.getLayoutManager(requireContext(), 3));
             sellerView.setAdapter(sellerAdapter);
 
-            sellerViewModel.getSeller().observe(getViewLifecycleOwner(), new Observer<SellerModel>() {
-                @Override
-                public void onChanged(SellerModel sellerModel) {
-                    if (sellerModel != null) {
-                        sellerAdapter.setItems(sellerModel.getAllItems());
-                        binding.sellerName.setText(sellerModel.getName());
-                        String imageUrl = URLHelper.getResourceURL(sellerModel.getImage());
-                        Glide.with(requireContext())
-                                .asDrawable()
-                                .centerCrop()
-                                .load(imageUrl)
-                                .into(background);
-                    }
+            buyerView.setLayoutManager(userAdapter.getLayoutManager(requireContext(), 3));
+            buyerView.setAdapter(userAdapter);
+
+            questViewModel.getSeller().observe(getViewLifecycleOwner(), sellerModel -> {
+                if (sellerModel != null) {
+                    sellerAdapter.setItems(sellerModel.getAllItems());
+                    binding.sellerName.setText(sellerModel.getName());
+                    String imageUrl = URLHelper.getResourceURL(sellerModel.getImage());
+                    Glide.with(requireContext())
+                            .asDrawable()
+                            .centerCrop()
+                            .load(imageUrl)
+                            .into(background);
                 }
             });
-            sellerViewModel.getStatus().observe(getViewLifecycleOwner(), statusModel ->
-                    Toast.makeText(requireContext(), statusModel.getDescription(), Toast.LENGTH_SHORT).show());
+            questViewModel.getStatus().observe(getViewLifecycleOwner(), statusModel -> {
+                questViewModel.sync(Map.of());
+                questViewModel.updateSeller(sellerId);
+                Toast.makeText(requireContext(), statusModel.getDescription(), Toast.LENGTH_SHORT).show();
+            });
+
 
         } else
             throw new RuntimeException();

@@ -76,6 +76,9 @@ public class AssetsFinder implements Disposable {
             FileHandle sounds = assetManager.getFileHandleResolver().resolve("audio/sounds");
             loadRecursively(assetManager, sounds, true, Sound.class);
 
+            FileHandle textures = assetManager.getFileHandleResolver().resolve("textures");
+            loadRecursively(assetManager, textures, true, Texture.class);
+
             sounds = assetManager.getFileHandleResolver().resolve("audio/music");
             loadRecursively(assetManager, sounds, true, Music.class);
 

@@ -12,7 +12,6 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.MessagingCodes;
-import net.artux.pda.map.engine.components.PassivityComponent;
 import net.artux.pda.map.engine.components.BulletComponent;
 import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.GroupComponent;
@@ -29,6 +28,7 @@ import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.states.StalkerState;
+import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
@@ -60,7 +60,7 @@ public class EntityBuilder {
                 .add(new VelocityComponent())
                 .add(new VisionComponent())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
-                .add(new WeaponComponent(gdxData))
+                .add(new WeaponComponent(gdxData, assetManager))
                 .add(new MoodComponent(userModel))
                 .add(new HealthComponent())
                 .add(new PlayerComponent(userModel, gdxData));
@@ -113,6 +113,7 @@ public class EntityBuilder {
         Entity entity = new Entity();
 
         WeaponModel w = new WeaponModel();
+        w.setType(ItemType.RIFLE);
         w.setSpeed(random(5, 10));
         w.setDamage(random(3, 5));
         w.setPrecision(random(15, 25));
@@ -133,7 +134,7 @@ public class EntityBuilder {
                 .add(group)
                 .add(group.getMood())
                 .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<>()))
-                .add(new WeaponComponent(w))
+                .add(new WeaponComponent(w, assetManager))
                 .add(statesComponent)
                 .add(new GroupTargetMovingComponent(group))
                 .add(new RelationalSpriteComponent(8, 8));

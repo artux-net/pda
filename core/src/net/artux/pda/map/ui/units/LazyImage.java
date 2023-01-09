@@ -1,6 +1,7 @@
 package net.artux.pda.map.ui.units;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -15,7 +16,9 @@ public class LazyImage extends Image {
         this.assetManager = assetManager;
         this.filename = filename;
 
-        assetManager.load(filename, Texture.class);
+        FileHandle fileHandle = assetManager.getFileHandleResolver().resolve(filename);
+        if (fileHandle.exists())
+            assetManager.load(filename, Texture.class);
     }
 
     @Override

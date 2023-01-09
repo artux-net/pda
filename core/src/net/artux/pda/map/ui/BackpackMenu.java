@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Align;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Utils;
@@ -36,6 +37,7 @@ import javax.inject.Inject;
 @PerGameMap
 public class BackpackMenu extends Table {
 
+    private final SoundsSystem soundsSystem;
     private final PlayerSystem playerSystem;
     private final DataRepository dataRepository;
     private final AssetManager assetManager;
@@ -47,11 +49,12 @@ public class BackpackMenu extends Table {
     private final Table additionalContent;
 
     @Inject
-    public BackpackMenu(HUD hud, SlotTextButton textButton, AssetsFinder assetsFinder, PlayerSystem playerSystem, DataRepository dataRepository, Skin skin) {
+    public BackpackMenu(HUD hud, SlotTextButton textButton, AssetsFinder assetsFinder, PlayerSystem playerSystem, DataRepository dataRepository, Skin skin, SoundsSystem soundsSystem) {
         super();
         this.playerSystem = playerSystem;
         this.dataRepository = dataRepository;
         this.assetManager = assetsFinder.getManager();
+        this.soundsSystem = soundsSystem;
         top();
         defaults()
                 .pad(10)
@@ -170,6 +173,7 @@ public class BackpackMenu extends Table {
                             if (model.getQuantity() > 0) {
                                 model.setQuantity(model.getQuantity() - 1);
                                 playerSystem.getHealthComponent().treat((MedicineModel) itemModel);
+                                soundsSystem.playSound(assetManager.get("audio/sounds/person/medicine.ogg"));
                             }
                             super.clicked(event, x, y);
                             update();
@@ -178,10 +182,10 @@ public class BackpackMenu extends Table {
                     additionalContent.add(itemView)
                             .uniform()
                             .fill();
-                }
-                mainContent.add(itemView)
-                        .uniform()
-                        .fill();
+                } else
+                    mainContent.add(itemView)
+                            .uniform()
+                            .fill();
             }
         }
 

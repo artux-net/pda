@@ -27,6 +27,7 @@ public class BattleSystem extends BaseSystem {
     private ImmutableArray<Entity> bullets;
 
     private final EntityProcessorSystem entityProcessorSystem;
+    private final SoundsSystem soundsSystem;
 
     private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<VisionComponent> vm = ComponentMapper.getFor(VisionComponent.class);
@@ -36,10 +37,11 @@ public class BattleSystem extends BaseSystem {
     private ComponentMapper<BulletComponent> bcm = ComponentMapper.getFor(BulletComponent.class);
 
     @Inject
-    public BattleSystem(EntityProcessorSystem entityProcessorSystem) {
+    public BattleSystem(SoundsSystem soundsSystem, EntityProcessorSystem entityProcessorSystem) {
         super(Family.all(HealthComponent.class, VisionComponent.class,
                 MoodComponent.class, PositionComponent.class, WeaponComponent.class).exclude(PlayerComponent.class, PassivityComponent.class).get());
         this.entityProcessorSystem = entityProcessorSystem;
+        this.soundsSystem = soundsSystem;
     }
 
     @Override
@@ -87,8 +89,10 @@ public class BattleSystem extends BaseSystem {
 
         if (moodComponent.hasEnemy())
             if (visionComponent.isSeeing(moodComponent.getEnemy()))
-                if (entityWeapon.shoot())
+                if (entityWeapon.shoot()) {
                     entityProcessorSystem.addBulletToEngine(entity, moodComponent.getEnemy(), entityWeapon.getSelected());
+                    soundsSystem.playSoundAtDistance(entityWeapon.getShotSound(), pm.get(moodComponent.getEnemy()));
+                }
         //todo count dst
     }
 
