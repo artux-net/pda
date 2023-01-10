@@ -50,8 +50,13 @@ public class PlayerBattleSystem extends BaseSystem {
         WeaponComponent entityWeapon = wm.get(entity);
         MoodComponent moodComponent = mm.get(entity);
         VisionComponent visionComponent = vm.get(entity);
+        if (entityWeapon.reloading && !soundStarted) {
+            soundsSystem.playSound(entityWeapon.getReloadSound());
+            soundStarted = true;
+        }
+
         entityWeapon.update(deltaTime);
-        
+
         if (moodComponent.hasEnemy()) {
             if (!mm.get(moodComponent.enemy).untarget)
                 if (visionComponent.isSeeing(moodComponent.getEnemy()))
@@ -60,11 +65,6 @@ public class PlayerBattleSystem extends BaseSystem {
                         entityProcessorSystem.addBulletToEngine(entity, moodComponent.getEnemy(), entityWeapon.getSelected());
                         soundsSystem.playSoundAtDistance(entityWeapon.getShotSound(), pm.get(moodComponent.getEnemy()));
                     }
-        }
-
-        if (entityWeapon.reloading && !soundStarted){
-            soundsSystem.playSound(entityWeapon.getReloadSound());
-            soundStarted = true;
         }
     }
 

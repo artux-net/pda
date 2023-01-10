@@ -20,6 +20,7 @@ import net.artux.pda.map.engine.systems.MapOrientationSystem;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.HashMap;
+import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -45,12 +46,14 @@ public class PlayerMovingSystem extends BaseSystem {
     private final float stepVolume = 0.15f;
     private final float oneSoundDistance = 5.7f;
     private float stepsDistance = 0;
+    private final Random random;
 
     @Inject
     public PlayerMovingSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem) {
         super(Family.all(VelocityComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
         stepSounds = new HashMap<>();
+        random = new Random();
 
         String prefix = "audio/sounds/steps/";
 
@@ -117,13 +120,13 @@ public class PlayerMovingSystem extends BaseSystem {
             if (stepsDistance >= oneSoundDistance) {
                 stepsDistance = 0;
                 int type = mapOrientationSystem.getMapBorder().getTileType(positionComponent.x, positionComponent.y);
-                if (!stepSounds.containsKey(type))
+                if (!stepSounds.containsKey(type) || random.nextInt(4) == 0)
                     type = TiledNode.TILE_EMPTY;
-                
+
                 if (left)
-                    stepSounds.get(type).left.play(stepVolume);
+                    stepSounds.get(type).left.play(stepVolume * currentVelocity.len());
                 else
-                    stepSounds.get(type).right.play(stepVolume);
+                    stepSounds.get(type).right.play(stepVolume * currentVelocity.len());
                 left = !left;
             }
         }

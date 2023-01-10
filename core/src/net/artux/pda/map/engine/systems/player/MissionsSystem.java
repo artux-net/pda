@@ -6,6 +6,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -20,6 +22,8 @@ import net.artux.pda.map.engine.pathfinding.own.DijkstraPathFinder;
 import net.artux.pda.map.engine.pathfinding.own.GraphPath;
 import net.artux.pda.map.engine.pathfinding.own.Node;
 import net.artux.pda.map.engine.systems.BaseSystem;
+import net.artux.pda.map.engine.systems.SoundsSystem;
+import net.artux.pda.map.ui.blocks.MessagesPlane;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.Point;
@@ -33,6 +37,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -45,17 +51,24 @@ public class MissionsSystem extends BaseSystem implements Disposable {
     private final float pixelsPerMeter = 3f;
     private final DataRepository dataRepository;
     private final CameraSystem cameraSystem;
+    private final SoundsSystem soundsSystem;
+    private final MessagesPlane messagesPlane;
     private final Digraph<GameMap> mapDigraph;
     private final DijkstraPathFinder<GameMap> pathFinder;
+    private final Sound missionUpdatedSound;
 
     private MissionModel activeMission;
     private Vector2 targetPosition;
 
     @Inject
-    public MissionsSystem(DataRepository dataRepository, CameraSystem cameraSystem) {
+    public MissionsSystem(MessagesPlane messagesPlane, AssetManager assetManager, DataRepository dataRepository, SoundsSystem soundsSystem, CameraSystem cameraSystem) {
         super(Family.all(PositionComponent.class, QuestComponent.class).exclude(PassivityComponent.class).get());
         this.dataRepository = dataRepository;
         this.cameraSystem = cameraSystem;
+        this.messagesPlane = messagesPlane;
+        this.soundsSystem = soundsSystem;
+
+        missionUpdatedSound = assetManager.get("audio/sounds/pda/pda_objective.ogg");
 
         mapDigraph = buildSystemFromStory();
         pathFinder = new DijkstraPathFinder<>();
@@ -68,14 +81,39 @@ public class MissionsSystem extends BaseSystem implements Disposable {
         loadPreferences();
     }
 
+    public void updateData(StoryDataModel oldDataModel) {
+        Set<String> oldParams = getParams(oldDataModel);
+        Set<String> params = getParams(dataRepository.getStoryDataModel());
+
+        params.removeIf(oldParams::contains);
+        String[] paramArr = params.toArray(new String[]{});
+        List<MissionModel> updatedMissions = getMissions(paramArr);
+        for (MissionModel m :
+                updatedMissions) {
+            CheckpointModel checkpointModel = m.getCurrentCheckpoint(paramArr);
+            messagesPlane.addMessage("avatars/a0.jpg", "Задание обновлено: " + m.getTitle(),
+                    "Новая цель: " + checkpointModel.getTitle(), MessagesPlane.Length.SHORT);
+            soundsSystem.playSound(missionUpdatedSound);
+        }
+    }
+
+    public Set<String> getParams(StoryDataModel dataModel) {
+        return dataModel.getParameters().stream()
+                .map(ParameterModel::getKey).collect(Collectors.toSet());
+    }
+
     public String[] getParams() {
-        StoryDataModel storyDataModel = dataRepository.getStoryDataModel();
-        return storyDataModel.getParameters().stream()
+        StoryDataModel dataModel = dataRepository.getStoryDataModel();
+        return dataModel.getParameters().stream()
                 .map(ParameterModel::getKey).toArray(String[]::new);
     }
 
     public List<MissionModel> getMissions() {
-        return dataRepository.getStoryModel().getCurrentMissions(getParams());
+        return getMissions(getParams());
+    }
+
+    public List<MissionModel> getMissions(String[] params) {
+        return dataRepository.getStoryModel().getCurrentMissions(params);
     }
 
     public List<QuestComponent> getPoints() {

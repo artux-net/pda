@@ -71,13 +71,23 @@ public class StoryDataModel implements Serializable {
     }
 
     public ItemModel getCurrentWearable(ItemType type) {
+        ItemModel weapon = null;
         for (ItemModel item : getAllItems()) {
             if (item instanceof WearableModel)
                 if (item.getType() == type && ((WearableModel) item).isEquipped()) {
-                    return item;
+                    weapon = item;
                 }
         }
-        return null;
+        if (weapon!=null)
+            return weapon;
+
+        for (ItemModel item : getAllItems()) {
+            if (item instanceof WearableModel)
+                if (item.getType() == type) {
+                    weapon = item;
+                }
+        }
+        return weapon;
     }
 
     public ItemModel getItemByBaseId(int baseId) {

@@ -98,15 +98,13 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
         });
 
         questViewModel.getStage().observe(this, stageModel -> {
-            setTitle(stageModel.getTitle());
-            findViewById(R.id.navbar).setVisibility(View.VISIBLE);
             FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
-            StageFragment stageFragment = StageFragment.createInstance(stageModel);
             if (coreFragment != null && coreFragment.isAdded()) {
                 mFragmentTransaction.hide(coreFragment);
                 mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.STARTED);
             }
 
+            StageFragment stageFragment = StageFragment.createInstance(stageModel);
             for (Fragment fragment : getSupportFragmentManager().getFragments()) {
                 if (fragment instanceof StageFragment) {
                     mFragmentTransaction.remove(fragment);
@@ -118,6 +116,9 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
                     .add(R.id.containerView, stageFragment, "stage")
                     .addToBackStack("stage")
                     .commit();
+
+            setTitle(stageModel.getTitle());
+            findViewById(R.id.navbar).setVisibility(View.VISIBLE);
         });
 
         questViewModel.getMap().observe(this, map -> {

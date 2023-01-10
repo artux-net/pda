@@ -34,9 +34,9 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     private Vector2 cameraV2Position = new Vector2();
 
     private float initialZoom = 0.5f;
-    private static float maxZoom = 2f;
+    private static float maxZoom = 1f;
     private static float minZoom = 0.1f;
-    private static float maxLimit = 1.4f;
+    private static float maxLimit = 0.8f;
     private static float minLimit = 0.4f;
     private static float zoomingSpeed = 2f;
     private static float specialZoomValue = 0.2f;

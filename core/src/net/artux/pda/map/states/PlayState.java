@@ -16,7 +16,7 @@ import net.artux.pda.map.di.core.DaggerMapComponent;
 import net.artux.pda.map.di.core.MapComponent;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
-import net.artux.pda.map.engine.LevelBackground;
+import net.artux.pda.map.engine.LevelBackgroundImage;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.ui.UserInterface;
 import net.artux.pda.map.utils.NetFile;
@@ -33,7 +33,7 @@ public class PlayState extends State {
     public Stage stage;
     public Stage uistage;
 
-    private LevelBackground levelBackground;
+    private LevelBackgroundImage levelBackgroundImage;
     private final EngineManager engineManager;
     private final AssetManager assetManager;
     private final UserInterface userInterface;
@@ -74,8 +74,8 @@ public class PlayState extends State {
             stage.addActor(mapTexture);
 
         Texture levelTexture = assetManager.get("textures/defaults/blur.png", Texture.class);
-        if (levelBackground == null) {
-            levelBackground = new LevelBackground(levelTexture, stage.getCamera());
+        if (levelBackgroundImage == null) {
+            levelBackgroundImage = new LevelBackgroundImage(levelTexture, stage.getCamera());
         }
     }
 
@@ -129,8 +129,8 @@ public class PlayState extends State {
     public void render() {
         SpriteBatch batch = (SpriteBatch) stage.getBatch();
         batch.begin();
-        if (levelBackground != null)
-            levelBackground.render(batch);
+        if (levelBackgroundImage != null)
+            levelBackgroundImage.render(batch);
         batch.draw(background, 0, 0);
         batch.end();
 

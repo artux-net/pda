@@ -207,11 +207,14 @@ public class UserInterfaceModule {
                 ItemModel resource = entityWeapon.getBulletModel();
                 if (entityWeapon.getSelected() != null) {
                     PlayerData.selectedWeapon = entityWeapon.getSelected().getTitle();
+                    weaponSlot.setText(entityWeapon.getSelected().getTitle());
                     if (resource != null) {
                         PlayerData.bullet = resource.getTitle();
                         weaponSlot.setLabelText(entityWeapon.getMagazine() + "/" + resource.getQuantity());
-                        weaponSlot.setText(entityWeapon.getSelected().getTitle());
                     }
+                }else {
+                    weaponSlot.setText("Оружие отсутствует");
+                    weaponSlot.setLabelText("");
                 }
                 return false;
             }

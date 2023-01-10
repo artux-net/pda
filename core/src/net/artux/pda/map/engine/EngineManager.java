@@ -25,7 +25,6 @@ import net.artux.pda.map.engine.systems.player.CameraSystem;
 import net.artux.pda.map.engine.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
-import net.artux.pda.map.engine.world.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
 import net.artux.pda.map.utils.Mappers;
@@ -54,6 +53,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
     private final PropertyChangeListener storyDataListener = propertyChangeEvent -> {
         if (propertyChangeEvent.getPropertyName().equals("storyData") && engine != null) {
+            StoryDataModel oldDataModel = (StoryDataModel) propertyChangeEvent.getOldValue();
             StoryDataModel dataModel = (StoryDataModel) propertyChangeEvent.getNewValue();
             PlayerSystem playerSystem = engine.getSystem(PlayerSystem.class);
             if (playerSystem==null)
@@ -65,7 +65,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
                 playerComponent.gdxData = dataModel;
                 weaponComponent.updateData(dataModel);
-                engine.getSystem(MissionsSystem.class);
+                engine.getSystem(MissionsSystem.class).updateData(oldDataModel);
             }
         }
     };
@@ -90,8 +90,8 @@ public class EngineManager extends InputListener implements Drawable, Disposable
             ControlPointsHelper.createControlPointsEntities(mapComponent);
         if (questPoints)
             QuestPointsHelper.createQuestPointsEntities(mapComponent);
-        if (anomalies)
-            AnomalyHelper.createAnomalies(mapComponent);
+      /*  if (anomalies)
+            AnomalyHelper.createAnomalies(mapComponent);*/
 
 //        RandomSpawnerHelper.init(coreComponent);
         mapComponent.getConditionManager()

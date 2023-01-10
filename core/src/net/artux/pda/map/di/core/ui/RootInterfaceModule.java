@@ -1,5 +1,6 @@
 package net.artux.pda.map.di.core.ui;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -101,6 +102,7 @@ public class RootInterfaceModule {
     @Named("joyTable")
     public Table getJoyTable(@Named("gameZone") Group gameZone) {
         Table table = new Table();
+        table.setWidth(Gdx.graphics.getWidth()/3f);
         table.setFillParent(true);
         table.left().bottom();
         gameZone.addActor(table);

@@ -48,9 +48,11 @@ public class WeaponComponent implements Component {
 
     public void updateData(StoryDataModel dataModel) {
         this.dataModel = dataModel;
-        setWeaponModel((WeaponModel) dataModel.getCurrentWearable(ItemType.RIFLE));
         player = true;
-        reload();
+        ItemModel weapon = dataModel.getCurrentWearable(ItemType.RIFLE);
+        if (weapon == null)
+            weapon = dataModel.getCurrentWearable(ItemType.PISTOL);
+        setWeaponModel((WeaponModel) weapon);
     }
 
     public WeaponComponent(WeaponModel weaponModel, AssetManager assetManager) {
@@ -89,6 +91,7 @@ public class WeaponComponent implements Component {
             reload = assetManager.get(reloadSoundName);
 
             reload();
+            reloading = false;
         }
     }
 
@@ -143,7 +146,7 @@ public class WeaponComponent implements Component {
         }*/
     }
 
-    public boolean reloading;
+    public boolean reloading = false;
 
     public boolean shoot() {
         if (timeout <= 0 && ((bulletModel != null && bulletModel.getQuantity() > 0) || !player)) {
@@ -174,10 +177,10 @@ public class WeaponComponent implements Component {
     }
 
     public void reload() {
-        reloading = true;
         WeaponModel weaponModel = getSelected();
         if (weaponModel != null) {
             int take = weaponModel.getBulletQuantity();
+            reloading = true;
             if (player) {
                 if (bulletModel != null) {
                     take = bulletModel.getQuantity();

@@ -4,13 +4,11 @@ import static com.badlogic.gdx.math.MathUtils.random;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.ui.blocks.MessagesPlane;
 import net.artux.pda.model.UserMessage;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.inject.Inject;
 
@@ -22,17 +20,17 @@ public class StalkerMessageGenerator {
     private final AssetManager assetManager;
 
     @Inject
-    public StalkerMessageGenerator(AssetManager assetManager, SoundsSystem soundsSystem, MessagesPlane messagesPlane, Timer timer, ContentGenerator contentGenerator) {
+    public StalkerMessageGenerator(AssetManager assetManager, SoundsSystem soundsSystem, MessagesPlane messagesPlane, ContentGenerator contentGenerator) {
         this.contentGenerator = contentGenerator;
         this.assetManager = assetManager;
         this.soundsSystem = soundsSystem;
         this.messagesPlane = messagesPlane;
-        timer.schedule(new TimerTask() {
+        Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
                 addMessage(generateMessage());
             }
-        }, MathUtils.random(60000, 120000), MathUtils.random(60000, 120000));
+        }, MathUtils.random(60, 120), MathUtils.random(60, 120));
     }
 
     public void addMessage(UserMessage message) {
