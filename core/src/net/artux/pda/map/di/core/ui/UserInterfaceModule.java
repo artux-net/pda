@@ -212,7 +212,7 @@ public class UserInterfaceModule {
                         PlayerData.bullet = resource.getTitle();
                         weaponSlot.setLabelText(entityWeapon.getMagazine() + "/" + resource.getQuantity());
                     }
-                }else {
+                } else {
                     weaponSlot.setText("Оружие отсутствует");
                     weaponSlot.setLabelText("");
                 }
@@ -245,6 +245,7 @@ public class UserInterfaceModule {
     @Provides
     public Actor initControlTable(@Named("controlTable") Table controlTable, PlayerSystem playerSystem,
                                   PlayerBattleSystem battleSystem, AssetManager assetManager) {
+        controlTable.defaults().size(10);
         controlTable.add(addInteractButton(assetManager, "ui/icons/icon_shoot.png", new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -305,7 +306,7 @@ public class UserInterfaceModule {
                     moodComponent.setEnemy(playerEnemies.getFirst());
             }
         }));
-        controlTable.add().colspan(3);
+        //controlTable.add().colspan(3);
 
         return controlTable;
     }

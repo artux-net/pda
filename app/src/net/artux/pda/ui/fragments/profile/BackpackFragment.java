@@ -82,9 +82,15 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
             navigationPresenter.addFragment(EncyclopediaFragment.of(item), true);
         });
 
-        if (item instanceof WearableModel)
-            builder.setNeutralButton(getString(R.string.item_as_main),
+        if (item instanceof WearableModel) {
+            WearableModel wearableModel = (WearableModel) item;
+            if (!wearableModel.isEquipped())
+                builder.setNeutralButton(getString(R.string.item_as_main),
+                        (dialogInterface, i) -> itemsViewModel.setWearable((WearableModel) item));
+            else
+                builder.setNeutralButton(getString(R.string.take_off),
                     (dialogInterface, i) -> itemsViewModel.setWearable((WearableModel) item));
+        }
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();

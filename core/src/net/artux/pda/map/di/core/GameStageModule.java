@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
@@ -37,7 +38,7 @@ public class GameStageModule {
     @Provides
     @Named("uiStage")
     public Stage uiStage(UserInterface userInterface) {
-        Stage stage = new Stage();
+        Stage stage = new Stage(new ScreenViewport());
         stage.addActor(userInterface);
         return stage;
     }

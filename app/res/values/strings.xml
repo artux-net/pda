@@ -49,10 +49,10 @@
     <string name="profile_inventory">Inventory</string>
     <string name="profile_equipment">Equipment</string>
     <string name="profile_achievements">Achievements</string>
-    <string name="profile_brief">Сводка</string>
+    <string name="profile_brief">Summary</string>
 
     <!-- Strings related to profileModel view -->
-    <string name="profile_arena">Арена</string>
+    <string name="profile_arena">Arena</string>
     <string name="profile_shop">Shop</string>
     <string name="profile_error">Cannot find this pdaId</string>
     <string name="backpack">Backpack</string>
@@ -160,8 +160,8 @@
     <string name="empty">"There are no entries. "</string>
 
     <string name="note_isnt_selected">Note isn\'t selected.</string>
-    <string name="noteTitleInput">Введите заглавие...</string>
-    <string name="noteContentInput">Введите содержимое заметки...</string>
+    <string name="noteTitleInput">Input title...</string>
+    <string name="noteContentInput">Input content of the note...</string>
     <string name="subs">Friend requests - %1$s</string>
     <string name="settings">Settings</string>
     <string name="registrationEndDesc">На указанную почту %1$s было отправлено письмо с ссылкой для подтверждения регистрации в сталкерской сети, перейдите по ней для завершения. Письмо может попасть в папку спам, советуем ее проверить.</string>
@@ -193,14 +193,14 @@
 Дальше начни свой путь в Зоне с пролога, для этого зайди в "Карта" и выбери соответствующий пункт. Пройди его, чтобы понимать, как устроен ПДА. После ты можешь начинать общение со сталкерами в чате, проходить режим свободной игры, который содержит в себе десятки квестов. Становись лучшим из лучших. Удачной дороги, сталкер!
 
 ]]></string>
-    <string name="help_tab4_title">Как тогда поступим?</string>
     <string name="friends_of">\"Friends of %s\"</string>
     <string name="create_note">Create note</string>
     <string name="help_tab3_title">How to use</string>
     <string name="summaryDate">Summary from %s</string>
     <string name="selectSummary">Select summary.</string>
-    <string name="item_as_main">Make as main</string>
-    <string name="notification_message">Сообщение</string>
-    <string name="notification_alert">Уведомление</string>
-    <string name="any_select_action">Выберете действие</string>
+    <string name="item_as_main">Equip</string>
+    <string name="notification_message">Message</string>
+    <string name="notification_alert">Notification</string>
+    <string name="any_select_action">Choose action</string>
+    <string name="take_off">Take off</string>
 </resources>

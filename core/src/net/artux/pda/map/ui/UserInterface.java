@@ -39,6 +39,8 @@ public class UserInterface extends Group implements Disposable {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
+        //setSize(200,100);
+
         float gameZoneWidth = w - uiFrame.standartFrameSize - uiFrame.headerLeftX;
         float gameZoneHeight = h - uiFrame.standartFrameSize - uiFrame.topFrameHeight;
         stack.setSize(gameZoneWidth, gameZoneHeight);
@@ -73,4 +75,5 @@ public class UserInterface extends Group implements Disposable {
     public UIFrame getUIFrame() {
         return uiFrame;
     }
+
 }
