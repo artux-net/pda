@@ -119,4 +119,5 @@
     <string name="noteContentInput">Введите содержимое заметки...</string>
     <string name="take_off">Снять</string>
     <string name="help_tab4_title">Как тогда поступим?</string>
+    <string name="friends_of">Друзья %s</string>
 </resources>

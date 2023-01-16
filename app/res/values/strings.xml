@@ -164,14 +164,14 @@
     <string name="noteContentInput">Input content of the note...</string>
     <string name="subs">Friend requests - %1$s</string>
     <string name="settings">Settings</string>
-    <string name="registrationEndDesc">На указанную почту %1$s было отправлено письмо с ссылкой для подтверждения регистрации в сталкерской сети, перейдите по ней для завершения. Письмо может попасть в папку спам, советуем ее проверить.</string>
+    <string name="registrationEndDesc">An email has been sent to the specified email address %1$s with a link to confirm registration in the stalker network, follow it to complete. The letter may end up in the spam folder, we advise you to check it.</string>
     <string name="registrationEndConfirm">Done</string>
     <string name="notEqualPasswords">Passwords are not equal.</string>
     <string name="exitStory">Exit story</string>
     <string name="wrong_response">Wrong response from server, please update the app or try again</string>
     <string name="what_is_pda">Что такое ПДА?</string>
     <string name="help_tab1_title">What is PDA?</string>
-    <string name="help_tab1_content">Сталкерский ПДА - многофункциональное приложение для Android, которое поможет тебе погрузиться в атмосферу жизни в Зоне Отчуждения. Ты сможешь приятно провести время в общем чате, посоревноваться с друзьями на онлайн арене, купить и продать снаряжение и самое главное - пройти сюжетные квесты. А после прохождения сюжета тебе будет доступен фриплей, в котором ты решишь сам свою дальнейшую судьбу!</string>
+    <string name="help_tab1_content">Stalker PDA is a multifunctional application for Android that will help you immerse yourself in the atmosphere of life in the Exclusion Zone. You can have a good time in the general chat, compete with friends in the online arena, buy and sell equipment, and most importantly, complete story quests. And after completing the story, you will have freeplay available, in which you will decide your own fate!</string>
     <string name="help_tab2_title">How it works</string>
     <string name="help_tab2_content"><![CDATA[
 
@@ -193,7 +193,7 @@
 Дальше начни свой путь в Зоне с пролога, для этого зайди в "Карта" и выбери соответствующий пункт. Пройди его, чтобы понимать, как устроен ПДА. После ты можешь начинать общение со сталкерами в чате, проходить режим свободной игры, который содержит в себе десятки квестов. Становись лучшим из лучших. Удачной дороги, сталкер!
 
 ]]></string>
-    <string name="friends_of">\"Friends of %s\"</string>
+    <string name="friends_of">Friends of %s</string>
     <string name="create_note">Create note</string>
     <string name="help_tab3_title">How to use</string>
     <string name="summaryDate">Summary from %s</string>
@@ -203,4 +203,5 @@
     <string name="notification_alert">Notification</string>
     <string name="any_select_action">Choose action</string>
     <string name="take_off">Take off</string>
+    <string name="help_tab4_title">How shall we proceed then?</string>
 </resources>
