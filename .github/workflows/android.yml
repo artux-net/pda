@@ -22,9 +22,14 @@ jobs:
         with:
           gradlePath: app/build.gradle
           versionCode: ${{github.run_number}}
-            
+          
+      - name: Build APK
+        id: build
+        run: bash ./gradlew assembleRelease
+        
       - uses: r0adkll/sign-android-release@v1
-        name: Sign app APK
+        name: Sign APK
+        id: sign_apk
         with:
           releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
@@ -39,4 +44,4 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
             Сборка ${{github.run_number}}: ${{ github.event.commits[0].message }}
-          document: app/build/outputs/apk/release/**.apk
+          document: ${{steps.sign_apk.outputs.signedReleaseFile}}
