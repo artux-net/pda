@@ -18,15 +18,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Restore Cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
       - name: Run Debug Tests
         run: ./gradlew testDebugUnitTest --continue
 
@@ -46,15 +37,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Restore Cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
       - name: Run Debug Lint
         run: ./gradlew lintDebug
 
@@ -70,7 +52,6 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-
       - name: Checkout
         uses: actions/checkout@v2
         
@@ -79,24 +60,20 @@ jobs:
         with:
           gradlePath: app/build.gradle
           versionCode: ${{github.run_number}}
-          
-      - name: Restore Cache
-        uses: actions/cache@v2
+            
+      - name: Build Signed APK
+        uses: victorbnl/build-signed-apk@main
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Assemble Debug
-        run: ./gradlew assembleDebug
-
+          keystore_file : keystore/pda.jks
+          keystore_password: ${{ secrets.keystore_password }}
+          key_alias: ${{ secrets.key_alias }}
+          key_password: ${{ secrets.key_password }}
+          
       - name: Upload APK
         uses: actions/upload-artifact@v2
         with:
           name: apk
-          path: app/build/outputs/apk/debug/**.apk
+          path: app/release/**.apk
           
       - name: Send apk to Artux channel
         uses: appleboy/telegram-action@master
@@ -104,5 +81,5 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Build ${{github.run_number}}: ${{ github.event.commits[0].message }}
-          document: app/build/outputs/apk/debug/**.apk
+            Сборка ${{github.run_number}}: ${{ github.event.commits[0].message }}
+          document: app/release/**.apk
