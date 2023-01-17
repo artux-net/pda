@@ -73,7 +73,13 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
-
+        
+      - name: Bump version
+        uses: chkfung/android-version-actions@v1.2.1
+        with:
+          gradlePath: app/build.gradle
+          versionCode: ${{github.run_number}}
+          
       - name: Restore Cache
         uses: actions/cache@v2
         with:
@@ -91,3 +97,12 @@ jobs:
         with:
           name: apk
           path: app/build/outputs/apk/debug/**.apk
+          
+      - name: Send apk to Artux channel
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            Build ${{github.run_number}}: ${{ github.event.commits[0].message }}
+          document: app/build/outputs/apk/debug/**.apk
