@@ -42,14 +42,6 @@ gradle.projectsEvaluated {
 }
 
 android {
-    signingConfigs {
-        release {
-            storeFile file('C:\\artux.jks')
-            storePassword 'pass'
-            keyAlias 'pda'
-            keyPassword 'pass'
-        }
-    }
     buildToolsVersion "32.0.0"
     compileSdkVersion 33
     sourceSets {
@@ -73,7 +65,6 @@ android {
         targetSdkVersion 33
         versionCode 44
         versionName "0.2.0"
-        signingConfig signingConfigs.release
     }
     buildTypes {
         release {
