@@ -16,7 +16,7 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.RandomPosition;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.GroupComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.map.ConditionComponent;
 import net.artux.pda.map.engine.components.map.SpawnComponent;
@@ -37,7 +37,7 @@ import javax.inject.Inject;
 @PerGameMap
 public class EntityProcessorSystem extends EntitySystem {
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
 
     private final EntityBuilder builder;
     private final AssetManager assetManager;
@@ -74,7 +74,7 @@ public class EntityProcessorSystem extends EntitySystem {
             else
                 controlPoint.add(new ConditionComponent(Collections.emptyMap()));
 
-            controlPoint.add(new PositionComponent(Mappers.vector2(spawnModel.getPos())))
+            controlPoint.add(new Position(Mappers.vector2(spawnModel.getPos())))
                     .add(spawnComponent)
                     .add(new ClickComponent(spawnModel.getR(),
                             () -> renderSystem.showText(spawnComponent.desc(), Mappers.vector2(spawnModel.getPos()))));

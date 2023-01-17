@@ -16,13 +16,14 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.engine.components.FogOfWarComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PassivityComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.RelationalSpriteComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.entities.RelationType;
 
@@ -39,9 +40,9 @@ public class RenderSystem extends BaseSystem implements Drawable {
     private BitmapFont font;
     private Label.LabelStyle labelStyle;
 
-    private ComponentMapper<RelationalSpriteComponent> rsm = ComponentMapper.getFor(RelationalSpriteComponent.class);
+    private ComponentMapper<FogOfWarComponent> fog = ComponentMapper.getFor(FogOfWarComponent.class);
     private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
     private ImmutableArray<Entity> relationalEntities;
@@ -51,7 +52,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
     @Inject
     public RenderSystem(@Named("gameStage") Stage stage, AssetsFinder assetsFinder) {
-        super(Family.all(SpriteComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
+        super(Family.all(SpriteComponent.class, Position.class).exclude(PassivityComponent.class).get());
         this.stage = stage;
 
         font = assetsFinder.getFontManager().getFont(16);
@@ -77,7 +78,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        relationalEntities = engine.getEntitiesFor(Family.all(RelationalSpriteComponent.class, MoodComponent.class, PositionComponent.class).get());
+        relationalEntities = engine.getEntitiesFor(Family.all(MoodComponent.class, Position.class).exclude(SpriteComponent.class).get());
     }
 
     public void showText(String text, float x, float y) {
@@ -87,18 +88,13 @@ public class RenderSystem extends BaseSystem implements Drawable {
             label.setOrigin(Align.center);
             label.setPosition(x, y);
             stage.addActor(label);
-            new Thread(new Runnable() {
+            Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
-                    try {
-                        Thread.sleep(5000);
-                        if (stage.getActors().contains(label, true))
-                            label.remove();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    if (stage.getActors().contains(label, true))
+                        label.remove();
                 }
-            }).start();
+            }, 5);
         }
     }
 
@@ -111,10 +107,6 @@ public class RenderSystem extends BaseSystem implements Drawable {
         return false;
     }
 
-    public void showText(String text, int x, int y, int offsetX, int offsetY) {
-        showText(text, x + offsetX, y + offsetY);
-    }
-
     public void showText(String text, Vector2 position) {
         showText(text, position.x, position.y);
     }
@@ -122,34 +114,35 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-
-        for (int i = 0; i < getEntities().size(); i++) {
-            Entity entity = getEntities().get(i);
-            PositionComponent positionComponent = pm.get(entity);
+        ImmutableArray<Entity> entities = getEntities();
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
+            Position position = pm.get(entity);
             SpriteComponent spriteComponent = sm.get(entity);
             Sprite sprite = spriteComponent.sprite;
-            if (!showAll)
+            if (!showAll && fog.has(entity)) {
+                sprite.setAlpha(fog.get(entity).visionCoefficient);
                 batch.setColor(sprite.getColor());
+            }
 
-            batch.draw(sprite, positionComponent.getX() - sprite.getOriginX(), positionComponent.getY() - sprite.getOriginY(), sprite.getOriginX(),
+            batch.draw(sprite, position.getX() - sprite.getOriginX(), position.getY() - sprite.getOriginY(), sprite.getOriginX(),
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), spriteComponent.getRotation());
             batch.setColor(Color.WHITE);
         }
 
         for (int i = 0; i < relationalEntities.size(); i++) {
             Entity entity = relationalEntities.get(i);
-            PositionComponent positionComponent = pm.get(entity);
+            Position position = pm.get(entity);
 
             MoodComponent moodComponent = mm.get(getPlayer());
             MoodComponent entityMoodComponent = mm.get(entity);
 
             Sprite sprite = relationalSprites.get(RelationType.by(moodComponent.getRelation(entityMoodComponent)));
-            RelationalSpriteComponent relationalSpriteComponent = rsm.get(entity);
-            sprite.setAlpha(relationalSpriteComponent.getAlpha());
-            if (!showAll)
+            if (!showAll && fog.has(entity)) {
+                sprite.setAlpha(fog.get(entity).visionCoefficient);
                 batch.setColor(sprite.getColor());
-
-            batch.draw(sprite, positionComponent.getX() - sprite.getOriginX(), positionComponent.getY() - sprite.getOriginY(), sprite.getOriginX(),
+            }
+            batch.draw(sprite, position.getX() - sprite.getOriginX(), position.getY() - sprite.getOriginY(), sprite.getOriginX(),
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), 0);
             batch.setColor(Color.WHITE);
         }

@@ -17,8 +17,8 @@ import com.bumptech.glide.signature.ObjectKey;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
-import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemType;
+import net.artux.pda.model.items.WearableModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.AdditionalFragment;
 import net.artux.pda.ui.viewmodels.ItemsViewModel;
@@ -51,8 +51,8 @@ public class EquipmentFragment extends BaseFragment {
         itemsViewModel.updateDataFromCache();
     }
 
-    private void defineSlot(View view, int slotId, ItemModel item) {
-        if (item != null) {
+    private void defineSlot(View view, int slotId, WearableModel item) {
+        if (item != null && item.isEquipped()) {
             View slot = view.findViewById(slotId);
             TextView title = slot.findViewById(R.id.itemTitle);
             ImageView imageView = slot.findViewById(R.id.itemImage);

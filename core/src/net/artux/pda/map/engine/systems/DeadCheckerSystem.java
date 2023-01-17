@@ -18,7 +18,7 @@ import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.InteractiveComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.TimeComponent;
@@ -41,7 +41,7 @@ public class DeadCheckerSystem extends BaseSystem {
     private DataRepository dataRepository;
     private UserInterface userInterface;
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
     private AssetManager assetManager;
@@ -49,7 +49,7 @@ public class DeadCheckerSystem extends BaseSystem {
 
     @Inject
     public DeadCheckerSystem(UserInterface userInterface, DataRepository dataRepository, AssetManager assetManager) {
-        super(Family.all(HealthComponent.class, PositionComponent.class).get());
+        super(Family.all(HealthComponent.class, Position.class).get());
         this.gameZone = userInterface;
         this.assetManager = assetManager;
         this.userInterface = userInterface;
@@ -66,12 +66,12 @@ public class DeadCheckerSystem extends BaseSystem {
             Entity entity = getEntities().get(i);
 
             HealthComponent healthComponent = hm.get(entity);
-            PositionComponent positionComponent = pm.get(entity);
+            Position position = pm.get(entity);
 
             if (healthComponent.isDead()) {
                 if (random.nextInt(10) < 5) {
                     final Entity deadEntity = new Entity();
-                    deadEntity.add(new PositionComponent(positionComponent.getPosition()))
+                    deadEntity.add(new Position(position.getPosition()))
                             .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4));
 
                     if (entity != getPlayer()) {

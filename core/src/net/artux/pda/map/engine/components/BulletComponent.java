@@ -7,9 +7,9 @@ import com.badlogic.gdx.math.Vector2;
 public class BulletComponent implements Component {
 
     private final Entity author;
-    private Entity target;
-    private Vector2 targetPosition;
-    private float damage;
+    private final Entity target;
+    private final Vector2 targetPosition;
+    private final float damage;
     private float lastDstToTarget;
 
     public BulletComponent(Entity author, Entity target, Vector2 targetPosition, float damage) {

@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.Scaling;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.components.PassivityComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.map.PointComponent;
 import net.artux.pda.map.engine.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
@@ -47,7 +47,7 @@ public class MissionMenu extends Table {
     private final AssetManager assetManager;
     private final boolean testMode;
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<PointComponent> pcm = ComponentMapper.getFor(PointComponent.class);
 
     @Inject
@@ -130,7 +130,7 @@ public class MissionMenu extends Table {
             Label.LabelStyle labelStyle = assetsFinder.getFontManager().getLabelStyle(32, Color.WHITE);
             for (final Entity pointEntity : missionsSystem.getEngine()
                     .getEntitiesFor(Family.all(PointComponent.class, PointComponent.class).exclude(PassivityComponent.class).get())) {
-                PositionComponent position = pm.get(pointEntity);
+                Position position = pm.get(pointEntity);
                 PointComponent point = pcm.get(pointEntity);
                 Texture texture = QuestPointsHelper.getPointTexture(assetManager, point.getType());
                 if (texture != null) {

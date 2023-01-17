@@ -10,7 +10,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.SoundComponent;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class SoundsSystem extends BaseSystem {
     private final AssetManager assetManager;
     private static float VOLUME = 1f;
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
 
     @Inject
     public SoundsSystem(AssetManager assetManager) {
@@ -97,11 +97,11 @@ public class SoundsSystem extends BaseSystem {
 
     public void playSoundAtDistance(Sound sound, Vector2 position) {
         if (sound != null) {
-            PositionComponent positionComponent = pm.get(getPlayer());
+            Position positionComponent = pm.get(getPlayer());
             float dst = position.dst(positionComponent.getPosition());
-            float volume = (500 - dst) / 500;
-
-            sound.play(volume * VOLUME);
+            float volume = (500 - dst) / 1000f;
+            if (volume > 0)
+                sound.play(volume * VOLUME);
         }
     }
 

@@ -8,7 +8,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.ClickComponent;
 import net.artux.pda.map.engine.components.PassivityComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 
 import javax.inject.Inject;
 
@@ -16,11 +16,11 @@ import javax.inject.Inject;
 public class ClicksSystem extends IteratingSystem {
 
     private ComponentMapper<ClickComponent> cm = ComponentMapper.getFor(ClickComponent.class);
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
 
     @Inject
     public ClicksSystem() {
-        super(Family.all(ClickComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
+        super(Family.all(ClickComponent.class, Position.class).exclude(PassivityComponent.class).get());
     }
 
     @Override
@@ -36,9 +36,9 @@ public class ClicksSystem extends IteratingSystem {
     public boolean clicked(float x, float y) {
         for (int i = 0; i < getEntities().size(); i++) {
             ClickComponent clickComponent = cm.get(getEntities().get(i));
-            PositionComponent positionComponent = pm.get(getEntities().get(i));
+            Position position = pm.get(getEntities().get(i));
 
-            if (positionComponent.getPosition().epsilonEquals(x, y, clickComponent.clickRadius)) {
+            if (position.getPosition().epsilonEquals(x, y, clickComponent.clickRadius)) {
                 clickComponent.clickListener.clicked();
                 return true;
             }

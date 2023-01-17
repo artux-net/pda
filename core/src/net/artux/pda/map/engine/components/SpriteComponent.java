@@ -7,11 +7,6 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 public class SpriteComponent implements Component {
     public Sprite sprite;
 
-    public SpriteComponent(Texture texture) {
-        sprite = new Sprite(texture);
-    }
-
-
     public SpriteComponent(Texture texture, float width, float height) {
         sprite = new Sprite(texture);
         sprite.setSize(width, height);
@@ -27,20 +22,12 @@ public class SpriteComponent implements Component {
         sprite.setSize(width, height);
     }
 
-    public void setAlpha(float a) {
-        sprite.setAlpha(a);
-    }
-
-    public boolean isVisible() {
-        return sprite.getColor().a > 0.01f;
-    }
-
     public float getRotation() {
         return sprite.getRotation();
     }
 
     public void setRotation(float degrees) {
-        sprite.setRotation(degrees );
+        sprite.setRotation(degrees);
     }
 
 }

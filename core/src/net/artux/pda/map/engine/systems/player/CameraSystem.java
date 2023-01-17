@@ -10,7 +10,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.GlobalData;
@@ -28,7 +28,7 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     private GameMap map;
 
     private ComponentMapper<PlayerComponent> cm = ComponentMapper.getFor(PlayerComponent.class);
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 
     private Vector2 cameraV2Position = new Vector2();
@@ -65,15 +65,15 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
         super.update(deltaTime);
 
         if (isPlayerActive()) {
-            PositionComponent positionComponent = pm.get(getPlayer());
+            Position position = pm.get(getPlayer());
             VelocityComponent velocityComponent = vm.get(getPlayer());
 
             if (!detached) {
                 cameraV2Position.x = camera.position.x;
                 cameraV2Position.y = camera.position.y;
-                Vector2 unit = positionComponent.getPosition().cpy().sub(cameraV2Position);
+                Vector2 unit = position.getPosition().cpy().sub(cameraV2Position);
 
-                float speed = cameraV2Position.dst(positionComponent.getPosition()) * 3f * (1 / camera.zoom);
+                float speed = cameraV2Position.dst(position.getPosition()) * 3f * (1 / camera.zoom);
 
                 if (1 / unit.len() < 1.5) {
                     unit.scl((1 / unit.len()) * deltaTime * speed);
@@ -108,6 +108,10 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
             }
             updateData();
         }
+    }
+
+    public boolean isDetached() {
+        return detached;
     }
 
     @Override

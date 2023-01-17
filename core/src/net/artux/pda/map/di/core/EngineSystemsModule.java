@@ -19,6 +19,7 @@ import net.artux.pda.map.engine.systems.VisionSystem;
 import net.artux.pda.map.engine.systems.WorldSystem;
 import net.artux.pda.map.engine.systems.player.CameraSystem;
 import net.artux.pda.map.engine.systems.player.ClicksSystem;
+import net.artux.pda.map.engine.systems.player.FogSystem;
 import net.artux.pda.map.engine.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.systems.player.PlayerBattleSystem;
@@ -39,6 +40,10 @@ public abstract class EngineSystemsModule {
     @IntoSet
     @Binds
     public abstract EntitySystem missionsSystem(MissionsSystem missionsSystem);
+
+    @IntoSet
+    @Binds
+    public abstract EntitySystem fogSystem(FogSystem fogSystem);
 
     @IntoSet
     @Binds

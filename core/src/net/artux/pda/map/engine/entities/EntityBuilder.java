@@ -13,13 +13,13 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ContentGenerator;
 import net.artux.pda.map.engine.MessagingCodes;
 import net.artux.pda.map.engine.components.BulletComponent;
+import net.artux.pda.map.engine.components.FogOfWarComponent;
 import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.GroupComponent;
 import net.artux.pda.map.engine.components.GroupTargetMovingComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
-import net.artux.pda.map.engine.components.RelationalSpriteComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.StalkerComponent;
 import net.artux.pda.map.engine.components.StatesComponent;
@@ -40,7 +40,7 @@ import javax.inject.Inject;
 @PerGameMap
 public class EntityBuilder {
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
 
     private final AssetManager assetManager;
     private final ContentGenerator contentGenerator;
@@ -56,7 +56,7 @@ public class EntityBuilder {
 
     public Entity player(Vector2 position, StoryDataModel gdxData, UserModel userModel) {
         return new Entity()
-                .add(new PositionComponent(position))
+                .add(new Position(position))
                 .add(new VelocityComponent())
                 .add(new VisionComponent())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
@@ -67,7 +67,7 @@ public class EntityBuilder {
     }
 
     public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {
-        PositionComponent position = pm.get(author);
+        Position position = pm.get(author);
         Vector2 targetPosition = pm.get(target);
         targetPosition = getPointNear(targetPosition.cpy(), weaponModel.getPrecision());
 
@@ -92,9 +92,10 @@ public class EntityBuilder {
         spriteComponent.setRotation(degrees + 90);
 
         return new Entity()
-                .add(new PositionComponent(position))
+                .add(new Position(position))
                 .add(new VelocityComponent(vX, vY, true))
                 .add(spriteComponent)
+                .add(new FogOfWarComponent())
                 .add(new BulletComponent(author, target, targetPosition, weaponModel.getDamage()));
     }
 
@@ -126,7 +127,7 @@ public class EntityBuilder {
         group.getDispatcher().addListener(statesComponent, MessagingCodes.ATTACKED);
 
         entity
-                .add(new PositionComponent(position))
+                .add(new Position(position))
                 .add(new GraphMotionComponent(null))
                 .add(new VelocityComponent())
                 .add(new VisionComponent())
@@ -137,7 +138,7 @@ public class EntityBuilder {
                 .add(new WeaponComponent(w, assetManager))
                 .add(statesComponent)
                 .add(new GroupTargetMovingComponent(group))
-                .add(new RelationalSpriteComponent(8, 8));
+                .add(new FogOfWarComponent());
 
         return entity;
     }

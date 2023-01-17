@@ -13,7 +13,7 @@ import net.artux.pda.map.engine.components.GraphMotionComponent;
 import net.artux.pda.map.engine.components.GroupTargetMovingComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.StatesComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.VisionComponent;
@@ -68,9 +68,9 @@ public enum StalkerState implements State<Entity> {
         @Override
         public void update(Entity entity) {
             GraphMotionComponent targetMovingComponent = gmm.get(entity);
-            PositionComponent positionComponent = pm.get(entity);
+            Position position = pm.get(entity);
             if (targetMovingComponent.isActive()) {
-                if (positionComponent.getPosition().dst(targetMovingComponent.movementTarget) < 3f) {
+                if (position.getPosition().dst(targetMovingComponent.movementTarget) < 3f) {
                     sm.get(entity).changeState(STANDING);
                 }
             } else sm.get(entity).changeState(STANDING);
@@ -98,8 +98,8 @@ public enum StalkerState implements State<Entity> {
 
                 if (weaponComponent.getSelected() != null) {
                     WeaponModel weaponModel = weaponComponent.getSelected();
-                    PositionComponent enemyPosition = pm.get(enemy);
-                    PositionComponent entityPosition = pm.get(entity);
+                    Position enemyPosition = pm.get(enemy);
+                    Position entityPosition = pm.get(entity);
 
                     float dst = entityPosition.dst(enemyPosition);
                     if (dst > 200) {
@@ -135,11 +135,13 @@ public enum StalkerState implements State<Entity> {
             } else {
                 VisionComponent visionComponent = visionMapper.get(entity);
                 for (Entity visibleEntity : visionComponent.getVisibleEntities()) {
-                    MoodComponent enemyMood = mm.get(visibleEntity);
-                    if (moodComponent.isEnemy(enemyMood)) {
-                        moodComponent.setEnemy(visibleEntity);
-                        sm.get(entity).getDispatcher().dispatchMessage(ATTACKED, moodComponent.enemy);
-                        sm.get(entity).setGlobalState(ATTACKING);
+                    if (mm.has(visibleEntity)) {
+                        MoodComponent enemyMood = mm.get(visibleEntity);
+                        if (moodComponent.isEnemy(enemyMood)) {
+                            moodComponent.setEnemy(visibleEntity);
+                            sm.get(entity).getDispatcher().dispatchMessage(ATTACKED, moodComponent.enemy);
+                            sm.get(entity).setGlobalState(ATTACKING);
+                        }
                     }
                 }
             }
@@ -166,7 +168,7 @@ public enum StalkerState implements State<Entity> {
     protected ComponentMapper<VisionComponent> visionMapper = ComponentMapper.getFor(VisionComponent.class);
     protected ComponentMapper<GroupTargetMovingComponent> tmm = ComponentMapper.getFor(GroupTargetMovingComponent.class);
     protected ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
-    protected ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    protected ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     protected ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
     protected ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 

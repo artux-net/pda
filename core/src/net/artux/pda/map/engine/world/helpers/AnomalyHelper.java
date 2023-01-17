@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.map.di.core.MapComponent;
 import net.artux.pda.map.engine.components.AnomalyComponent;
 import net.artux.pda.map.engine.components.ClickComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.systems.MapOrientationSystem;
@@ -44,7 +44,7 @@ public class AnomalyHelper {
             size *= 2;
 
             final Vector2 finalPosition = position;
-            anomaly.add(new PositionComponent(finalPosition))
+            anomaly.add(new Position(finalPosition))
                     .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size))
                     .add(anomalyComponent)
                     .add(new ClickComponent(size / 2, new ClickComponent.ClickListener() {

@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.PassivityComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.data.GlobalData;
 
@@ -21,7 +21,7 @@ public class MovingSystem extends BaseSystem {
     private final float MOVEMENT = 20f;
     private final float RUN_MOVEMENT = 30f;
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
@@ -29,7 +29,7 @@ public class MovingSystem extends BaseSystem {
 
     @Inject
     public MovingSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem) {
-        super(Family.all(VelocityComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
+        super(Family.all(VelocityComponent.class, Position.class).exclude(PassivityComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
     }
 
@@ -43,7 +43,7 @@ public class MovingSystem extends BaseSystem {
         if (entity == getPlayer())
             return;
 
-        PositionComponent positionComponent = pm.get(entity);
+        Position position = pm.get(entity);
         VelocityComponent velocityComponent = vm.get(entity);
         Vector2 stepVector;
         Vector2 currentVelocity = velocityComponent.cpy();
@@ -68,13 +68,13 @@ public class MovingSystem extends BaseSystem {
 
 
         if (!stepVector.isZero()) {
-            float newX = positionComponent.getX() + stepVector.x;
-            float newY = positionComponent.getY() + stepVector.y;
+            float newX = position.getX() + stepVector.x;
+            float newY = position.getY() + stepVector.y;
             {
-                if (insideMap(newX, positionComponent.getY()))
-                    positionComponent.getPosition().x = newX;
-                if (insideMap(positionComponent.getX(), newY))
-                    positionComponent.getPosition().y = newY;
+                if (insideMap(newX, position.getY()))
+                    position.getPosition().x = newX;
+                if (insideMap(position.getX(), newY))
+                    position.getPosition().y = newY;
             }
         }
         if (!velocityComponent.isConstant() && entity != getPlayer())

@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.core.MapComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.WeaponComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.entities.EntityBuilder;
@@ -45,7 +45,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private Engine engine;
     private final DataRepository dataRepository;
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class); //todo remove from here
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class); //todo remove from here
 
     private boolean controlPoints = true;
     private boolean questPoints = true; //

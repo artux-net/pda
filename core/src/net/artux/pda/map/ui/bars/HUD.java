@@ -95,6 +95,11 @@ public class HUD extends Button {
     public void act(float delta) {
         super.act(delta);
         HealthComponent healthComponent = playerSystem.getHealthComponent();
+        if (healthComponent.isDead()) {
+            healthBar.updateValue(0);
+            staminaBar.updateValue(0);
+            return;
+        }
 
         healthBar.updateValue(healthComponent.value);
         staminaBar.updateValue(healthComponent.stamina);

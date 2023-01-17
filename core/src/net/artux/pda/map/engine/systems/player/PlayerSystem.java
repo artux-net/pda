@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Disposable;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.SpriteComponent;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
@@ -25,7 +25,7 @@ import javax.inject.Inject;
 @PerGameMap
 public class PlayerSystem extends BaseSystem implements Disposable {
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
     private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
@@ -61,14 +61,14 @@ public class PlayerSystem extends BaseSystem implements Disposable {
         super.update(deltaTime);
         if (getPlayer() != null) {
             MoodComponent moodComponent = mm.get(getPlayer());
-            PositionComponent playerPosition = pm.get(getPlayer());
+            Position playerPosition = pm.get(getPlayer());
             SpriteComponent spriteComponent = sm.get(getPlayer());
             Entity enemy = moodComponent.enemy;
             Vector2 direction;
             if (enemy == null) {
                 direction = vcm.get(getPlayer()).getVelocity();
             } else {
-                PositionComponent enemyPosition = pm.get(enemy);
+                Position enemyPosition = pm.get(enemy);
                 direction = enemyPosition.getPosition().cpy().sub(playerPosition.getPosition());
             }
 

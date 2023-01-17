@@ -7,7 +7,7 @@ import com.badlogic.ashley.core.Family;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.ArtifactComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.ui.UserInterface;
 
@@ -18,12 +18,12 @@ public class ArtifactSystem extends BaseSystem {
 
     private SoundsSystem soundsSystem;
     private UserInterface userInterface;
-    private ComponentMapper<PositionComponent> pcm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pcm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<PlayerComponent> pm = ComponentMapper.getFor(PlayerComponent.class);
 
     @Inject
     public ArtifactSystem(SoundsSystem soundsSystem, UserInterface userInterface) {
-        super(Family.all(ArtifactComponent.class, PositionComponent.class).get());
+        super(Family.all(ArtifactComponent.class, Position.class).get());
         this.soundsSystem = soundsSystem;
         this.userInterface = userInterface;
     }
@@ -41,9 +41,9 @@ public class ArtifactSystem extends BaseSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
         for (int i = 0; i < getEntities().size(); i++) {
-            PositionComponent positionComponent = pcm.get(getEntities().get(i));
-            PositionComponent playerComponent = pcm.get(getPlayer());
-            float dst = positionComponent.getPosition().dst(playerComponent.getPosition());
+            Position position = pcm.get(getEntities().get(i));
+            Position playerComponent = pcm.get(getPlayer());
+            float dst = position.getPosition().dst(playerComponent.getPosition());
             if (dst < distanceForDetector) {
                 float timeLimit = dst / distanceForDetector;
                 timeCount += deltaTime;

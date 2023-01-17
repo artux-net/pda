@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Disposable;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.PassivityComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.map.QuestComponent;
 import net.artux.pda.map.engine.pathfinding.own.Connection;
 import net.artux.pda.map.engine.pathfinding.own.Digraph;
@@ -45,7 +45,7 @@ import javax.inject.Inject;
 @PerGameMap
 public class MissionsSystem extends BaseSystem implements Disposable {
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<QuestComponent> qcm = ComponentMapper.getFor(QuestComponent.class);
 
     private final float pixelsPerMeter = 3f;
@@ -62,7 +62,7 @@ public class MissionsSystem extends BaseSystem implements Disposable {
 
     @Inject
     public MissionsSystem(MessagesPlane messagesPlane, AssetManager assetManager, DataRepository dataRepository, SoundsSystem soundsSystem, CameraSystem cameraSystem) {
-        super(Family.all(PositionComponent.class, QuestComponent.class).exclude(PassivityComponent.class).get());
+        super(Family.all(Position.class, QuestComponent.class).exclude(PassivityComponent.class).get());
         this.dataRepository = dataRepository;
         this.cameraSystem = cameraSystem;
         this.messagesPlane = messagesPlane;
@@ -155,7 +155,7 @@ public class MissionsSystem extends BaseSystem implements Disposable {
         boolean found = false;
         for (Entity questEntity : getEntities()) {
             QuestComponent questComponent = qcm.get(questEntity);
-            PositionComponent position = pm.get(questEntity);
+            Position position = pm.get(questEntity);
             if (questComponent.contains(chapter, stage)) {
                 found = true;
                 setTargetPosition(position);
@@ -241,7 +241,7 @@ public class MissionsSystem extends BaseSystem implements Disposable {
     }
 
     public Vector2 getPosition() {
-        PositionComponent playerPosition = pm.get(getPlayer());
+        Position playerPosition = pm.get(getPlayer());
         return playerPosition.getPosition();
     }
 

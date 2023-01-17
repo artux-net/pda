@@ -8,14 +8,14 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 
 import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.player.PlayerComponent;
 
 public abstract class BaseSystem extends IteratingSystem {
 
     private Entity player;
     private ComponentMapper<HealthComponent> healthMapper = ComponentMapper.getFor(HealthComponent.class);
-    private final Family playerFamily = Family.all(PlayerComponent.class, PositionComponent.class).get();
+    private final Family playerFamily = Family.all(PlayerComponent.class, Position.class).get();
 
     public BaseSystem(Family family) {
         super(family);

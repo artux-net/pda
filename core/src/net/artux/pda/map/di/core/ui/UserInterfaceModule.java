@@ -245,7 +245,7 @@ public class UserInterfaceModule {
     @Provides
     public Actor initControlTable(@Named("controlTable") Table controlTable, PlayerSystem playerSystem,
                                   PlayerBattleSystem battleSystem, AssetManager assetManager) {
-        controlTable.defaults().size(10);
+        //controlTable.defaults().size(10);
         controlTable.add(addInteractButton(assetManager, "ui/icons/icon_shoot.png", new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -259,7 +259,6 @@ public class UserInterfaceModule {
                 super.touchUp(event, x, y, pointer, button);
             }
         }));
-
 
         controlTable.row();
         controlTable.add(addInteractButton(assetManager, "ui/icons/icon_run.png", new ClickListener() {
@@ -288,8 +287,10 @@ public class UserInterfaceModule {
 
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                LinkedList<Entity> playerEnemies = vcm.get(playerSystem.getPlayer()).getVisibleEntities();
                 MoodComponent moodComponent = mm.get(playerSystem.getPlayer());
+                LinkedList<Entity> playerEnemies = vcm.get(playerSystem.getPlayer())
+                        .getVisibleEntities();
+
                 Entity playerEnemyTarget = moodComponent.getEnemy();
                 if (playerEnemies.size() > 1) {
                     Iterator<Entity> iterator = playerEnemies.iterator();
@@ -306,7 +307,7 @@ public class UserInterfaceModule {
                     moodComponent.setEnemy(playerEnemies.getFirst());
             }
         }));
-        //controlTable.add().colspan(3);
+        controlTable.add().colspan(3);
 
         return controlTable;
     }

@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.PassivityComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.pathfinding.TiledNode;
@@ -31,7 +31,7 @@ public class PlayerMovingSystem extends BaseSystem {
     private final float RUN_MOVEMENT = 30f;
     private final float PLAYER_MULTIPLICATION = 6f;
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
@@ -50,7 +50,7 @@ public class PlayerMovingSystem extends BaseSystem {
 
     @Inject
     public PlayerMovingSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem) {
-        super(Family.all(VelocityComponent.class, PositionComponent.class).exclude(PassivityComponent.class).get());
+        super(Family.all(VelocityComponent.class, Position.class).exclude(PassivityComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
         stepSounds = new HashMap<>();
         random = new Random();
@@ -74,7 +74,7 @@ public class PlayerMovingSystem extends BaseSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
         Entity entity = getPlayer();
-        PositionComponent positionComponent = pm.get(entity);
+        Position position = pm.get(entity);
         VelocityComponent velocityComponent = vm.get(entity);
 
         velocityComponent.setVelocity(velocityComponent.cpy());
@@ -102,24 +102,24 @@ public class PlayerMovingSystem extends BaseSystem {
         healthComponent.stamina += staminaDifference;
 
         if (!stepVector.isZero()) {
-            float newX = positionComponent.getX() + stepVector.x;
-            float newY = positionComponent.getY() + stepVector.y;
+            float newX = position.getX() + stepVector.x;
+            float newY = position.getY() + stepVector.y;
             if (playerWalls) {
-                if (insideMap(newX, positionComponent.getY()))
-                    positionComponent.getPosition().x += stepVector.x * mapOrientationSystem.getMapBorder().getK(newX, positionComponent.getY());
-                if (insideMap(positionComponent.getX(), newY))
-                    positionComponent.getPosition().y += stepVector.y * mapOrientationSystem.getMapBorder().getK(positionComponent.getX(), newY);
+                if (insideMap(newX, position.getY()))
+                    position.getPosition().x += stepVector.x * mapOrientationSystem.getMapBorder().getK(newX, position.getY());
+                if (insideMap(position.getX(), newY))
+                    position.getPosition().y += stepVector.y * mapOrientationSystem.getMapBorder().getK(position.getX(), newY);
             } else {
-                if (insideMap(newX, positionComponent.getY()))
-                    positionComponent.getPosition().x = newX;
-                if (insideMap(positionComponent.getX(), newY))
-                    positionComponent.getPosition().y = newY;
+                if (insideMap(newX, position.getY()))
+                    position.getPosition().x = newX;
+                if (insideMap(position.getX(), newY))
+                    position.getPosition().y = newY;
             }
 
             stepsDistance += stepVector.len();
             if (stepsDistance >= oneSoundDistance) {
                 stepsDistance = 0;
-                int type = mapOrientationSystem.getMapBorder().getTileType(positionComponent.x, positionComponent.y);
+                int type = mapOrientationSystem.getMapBorder().getTileType(position.x, position.y);
                 if (!stepSounds.containsKey(type) || random.nextInt(4) == 0)
                     type = TiledNode.TILE_EMPTY;
 

@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.di.core.MapComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.map.SpawnComponent;
 import net.artux.pda.map.engine.components.map.TransferComponent;
 import net.artux.pda.map.engine.entities.EntityBuilder;
@@ -23,7 +23,7 @@ import java.util.Properties;
 
 public class RandomSpawnerHelper {
 
-    private static ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private static ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private static ComponentMapper<SpawnComponent> sm = ComponentMapper.getFor(SpawnComponent.class);
 
     public static void init(MapComponent coreComponent) {
@@ -36,8 +36,8 @@ public class RandomSpawnerHelper {
         SpawnSystem spawnSystem = engine.getSystem(SpawnSystem.class);
         MapOrientationSystem mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
         Properties properties = coreComponent.getDataRepository().getProperties();
-        ImmutableArray<Entity> transfers = engine.getEntitiesFor(Family.all(PositionComponent.class, TransferComponent.class).get());
-        ImmutableArray<Entity> spawns = engine.getEntitiesFor(Family.all(PositionComponent.class, SpawnComponent.class).get());
+        ImmutableArray<Entity> transfers = engine.getEntitiesFor(Family.all(Position.class, TransferComponent.class).get());
+        ImmutableArray<Entity> spawns = engine.getEntitiesFor(Family.all(Position.class, SpawnComponent.class).get());
 
         float groupFreq = Float.parseFloat((String) properties.get(PropertyFields.GROUP_BOT_FREQ));
         timerSystem.addTimerAction(groupFreq, new TimerSystem.TimerListener() {

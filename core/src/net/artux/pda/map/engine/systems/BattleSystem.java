@@ -12,7 +12,7 @@ import net.artux.pda.map.engine.components.BulletComponent;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.MoodComponent;
 import net.artux.pda.map.engine.components.PassivityComponent;
-import net.artux.pda.map.engine.components.PositionComponent;
+import net.artux.pda.map.engine.components.Position;
 import net.artux.pda.map.engine.components.VelocityComponent;
 import net.artux.pda.map.engine.components.VisionComponent;
 import net.artux.pda.map.engine.components.WeaponComponent;
@@ -29,7 +29,7 @@ public class BattleSystem extends BaseSystem {
     private final EntityProcessorSystem entityProcessorSystem;
     private final SoundsSystem soundsSystem;
 
-    private ComponentMapper<PositionComponent> pm = ComponentMapper.getFor(PositionComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
     private ComponentMapper<VisionComponent> vm = ComponentMapper.getFor(VisionComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
@@ -39,7 +39,7 @@ public class BattleSystem extends BaseSystem {
     @Inject
     public BattleSystem(SoundsSystem soundsSystem, EntityProcessorSystem entityProcessorSystem) {
         super(Family.all(HealthComponent.class, VisionComponent.class,
-                MoodComponent.class, PositionComponent.class, WeaponComponent.class).exclude(PlayerComponent.class, PassivityComponent.class).get());
+                MoodComponent.class, Position.class, WeaponComponent.class).exclude(PlayerComponent.class, PassivityComponent.class).get());
         this.entityProcessorSystem = entityProcessorSystem;
         this.soundsSystem = soundsSystem;
     }
@@ -47,7 +47,7 @@ public class BattleSystem extends BaseSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        bullets = engine.getEntitiesFor(Family.all(PositionComponent.class, VelocityComponent.class, BulletComponent.class).get());
+        bullets = engine.getEntitiesFor(Family.all(Position.class, VelocityComponent.class, BulletComponent.class).get());
     }
 
     @Override
@@ -55,10 +55,10 @@ public class BattleSystem extends BaseSystem {
         super.update(deltaTime);
         for (Entity bullet : bullets) {
             BulletComponent bulletComponent = bcm.get(bullet);
-            PositionComponent bulletPosition = pm.get(bullet);
+            Position bulletPosition = pm.get(bullet);
             Vector2 targetPosition = bulletComponent.getTargetPosition();
 
-            PositionComponent targetEntityPosition = pm.get(bulletComponent.getTarget());
+            Position targetEntityPosition = pm.get(bulletComponent.getTarget());
             MoodComponent targetEntityMood = mm.get(bulletComponent.getTarget());
             HealthComponent targetEntityHealth = hm.get(bulletComponent.getTarget());
 
