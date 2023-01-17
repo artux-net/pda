@@ -63,27 +63,6 @@
             android:name=".ui.activities.LoadingActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" />
-        <activity
-            android:name=".ui.activities.SellerFragment"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="sensorLandscape" />
-        <activity
-            android:name=".gdx.CoreFragment"
-            android:exported="true"
-            android:launchMode="singleInstance"
-            android:screenOrientation="sensorLandscape">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="www.artux.net"
-                    android:pathPrefix="/pda"
-                    android:scheme="http" />
-            </intent-filter>
-        </activity>
 
         <service
             android:name=".utils.MyDownloadService"
@@ -97,7 +76,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
-        <service android:name=".app.ForegroundService" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
