@@ -2,6 +2,8 @@ package net.artux.pda.app;
 
 import android.app.Application;
 
+import com.google.firebase.FirebaseApp;
+
 import net.artux.pda.R;
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.utils.URLHelper;
@@ -36,6 +38,7 @@ public class PDAApplication extends Application {
 
     @Override
     public void onCreate() {
+        FirebaseApp.initializeApp(this);
         super.onCreate();
         for (Timber.Tree tree : forest) {
             Timber.plant(tree);
@@ -49,7 +52,7 @@ public class PDAApplication extends Application {
         return properties;
     }
 
-    public boolean isTesterMode(){
+    public boolean isTesterMode() {
         return properties.getProperty(PropertyFields.TESTER_MODE, "false")
                 .equals("true");
     }

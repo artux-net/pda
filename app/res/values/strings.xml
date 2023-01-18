@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">PDA</string>
     <string name="app_full_name">PDA Network</string>
+    <string name="appodeal_key" translatable="false">1eba88379baca42ad89dac97b3746a3f5c757db67caf911d</string>
 
     <string name="prompt_user">User</string>
 

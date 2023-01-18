@@ -16,6 +16,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.appodeal.ads.Appodeal;
+import com.appodeal.ads.initializing.ApdInitializationCallback;
+import com.appodeal.ads.initializing.ApdInitializationError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -69,12 +72,22 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        Appodeal.initialize(this, getString(R.string.appodeal_key), Appodeal.INTERSTITIAL, new ApdInitializationCallback() {
+            @Override
+            public void onInitializationFinished(List<ApdInitializationError> list) {
+                if (list != null && list.size() > 0)
+                    for (ApdInitializationError err : list)
+                        Timber.tag("Add Error").e( err);
+            }
+        });
+        Appodeal.setTesting(true);
+
         presenter = new MainPresenter();
         presenter.attachView(this);
 
         Intent intent = getIntent();
         if (intent != null) {
-            if(intent.hasExtra("section"))
+            if (intent.hasExtra("section"))
                 switch (intent.getStringExtra("section")) {
                     case "stories":
                         presenter.addFragment(new StoriesFragment(), false);
@@ -88,10 +101,11 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
                 }
             else
                 presenter.addFragment(new NewsFragment(), false);
-            if(intent.hasExtra("status")){
+            if (intent.hasExtra("status")) {
                 StatusModel statusModel = (StatusModel) intent.getSerializableExtra("status");
                 Snackbar.make(binding.getRoot(), statusModel.getDescription(), Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Ok", view -> {})
+                        .setAction("Ok", view -> {
+                        })
                         .show();
                 if (!statusModel.isSuccess())
                     Timber.e(statusModel.getDescription());

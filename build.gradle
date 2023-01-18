@@ -21,6 +21,7 @@ buildscript {
 
 }
 
+
 allprojects {
     version = '1.0'
     ext {
@@ -32,10 +33,12 @@ allprojects {
         gdxControllersVersion = '2.2.1'
     }
 
+
     repositories {
         google()
         mavenLocal()
         mavenCentral()
+        maven { url "https://artifactory.appodeal.com/appodeal" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
