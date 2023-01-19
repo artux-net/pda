@@ -11,9 +11,7 @@ import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
@@ -32,8 +30,11 @@ public class UIFrame extends Group implements Disposable {
     private final Color primaryColor;
     private final Color backgroundColor;
 
-    int w = Gdx.graphics.getWidth();
-    int h = Gdx.graphics.getHeight();
+    int w;
+    int h;
+
+    int screenW = Gdx.graphics.getWidth();
+    int screenH = Gdx.graphics.getHeight();
 
     private final short[] squareTriangles = new short[]{
             0, 1, 3,
@@ -50,12 +51,20 @@ public class UIFrame extends Group implements Disposable {
         this.camera = camera;
         shapeRenderer = new ShapeRenderer();
 
+        w = (int) camera.viewportWidth;
+        h = (int) camera.viewportHeight;
+
+        standartFrameSize = 30f;
+        topFrameHeight = standartFrameSize * 2.0f;
+        additionalSizes = topFrameHeight * 0.3f;
+        headerBottomY = h - topFrameHeight + (additionalSizes) / 2;
+
+        headerLeftX = standartFrameSize / 5;
+        headerRightX = w - headerLeftX - 24;
+        leftBarWidth = w - getHeaderLeftX() - standartFrameSize;
+
         float topHeaderOffset = (additionalSizes) / 2;
         headerHeight = h - topHeaderOffset - headerBottomY;
-
-        Actor table = new Actor();
-        table.setTouchable(Touchable.disabled);
-        table.setSize(w * 10, h * 10);
 
         counter = new Label("0", new Label.LabelStyle(font, Color.ORANGE));
         counter.setPosition(w - standartFrameSize, 0);
@@ -122,15 +131,15 @@ public class UIFrame extends Group implements Disposable {
     }
 
 
-    float standartFrameSize = h / 28f;
-    float topFrameHeight = standartFrameSize * 2.4f;
-    float additionalSizes = topFrameHeight * 0.3f;
-    float headerBottomY = h - topFrameHeight + (additionalSizes) / 2;
+    float standartFrameSize;
+    float topFrameHeight;
+    float additionalSizes;
+    float headerBottomY;
 
     float headerHeight;
-    float headerLeftX = standartFrameSize / 5;
-    float headerRightX = w - headerLeftX - (w / 80f);
-    float leftBarWidth = w - getHeaderLeftX() - standartFrameSize;
+    float headerLeftX;
+    float headerRightX;
+    float leftBarWidth;
 
     PolygonSprite headerBarSprite;
     PolygonSprite bottomBarSprite;
@@ -187,8 +196,8 @@ public class UIFrame extends Group implements Disposable {
             bottomBarLeftX = getHeaderLeftX();
         }
 
-        if (bottomBarLeftX + barWidth > w - standartFrameSize) {
-            barWidth -= bottomBarLeftX + barWidth - (w - standartFrameSize);
+        if (bottomBarLeftX + barWidth > screenW - standartFrameSize) {
+            barWidth -= bottomBarLeftX + barWidth - (screenW - standartFrameSize);
         }
 
         polyBatch.begin();
@@ -223,8 +232,8 @@ public class UIFrame extends Group implements Disposable {
             rightBarDownY = standartFrameSize;
         }
 
-        if (rightBarDownY + barHeight > h - topFrameHeight) {
-            barHeight -= rightBarDownY + barHeight - (h - topFrameHeight);
+        if (rightBarDownY + barHeight > screenH - topFrameHeight) {
+            barHeight -= rightBarDownY + barHeight - (screenH - topFrameHeight);
         }
 
         float rightBarLeftX = getHeaderLeftX() + leftBarWidth + additionalSizes / 2;
@@ -244,9 +253,9 @@ public class UIFrame extends Group implements Disposable {
                 }, squareTriangles);
         rightBarSprite.setRegion(rightBar);
 
-        rightBarSprite.draw(polyBatch);
+        /*rightBarSprite.draw(polyBatch);
         bottomBarSprite.draw(polyBatch);
-        headerBarSprite.draw(polyBatch);
+        headerBarSprite.draw(polyBatch);*/
         polyBatch.end();
 
         batch.begin();
@@ -254,7 +263,7 @@ public class UIFrame extends Group implements Disposable {
     }
 
     public float getSideBarHeight(){
-        return h - standartFrameSize - topFrameHeight;
+        return screenH - standartFrameSize - topFrameHeight;
     }
 
     public float getRightSideBarWidth(){

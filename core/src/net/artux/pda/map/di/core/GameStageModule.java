@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
@@ -31,16 +32,26 @@ public class GameStageModule {
 
     @Provides
     @PerGameMap
+    @Named("uiStage")
+    public Stage uiStage() {
+        ScreenViewport screenViewport = new ScreenViewport();
+        screenViewport.setUnitsPerPixel(Math.min(1920.0f/Gdx.graphics.getWidth(),1080.0f/Gdx.graphics.getHeight()));
+        return new Stage(screenViewport);
+    }
+
+
+    @Provides
+    @PerGameMap
     public Camera getCamera(@Named("gameStage") Stage stage) {
         return stage.getCamera();
     }
 
     @Provides
-    @Named("uiStage")
-    public Stage uiStage(UserInterface userInterface) {
-        Stage stage = new Stage(new ScreenViewport());
-        stage.addActor(userInterface);
-        return stage;
+    @PerGameMap
+    public UserInterface userInterface(AssetsFinder finder, @Named("uiStage") Stage uiStage) {
+        UserInterface userInterface = new UserInterface(finder, uiStage.getCamera());
+        uiStage.addActor(userInterface);
+        return userInterface;
     }
 
     @Provides

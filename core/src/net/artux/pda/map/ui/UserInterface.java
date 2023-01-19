@@ -10,13 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.utils.Colors;
 
-import javax.inject.Inject;
-
-@PerGameMap
 public class UserInterface extends Group implements Disposable {
 
     private final BitmapFont font;
@@ -26,7 +22,6 @@ public class UserInterface extends Group implements Disposable {
     private final UIFrame uiFrame;
     private final Skin skin;
 
-    @Inject
     public UserInterface(AssetsFinder assetsFinder, Camera camera) {
         super();
         this.stack = new Stack();
@@ -36,10 +31,10 @@ public class UserInterface extends Group implements Disposable {
         uiFrame = new UIFrame(camera, font, Colors.primaryColor, Colors.backgroundColor);
         addActor(uiFrame);
 
-        float w = Gdx.graphics.getWidth();
-        float h = Gdx.graphics.getHeight();
+        float w = camera.viewportWidth;
+        float h = camera.viewportHeight;
 
-        //setSize(200,100);
+        setSize(w,h);
 
         float gameZoneWidth = w - uiFrame.standartFrameSize - uiFrame.headerLeftX;
         float gameZoneHeight = h - uiFrame.standartFrameSize - uiFrame.topFrameHeight;

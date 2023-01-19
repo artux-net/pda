@@ -1,7 +1,6 @@
 package net.artux.pda.map.ui.bars;
 
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -45,7 +44,7 @@ public class HUD extends Button {
 
         setSize(textureRegionDrawable.getRegion().getRegionWidth(), textureRegionDrawable.getRegion().getRegionHeight());
         defaults().pad(5);
-        float iconSize = Gdx.graphics.getHeight() / 60f;
+        float iconSize = 18f;
         Image actor = new Image(assetManager.get("ui/bar/ic_health.png", Texture.class));
         actor.setScaling(Scaling.fill);
         add(actor).size(iconSize);
