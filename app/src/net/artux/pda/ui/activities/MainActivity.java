@@ -72,15 +72,14 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Appodeal.initialize(this, getString(R.string.appodeal_key), Appodeal.INTERSTITIAL, new ApdInitializationCallback() {
+        Appodeal.initialize(this, getString(R.string.appodeal_key), Appodeal.INTERSTITIAL | Appodeal.REWARDED_VIDEO, new ApdInitializationCallback() {
             @Override
             public void onInitializationFinished(List<ApdInitializationError> list) {
                 if (list != null && list.size() > 0)
                     for (ApdInitializationError err : list)
-                        Timber.tag("Add Error").e( err);
+                        Timber.tag("Add Error").e(err);
             }
         });
-        Appodeal.setTesting(true);
 
         presenter = new MainPresenter();
         presenter.attachView(this);

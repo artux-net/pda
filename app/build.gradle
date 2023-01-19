@@ -68,7 +68,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
@@ -186,7 +186,12 @@ dependencies {
 
     //appodeal
     implementation ('com.appodeal.ads:sdk:3.0.2.+') {
+        exclude group: 'com.appodeal.ads.sdk.services', module: 'adjust'
+        exclude group: 'com.appodeal.ads.sdk.networks', module: 'applovin'
+        exclude group: 'com.appodeal.ads.sdk.services', module: 'appsflyer'
+        exclude group: 'com.appodeal.ads.sdk.networks', module: 'admob'
         exclude group: 'com.appodeal.ads.sdk.services', module: 'facebook_analytics'
+        exclude group: 'com.appodeal.ads.sdk.networks', module: 'facebook'
     }
 }
 
