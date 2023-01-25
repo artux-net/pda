@@ -59,5 +59,4 @@ public interface MapComponent {
 
     ConditionEntityManager getConditionManager();
 
-    Timer getTimer();
 }

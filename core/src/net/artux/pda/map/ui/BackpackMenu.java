@@ -74,10 +74,8 @@ public class BackpackMenu extends Table {
         });
         add(textButton)
                 .left();
-        row();
+
         UserModel userModel = dataRepository.getUserModel();
-
-
         Image avatar;
         if (isInteger(userModel.getAvatar()) && !userModel.getAvatar().equals("0"))
             avatar = new LazyImage(assetManager, "avatars/a" + userModel.getAvatar() + ".png");

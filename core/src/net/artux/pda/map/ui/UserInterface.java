@@ -1,34 +1,29 @@
 package net.artux.pda.map.ui;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
-import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.pathfinding.MapBorder;
 
-public class UserInterface extends Group implements Disposable {
+public class UserInterface extends Group {
 
     private final BitmapFont font;
     private final Stack stack;
 
     private final Group gameZone;
     private final UIFrame uiFrame;
-    private final Skin skin;
 
     public UserInterface(AssetsFinder assetsFinder, MapBorder mapBorder, Camera uiCamera, Camera camera) {
         super();
         this.stack = new Stack();
-        skin = new Skin(Gdx.files.internal("data/skin/uiskin.json")); //todo asset manager
 
         font = assetsFinder.getFontManager().getFont(24);
-        uiFrame = new UIFrame(assetsFinder.getManager(), camera, uiCamera, mapBorder, font, skin);
+        uiFrame = new UIFrame(assetsFinder.getManager(), camera, uiCamera, mapBorder, font);
         uiFrame.setFillParent(true);
         addActor(uiFrame);
 
@@ -56,11 +51,6 @@ public class UserInterface extends Group implements Disposable {
 
     public Label.LabelStyle getLabelStyle() {
         return new Label.LabelStyle(font, Color.WHITE);
-    }
-
-    @Override
-    public void dispose() {
-        skin.dispose();
     }
 
     public Group getGameZone() {

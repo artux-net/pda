@@ -7,9 +7,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.UserMessage
-import net.artux.pda.model.items.SellerModel
 import net.artux.pda.model.map.GameMap
-import net.artux.pda.model.mapper.SellerMapper
+import net.artux.pda.model.mapper.ItemMapper
 import net.artux.pda.model.mapper.StageMapper
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
@@ -25,14 +24,16 @@ import java.util.*
 
 @HiltViewModel
 class QuestViewModel @javax.inject.Inject constructor(
+    var sellerRepository: SellerRepository,
     var summaryRepository: SummaryRepository,
     var userRepository: UserRepository,
     var repository: QuestRepository,
     var stageMapper: StageMapper,
     var mapper: StoryMapper,
-    var statusMapper: StatusMapper,
-    var sellerRepository: SellerRepository
+    var statusMapper: StatusMapper
 ) : ViewModel() {
+
+    val itemMapper: ItemMapper = ItemMapper.INSTANCE
 
     var title: MutableLiveData<String> = MutableLiveData()
     var loadingState: MutableLiveData<Boolean> = MutableLiveData()
@@ -64,6 +65,7 @@ class QuestViewModel @javax.inject.Inject constructor(
             .map { mapper.dataModel(it) }
             .onSuccess { storyData.postValue(it) }
             .getOrThrow()
+        sellerRepository.getItems().getOrThrow()
     }
 
     fun beginWithStage(chapterId: Int, stageId: Int) {
@@ -251,7 +253,7 @@ class QuestViewModel @javax.inject.Inject constructor(
         if (data.containsKey("over")) {
             actionsMap["over"] = mutableListOf("")
             exitStory()
-        }else if (data.containsKey("chapter")) {
+        } else if (data.containsKey("chapter")) {
             val chapterId: String? = data["chapter"]
             val stageId: String? = data["stage"]
             if (chapterId != null && stageId != null) {
@@ -264,56 +266,6 @@ class QuestViewModel @javax.inject.Inject constructor(
             }
         }
 
-    }
-
-    var seller: MutableLiveData<SellerModel> = MutableLiveData()
-    var sellerMapper: SellerMapper = SellerMapper.INSTANCE
-
-    fun updateSeller(id: Long) {
-        viewModelScope.launch {
-            sellerRepository.getSeller(id)
-                .onSuccess { seller.postValue(sellerMapper.model(it)) }
-                .onFailure { status.postValue(StatusModel(it)) }
-        }
-    }
-
-    private suspend fun actionWithItem(
-        type: SellerRepository.OperationType,
-        uuid: UUID,
-        quantity: Int
-    ): Result<StatusModel> {
-        val sellerId = seller.value!!.id
-        return sellerRepository.actionWithItem(type, uuid, sellerId, quantity)
-            .map { statusMapper.model(it) }
-    }
-
-    fun buyItem(uuid: UUID, quantity: Int) {
-        viewModelScope.launch {
-            actionWithItem(SellerRepository.OperationType.BUY, uuid, quantity)
-                .onSuccess {
-                    status.postValue(it) }
-                .onFailure { status.postValue(StatusModel(it)) }
-        }
-    }
-
-    fun sellItem(uuid: UUID, quantity: Int) {
-        viewModelScope.launch {
-            actionWithItem(SellerRepository.OperationType.SELL, uuid, quantity)
-                .onSuccess { status.postValue(it) }
-                .onFailure { status.postValue(StatusModel(it)) }
-        }
-    }
-
-    fun getSellerCoefficient(): Float {
-        return if (seller.value != null)
-            seller.value!!.sellCoefficient
-        else 0.8f
-    }
-
-    fun getBuyCoefficient(): Float {
-        return if (seller.value != null)
-            seller.value!!.buyCoefficient
-        else 1.2f
     }
 
 }

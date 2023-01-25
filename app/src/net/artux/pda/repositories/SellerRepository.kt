@@ -1,6 +1,7 @@
 package net.artux.pda.repositories
 
 import net.artux.pdanetwork.api.DefaultApi
+import net.artux.pdanetwork.model.ItemsContainer
 import net.artux.pdanetwork.model.SellerDto
 import net.artux.pdanetwork.model.Status
 import retrofit2.Call
@@ -16,6 +17,7 @@ import kotlin.coroutines.suspendCoroutine
 class SellerRepository @Inject constructor(
     private val webservice: DefaultApi,
     private val cache: Cache<SellerDto>,
+    private val itemsCache: Cache<ItemsContainer>
 ) {
 
     fun clearCache() {
@@ -27,6 +29,41 @@ class SellerRepository @Inject constructor(
         return if (result != null)
             Result.success(result)
         else Result.failure(Exception("Seller isn't found"))
+    }
+
+    fun getCachedItems(): Result<ItemsContainer> {
+        val items = itemsCache.get("items")
+        return if (items != null)
+            Result.success(items)
+        else
+            Result.failure(java.lang.Exception("Not found exc"))
+    }
+
+    suspend fun getItems(): Result<ItemsContainer> {
+        return suspendCoroutine {
+            val items = itemsCache.get("items")
+            if (items != null) {
+                it.resume(Result.success(items))
+            } else
+                webservice.container.enqueue(object : Callback<ItemsContainer> {
+                    override fun onResponse(
+                        call: Call<ItemsContainer>,
+                        response: Response<ItemsContainer>
+                    ) {
+                        val data = response.body()
+                        if (data != null) {
+                            itemsCache.put("items", data)
+                            it.resume(Result.success(data))
+                        } else
+                            it.resume(Result.failure(Exception("Items container null")))
+                    }
+
+                    override fun onFailure(call: Call<ItemsContainer>, t: Throwable) {
+                        it.resume(Result.failure(java.lang.Exception(t)))
+                    }
+
+                })
+        }
     }
 
     suspend fun getSeller(id: Long): Result<SellerDto> {

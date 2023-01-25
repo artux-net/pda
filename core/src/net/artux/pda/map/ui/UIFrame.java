@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
@@ -30,9 +29,6 @@ public class UIFrame extends WidgetGroup {
     private final Camera camera;
     private final Label counter;
 
-    private final Color primaryColor = Colors.primaryColor;
-    private final Color backgroundColor = Colors.backgroundColor;
-
     int w;
     int h;
 
@@ -40,7 +36,7 @@ public class UIFrame extends WidgetGroup {
     private final Table rightGroup;
 
     @Inject
-    public UIFrame(AssetManager assetManager, Camera usualCamera, Camera uiCamera, MapBorder mapBorder, BitmapFont font, Skin skin) {
+    public UIFrame(AssetManager assetManager, Camera usualCamera, Camera uiCamera, MapBorder mapBorder, BitmapFont font) {
         super();
         this.camera = usualCamera;
 
@@ -72,6 +68,7 @@ public class UIFrame extends WidgetGroup {
                 .width(headerHeight);
         rightGroup.align(Align.right | Align.center);
 
+        Color backgroundColor = Colors.backgroundColor;
         Image image = new Image(Utils.getColoredRegion(w, (int) standardFrameSize, backgroundColor));
         addActor(image);
 
@@ -86,6 +83,7 @@ public class UIFrame extends WidgetGroup {
         image.setPosition(w - standardFrameSize, 0);
         addActor(image);
 
+        Color primaryColor = Colors.primaryColor;
         image = new Image(Utils.getColoredRegion((int) (w - getHeaderLeftX() * 2), 2, primaryColor));
         image.setPosition(getHeaderLeftX(), h - topFrameHeight + (additionalSizes) / 4);
         addActor(image);
@@ -176,6 +174,5 @@ public class UIFrame extends WidgetGroup {
             knobHeight *= heightK;
 
         verticalSlider.getStyle().knob.setMinHeight(knobHeight);
-
     }
 }

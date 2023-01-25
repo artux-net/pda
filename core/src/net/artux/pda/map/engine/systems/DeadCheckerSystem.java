@@ -77,7 +77,8 @@ public class DeadCheckerSystem extends BaseSystem {
                         deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, new InteractiveComponent.InteractListener() {
                                     @Override
                                     public void interact() {
-                                        switch (random.nextInt(4)) {
+                                        //todo open stalker menu
+                                        /*switch (random.nextInt(4)) {
                                             case 0:
                                                 dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("85:1")));
                                                 break;
@@ -93,7 +94,7 @@ public class DeadCheckerSystem extends BaseSystem {
                                             case 4:
                                                 dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("83:1")));
                                                 break;
-                                        }
+                                        }*/
 
                                         getEngine().removeEntity(deadEntity);
                                     }

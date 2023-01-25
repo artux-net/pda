@@ -36,7 +36,7 @@ public class ItemsHelper {
                     String.valueOf(armor.getCondition()));
         } else if (item instanceof ArtifactModel) {
             ArtifactModel artifact = (ArtifactModel) item;
-            context.getString(R.string.artifact_desc,
+            result += context.getString(R.string.artifact_desc,
                     String.valueOf(artifact.getHealth()),
                     String.valueOf(artifact.getRadio()),
                     String.valueOf(artifact.getDamage()),
@@ -47,11 +47,11 @@ public class ItemsHelper {
                     String.valueOf(artifact.getElectric()));
         } else if (item instanceof DetectorModel) {
             DetectorModel detectorModel = (DetectorModel) item;
-            context.getString(R.string.detector_desc,
+            result += context.getString(R.string.detector_desc,
                     String.valueOf(detectorModel.getDetectorType().toString()));
         } else if (item instanceof WeaponModel) {
             WeaponModel weapon = (WeaponModel) item;
-            context.getString(R.string.weapon_desc,
+            result += context.getString(R.string.weapon_desc,
                     String.valueOf(weapon.getPrecision()),
                     String.valueOf(weapon.getSpeed()),
                     String.valueOf(weapon.getDamage()),

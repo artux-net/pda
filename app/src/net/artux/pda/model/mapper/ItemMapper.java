@@ -1,10 +1,12 @@
 package net.artux.pda.model.mapper;
 
 import net.artux.pda.model.items.ItemType;
+import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pdanetwork.model.ArmorDto;
 import net.artux.pdanetwork.model.ArtifactDto;
 import net.artux.pdanetwork.model.DetectorDto;
 import net.artux.pdanetwork.model.ItemDto;
+import net.artux.pdanetwork.model.ItemsContainer;
 import net.artux.pdanetwork.model.MedicineDto;
 import net.artux.pdanetwork.model.WeaponDto;
 
@@ -15,6 +17,8 @@ import org.mapstruct.factory.Mappers;
 public interface ItemMapper {
 
     ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
+
+    ItemsContainerModel model(ItemsContainer itemsContainer);
 
     default ItemType type(ArmorDto.TypeEnum type) {
         return Enum.valueOf(ItemType.class, type.getValue());

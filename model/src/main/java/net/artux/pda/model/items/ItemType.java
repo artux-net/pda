@@ -6,7 +6,7 @@ public enum ItemType {
         public int getTypeId() {
             return 4;
         }
-        },
+    },
     PISTOL {
         @Override
         public int getTypeId() {
@@ -48,6 +48,13 @@ public enum ItemType {
             return 2;
         }
 
+    },
+    ITEM {
+        @Override
+        public int getTypeId() {
+            return 7;
+        }
+
     };
 
     public abstract int getTypeId();
@@ -57,6 +64,6 @@ public enum ItemType {
             if (type.getTypeId() == typeId)
                 return type;
         }
-        return ItemType.BULLET;
+        return ItemType.ITEM;
     }
 }

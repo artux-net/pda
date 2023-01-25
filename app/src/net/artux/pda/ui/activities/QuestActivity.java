@@ -37,6 +37,7 @@ import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.ui.fragments.quest.StageFragment;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
+import net.artux.pda.ui.viewmodels.SellerViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
 import net.artux.pda.utils.MultiExoPlayer;
 import net.artux.pda.utils.URLHelper;
@@ -131,6 +132,8 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
             args.putSerializable("data", questViewModel.getStoryData().getValue());
             args.putSerializable("user", provider.get(UserViewModel.class).getFromCache());
             args.putSerializable("story", provider.get(QuestViewModel.class).getCurrentStory());
+            args.putSerializable("items", provider.get(SellerViewModel.class).getItems());
+
             coreFragment.setArguments(args);
             if (coreFragment.isAdded()) {
                 if (coreFragment.isHidden()) {

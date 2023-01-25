@@ -8,6 +8,7 @@
 
     <ImageView
         android:id="@+id/itemImage"
+        android:src="@mipmap/ic_launcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -21,24 +22,25 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:text="1"
         android:textSize="14sp"/>
 
     <TextView
         android:id="@+id/itemTitle"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/itemWeight"
         android:text="Пусто"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/itemWeight"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/itemWeight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/itemTitle" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

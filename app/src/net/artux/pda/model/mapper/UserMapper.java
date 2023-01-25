@@ -37,7 +37,6 @@ public interface UserMapper {
 
     RegisterUserDto model(RegisterUserModel model);
 
-
     GangRelation relation(GangRelationDto dto);
 
     default Gang get(UserDto.GangEnum gang) {

@@ -5,7 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.NumberPicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,10 +22,14 @@ import com.bumptech.glide.Glide;
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentQuest3Binding;
 import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.repositories.SellerRepository;
 import net.artux.pda.ui.fragments.profile.adapters.ItemsAdapter;
+import net.artux.pda.ui.fragments.profile.helpers.ItemsHelper;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
+import net.artux.pda.ui.viewmodels.SellerViewModel;
 import net.artux.pda.utils.URLHelper;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +38,11 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class SellerFragment extends Fragment implements View.OnClickListener {
 
+    private final DecimalFormat formater = new DecimalFormat("##.##");
     private ItemsAdapter sellerAdapter;
     private ItemsAdapter userAdapter;
     private ImageView background;
+    private SellerViewModel sellerViewModel;
 
     private FragmentQuest3Binding binding;
 
@@ -58,6 +66,7 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
 
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
+        sellerViewModel = provider.get(SellerViewModel.class);
         QuestViewModel questViewModel = provider.get(QuestViewModel.class);
 
         Bundle args = getArguments();
@@ -66,6 +75,11 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
 
             RecyclerView sellerView = view.findViewById(R.id.sellerList);
             RecyclerView buyerView = view.findViewById(R.id.buyerList);
+            sellerAdapter = new ItemsAdapter();
+            userAdapter = new ItemsAdapter();
+
+            sellerAdapter.setOnClickListener(item -> showDialog(SellerRepository.OperationType.BUY, item));
+            userAdapter.setOnClickListener(item -> showDialog(SellerRepository.OperationType.SELL, item));
 
             background = view.findViewById(R.id.sellerBackground);
             binding.map.setOnClickListener(this);
@@ -78,63 +92,8 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
                 binding.playerMoney.setText(getString(R.string.money, String.valueOf(dataModel.getMoney())));
             });
 
-            sellerAdapter = new ItemsAdapter();
-            sellerAdapter.setOnClickListener(item -> {
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
-                if (item.getQuantity() > 1) {
-                    final NumberPicker numberPicker = new NumberPicker(getActivity());
-                    numberPicker.setMaxValue(item.getQuantity());
-                    numberPicker.setMinValue(1);
-                    builder.setView(numberPicker);
-                    builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                        questViewModel.buyItem(item.getId(), numberPicker.getValue());
-                    });
-                } else {
-                    builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                        questViewModel.buyItem(item.getId(), 1);
-                    });
-                }
-
-                float price = item.getPrice() * questViewModel.getBuyCoefficient();
-                builder.setTitle("Вы хотите купить " + item.getTitle() + "?");
-                builder.setMessage("Ориентировочная стоимость за штуку: " + price + " RU");
-                builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {
-                });
-
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-            });
-
-            userAdapter = new ItemsAdapter();
-            userAdapter.setOnClickListener(item -> {
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
-                if (item.getQuantity() > 1) {
-                    final NumberPicker numberPicker = new NumberPicker(getActivity());
-                    numberPicker.setMaxValue(item.getQuantity());
-                    numberPicker.setMinValue(1);
-                    builder.setView(numberPicker);
-                    builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                        questViewModel.sellItem(item.getId(), numberPicker.getValue());
-                    });
-                } else {
-                    builder.setPositiveButton(R.string.yes, (dialog, which) -> {
-                        questViewModel.sellItem(item.getId(), 1);
-                    });
-                }
-
-                float price = item.getPrice() * questViewModel.getSellerCoefficient();
-
-                builder.setTitle("Вы хотите продать " + item.getTitle() + "?");
-                builder.setMessage("Ориентировочная стоимость за штуку: " + price + " RU");
-                builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {
-                });
-
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-            });
-
             questViewModel.sync(Map.of());
-            questViewModel.updateSeller(sellerId);
+            sellerViewModel.updateSeller(sellerId);
 
             sellerView.setLayoutManager(sellerAdapter.getLayoutManager(requireContext(), 3));
             sellerView.setAdapter(sellerAdapter);
@@ -142,7 +101,7 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
             buyerView.setLayoutManager(userAdapter.getLayoutManager(requireContext(), 3));
             buyerView.setAdapter(userAdapter);
 
-            questViewModel.getSeller().observe(getViewLifecycleOwner(), sellerModel -> {
+            sellerViewModel.getSeller().observe(getViewLifecycleOwner(), sellerModel -> {
                 if (sellerModel != null) {
                     sellerAdapter.setItems(sellerModel.getAllItems());
                     binding.sellerName.setText(sellerModel.getName());
@@ -154,15 +113,66 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
                             .into(background);
                 }
             });
-            questViewModel.getStatus().observe(getViewLifecycleOwner(), statusModel -> {
-                questViewModel.sync(Map.of());
-                questViewModel.updateSeller(sellerId);
+            sellerViewModel.getStatus().observe(getViewLifecycleOwner(), statusModel -> {
+                questViewModel.sync(Map.of()); //todo add to status optional story data
+                sellerViewModel.updateSeller(sellerId);
                 Toast.makeText(requireContext(), statusModel.getDescription(), Toast.LENGTH_SHORT).show();
             });
-
-
         } else
             throw new RuntimeException();
+    }
+
+    private void showDialog(SellerRepository.OperationType operationType, ItemModel item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+        float coefficient;
+        if (operationType == SellerRepository.OperationType.BUY) {
+            builder.setTitle(getString(R.string.buy_question));
+            coefficient = sellerViewModel.getBuyCoefficient();
+        } else {
+            builder.setTitle(getString(R.string.sell_question, item.getTitle()));
+            coefficient = sellerViewModel.getSellerCoefficient();
+        }
+
+        LinearLayout linearLayout = new LinearLayout(requireContext());
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+        TextView textView = new TextView(requireContext());
+        textView.setPadding(10, 10, 10, 10);
+        float price = item.getPrice() * coefficient;
+        textView.setText(getString(R.string.cost, formater.format(price)));
+        linearLayout.addView(textView);
+        builder.setView(linearLayout);
+
+        if (item.getQuantity() > 1) {
+            final NumberPicker numberPicker = new NumberPicker(getActivity());
+            numberPicker.setMaxValue(item.getQuantity());
+            numberPicker.setMinValue(1);
+            linearLayout.addView(numberPicker);
+
+            numberPicker.setOnValueChangedListener((picker, oldVal, newVal) -> {
+                float price1 = item.getPrice() * coefficient * newVal;
+                textView.setText(getString(R.string.cost, formater.format(price1)));
+            });
+
+            builder.setPositiveButton(R.string.yes, (dialog, which) ->
+                    sellerViewModel.buyItem(item.getId(), numberPicker.getValue()));
+        } else
+            builder.setPositiveButton(R.string.yes, (dialog, which) ->
+                    sellerViewModel.buyItem(item.getId(), 1));
+
+
+        builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {
+        });
+        builder.setNeutralButton(R.string.info, ((dialog, which) -> showInfoDialog(item)));
+
+        builder.create().show();
+    }
+
+    private void showInfoDialog(ItemModel item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+        builder.setTitle(item.getTitle());
+        builder.setMessage(ItemsHelper.getDesc(item, getContext()));
+        builder.create().show();
     }
 
     @Override

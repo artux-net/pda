@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.model.StatusModel
+import net.artux.pda.model.items.ItemsContainerModel
 import net.artux.pda.model.items.SellerModel
+import net.artux.pda.model.mapper.ItemMapper
 import net.artux.pda.model.mapper.SellerMapper
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.repositories.SellerRepository
@@ -21,13 +23,18 @@ class SellerViewModel @Inject constructor(
     var status: MutableLiveData<StatusModel> = MutableLiveData()
     var statusMapper: StatusMapper = StatusMapper.INSTANCE
     var sellerMapper: SellerMapper = SellerMapper.INSTANCE
+    var itemMapper: ItemMapper = ItemMapper.INSTANCE
 
-    fun update(id: Long) {
+    fun updateSeller(id: Long) {
         viewModelScope.launch {
             repository.getSeller(id)
                 .onSuccess { seller.postValue(sellerMapper.model(it)) }
                 .onFailure { status.postValue(StatusModel(it)) }
         }
+    }
+
+    fun getItems(): ItemsContainerModel {
+        return repository.getCachedItems().map { itemMapper.model(it) }.getOrThrow()
     }
 
     private suspend fun actionWithItem(
@@ -44,7 +51,8 @@ class SellerViewModel @Inject constructor(
         viewModelScope.launch {
             actionWithItem(SellerRepository.OperationType.BUY, uuid, quantity)
                 .onSuccess {
-                    status.postValue(it) }
+                    status.postValue(it)
+                }
                 .onFailure { status.postValue(StatusModel(it)) }
         }
     }

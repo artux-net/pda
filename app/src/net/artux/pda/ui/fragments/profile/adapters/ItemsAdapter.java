@@ -19,6 +19,7 @@ import net.artux.pda.R;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WearableModel;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,15 +27,17 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
     private List<ItemModel> items = new ArrayList<>();
     OnClickListener onClickListener;
+    private final DecimalFormat formater = new DecimalFormat("##.##");
 
-    public ItemsAdapter(){}
+    public ItemsAdapter() {
+    }
 
     public ItemsAdapter(OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
     }
 
-    public GridLayoutManager getLayoutManager(Context context, int span){
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(context,  span);
+    public GridLayoutManager getLayoutManager(Context context, int span) {
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(context, span);
         gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
@@ -73,7 +76,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
         return items.size();
     }
 
-    public void setItems(List<ItemModel> items){
+    public void setItems(List<ItemModel> items) {
         this.items = items;
         notifyDataSetChanged();
     }
@@ -82,7 +85,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
         return items;
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView title;
         ImageView image;
@@ -93,12 +96,12 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
             super(itemView);
             title = itemView.findViewById(R.id.itemTitle);
             image = itemView.findViewById(R.id.itemImage);
-            weight  = itemView.findViewById(R.id.itemWeight);
+            weight = itemView.findViewById(R.id.itemWeight);
             quantity = itemView.findViewById(R.id.itemQuantity);
         }
 
-        void bind(ItemModel item){
-            if (item instanceof WearableModel){
+        void bind(ItemModel item) {
+            if (item instanceof WearableModel) {
                 WearableModel wearableModel = (WearableModel) item;
                 if (wearableModel.isEquipped())
                     title.setText(item.getTitle() + " (надет)");
@@ -117,16 +120,16 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> 
 
             Glide.with(title.getContext())
                     .asGif()
-                    .load(BuildConfig.PROTOCOL + "://"+ BuildConfig.URL_API+"base/items/icons/"+item.getIcon())
+                    .load(BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API + "base/items/icons/" + item.getIcon())
                     .apply(options)
                     .into(image);
 
             quantity.setText(String.valueOf(item.getQuantity()));
-            weight.setText(weight.getContext().getString(R.string.weight, String.valueOf(item.getWeight())));
+            weight.setText(weight.getContext().getString(R.string.weight, formater.format(item.getWeight() * item.getQuantity())));
         }
     }
 
-    public interface OnClickListener{
+    public interface OnClickListener {
         void onClick(ItemModel item);
     }
 }

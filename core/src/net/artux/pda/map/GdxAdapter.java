@@ -13,6 +13,7 @@ import net.artux.pda.map.di.DaggerCoreComponent;
 import net.artux.pda.map.states.GameStateController;
 import net.artux.pda.map.states.State;
 import net.artux.pda.map.utils.PlatformInterface;
+import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
@@ -122,6 +123,11 @@ public class GdxAdapter extends ApplicationAdapter {
 
         public Builder props(Properties properties) {
             gdxAdapter.coreComponent.getDataRepository().setProperties(properties);
+            return this;
+        }
+
+        public Builder items(ItemsContainerModel items) {
+            gdxAdapter.coreComponent.getDataRepository().setItems(items);
             return this;
         }
 

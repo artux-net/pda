@@ -7,6 +7,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.components.HealthComponent;
 import net.artux.pda.map.engine.components.PassivityComponent;
@@ -16,6 +17,7 @@ import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.pathfinding.TiledNode;
 import net.artux.pda.map.engine.systems.BaseSystem;
 import net.artux.pda.map.engine.systems.MapOrientationSystem;
+import net.artux.pda.model.quest.story.StoryDataModel;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
@@ -41,6 +43,8 @@ public class PlayerMovingSystem extends BaseSystem {
     public static boolean speedup = false;
     public static boolean alwaysRun = false;
 
+    private float weightCoefficient = 0f;
+
     private final HashMap<Integer, ImmutablePair<Sound, Sound>> stepSounds;
     private boolean left = false;
     private final float stepVolume = 0.15f;
@@ -49,9 +53,15 @@ public class PlayerMovingSystem extends BaseSystem {
     private final Random random;
 
     @Inject
-    public PlayerMovingSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem) {
+    public PlayerMovingSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem, DataRepository dataRepository) {
         super(Family.all(VelocityComponent.class, Position.class).exclude(PassivityComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
+        dataRepository.addPropertyChangeListener(propertyChangeEvent -> {
+            StoryDataModel storyDataModel = (StoryDataModel) propertyChangeEvent.getNewValue();
+            weightCoefficient = 1.5f - storyDataModel.getTotalWeight() / 60;
+        });
+
+        weightCoefficient = 1.5f - dataRepository.getStoryDataModel().getTotalWeight() / 60;
         stepSounds = new HashMap<>();
         random = new Random();
 
@@ -82,7 +92,7 @@ public class PlayerMovingSystem extends BaseSystem {
             velocityComponent.setRunning(true);
 
         Vector2 stepVector;
-        Vector2 currentVelocity = velocityComponent.cpy();
+        Vector2 currentVelocity = velocityComponent.cpy().scl(weightCoefficient);
         if (speedup)
             currentVelocity.scl(PLAYER_MULTIPLICATION);
 

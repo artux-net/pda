@@ -18,6 +18,7 @@ import net.artux.pda.app.PDAApplication;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.GdxAdapter;
 import net.artux.pda.map.utils.PlatformInterface;
+import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
@@ -45,6 +46,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             StoryModel storyModel = (StoryModel) args.getSerializable("story");
             StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
             GameMap map = (GameMap) args.getSerializable("map");
+            ItemsContainerModel items = (ItemsContainerModel) args.getSerializable("items");
 
             GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
                     .map(map)
@@ -76,6 +78,8 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             StoryModel storyModel = (StoryModel) args.getSerializable("story");
             StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
             GameMap map = (GameMap) args.getSerializable("map");
+            ItemsContainerModel items = (ItemsContainerModel) args.getSerializable("items");
+
             DataRepository dataRepository = gdxAdapter.getDataRepository();
             dataRepository.setStoryDataModel(dataModel);
             dataRepository.setGameMap(map);

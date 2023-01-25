@@ -205,4 +205,8 @@
     <string name="any_select_action">Choose action</string>
     <string name="take_off">Take off</string>
     <string name="help_tab4_title">How shall we proceed then?</string>
+    <string name="info">Information</string>
+    <string name="cost">Ориентировочная стоимость: %s RU</string>
+    <string name="sell_question">Вы хотите продать %s?</string>
+    <string name="buy_question">Вы хотите купить %s?</string>
 </resources>

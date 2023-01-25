@@ -8,6 +8,7 @@ import net.artux.pda.app.DataManager;
 import net.artux.pda.model.Summary;
 import net.artux.pda.repositories.Cache;
 import net.artux.pdanetwork.model.ArticleDto;
+import net.artux.pdanetwork.model.ItemsContainer;
 import net.artux.pdanetwork.model.NoteDto;
 import net.artux.pdanetwork.model.Profile;
 import net.artux.pdanetwork.model.SellerDto;
@@ -34,6 +35,11 @@ public class CacheModule {
     @Provides
     public Cache<Profile> getProfileCache(@ApplicationContext Context context, Gson gson) {
         return new Cache<>(Profile.class, context, gson);
+    }
+
+    @Provides
+    public Cache<ItemsContainer> getItemsCache(@ApplicationContext Context context, Gson gson) {
+        return new Cache<>(ItemsContainer.class, context, gson);
     }
 
     @Provides
