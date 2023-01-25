@@ -3,7 +3,6 @@ package net.artux.pda.map.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -29,7 +28,7 @@ import javax.inject.Inject;
 public class PlayState extends State {
 
     private final static String TAG = "PlayState";
-    private GameMap gameMap;
+    private final GameMap gameMap;
     public Stage stage;
     public Stage uistage;
 
@@ -72,10 +71,13 @@ public class PlayState extends State {
         Image mapTexture = new Image(background);
         if (!stage.getActors().contains(mapTexture, false))
             stage.addActor(mapTexture);
+        mapTexture.setZIndex(1);
 
         Texture levelTexture = assetManager.get("textures/defaults/blur.png", Texture.class);
         if (levelBackgroundImage == null) {
             levelBackgroundImage = new LevelBackgroundImage(levelTexture, stage.getCamera());
+            stage.addActor(levelBackgroundImage);
+            levelBackgroundImage.setZIndex(0);
         }
     }
 
@@ -127,13 +129,6 @@ public class PlayState extends State {
 
     @Override
     public void render() {
-        SpriteBatch batch = (SpriteBatch) stage.getBatch();
-        batch.begin();
-        if (levelBackgroundImage != null)
-            levelBackgroundImage.render(batch);
-        batch.draw(background, 0, 0);
-        batch.end();
-
         stage.draw();
         stage.getBatch().begin();
         engineManager.draw(stage.getBatch(), 1);
@@ -144,6 +139,7 @@ public class PlayState extends State {
     @Override
     public void resize(int w, int h) {
         stage.getViewport().update(w, h, false);
+        //uistage.getViewport().update(w, h, false);
     }
 
     @Override

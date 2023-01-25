@@ -12,6 +12,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import fr.bipi.tressence.file.FileLoggerTree
 import net.artux.pda.BuildConfig
+import net.artux.pda.common.PropertyFields
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.io.IOException
@@ -35,6 +36,8 @@ class AppModule {
         } catch (e: IOException) {
             Timber.i("Props not found.")
         }
+        properties[PropertyFields.API_URL] = BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API
+        properties[PropertyFields.RESOURCE_URL] = BuildConfig.PROTOCOL + "://" + BuildConfig.URL
         properties.putAll(remoteConfig.all.mapValues { it.value.asString() })
         return properties
     }

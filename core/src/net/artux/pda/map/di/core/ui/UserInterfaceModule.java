@@ -245,7 +245,8 @@ public class UserInterfaceModule {
     @Provides
     public Actor initControlTable(@Named("controlTable") Table controlTable, PlayerSystem playerSystem,
                                   PlayerBattleSystem battleSystem, AssetManager assetManager) {
-        //controlTable.defaults().size(10);
+        float offset = 50;
+        float step = 60;
         controlTable.add(addInteractButton(assetManager, "ui/icons/icon_shoot.png", new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -258,29 +259,10 @@ public class UserInterfaceModule {
                 battleSystem.setPlayerShoot(false);
                 super.touchUp(event, x, y, pointer, button);
             }
-        }));
+        })).padRight(offset += step);
 
         controlTable.row();
-        controlTable.add(addInteractButton(assetManager, "ui/icons/icon_run.png", new ClickListener() {
-            private final ComponentMapper<VelocityComponent> vcm = ComponentMapper.getFor(VelocityComponent.class);
-            private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                vcm.get(playerSystem.getPlayer()).running = false;
-                super.touchUp(event, x, y, pointer, button);
-            }
-
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                HealthComponent healthComponent = hm.get(playerSystem.getPlayer());
-                if (healthComponent.stamina > 10f)
-                    vcm.get(playerSystem.getPlayer()).running = true;
-                return super.touchDown(event, x, y, pointer, button);
-            }
-        }));
-
-        controlTable.row();
         controlTable.add(addInteractButton(assetManager, "ui/icons/icon_target.png", new ChangeListener() {
             private final ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
             private final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
@@ -306,8 +288,30 @@ public class UserInterfaceModule {
                 } else if (playerEnemies.size() == 1)
                     moodComponent.setEnemy(playerEnemies.getFirst());
             }
-        }));
-        controlTable.add().colspan(3);
+        })).padRight(offset += step);
+        controlTable.row();
+
+        controlTable.add(addInteractButton(assetManager, "ui/icons/icon_run.png", new ClickListener() {
+                    private final ComponentMapper<VelocityComponent> vcm = ComponentMapper.getFor(VelocityComponent.class);
+                    private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
+
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        vcm.get(playerSystem.getPlayer()).running = false;
+                        super.touchUp(event, x, y, pointer, button);
+                    }
+
+                    @Override
+                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                        HealthComponent healthComponent = hm.get(playerSystem.getPlayer());
+                        if (healthComponent.stamina > 10f)
+                            vcm.get(playerSystem.getPlayer()).running = true;
+                        return super.touchDown(event, x, y, pointer, button);
+                    }
+                }))
+                .padRight(offset + step)
+                .padBottom(step);
+
 
         return controlTable;
     }

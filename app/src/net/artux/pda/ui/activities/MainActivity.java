@@ -130,7 +130,6 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         binding.rightTitleView.setText(title);
     }
 
-
     void setListeners() {
         binding.newsButton.setOnClickListener(this);
         binding.messagesButton.setOnClickListener(this);

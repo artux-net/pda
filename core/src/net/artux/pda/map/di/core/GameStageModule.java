@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.engine.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.ui.Logger;
 import net.artux.pda.map.ui.UserInterface;
@@ -48,8 +49,8 @@ public class GameStageModule {
 
     @Provides
     @PerGameMap
-    public UserInterface userInterface(AssetsFinder finder, @Named("uiStage") Stage uiStage) {
-        UserInterface userInterface = new UserInterface(finder, uiStage.getCamera());
+    public UserInterface userInterface(AssetsFinder finder, MapOrientationSystem mapOrientationSystem, @Named("uiStage") Stage uiStage, @Named("gameStage") Stage stage) {
+        UserInterface userInterface = new UserInterface(finder, mapOrientationSystem.getMapBorder(), uiStage.getCamera(), stage.getCamera());
         uiStage.addActor(userInterface);
         return userInterface;
     }

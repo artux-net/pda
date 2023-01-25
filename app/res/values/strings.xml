@@ -91,7 +91,7 @@
 
     <string name="nickname">Nickname</string>
     <string name="repeat_password">Repeat password</string>
-    <string name="agreement">Pressing \"Registration\",  you accept <font color="#f2cd34">privacy policy</font>.</string>
+    <string name="agreement">Pressing \"Registration\",  you accept <font color="#f2cd34">privacy policy</font> and receiving emails.</string>
     <string name="weight">%1$s kg</string>
     <string name="item_desc">Price: %1$s \nWeight: %2$s \nQuantity: %3$s - %4$s kg at all\n</string>
     <string name="weapon_desc">Precision: %1$s \nSpeed: %2$s \nDamage: %3$s \nCondition: %4$s \n</string>

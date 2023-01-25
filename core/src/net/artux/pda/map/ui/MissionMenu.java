@@ -62,11 +62,9 @@ public class MissionMenu extends Table {
 
         setFillParent(true);
         top();
-        defaults().pad(10f);
 
         SlotTextButton text = new SlotTextButton("Задания", textButtonStyle);
         add(text)
-                .fill()
                 .uniform();
         text.addListener(new ClickListener() {
             @Override
@@ -75,9 +73,9 @@ public class MissionMenu extends Table {
                 update(Type.MISSIONS);
             }
         });
+
         text = new SlotTextButton("Метки", textButtonStyle);
         add(text)
-                .fill()
                 .uniform();
         text.addListener(new ClickListener() {
             @Override

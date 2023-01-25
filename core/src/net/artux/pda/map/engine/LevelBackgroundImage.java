@@ -2,17 +2,15 @@ package net.artux.pda.map.engine;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
 import net.artux.pda.map.engine.data.GlobalData;
 
-public class LevelBackgroundImage {
+public class LevelBackgroundImage extends Actor {
 
     private final TextureRegion backgroundTextureRegion;
-
-    private final int totalWidth;
-    private final int totalHeight;
 
     private final int startX;
     private final int startY;
@@ -26,11 +24,13 @@ public class LevelBackgroundImage {
         startX = (int) (-camera.viewportWidth/2);
         startY = (int) (-camera.viewportHeight/2);
 
-        totalWidth = (int) (GlobalData.mapWidth + camera.viewportWidth);
-        totalHeight = (int) (GlobalData.mapHeight + camera.viewportHeight);
+        setWidth(GlobalData.mapWidth + camera.viewportWidth);
+        setHeight(GlobalData.mapHeight + camera.viewportHeight);
     }
 
-    public void render(SpriteBatch spriteBatch) {
-        spriteBatch.draw(backgroundTextureRegion, startX, startY, totalWidth, totalHeight);
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+        batch.draw(backgroundTextureRegion, startX, startY);
     }
 }

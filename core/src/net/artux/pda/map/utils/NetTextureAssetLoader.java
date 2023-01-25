@@ -38,6 +38,7 @@ public class NetTextureAssetLoader extends AsynchronousAssetLoader<NetFile, NetT
                 final String url = baseUrl + path;
                 Gdx.app.error("Preload", path + " missed, try to load from net.");
                 Net.HttpRequest request = new Net.HttpRequest(Net.HttpMethods.GET);
+                request.setTimeOut(20 * 1000);
                 request.setUrl(url);
 
                 Gdx.net.sendHttpRequest(request, new Net.HttpResponseListener() {

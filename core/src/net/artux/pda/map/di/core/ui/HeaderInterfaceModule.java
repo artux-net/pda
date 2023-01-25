@@ -17,6 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.DataRepository;
@@ -37,8 +38,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.inject.Named;
 
@@ -55,7 +54,7 @@ public class HeaderInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initHeader(Timer timer, MissionMenu missionMenu, GameMap map,
+    public Actor initHeader(MissionMenu missionMenu, GameMap map,
                             @Named("gameZone") Group gameZone,
                             Label.LabelStyle labelStyle, UIFrame uiFrame,
                             AssetManager assetManager, DataRepository dataRepository) {
@@ -106,15 +105,16 @@ public class HeaderInterfaceModule {
                 .add(new Label(map.getTitle(), labelStyle))
                 .padRight(20);
 
-        timer.schedule(new TimerTask() {
+        Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
                 timeLabel.setText(timeFormatter.format(Instant.now()));
             }
-        }, 0, 2000);
+        }, 0, 3);
 
-        uiFrame.getLeftHeaderTable().add(missionsButton)
-                .width(uiFrame.getLeftHeaderTable().getHeight())
+        uiFrame.getLeftHeaderTable()
+                .add(missionsButton)
+                //.width(uiFrame.getLeftHeaderTable().getHeight())
                 .uniform();
 
         uiFrame.getRightHeaderTable().add(pauseButton).uniform();

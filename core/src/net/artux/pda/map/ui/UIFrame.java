@@ -1,126 +1,136 @@
 package net.artux.pda.map.ui;
 
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.PolygonRegion;
-import com.badlogic.gdx.graphics.g2d.PolygonSprite;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Disposable;
 
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.data.PlayerData;
+import net.artux.pda.map.engine.pathfinding.MapBorder;
 import net.artux.pda.map.ui.bars.Utils;
+import net.artux.pda.map.utils.Colors;
 
-public class UIFrame extends Group implements Disposable {
+import javax.inject.Inject;
 
-    private final ShapeRenderer shapeRenderer;
+@PerGameMap
+public class UIFrame extends WidgetGroup {
+
     private final Camera camera;
     private final Label counter;
 
-    private final Color primaryColor;
-    private final Color backgroundColor;
+    private final Color primaryColor = Colors.primaryColor;
+    private final Color backgroundColor = Colors.backgroundColor;
 
     int w;
     int h;
 
-    int screenW = Gdx.graphics.getWidth();
-    int screenH = Gdx.graphics.getHeight();
-
-    private final short[] squareTriangles = new short[]{
-            0, 1, 3,
-            1, 2, 3,
-    };
-
     private final Table leftGroup;
     private final Table rightGroup;
 
-    public UIFrame(Camera camera, BitmapFont font, Color primaryColor, Color backgroundColor) {
+    @Inject
+    public UIFrame(AssetManager assetManager, Camera usualCamera, Camera uiCamera, MapBorder mapBorder, BitmapFont font, Skin skin) {
         super();
-        this.primaryColor = primaryColor;
-        this.backgroundColor = backgroundColor;
-        this.camera = camera;
-        shapeRenderer = new ShapeRenderer();
+        this.camera = usualCamera;
 
-        w = (int) camera.viewportWidth;
-        h = (int) camera.viewportHeight;
+        w = (int) uiCamera.viewportWidth;
+        h = (int) uiCamera.viewportHeight;
 
-        standartFrameSize = 30f;
-        topFrameHeight = standartFrameSize * 2.0f;
+        standardFrameSize = 30f;
+        topFrameHeight = standardFrameSize * 2.5f;
         additionalSizes = topFrameHeight * 0.3f;
         headerBottomY = h - topFrameHeight + (additionalSizes) / 2;
 
-        headerLeftX = standartFrameSize / 5;
+        headerLeftX = standardFrameSize / 5;
         headerRightX = w - headerLeftX - 24;
-        leftBarWidth = w - getHeaderLeftX() - standartFrameSize;
+        leftBarWidth = w - getHeaderLeftX() - standardFrameSize;
 
         float topHeaderOffset = (additionalSizes) / 2;
         headerHeight = h - topHeaderOffset - headerBottomY;
 
-        counter = new Label("0", new Label.LabelStyle(font, Color.ORANGE));
-        counter.setPosition(w - standartFrameSize, 0);
-        counter.setAlignment(Align.center);
-        counter.setSize(standartFrameSize, standartFrameSize);
-        addActor(counter);
-
-        float headerWidth = headerRightX - headerLeftX;
-
         leftGroup = new Table();
-        leftGroup.setPosition(headerLeftX, headerBottomY);
-        leftGroup.setSize(headerWidth / 2, headerHeight);
-        leftGroup.align(Align.left | Align.center);
+        leftGroup.align(Align.left);
         leftGroup.defaults()
                 .pad(10)
                 .height(headerHeight);
-        addActor(leftGroup);
 
         rightGroup = new Table();
-        rightGroup.setPosition(headerLeftX + headerWidth / 2, headerBottomY);
-        rightGroup.setSize(headerWidth / 2, headerHeight);
         rightGroup.defaults()
                 .pad(10)
                 .height(headerHeight)
                 .width(headerHeight);
         rightGroup.align(Align.right | Align.center);
 
-        addActor(rightGroup);
+        Image image = new Image(Utils.getColoredRegion(w, (int) standardFrameSize, backgroundColor));
+        addActor(image);
 
-        solidTextureRegion = Utils.getColoredRegion(1, 1, primaryColor);
+        image = new Image(Utils.getColoredRegion((int) getHeaderLeftX(), h, backgroundColor));
+        addActor(image);
 
-        PolygonRegion polyRegHeaderFrame = new PolygonRegion(solidTextureRegion,
-                new float[]{
-                        headerLeftX,
-                        headerBottomY,
-                        headerLeftX,
-                        h - topHeaderOffset,
-                        headerRightX,
-                        h - topHeaderOffset,
-                        w - headerLeftX,
-                        h - topFrameHeight / 2,
-                        w - headerLeftX,
-                        headerBottomY
-                },
-                new short[]{
-                        0, 3, 4,
-                        0, 2, 3,
-                        0, 1, 2
-                });
+        image = new Image(Utils.getColoredRegion(w, (int) topFrameHeight + 1, backgroundColor));
+        image.setPosition(0, h - topFrameHeight);
+        addActor(image);
 
-        headerBarSprite = new PolygonSprite(polyRegHeaderFrame);
-        bottomBarSprite = new PolygonSprite(polyRegHeaderFrame);
-        rightBarSprite = new PolygonSprite(polyRegHeaderFrame);
+        image = new Image(Utils.getColoredRegion((int) standardFrameSize, h, backgroundColor));
+        image.setPosition(w - standardFrameSize, 0);
+        addActor(image);
 
-        polyBatch = new PolygonSpriteBatch();
+        image = new Image(Utils.getColoredRegion((int) (w - getHeaderLeftX() * 2), 2, primaryColor));
+        image.setPosition(getHeaderLeftX(), h - topFrameHeight + (additionalSizes) / 4);
+        addActor(image);
+
+        Table headerTable = new Table();
+        headerTable.setPosition(headerLeftX, headerBottomY);
+        headerTable.setSize((w - getHeaderLeftX() * 2), headerHeight);
+        headerTable.setBackground(new TextureRegionDrawable(assetManager.get("ui/title_background.png", Texture.class)));
+        addActor(headerTable);
+
+        headerTable.add(leftGroup)
+                .left()
+                .expandX();
+        headerTable.add(rightGroup)
+                .padRight(getHeaderLeftX())
+                .fill();
+
+        float frameOffset = standardFrameSize * 0.35f;
+
+        Slider.SliderStyle style = new Slider.SliderStyle();
+        style.knob = new TextureRegionDrawable(Utils.getColoredRegion(1, 1, primaryColor));
+        style.knob.setMinHeight((int) (standardFrameSize - frameOffset));
+        horizontalSlider = new Slider(0, mapBorder.getMapWidth(), 1, false, style);
+        horizontalSlider.setSize(w - standardFrameSize - getHeaderLeftX(), standardFrameSize - additionalSizes*2);
+        horizontalSlider.setPosition(getHeaderLeftX(), additionalSizes);
+        addActor(horizontalSlider);
+
+        style = new Slider.SliderStyle();
+        style.knob = Utils.getColoredDrawable(1,1, primaryColor);
+        style.knob.setMinWidth((int) (standardFrameSize - frameOffset));
+        verticalSlider = new Slider(0, mapBorder.getMapHeight(), 1, true, style);
+
+        verticalSlider.setSize(standardFrameSize - frameOffset, h - topFrameHeight - standardFrameSize);
+        verticalSlider.setPosition(w - standardFrameSize + frameOffset/2, standardFrameSize);
+        addActor(verticalSlider);
+
+        counter = new Label("0", new Label.LabelStyle(font, Color.ORANGE));
+        counter.setPosition(w - standardFrameSize, 0);
+        counter.setAlignment(Align.center);
+        counter.setSize(standardFrameSize, standardFrameSize);
+        addActor(counter);
     }
+
+    Slider horizontalSlider;
+    Slider verticalSlider;
 
     public Table getLeftHeaderTable() {
         return leftGroup;
@@ -130,8 +140,7 @@ public class UIFrame extends Group implements Disposable {
         return rightGroup;
     }
 
-
-    float standartFrameSize;
+    float standardFrameSize;
     float topFrameHeight;
     float additionalSizes;
     float headerBottomY;
@@ -141,14 +150,6 @@ public class UIFrame extends Group implements Disposable {
     float headerRightX;
     float leftBarWidth;
 
-    PolygonSprite headerBarSprite;
-    PolygonSprite bottomBarSprite;
-    PolygonSprite rightBarSprite;
-
-    PolygonSpriteBatch polyBatch;
-
-    TextureRegion solidTextureRegion;
-
     public float getHeaderLeftX() {
         return headerLeftX;
     }
@@ -157,130 +158,24 @@ public class UIFrame extends Group implements Disposable {
     public void act(float delta) {
         super.act(delta);
         counter.setText(String.valueOf(PlayerData.visibleEntities));
-    }
-
-    @Override
-    public void draw(Batch batch, float parentAlpha) {
-        batch.end();
-
-        //border frames
-        shapeRenderer.setColor(backgroundColor);
-        shapeRenderer.setProjectionMatrix(getStage().getBatch().getProjectionMatrix());
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.rect(0, 0, getHeaderLeftX(), h);
-        shapeRenderer.rect(0, 0, w, standartFrameSize);
-        shapeRenderer.rect(w - standartFrameSize, 0, standartFrameSize, h);
-        shapeRenderer.rect(0, h - topFrameHeight, w, topFrameHeight);
-        shapeRenderer.end();
-
-        //line
-        shapeRenderer.setProjectionMatrix(getStage().getBatch().getProjectionMatrix());
-        shapeRenderer.setColor(primaryColor);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.rectLine(getHeaderLeftX(), h - topFrameHeight + (additionalSizes) / 4, w - getHeaderLeftX(),
-                h - topFrameHeight + (additionalSizes) / 4, 1);
-        shapeRenderer.end();
-
+        horizontalSlider.setValue(GlobalData.cameraPosX);
         Vector3[] visibleCameraCorners = camera.frustum.planePoints;
 
-        //bottom bar
         float widthK = (visibleCameraCorners[1].x - visibleCameraCorners[0].x) / GlobalData.mapWidth;
-        float barWidth = leftBarWidth;
+        float knobWidth = horizontalSlider.getWidth();
         if (widthK < 1)
-            barWidth *= widthK;
+            knobWidth *= widthK;
 
-        float bottomBarLeftX = getHeaderLeftX() + (GlobalData.cameraPosX / GlobalData.mapWidth) * leftBarWidth - barWidth * 0.5f;
+        horizontalSlider.getStyle().knob.setMinWidth(knobWidth);
 
-        if (bottomBarLeftX < getHeaderLeftX()) {
-            barWidth -= getHeaderLeftX() - bottomBarLeftX;
-            bottomBarLeftX = getHeaderLeftX();
-        }
+        verticalSlider.setValue(GlobalData.cameraPosY);
 
-        if (bottomBarLeftX + barWidth > screenW - standartFrameSize) {
-            barWidth -= bottomBarLeftX + barWidth - (screenW - standartFrameSize);
-        }
-
-        polyBatch.begin();
-
-        float bottomBarDownY = additionalSizes / 2;
-        float bottomBarUpY = bottomBarDownY + standartFrameSize - additionalSizes;
-
-        PolygonRegion bottomBar = new PolygonRegion(solidTextureRegion,
-                new float[]{
-                        bottomBarLeftX,
-                        bottomBarDownY,
-                        bottomBarLeftX,
-                        bottomBarUpY,
-                        bottomBarLeftX + barWidth,
-                        bottomBarUpY,
-                        bottomBarLeftX + barWidth,
-                        bottomBarDownY,
-                }, squareTriangles);
-        bottomBarSprite.setRegion(bottomBar);
-
-        //right bar
         float heightK = (visibleCameraCorners[2].y - visibleCameraCorners[1].y) / GlobalData.mapHeight;
-
-        float barHeight = getSideBarHeight();
+        float knobHeight = verticalSlider.getHeight();
         if (heightK < 1)
-            barHeight *= heightK;
+            knobHeight *= heightK;
 
-        float rightBarDownY = standartFrameSize + (GlobalData.cameraPosY / GlobalData.mapHeight) * (getSideBarHeight()) - barHeight * 0.5f;
+        verticalSlider.getStyle().knob.setMinHeight(knobHeight);
 
-        if (rightBarDownY < standartFrameSize) {
-            barHeight -= standartFrameSize - rightBarDownY;
-            rightBarDownY = standartFrameSize;
-        }
-
-        if (rightBarDownY + barHeight > screenH - topFrameHeight) {
-            barHeight -= rightBarDownY + barHeight - (screenH - topFrameHeight);
-        }
-
-        float rightBarLeftX = getHeaderLeftX() + leftBarWidth + additionalSizes / 2;
-        float rightBarRightX = rightBarLeftX + standartFrameSize - additionalSizes;
-
-
-        PolygonRegion rightBar = new PolygonRegion(solidTextureRegion,
-                new float[]{
-                        rightBarLeftX,
-                        rightBarDownY,
-                        rightBarLeftX,
-                        rightBarDownY + barHeight,
-                        rightBarRightX,
-                        rightBarDownY + barHeight,
-                        rightBarRightX,
-                        rightBarDownY
-                }, squareTriangles);
-        rightBarSprite.setRegion(rightBar);
-
-        /*rightBarSprite.draw(polyBatch);
-        bottomBarSprite.draw(polyBatch);
-        headerBarSprite.draw(polyBatch);*/
-        polyBatch.end();
-
-        batch.begin();
-        super.draw(batch, parentAlpha);
-    }
-
-    public float getSideBarHeight(){
-        return screenH - standartFrameSize - topFrameHeight;
-    }
-
-    public float getRightSideBarWidth(){
-        return h - standartFrameSize - topFrameHeight;
-    }
-
-    public float getBottomBarHeight(){
-        return h - standartFrameSize - topFrameHeight;
-    }
-
-    public float getTopBarHeight(){
-        return h - standartFrameSize - topFrameHeight;
-    }
-
-    @Override
-    public void dispose() {
-        polyBatch.dispose();
-        shapeRenderer.dispose();
     }
 }

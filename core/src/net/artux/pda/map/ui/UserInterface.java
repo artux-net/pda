@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.engine.AssetsFinder;
-import net.artux.pda.map.utils.Colors;
+import net.artux.pda.map.engine.pathfinding.MapBorder;
 
 public class UserInterface extends Group implements Disposable {
 
@@ -22,25 +22,26 @@ public class UserInterface extends Group implements Disposable {
     private final UIFrame uiFrame;
     private final Skin skin;
 
-    public UserInterface(AssetsFinder assetsFinder, Camera camera) {
+    public UserInterface(AssetsFinder assetsFinder, MapBorder mapBorder, Camera uiCamera, Camera camera) {
         super();
         this.stack = new Stack();
         skin = new Skin(Gdx.files.internal("data/skin/uiskin.json")); //todo asset manager
 
         font = assetsFinder.getFontManager().getFont(24);
-        uiFrame = new UIFrame(camera, font, Colors.primaryColor, Colors.backgroundColor);
+        uiFrame = new UIFrame(assetsFinder.getManager(), camera, uiCamera, mapBorder, font, skin);
+        uiFrame.setFillParent(true);
         addActor(uiFrame);
 
-        float w = camera.viewportWidth;
-        float h = camera.viewportHeight;
+        float w = uiCamera.viewportWidth;
+        float h = uiCamera.viewportHeight;
 
         setSize(w,h);
 
-        float gameZoneWidth = w - uiFrame.standartFrameSize - uiFrame.headerLeftX;
-        float gameZoneHeight = h - uiFrame.standartFrameSize - uiFrame.topFrameHeight;
+        float gameZoneWidth = w - uiFrame.standardFrameSize - uiFrame.headerLeftX;
+        float gameZoneHeight = h - uiFrame.standardFrameSize - uiFrame.topFrameHeight;
         stack.setSize(gameZoneWidth, gameZoneHeight);
         stack.setX(uiFrame.getHeaderLeftX());
-        stack.setY(uiFrame.standartFrameSize);
+        stack.setY(uiFrame.standardFrameSize);
 
         gameZone = new Group();
         gameZone.setSize(gameZoneWidth, gameZoneHeight);
@@ -60,7 +61,6 @@ public class UserInterface extends Group implements Disposable {
     @Override
     public void dispose() {
         skin.dispose();
-        uiFrame.dispose();
     }
 
     public Group getGameZone() {

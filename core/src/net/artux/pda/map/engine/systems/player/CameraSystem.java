@@ -1,4 +1,4 @@
-package net.artux.pda.map.engine.systems;
+package net.artux.pda.map.engine.systems.player;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
@@ -9,38 +9,56 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.engine.components.BodyComponent;
+import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.components.Position;
+import net.artux.pda.map.engine.components.VelocityComponent;
+import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.data.GlobalData;
+import net.artux.pda.map.engine.systems.BaseSystem;
+import net.artux.pda.map.utils.Mappers;
+import net.artux.pda.model.map.GameMap;
 
+import javax.inject.Inject;
+
+@PerGameMap
 public class CameraSystem extends BaseSystem implements GestureDetector.GestureListener {
 
     private OrthographicCamera camera;
     private ClicksSystem clicksSystem;
+    private GameMap map;
 
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private ComponentMapper<PlayerComponent> cm = ComponentMapper.getFor(PlayerComponent.class);
+    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 
     private Vector2 cameraV2Position = new Vector2();
+    private Vector2 cameraSpeed = new Vector2();
 
     private float initialZoom = 0.5f;
-    private static float maxZoom = 2f;
+    private static float maxZoom = 1f;
     private static float minZoom = 0.1f;
-    private static float maxLimit = 1.4f;
+    private static float maxLimit = 0.8f;
     private static float minLimit = 0.4f;
     private static float zoomingSpeed = 2f;
     private static float specialZoomValue = 0.2f;
     boolean detached;
     boolean specialZoom = false;
 
-    public CameraSystem(Camera camera) {
+    @Inject
+    public CameraSystem(Camera camera, ClicksSystem clicksSystem, GameMap map) {
         super(Family.all().get());
         this.camera = (OrthographicCamera) camera;
+        this.clicksSystem = clicksSystem;
+        this.map = map;
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         camera.zoom = initialZoom;
-        clicksSystem = engine.getSystem(ClicksSystem.class);
+
+        camera.position.x = Mappers.vector2(map.getDefPos()).x;
+        camera.position.y = Mappers.vector2(map.getDefPos()).y;
     }
 
     @Override
@@ -48,24 +66,31 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
         super.update(deltaTime);
 
         if (isPlayerActive()) {
-            Vector2 playerPosition = pm.get(player).getBody().getPosition();
-            Vector2 playerVelocity = pm.get(player).getBody().getLinearVelocity();
+            Position position = pm.get(getPlayer());
+            VelocityComponent velocityComponent = vm.get(getPlayer());
 
             if (!detached) {
                 cameraV2Position.x = camera.position.x;
                 cameraV2Position.y = camera.position.y;
-                Vector2 unit = playerPosition.cpy().sub(cameraV2Position);
+                Vector2 unit = position.getPosition().cpy().sub(cameraV2Position);
 
-                float speed = cameraV2Position.dst(playerPosition) * 3f * (1 / camera.zoom);
+                float speed = cameraV2Position.dst(position.getPosition()) * 3f * (1 / camera.zoom);
 
                 if (1 / unit.len() < 1.5) {
                     unit.scl((1 / unit.len()) * deltaTime * speed);
                 }
 
                 internalMoveBy(unit.x, unit.y);
+            }else{
+                cameraSpeed.scl(0.9f);
+                moveBy(cameraSpeed.x, cameraSpeed.y);
+                if (cameraSpeed.len2() < 0.1)
+                    cameraSpeed.set(0,0);
             }
-            if (!playerVelocity.isZero())
+            if (!velocityComponent.isZero()) {
                 detached = false;
+                cameraSpeed.set(0,0);
+            }
 
             if (specialZoom && !detached) {
                 if (camera.zoom > specialZoomValue) {
@@ -91,6 +116,10 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
             }
             updateData();
         }
+    }
+
+    public boolean isDetached() {
+        return detached;
     }
 
     @Override
@@ -178,8 +207,9 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
 
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
+        cameraSpeed.set(0,0);
         if (clicksSystem != null)
-            clicksSystem.clicked(x, y);
+            return clicksSystem.clicked(x, y);
         return false;
     }
 
@@ -195,8 +225,8 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
 
     @Override
     public boolean fling(float velocityX, float velocityY, int button) {
-        //Gdx.app.debug("", velocityX + ":" + velocityY);
-        //TODO fling
+        cameraSpeed.set(-velocityX, velocityY);
+        cameraSpeed.scl(0.01f);
         return false;
     }
 

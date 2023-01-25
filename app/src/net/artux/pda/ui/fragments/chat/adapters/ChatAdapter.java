@@ -2,6 +2,7 @@ package net.artux.pda.ui.fragments.chat.adapters;
 
 import android.annotation.SuppressLint;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     private List<UserMessage> messages;
     private final MessageClickListener listener;
 
-    public ChatAdapter(MessageClickListener listener){
+    public ChatAdapter(MessageClickListener listener) {
         this.listener = listener;
         messages = new LinkedList<>();
     }
@@ -46,7 +47,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void addMessage(UserMessage userMessage){
+    public void addMessage(UserMessage userMessage) {
         messages.add(userMessage);
         notifyDataSetChanged();
     }
@@ -69,7 +70,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         return messages.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView avatarView;
         TextView nicknameView;
@@ -88,34 +89,39 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 .withZone(ZoneId.systemDefault());
 
         @SuppressLint("SetTextI18n")
-        void bind(UserMessage userMessage){
-            itemView.setOnLongClickListener(view -> {
-                listener.onLongClick(userMessage);
-                return false;
-            });
-            itemView.setOnClickListener(view -> listener.onClick(userMessage));
+        void bind(UserMessage userMessage) {
             Instant instant = userMessage.getTimestamp();
-
             UserModel userModel = userMessage.getAuthor();
 
-            nicknameView.setText(userModel.getLogin());
-            messageView.setText(Html.fromHtml(userMessage.getContent()));
-
-            if (userModel.getPdaId() < 0 || userModel.getGang() == null){
-                infoView.setText(" [PDA ###]"
-                        + " - " + formatter.format(instant));
-            }else {
-                infoView.setText(" [PDA #" + userModel.getPdaId() + "] "
-                        + infoView.getContext().getResources().getStringArray(R.array.groups)[userModel.getGang().getId()] // группировка
-                        + " - " + formatter.format(instant));
+            if (userModel != null) {
+                nicknameView.setText(userModel.getLogin());
+                itemView.setOnLongClickListener(view -> {
+                    listener.onLongClick(userMessage);
+                    return false;
+                });
+                itemView.setOnClickListener(view -> listener.onClick(userMessage));
+                if (userModel.getPdaId() < 0 || userModel.getGang() == null) {
+                    infoView.setText(" [PDA ###]"
+                            + " - " + formatter.format(instant));
+                } else {
+                    infoView.setText(" [PDA #" + userModel.getPdaId() + "] "
+                            + infoView.getContext().getResources().getStringArray(R.array.groups)[userModel.getGang().getId()] // группировка
+                            + " - " + formatter.format(instant));
+                }
+                ProfileHelper.setAvatar(avatarView, userModel.getAvatar());
+            } else {
+                nicknameView.setText("System ");
+                infoView.setText(formatter.format(instant));
+                messageView.setMovementMethod(LinkMovementMethod.getInstance());
             }
-            ProfileHelper.setAvatar(avatarView, userModel.getAvatar());
+            messageView.setText(Html.fromHtml(userMessage.getContent(), Html.FROM_HTML_MODE_LEGACY));
         }
     }
 
-    public interface MessageClickListener{
+    public interface MessageClickListener {
 
         void onClick(UserMessage message);
+
         void onLongClick(UserMessage message);
 
     }
