@@ -23,6 +23,8 @@ public class ItemView extends Table {
         super();
         iconFilename = "icons/items/" + itemModel.getIcon();
 
+
+        //todo add counter
         image = new LazyImage(assetManager, iconFilename);
         image.setScaling(Scaling.fit);
         add(image)

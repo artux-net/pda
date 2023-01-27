@@ -16,13 +16,13 @@
            <Button
                android:id="@+id/commonChatBtn"
                android:layout_width="match_parent"
-               android:layout_height="wrap_content"
+               android:layout_height="match_parent"
                android:text="@string/general_chat_channel"
                android:layout_weight="1"/>
            <Button
                android:id="@+id/groupChatBtn"
                android:layout_width="match_parent"
-               android:layout_height="wrap_content"
+               android:layout_height="match_parent"
                android:text="@string/group_chat_channel"
                android:layout_weight="1"/>
 

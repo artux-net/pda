@@ -17,7 +17,7 @@ import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.LevelBackgroundImage;
 import net.artux.pda.map.engine.data.GlobalData;
-import net.artux.pda.map.utils.NetFile;
+import net.artux.engine.resource.types.NetFile;
 import net.artux.pda.model.map.GameMap;
 
 import javax.inject.Inject;

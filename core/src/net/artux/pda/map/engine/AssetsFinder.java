@@ -12,9 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
 
+import net.artux.engine.resource.loaders.LocaleBundleLoader;
+import net.artux.engine.resource.loaders.NetTextureAssetLoader;
+import net.artux.engine.resource.types.NetFile;
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.ui.FontManager;
-import net.artux.pda.map.utils.NetFile;
-import net.artux.pda.map.utils.NetTextureAssetLoader;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +29,6 @@ public class AssetsFinder implements Disposable {
     public static final String cachePath = "cache/";
 
     public AssetManager assetManager;
-    public AssetManager remoteAssetManager;
     private final Map<String, Texture> textureMap;
     private final FontManager fontManager;
     private final Properties properties;
@@ -37,7 +38,6 @@ public class AssetsFinder implements Disposable {
         fontManager = new FontManager();
         textureMap = new HashMap<>();
         this.properties = properties;
-        remoteAssetManager = new AssetManager();
     }
 
     public AssetManager getManager() {
@@ -83,8 +83,14 @@ public class AssetsFinder implements Disposable {
             loadRecursively(assetManager, sounds, true, Music.class);
 
             assetManager.setLoader(NetFile.class, new NetTextureAssetLoader(properties));
+            assetManager.setLoader(LocaleBundle.class, new LocaleBundleLoader(assetManager.getFileHandleResolver()));
+            assetManager.load("locale/ui.properties", LocaleBundle.class);
         }
         return assetManager;
+    }
+
+    public LocaleBundle getLocaleBundle() {
+        return assetManager.get("locale/ui.properties");
     }
 
     public FontManager getFontManager() {

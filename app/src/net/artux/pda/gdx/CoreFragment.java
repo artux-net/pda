@@ -53,6 +53,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
                     .user(user)
                     .story(storyModel)
                     .storyData(dataModel)
+                    .items(items)
                     .props(((PDAApplication) requireActivity().getApplication()).getProperties());
             gdxAdapter = (GdxAdapter) builder.build();
             Timber.i("Core view created");
@@ -85,6 +86,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             dataRepository.setGameMap(map);
             dataRepository.setStoryModel(storyModel);
             dataRepository.setUserModel(user);
+            dataRepository.setItems(items);
         }
         super.onResume();
     }

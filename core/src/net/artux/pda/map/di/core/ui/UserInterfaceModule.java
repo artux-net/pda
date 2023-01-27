@@ -68,7 +68,7 @@ public class UserInterfaceModule {
 
         Touchpad touchpad = new Touchpad(10, style);
         touchpad.setPosition(0, 0);
-        touchpad.setBounds(50, 50, gameZone.getHeight() / 2.5f, gameZone.getHeight() / 2.5f);
+        touchpad.setBounds(50, 50, 200, 200);
         touchpad.addListener(new ChangeListener() {
             private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 

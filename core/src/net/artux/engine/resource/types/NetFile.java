@@ -1,4 +1,4 @@
-package net.artux.pda.map.utils;
+package net.artux.engine.resource.types;
 
 import com.badlogic.gdx.utils.Disposable;
 

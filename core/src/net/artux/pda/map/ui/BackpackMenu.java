@@ -1,18 +1,15 @@
 package net.artux.pda.map.ui;
 
-import static net.artux.pda.model.QuestUtil.isInteger;
-
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
@@ -20,17 +17,22 @@ import net.artux.pda.map.engine.systems.SoundsSystem;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.ui.bars.HUD;
 import net.artux.pda.map.ui.bars.Utils;
-import net.artux.pda.map.ui.blocks.MediaItem;
 import net.artux.pda.map.ui.blocks.SlotTextButton;
-import net.artux.pda.map.ui.units.LazyImage;
-import net.artux.pda.map.ui.view.ItemView;
+import net.artux.pda.map.ui.view.DetailItemView;
+import net.artux.pda.map.ui.view.ItemsHorizontalView;
+import net.artux.pda.map.ui.view.OnItemClickListener;
 import net.artux.pda.map.utils.Colors;
+import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.MedicineModel;
+import net.artux.pda.model.items.WeaponModel;
+import net.artux.pda.model.items.WearableModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.UserModel;
 
-import java.text.DecimalFormat;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -43,14 +45,16 @@ public class BackpackMenu extends Table {
     private final AssetManager assetManager;
     private final FontManager fontManager;
 
-    private final MediaItem mediaItem;
-    private final Label additionalLabel;
-    private final Table mainContent;
-    private final Table additionalContent;
+    private final Label infoLabel;
+    private final LocaleBundle localeBundle;
+    private final ItemsHorizontalView mainItemsView;
+    private final ItemsHorizontalView fastItemsView;
 
     @Inject
-    public BackpackMenu(HUD hud, SlotTextButton textButton, AssetsFinder assetsFinder, PlayerSystem playerSystem, DataRepository dataRepository, Skin skin, SoundsSystem soundsSystem) {
+    public BackpackMenu(HUD hud, SlotTextButton textButton, AssetsFinder assetsFinder, PlayerSystem playerSystem,
+                        LocaleBundle localeBundle, DataRepository dataRepository, Skin skin, SoundsSystem soundsSystem) {
         super();
+        this.localeBundle = localeBundle;
         this.playerSystem = playerSystem;
         this.dataRepository = dataRepository;
         this.assetManager = assetsFinder.getManager();
@@ -61,10 +65,10 @@ public class BackpackMenu extends Table {
                 .space(20);
 
         fontManager = assetsFinder.getFontManager();
-        Label.LabelStyle labelStyle = fontManager.getLabelStyle(38, Color.WHITE);
+        Label.LabelStyle titleLabelStyle = fontManager.getLabelStyle(38, Color.WHITE);
         Label.LabelStyle subtitleStyle = fontManager.getLabelStyle(30, Color.GRAY);
 
-        textButton.setText("Закрыть");
+        textButton.setText(localeBundle.get("main.close"));
         textButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -72,126 +76,82 @@ public class BackpackMenu extends Table {
                 remove();
             }
         });
-        add(textButton)
-                .left();
+        infoLabel = new Label("", subtitleStyle);
 
-        UserModel userModel = dataRepository.getUserModel();
-        Image avatar;
-        if (isInteger(userModel.getAvatar()) && !userModel.getAvatar().equals("0"))
-            avatar = new LazyImage(assetManager, "avatars/a" + userModel.getAvatar() + ".png");
-        else
-            avatar = new LazyImage(assetManager, "avatars/a0.jpg");
+        VerticalGroup verticalGroup = new VerticalGroup();
+        verticalGroup.addActor(textButton);
+        verticalGroup.addActor(hud);
+        verticalGroup.addActor(infoLabel);
 
-        mediaItem = new MediaItem(avatar, "nickname", "content", labelStyle, subtitleStyle);
+        add(verticalGroup)
+                .left().top();
 
-        add(mediaItem)
-                .uniformY();
+        ArmorModel armorModel = (ArmorModel) dataRepository.getStoryDataModel().getCurrentWearable(ItemType.ARMOR);
 
-        add(hud)
-                .fill()
+        if (armorModel != null)
+            add(new DetailItemView(armorModel, titleLabelStyle, subtitleStyle, localeBundle, assetManager))
+                    .fill()
+                    .growX();
+
+        verticalGroup = new VerticalGroup();
+        WeaponModel weaponModel = (WeaponModel) dataRepository.getStoryDataModel().getCurrentWearable(ItemType.RIFLE);
+        if (weaponModel != null)
+            verticalGroup.addActor(new DetailItemView(weaponModel, titleLabelStyle, subtitleStyle, localeBundle, assetManager));
+
+        weaponModel = (WeaponModel) dataRepository.getStoryDataModel().getCurrentWearable(ItemType.PISTOL);
+        if (weaponModel != null)
+            verticalGroup.addActor(new DetailItemView(weaponModel, titleLabelStyle, subtitleStyle, localeBundle, assetManager));
+
+        add(verticalGroup)
                 .growX();
+
         row();
 
-        Label label = new Label("Инвентарь", labelStyle);
-        add(label)
-                .left()
-                .growX();
-        row();
-
-        mainContent = new Table();
-        mainContent
-                .align(Align.left | Align.top)
-                .left()
-                .defaults()
-                .pad(5)
-                .space(15);
-
-        mainContent.debugCell();
-
-        ScrollPane scrollPane = new ScrollPane(mainContent, skin);
-        scrollPane.setScrollingDisabled(false, true);
-
-        add(scrollPane)
-                .fillY()
-                .growX()
-                .uniformY()
-                .colspan(2);
-        row();
-        additionalLabel = new Label("Быстрый доступ", labelStyle);
-        add(additionalLabel)
+        mainItemsView = new ItemsHorizontalView(localeBundle.get("main.inventory"), titleLabelStyle, subtitleStyle, assetsFinder, skin);
+        add(mainItemsView)
+                .colspan(3)
                 .left()
                 .growX();
         row();
 
-
-        additionalContent = new Table();
-        additionalContent
-                .align(Align.left | Align.top)
+        fastItemsView = new ItemsHorizontalView(localeBundle.get("main.fastaccess"), titleLabelStyle, subtitleStyle, assetsFinder, skin);
+        add(fastItemsView)
+                .colspan(3)
                 .left()
-                .defaults()
-                .pad(5)
-                .space(15);
+                .growX();
+        row();
 
-        additionalContent.debugCell();
+        OnItemClickListener onItemClickListener = itemModel -> {
+            if (itemModel instanceof MedicineModel) {
+                MedicineModel model = (MedicineModel) itemModel;
+                if (model.getQuantity() > 0) {
+                    model.setQuantity(model.getQuantity() - 1);
+                    playerSystem.getHealthComponent().treat((MedicineModel) itemModel);
+                    soundsSystem.playSound(assetManager.get("audio/sounds/person/medicine.ogg"));
+                }
+                update();
+            }else if (itemModel instanceof WearableModel){
 
-        scrollPane = new ScrollPane(additionalContent, skin);
-        scrollPane.setScrollingDisabled(false, true);
-        add(scrollPane)
-                .fillY()
-                .growX()
-                .uniformY()
-                .colspan(2);
+            }
+        };
+        fastItemsView.setOnClickListener(onItemClickListener);
+        mainItemsView.setOnClickListener(onItemClickListener);
 
         setBackground(Utils.getColoredDrawable(1, 1, Colors.backgroundColor));
     }
 
-    private final DecimalFormat formater = new DecimalFormat("##.##");
-
     public void update() {
-        mainContent.clear();
-        additionalContent.clear();
-
         StoryDataModel dataModel = dataRepository.getStoryDataModel();
+        List<ItemModel> models = dataModel.getAllItems();
+        List<ItemModel> medicines = models.stream()
+                .filter(itemModel -> itemModel instanceof MedicineModel)
+                .collect(Collectors.toList());
 
-        Label.LabelStyle titleStyle = fontManager.getLabelStyle(28, Color.WHITE);
-        Label.LabelStyle subtitleStyle = fontManager.getLabelStyle(22, Color.GRAY);
-
-        float weightSum = 0;
-
-        for (ItemModel itemModel : dataModel.getAllItems()) {
-            if (itemModel.getQuantity() > 0) {
-                weightSum += itemModel.getQuantity() * itemModel.getWeight();
-
-                ItemView itemView = new ItemView(itemModel, titleStyle, subtitleStyle, assetManager);
-                if (itemModel instanceof MedicineModel) {
-                    itemView.addListener(new ClickListener() {
-                        @Override
-                        public void clicked(InputEvent event, float x, float y) {
-                            MedicineModel model = (MedicineModel) itemModel;
-                            if (model.getQuantity() > 0) {
-                                model.setQuantity(model.getQuantity() - 1);
-                                playerSystem.getHealthComponent().treat((MedicineModel) itemModel);
-                                soundsSystem.playSound(assetManager.get("audio/sounds/person/medicine.ogg"));
-                            }
-                            super.clicked(event, x, y);
-                            update();
-                        }
-                    });
-                    additionalContent.add(itemView)
-                            .uniform()
-                            .fill();
-                } else
-                    mainContent.add(itemView)
-                            .uniform()
-                            .fill();
-            }
-        }
+        mainItemsView.update(models);
+        fastItemsView.update(medicines);
 
         UserModel userModel = dataRepository.getUserModel();
-        String nickname = userModel.getName() + " " + userModel.getNickname();
-        String content = "Денег: " + userModel.getMoney() + " RU" + "\nВес рюкзака: " + formater.format(weightSum) + " кг.";
-        mediaItem.setTitle(nickname);
-        mediaItem.setSubtitle(content);
+        infoLabel.setText(localeBundle.get("user.info", userModel.getMoney(), userModel.getXp()));
     }
 
 }

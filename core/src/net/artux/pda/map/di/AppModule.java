@@ -2,6 +2,7 @@ package net.artux.pda.map.di;
 
 import com.badlogic.gdx.assets.AssetManager;
 
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.AssetsFinder;
@@ -58,6 +59,11 @@ public class AppModule {
     @Provides
     public AssetManager getAssetManager(AssetsFinder assetsFinder) {
         return assetsFinder.getManager();
+    }
+
+    @Provides
+    public LocaleBundle getLocaleBundle(AssetsFinder assetsFinder) {
+        return assetsFinder.getLocaleBundle();
     }
 
     @Provides

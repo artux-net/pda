@@ -1,4 +1,4 @@
-package net.artux.pda.map.utils;
+package net.artux.engine.resource.loaders;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.utils.Array;
 
+import net.artux.engine.resource.types.NetFile;
 import net.artux.pda.common.PropertyFields;
 
 import java.util.Properties;
@@ -21,13 +22,11 @@ public class NetTextureAssetLoader extends AsynchronousAssetLoader<NetFile, NetT
 
     private final static String TAG = "NETLoader";
 
-    private final Properties properties;
     private final String baseUrl;
     private final String fileCachePath = "cache/";
 
     public NetTextureAssetLoader(Properties properties) {
         super(new LocalFileHandleResolver());
-        this.properties = properties;
         baseUrl = properties.getProperty(PropertyFields.RESOURCE_URL);
     }
 

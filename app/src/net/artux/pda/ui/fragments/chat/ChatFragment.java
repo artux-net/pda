@@ -69,20 +69,20 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     }
 
     public static ChatFragment asGroupChat() {
-        ChatFragment chatFragment1 = new ChatFragment();
+        ChatFragment chatFragment = new ChatFragment();
         Bundle bundle1 = new Bundle();
         bundle1.putBoolean("group", true);
-        chatFragment1.setArguments(bundle1);
-        return new ChatFragment();
+        chatFragment.setArguments(bundle1);
+        return chatFragment;
     }
 
 
     public static ChatFragment withConversation(ConversationModel conversation) {
-        ChatFragment chatFragment1 = new ChatFragment();
+        ChatFragment chatFragment = new ChatFragment();
         Bundle bundle1 = new Bundle();
         bundle1.putSerializable("conversation", conversation.getId());
-        chatFragment1.setArguments(bundle1);
-        return new ChatFragment();
+        chatFragment.setArguments(bundle1);
+        return chatFragment;
     }
 
     @Nullable

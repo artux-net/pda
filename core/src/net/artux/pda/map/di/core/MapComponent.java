@@ -19,7 +19,6 @@ import net.artux.pda.map.states.GameStateController;
 import net.artux.pda.map.ui.UserInterface;
 
 import java.util.Set;
-import java.util.Timer;
 
 import javax.inject.Named;
 
@@ -27,7 +26,7 @@ import dagger.Component;
 
 @PerGameMap
 @Component(modules = {EngineModule.class, UserInterfaceModule.class}, dependencies = CoreComponent.class)
-public interface MapComponent {
+public interface MapComponent extends CoreComponent{
 
     Engine getEngine();
 
@@ -44,10 +43,6 @@ public interface MapComponent {
     UserInterface getUserInterface();
 
     GameStateController getGSC();
-
-    AssetsFinder getAssetsFinder();
-
-    AssetManager getAssetsManager();
 
     DataRepository getDataRepository();
 

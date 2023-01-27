@@ -27,12 +27,12 @@ public class ItemsHelper {
         if (item instanceof ArmorModel) {
             ArmorModel armor = (ArmorModel) item;
             result += context.getString(R.string.armor_desc,
-                    String.valueOf(armor.getThermal_pr()),
-                    String.valueOf(armor.getElectric_pr()),
-                    String.valueOf(armor.getChemical_pr()),
-                    String.valueOf(armor.getRadio_pr()),
-                    String.valueOf(armor.getPsy_pr()),
-                    String.valueOf(armor.getDamage_pr()),
+                    String.valueOf(armor.getThermalProtection()),
+                    String.valueOf(armor.getElectricProtection()),
+                    String.valueOf(armor.getChemicalProtection()),
+                    String.valueOf(armor.getRadioProtection()),
+                    String.valueOf(armor.getPsyProtection()),
+                    String.valueOf(armor.getDamageProtection()),
                     String.valueOf(armor.getCondition()));
         } else if (item instanceof ArtifactModel) {
             ArtifactModel artifact = (ArtifactModel) item;

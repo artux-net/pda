@@ -2,6 +2,7 @@ package net.artux.pda.map.di;
 
 import com.badlogic.gdx.assets.AssetManager;
 
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.states.GameStateController;
@@ -29,6 +30,8 @@ public interface CoreComponent {
     AssetsFinder getAssetsFinder();
 
     AssetManager getAssetsManager();
+
+    LocaleBundle getLocaleBundle();
 
     DataRepository getDataRepository();
 

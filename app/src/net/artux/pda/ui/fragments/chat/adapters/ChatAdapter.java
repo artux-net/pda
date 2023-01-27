@@ -90,6 +90,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
         @SuppressLint("SetTextI18n")
         void bind(UserMessage userMessage) {
+            if (userMessage == null) return;
             Instant instant = userMessage.getTimestamp();
             UserModel userModel = userMessage.getAuthor();
 

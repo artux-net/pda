@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.utils.NetFile;
+import net.artux.engine.resource.types.NetFile;
 import net.artux.pda.model.map.GameMap;
 
 public class MapBorder implements Disposable {
