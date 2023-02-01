@@ -3,6 +3,8 @@ package net.artux.pda.map.ui.view;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -18,11 +20,11 @@ import net.artux.pda.model.items.ItemModel;
 
 import java.util.List;
 
-public class ItemsHorizontalView extends Table {
+public class ItemsTableView extends Table {
 
     private final Label titleLabel;
     private final Label descLabel;
-    private final Table itemsTable;
+    private final HorizontalGroup itemsTable;
     private final AssetManager assetManager;
     private final LocaleBundle localeBundle;
     private OnItemClickListener onItemClickListener;
@@ -31,7 +33,7 @@ public class ItemsHorizontalView extends Table {
     Label.LabelStyle titleStyle;
     Label.LabelStyle subtitleStyle;
 
-    public ItemsHorizontalView(String title, Label.LabelStyle titleLabelStyle, Label.LabelStyle descLabelStyle, AssetsFinder assetsFinder, Skin skin) {
+    public ItemsTableView(String title, Label.LabelStyle titleLabelStyle, Label.LabelStyle descLabelStyle, AssetsFinder assetsFinder, Skin skin) {
         super(skin);
         this.assetManager = assetsFinder.getManager();
         this.localeBundle = assetsFinder.getLocaleBundle();
@@ -52,22 +54,27 @@ public class ItemsHorizontalView extends Table {
         titleStyle = fontManager.getLabelStyle(28, Color.WHITE);
         subtitleStyle = fontManager.getLabelStyle(22, Color.GRAY);
 
-        itemsTable = new Table();
+        itemsTable = new HorizontalGroup();
         itemsTable
+                .wrap(true)
+                .fill()
+                .expand()
+                .fill()
                 .align(Align.left | Align.top)
                 .left()
-                .defaults()
                 .pad(5)
                 .space(15);
 
         ScrollPane scrollPane = new ScrollPane(itemsTable, skin);
-        scrollPane.setScrollingDisabled(false, true);
+        scrollPane.setClamp(false);
+        scrollPane.setFadeScrollBars(false);
+        scrollPane.setScrollingDisabled(true, false);
 
         add(scrollPane)
-                .fillY()
-                .growX()
-                .uniformY()
-                .colspan(2);
+                .top()
+                .fill()
+                .expand()
+                .colspan(3);
         row();
     }
 
@@ -82,8 +89,10 @@ public class ItemsHorizontalView extends Table {
             for (ItemModel itemModel : items) {
                 if (itemModel.getQuantity() > 0) {
                     weightSum += itemModel.getQuantity() * itemModel.getWeight();
-
+                    Container<ItemView> container = new Container<>();
                     ItemView itemView = new ItemView(itemModel, titleStyle, subtitleStyle, assetManager);
+                    container.setActor(itemView);
+                    container.fill();
                     itemView.addListener(new ClickListener() {
                         @Override
                         public void clicked(InputEvent event, float x, float y) {
@@ -91,14 +100,14 @@ public class ItemsHorizontalView extends Table {
                                 onItemClickListener.onClick(itemModel);
                         }
                     });
-                    itemsTable.add(itemView)
-                            .uniform()
-                            .fill()
-                            .minWidth(200);
+                    container.width(230);
+                    container.minHeight(140);
+
+                    itemsTable.addActor(container);
                 }
             }
         else
-            itemsTable.add(new Label(localeBundle.get("main.empty"), subtitleStyle));
+            itemsTable.addActor(new Label(localeBundle.get("main.empty"), descLabel.getStyle()));
         descLabel.setText(localeBundle.get("user.info.weight", weightSum));
     }
 

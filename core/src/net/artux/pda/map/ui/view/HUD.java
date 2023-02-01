@@ -1,4 +1,4 @@
-package net.artux.pda.map.ui.bars;
+package net.artux.pda.map.ui.view;
 
 
 import com.badlogic.gdx.assets.AssetManager;
@@ -6,33 +6,26 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
 import net.artux.pda.map.engine.components.HealthComponent;
-import net.artux.pda.map.engine.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
-import net.artux.pda.map.ui.UserInterface;
+import net.artux.pda.map.ui.view.bars.Bar;
 
 import javax.inject.Inject;
 
 public class HUD extends Button {
 
     private final PlayerSystem playerSystem;
-    private Bar healthBar;
-    private Bar staminaBar;
-    private Bar radiationBar;
-    private MissionsSystem missionsSystem;
-    private Label distanceLabel;
-    private Image directionImage;
+    private final Bar healthBar;
+    private final Bar staminaBar;
+    private final Bar radiationBar;
 
     @Inject
-    public HUD(AssetManager assetManager, PlayerSystem playerSystem, MissionsSystem missionsSystem, UserInterface userInterface) {
+    public HUD(AssetManager assetManager, PlayerSystem playerSystem) {
         super();
         this.playerSystem = playerSystem;
-        this.missionsSystem = missionsSystem;
 
         top();
         left();
@@ -71,23 +64,6 @@ public class HUD extends Button {
         add(radiationBar)
                 .growX()
                 .colspan(2);
-
-        distanceLabel = new Label("", userInterface.getLabelStyle());
-        row();
-
-        add(distanceLabel)
-                .growX()
-                .left()
-                .colspan(2);
-
-        directionImage = new Image(assetManager.get("ui/direction.png", Texture.class));
-        directionImage.setScaling(Scaling.fit);
-        directionImage.setOrigin(Align.center);
-
-        add(directionImage)
-                .colspan(1)
-                .right()
-                .padRight(20);
     }
 
     @Override
@@ -103,16 +79,6 @@ public class HUD extends Button {
         healthBar.updateValue(healthComponent.value);
         staminaBar.updateValue(healthComponent.stamina);
         radiationBar.updateValue(healthComponent.radiation);
-
-        int dist = missionsSystem.getTargetDistance();
-        if (dist > 5) {
-            distanceLabel.setText(dist + " м.");
-            directionImage.setVisible(true);
-            directionImage.setRotation((float) missionsSystem.getTargetAngle());
-        } else {
-            distanceLabel.setText("");
-            directionImage.setVisible(false);
-        }
     }
 
 }

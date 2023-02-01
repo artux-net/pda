@@ -18,7 +18,7 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.pathfinding.MapBorder;
-import net.artux.pda.map.ui.bars.Utils;
+import net.artux.pda.map.ui.view.bars.Utils;
 import net.artux.pda.map.utils.Colors;
 
 import javax.inject.Inject;
@@ -107,17 +107,17 @@ public class UIFrame extends WidgetGroup {
         style.knob = new TextureRegionDrawable(Utils.getColoredRegion(1, 1, primaryColor));
         style.knob.setMinHeight((int) (standardFrameSize - frameOffset));
         horizontalSlider = new Slider(0, mapBorder.getMapWidth(), 1, false, style);
-        horizontalSlider.setSize(w - standardFrameSize - getHeaderLeftX(), standardFrameSize - additionalSizes*2);
+        horizontalSlider.setSize(w - standardFrameSize - getHeaderLeftX(), standardFrameSize - additionalSizes * 2);
         horizontalSlider.setPosition(getHeaderLeftX(), additionalSizes);
         addActor(horizontalSlider);
 
         style = new Slider.SliderStyle();
-        style.knob = Utils.getColoredDrawable(1,1, primaryColor);
+        style.knob = Utils.getColoredDrawable(1, 1, primaryColor);
         style.knob.setMinWidth((int) (standardFrameSize - frameOffset));
         verticalSlider = new Slider(0, mapBorder.getMapHeight(), 1, true, style);
 
         verticalSlider.setSize(standardFrameSize - frameOffset, h - topFrameHeight - standardFrameSize);
-        verticalSlider.setPosition(w - standardFrameSize + frameOffset/2, standardFrameSize);
+        verticalSlider.setPosition(w - standardFrameSize + frameOffset / 2, standardFrameSize);
         addActor(verticalSlider);
 
         counter = new Label("0", new Label.LabelStyle(font, Color.ORANGE));
@@ -174,5 +174,10 @@ public class UIFrame extends WidgetGroup {
             knobHeight *= heightK;
 
         verticalSlider.getStyle().knob.setMinHeight(knobHeight);
+    }
+
+    public void setSlidersVisible(boolean value) {
+        horizontalSlider.setVisible(value);
+        verticalSlider.setVisible(value);
     }
 }

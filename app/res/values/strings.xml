@@ -87,7 +87,7 @@
     <string name="location_p">Location: %1$s</string>
 
     <string name="rating_title" translatable="false">%1$s - [PDA #%2$s] %3$s</string>
-    <string name="rating_desc">Group - %1$s, in zone %2$s, last time was in %3$s</string>
+    <string name="rating_desc">Group - %1$s, in zone %2$s</string>
 
     <string name="nickname">Nickname</string>
     <string name="repeat_password">Repeat password</string>
@@ -209,4 +209,6 @@
     <string name="cost">Ориентировочная стоимость: %s RU</string>
     <string name="sell_question">Вы хотите продать %s?</string>
     <string name="buy_question">Вы хотите купить %s?</string>
+    <string name="group_relation">Отношение группировок</string>
+    <string name="progress">Прогресс</string>
 </resources>

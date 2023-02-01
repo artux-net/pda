@@ -19,7 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 
 import net.artux.pda.map.engine.AssetsFinder;
@@ -36,9 +35,9 @@ import net.artux.pda.map.engine.systems.player.PlayerBattleSystem;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.ui.BackpackMenu;
 import net.artux.pda.map.ui.UserInterface;
-import net.artux.pda.map.ui.bars.HUD;
-import net.artux.pda.map.ui.bars.Slot;
 import net.artux.pda.map.ui.blocks.MessagesPlane;
+import net.artux.pda.map.ui.view.DetailedHUD;
+import net.artux.pda.map.ui.view.bars.Slot;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.Collection;
@@ -67,7 +66,6 @@ public class UserInterfaceModule {
         style.knob.setMinWidth(170);
 
         Touchpad touchpad = new Touchpad(10, style);
-        touchpad.setPosition(0, 0);
         touchpad.setBounds(50, 50, 200, 200);
         touchpad.addListener(new ChangeListener() {
             private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
@@ -86,13 +84,13 @@ public class UserInterfaceModule {
         });
         joyTable.add(messagesPlane);
         joyTable.row();
+        float size = gameZone.getHeight() / 2.5f;
         joyTable.add(touchpad)
-                .width(gameZone.getHeight() / 2.5f)
-                .height(gameZone.getHeight() / 2.5f)
-                .align(Align.left)
-                .space(50f)
-                .pad(50f);
-
+                .width(size)
+                .height(size)
+                .pad(50)
+                .left()
+                .bottom();
         return touchpad;
     }
 
@@ -181,7 +179,7 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initHud(BackpackMenu backpackMenu, HUD hud, Slot weaponSlot, @Named("hudTable") Table hudTable,
+    public Actor initHud(BackpackMenu backpackMenu, DetailedHUD hud, Slot weaponSlot, @Named("hudTable") Table hudTable,
                          UserInterface userInterface, PlayerSystem playerSystem, PlayerBattleSystem playerBattleSystem) {
         hudTable.add(hud);
         hud.addListener(new ActorGestureListener() {
@@ -243,7 +241,7 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initControlTable(@Named("controlTable") Table controlTable, PlayerSystem playerSystem,
+    public Actor initControlTable(@Named("controlTable") Table controlTable, @Named("gameZone") Group gameZone, PlayerSystem playerSystem,
                                   PlayerBattleSystem battleSystem, AssetManager assetManager) {
         float offset = 50;
         float step = 60;
@@ -311,7 +309,8 @@ public class UserInterfaceModule {
                 }))
                 .padRight(offset + step)
                 .padBottom(step);
-
+        float size = gameZone.getHeight() / 3f;
+        controlTable.setSize(size, size);
 
         return controlTable;
     }

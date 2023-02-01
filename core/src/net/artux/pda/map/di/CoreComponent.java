@@ -8,6 +8,7 @@ import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.states.GameStateController;
 import net.artux.pda.map.states.PlayState;
 import net.artux.pda.map.states.PreloadState;
+import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.map.GameMap;
 
 import java.util.Properties;
@@ -34,6 +35,8 @@ public interface CoreComponent {
     LocaleBundle getLocaleBundle();
 
     DataRepository getDataRepository();
+
+    PlatformInterface getPlatformInterface();
 
     GameMap getGameMap();
 

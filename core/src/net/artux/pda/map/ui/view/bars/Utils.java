@@ -1,4 +1,4 @@
-package net.artux.pda.map.ui.bars;
+package net.artux.pda.map.ui.view.bars;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;

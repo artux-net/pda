@@ -2,8 +2,10 @@ package net.artux.pda.app;
 
 import android.app.Application;
 
+import com.appodeal.ads.Appodeal;
 import com.google.firebase.FirebaseApp;
 
+import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.utils.URLHelper;
@@ -40,6 +42,7 @@ public class PDAApplication extends Application {
     public void onCreate() {
         FirebaseApp.initializeApp(this);
         super.onCreate();
+        Appodeal.setTesting(BuildConfig.DEBUG);
         for (Timber.Tree tree : forest) {
             Timber.plant(tree);
             Timber.i("%s planted", tree.getClass().getSimpleName());

@@ -1,39 +1,41 @@
 package net.artux.pda.map.ui.view;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
+import net.artux.engine.ui.ScalableLabel;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.ui.units.LazyImage;
+import net.artux.pda.map.ui.view.bars.Bar;
 import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.items.WearableModel;
 
-import java.text.DecimalFormat;
-
 public class DetailItemView extends Table {
 
-    private final String iconFilename;
-    private final Image image;
-
-    private static final DecimalFormat formater = new DecimalFormat("##.##");
+    private final Label titleLabel;
+    private final Label descLabel;
+    private final Bar conditionBar;
+    private final LocaleBundle localeBundle;
+    private final LazyImage image;
+    private WearableModel wearableModel;
 
     public DetailItemView(WearableModel itemModel, Label.LabelStyle titleStyle, Label.LabelStyle descStyle, LocaleBundle localeBundle, AssetManager assetManager) {
         super();
-        iconFilename = "icons/items/" + itemModel.getIcon();
+        this.localeBundle = localeBundle;
 
-        image = new LazyImage(assetManager, iconFilename);
+        image = new LazyImage(assetManager);
         image.setScaling(Scaling.fit);
         image.setAlign(Align.center);
 
-        Label title = new Label(itemModel.getTitle(), titleStyle);
-        title.setAlignment(Align.center);
-        add(title)
+        titleLabel = new ScalableLabel("", titleStyle);
+        titleLabel.setAlignment(Align.center);
+        add(titleLabel)
                 .colspan(2)
                 .row();
 
@@ -42,12 +44,24 @@ public class DetailItemView extends Table {
                 .center();
 
         VerticalGroup detailRootView = new VerticalGroup();
-        Label descLabel = new Label(itemModel.getTitle(), descStyle);
+        descLabel = new Label("", descStyle);
         descLabel.setAlignment(Align.left);
-        descLabel.setText(getDesc(localeBundle, itemModel));
+
         detailRootView.addActor(descLabel);
         add(detailRootView)
                 .fill();
+        row();
+
+        conditionBar = new Bar(Color.GREEN);
+        add(conditionBar)
+                .fillX()
+                .colspan(2);
+
+        setWearableModel(itemModel);
+    }
+
+    public void disableDesc() {
+        descLabel.remove();
     }
 
     private String getDesc(LocaleBundle localeBundle, WearableModel wearableModel) {
@@ -60,5 +74,35 @@ public class DetailItemView extends Table {
             return localeBundle.get("weapon.desc", weaponModel.getPrecision(), weaponModel.getSpeed(), weaponModel.getDamage(), weaponModel.getCondition());
         }
         return localeBundle.get("item.desc.empty");
+    }
+
+    public void setWearableModel(WearableModel itemModel) {
+        this.wearableModel = itemModel;
+        if (wearableModel == null) {
+            image.setFilename("icons/items/" + "default.png");
+            titleLabel.setText(localeBundle.get("item.title.empty"));
+            descLabel.setText("");
+            conditionBar.setVisible(false);
+        } else {
+            float condition = 100f;
+            if (itemModel instanceof WeaponModel)
+                condition = ((WeaponModel) itemModel).getCondition();
+            else if (itemModel instanceof ArmorModel)
+                condition = ((ArmorModel) itemModel).getCondition();
+
+            image.setFilename("icons/items/" + itemModel.getIcon());
+            titleLabel.setText(itemModel.getTitle());
+            descLabel.setText(getDesc(localeBundle, itemModel));
+            conditionBar.setVisible(true);
+            Color baseColor = new Color(1, 1, 0, 1);
+            float k = (condition - 75f) / 25f;
+            if (k > 0)
+                baseColor.r -= k;
+            else
+                baseColor.g -= k;
+
+            conditionBar.setValue(condition);
+            conditionBar.setColor(baseColor);
+        }
     }
 }

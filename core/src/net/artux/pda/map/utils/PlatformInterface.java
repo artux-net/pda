@@ -9,6 +9,7 @@ public interface PlatformInterface {
     void send(HashMap<String,String> data);
     void applyActions(Map<String, List<String>> actions);
     void restart();
+    void rewardedAd();
     void debug(String msg);
     void toast(String msg);
     void error(String msg, Throwable t);

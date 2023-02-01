@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
-import net.artux.pda.map.ui.bars.Utils;
+import net.artux.pda.map.ui.view.bars.Utils;
 import net.artux.pda.map.utils.Colors;
 
 public class DebugMenu extends Table {

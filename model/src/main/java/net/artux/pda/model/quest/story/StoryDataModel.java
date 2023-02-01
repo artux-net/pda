@@ -70,19 +70,23 @@ public class StoryDataModel implements Serializable {
         return map;
     }
 
-    public WearableModel getCurrentWearable(ItemType type) {
-        WearableModel wearableModel = null;
+    public WearableModel getEquippedWearable(ItemType type) {
         for (ItemModel item : getAllItems()) {
             if (item instanceof WearableModel)
                 if (item.getType() == type)
-                    if (wearableModel == null)
-                        wearableModel = (WearableModel) item;
-                    else if (((WearableModel) item).isEquipped()) {
-                        wearableModel = (WearableModel) item;
-                        break;
+                    if (((WearableModel) item).isEquipped()) {
+                        return (WearableModel) item;
                     }
         }
-        return wearableModel;
+        return null;
+    }
+
+    public void setCurrentWearable(WearableModel itemModel) {
+        WearableModel current = getEquippedWearable(itemModel.getType());
+        if (current != null)
+            current.setEquipped(false);
+        if (current != itemModel)
+            itemModel.setEquipped(true);
     }
 
     public ItemModel getItemByBaseId(int baseId) {

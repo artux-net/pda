@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.appodeal.ads.Appodeal;
+import com.appodeal.ads.RewardedVideoCallbacks;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 
 import net.artux.pda.app.PDAApplication;
@@ -138,6 +140,52 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     @Override
     public void restart() {
         gdxAdapter.create();
+    }
+
+    @Override
+    public void rewardedAd() {
+        Appodeal.show(requireActivity(), Appodeal.REWARDED_VIDEO, "default");
+        Appodeal.setRewardedVideoCallbacks(new RewardedVideoCallbacks() {
+            @Override
+            public void onRewardedVideoLoaded(boolean b) {
+
+            }
+
+            @Override
+            public void onRewardedVideoFailedToLoad() {
+
+            }
+
+            @Override
+            public void onRewardedVideoShown() {
+
+            }
+
+            @Override
+            public void onRewardedVideoShowFailed() {
+
+            }
+
+            @Override
+            public void onRewardedVideoFinished(double v, String s) {
+                questViewModel.sync(Map.of("money", List.of(String.valueOf((int) v))));
+            }
+
+            @Override
+            public void onRewardedVideoClosed(boolean b) {
+
+            }
+
+            @Override
+            public void onRewardedVideoExpired() {
+
+            }
+
+            @Override
+            public void onRewardedVideoClicked() {
+
+            }
+        });
     }
 
     @Override

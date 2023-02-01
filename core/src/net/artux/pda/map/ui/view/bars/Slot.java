@@ -1,4 +1,4 @@
-package net.artux.pda.map.ui.bars;
+package net.artux.pda.map.ui.view.bars;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;

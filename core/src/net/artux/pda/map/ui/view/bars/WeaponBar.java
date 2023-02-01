@@ -1,4 +1,4 @@
-package net.artux.pda.map.ui.bars;
+package net.artux.pda.map.ui.view.bars;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;

@@ -27,7 +27,7 @@ import net.artux.pda.map.engine.components.map.PointComponent;
 import net.artux.pda.map.engine.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.systems.player.PlayerSystem;
 import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
-import net.artux.pda.map.ui.bars.Utils;
+import net.artux.pda.map.ui.view.bars.Utils;
 import net.artux.pda.map.ui.blocks.ImageTextButton;
 import net.artux.pda.map.ui.blocks.MissionBlock;
 import net.artux.pda.map.ui.blocks.SlotTextButton;
@@ -88,7 +88,6 @@ public class MissionMenu extends Table {
 
         menuTable = new VerticalGroup();
         menuTable
-                .space(20)
                 .expand()
                 .fill();
         row();

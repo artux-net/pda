@@ -3,6 +3,7 @@ package net.artux.pda.map.ui;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
@@ -30,13 +31,20 @@ public class UserInterface extends Group {
         float w = uiCamera.viewportWidth;
         float h = uiCamera.viewportHeight;
 
-        setSize(w,h);
+        setSize(w, h);
 
         float gameZoneWidth = w - uiFrame.standardFrameSize - uiFrame.headerLeftX;
         float gameZoneHeight = h - uiFrame.standardFrameSize - uiFrame.topFrameHeight;
         stack.setSize(gameZoneWidth, gameZoneHeight);
         stack.setX(uiFrame.getHeaderLeftX());
         stack.setY(uiFrame.standardFrameSize);
+        stack.addAction(new Action() {
+            @Override
+            public boolean act(float delta) {
+                uiFrame.setSlidersVisible(stack.getChildren().size < 2);
+                return false;
+            }
+        });
 
         gameZone = new Group();
         gameZone.setSize(gameZoneWidth, gameZoneHeight);

@@ -71,9 +71,21 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             binding.profileTime.text =
                 getString(R.string.in_zone_time_p, ProfileHelper.getDays(model))
             binding.profileRang.text =
-                getString(R.string.rang_p, ProfileHelper.getRang(model.xp, view.context))
+                getString(R.string.rang_p, ProfileHelper.getRangTitleByXp(model.xp, view.context))
             binding.profileRating.text =
                 getString(R.string.xp_p, model.xp.toString())
+
+            val currentRang = model.rang
+            val nextRang = currentRang.nextRang
+
+            binding.currentRangTextView.text = ProfileHelper.getRangTitleById(currentRang.id, view.context)
+            binding.xpProgressBar.min = currentRang.xp
+            if(nextRang != null) {
+                binding.nextRangTextView.text =
+                    ProfileHelper.getRangTitleById(nextRang.id, view.context)
+                binding.xpProgressBar.max = nextRang.xp
+                binding.xpProgressBar.progress = model.xp
+            }
 
             binding.profileFriends.text =
                 view.context.getString(R.string.friends, model.friends.toString())

@@ -4,14 +4,13 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 
+import net.artux.pda.map.DataRepository;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.items.WeaponSound;
 import net.artux.pda.model.quest.story.StoryDataModel;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 
 public class WeaponComponent implements Component {
@@ -41,18 +40,20 @@ public class WeaponComponent implements Component {
 
     private final AssetManager assetManager;
 
-    public WeaponComponent(StoryDataModel dataModel, AssetManager assetManager) {
+    public WeaponComponent(DataRepository dataRepository, AssetManager assetManager) {
         this.assetManager = assetManager;
-        updateData(dataModel);
+        dataRepository.addPropertyChangeListener(propertyChangeEvent -> {
+            if (propertyChangeEvent.getPropertyName().equals("storyData")) {
+                updateData((StoryDataModel) propertyChangeEvent.getNewValue());
+            }
+        });
+        updateData(dataRepository.getStoryDataModel());
     }
 
     public void updateData(StoryDataModel dataModel) {
         this.dataModel = dataModel;
         player = true;
-        ItemModel weapon = dataModel.getCurrentWearable(ItemType.RIFLE);
-        if (weapon == null)
-            weapon = dataModel.getCurrentWearable(ItemType.PISTOL);
-        setWeaponModel((WeaponModel) weapon);
+        switchWeapons();
     }
 
     public WeaponComponent(WeaponModel weaponModel, AssetManager assetManager) {
@@ -121,18 +122,14 @@ public class WeaponComponent implements Component {
         return weaponModel;
     }
 
+    ItemType type = ItemType.RIFLE;
+
     public void switchWeapons() {
-        List<WeaponModel> weaponModelList = dataModel.getWeapons();
-        Iterator<WeaponModel> iterator = weaponModelList.listIterator();
-        WeaponModel old = weaponModel;
-        while (iterator.hasNext()) {
-            WeaponModel next = iterator.next();
-            if (weaponModel == next && iterator.hasNext()) {
-                setWeaponModel(iterator.next());
-            }
-        }
-        if (old == weaponModel && weaponModelList.size() > 1)
-            setWeaponModel(weaponModelList.get(0));
+        if (type == ItemType.RIFLE)
+            type = ItemType.PISTOL;
+        else
+            type = ItemType.RIFLE;
+        setWeaponModel((WeaponModel) dataModel.getEquippedWearable(type));
     }
 
     public void update(float dt) {

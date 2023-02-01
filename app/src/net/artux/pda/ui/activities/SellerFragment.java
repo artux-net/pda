@@ -126,7 +126,7 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
         float coefficient;
         if (operationType == SellerRepository.OperationType.BUY) {
-            builder.setTitle(getString(R.string.buy_question));
+            builder.setTitle(getString(R.string.buy_question, item.getTitle()));
             coefficient = sellerViewModel.getBuyCoefficient();
         } else {
             builder.setTitle(getString(R.string.sell_question, item.getTitle()));
@@ -154,11 +154,21 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
                 textView.setText(getString(R.string.cost, formater.format(price1)));
             });
 
-            builder.setPositiveButton(R.string.yes, (dialog, which) ->
-                    sellerViewModel.buyItem(item.getId(), numberPicker.getValue()));
+            builder.setPositiveButton(R.string.yes, (dialog, which) -> {
+                if (operationType == SellerRepository.OperationType.BUY) {
+                    sellerViewModel.buyItem(item.getId(), numberPicker.getValue());
+                } else {
+                    sellerViewModel.sellItem(item.getId(), numberPicker.getValue());
+                }
+            });
         } else
-            builder.setPositiveButton(R.string.yes, (dialog, which) ->
-                    sellerViewModel.buyItem(item.getId(), 1));
+            builder.setPositiveButton(R.string.yes, (dialog, which) -> {
+                if (operationType == SellerRepository.OperationType.BUY) {
+                    sellerViewModel.buyItem(item.getId(), 1);
+                } else {
+                    sellerViewModel.sellItem(item.getId(), 1);
+                }
+            });
 
 
         builder.setNegativeButton(R.string.no, (dialogInterface, i) -> {

@@ -44,9 +44,9 @@ public class EquipmentFragment extends BaseFragment {
         ItemsViewModel itemsViewModel = new ViewModelProvider(requireActivity()).get(ItemsViewModel.class);
 
         itemsViewModel.getStoryData().observe(getViewLifecycleOwner(), dataModel -> {
-            defineSlot(view, R.id.mainSlot, dataModel.getCurrentWearable(ItemType.ARMOR));
-            defineSlot(view, R.id.slot1, dataModel.getCurrentWearable(ItemType.RIFLE));
-            defineSlot(view, R.id.slot2, dataModel.getCurrentWearable(ItemType.PISTOL));
+            defineSlot(view, R.id.mainSlot, dataModel.getEquippedWearable(ItemType.ARMOR));
+            defineSlot(view, R.id.slot1, dataModel.getEquippedWearable(ItemType.RIFLE));
+            defineSlot(view, R.id.slot2, dataModel.getEquippedWearable(ItemType.PISTOL));
         });
         itemsViewModel.updateDataFromCache();
     }

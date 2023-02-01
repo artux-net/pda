@@ -9,16 +9,32 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class LazyImage extends Image {
 
     private final AssetManager assetManager;
-    private final String filename;
+    private String filename;
+
+    public LazyImage(AssetManager assetManager) {
+        this(assetManager, null);
+    }
 
     public LazyImage(AssetManager assetManager, String filename) {
         super();
         this.assetManager = assetManager;
-        this.filename = filename;
+        setFilename(filename);
+    }
 
-        FileHandle fileHandle = assetManager.getFileHandleResolver().resolve(filename);
-        if (fileHandle.exists())
-            assetManager.load(filename, Texture.class);
+    public void setFilename(String filename) {
+        if (filename == null || filename.isEmpty())
+            return;
+
+        if (assetManager.contains(filename)) {
+            this.filename = filename;
+        }else {
+            FileHandle fileHandle = assetManager.getFileHandleResolver().resolve(filename);
+            if (fileHandle.exists()) {
+                assetManager.load(filename, Texture.class);
+                this.filename = filename;
+            }
+        }
+        setDrawable(null);
     }
 
     @Override

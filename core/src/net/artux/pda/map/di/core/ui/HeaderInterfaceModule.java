@@ -177,6 +177,7 @@ public class HeaderInterfaceModule {
                     PlayerMovingSystem.playerWalls = ((CheckBox) actor).isChecked();
                 }
             }, PlayerMovingSystem.playerWalls);
+
             debugMenu.addCheckBox("Отобразить стены игрока", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {

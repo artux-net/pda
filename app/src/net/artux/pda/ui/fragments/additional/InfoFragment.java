@@ -44,7 +44,7 @@ public class InfoFragment extends AdditionalBaseFragment {
 
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
             String infoTitle = "PDA #" + memberResult.getPdaId();
-            if (((PDAApplication)getActivity().getApplication()).isTesterMode()){
+            if (((PDAApplication) requireActivity().getApplication()).isTesterMode()) {
                 infoTitle += " TESTER MODE";
             }
             navigationPresenter.setAdditionalTitle(infoTitle);
@@ -57,7 +57,7 @@ public class InfoFragment extends AdditionalBaseFragment {
 
         viewModel.getStoryData().observe(getViewLifecycleOwner(), dataModel -> {
             mGroupView.setText(ProfileHelper.getGroup(dataModel.getGang(), mGroupView.getContext()));
-            mRangView.setText(ProfileHelper.getRang(dataModel.getXp(), mRangView.getContext()));
+            mRangView.setText(ProfileHelper.getRangTitleByXp(dataModel.getXp(), mRangView.getContext()));
             mXpView.setText(String.valueOf(dataModel.getXp()));
         });
         viewModel.updateFromCache();

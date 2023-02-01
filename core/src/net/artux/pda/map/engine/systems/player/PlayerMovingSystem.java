@@ -39,7 +39,7 @@ public class PlayerMovingSystem extends BaseSystem {
 
     private MapOrientationSystem mapOrientationSystem;
 
-    public static boolean playerWalls = false;
+    public static boolean playerWalls = true;
     public static boolean speedup = false;
     public static boolean alwaysRun = false;
 
@@ -62,6 +62,8 @@ public class PlayerMovingSystem extends BaseSystem {
         });
 
         weightCoefficient = 1.5f - dataRepository.getStoryDataModel().getTotalWeight() / 60;
+        if (weightCoefficient < 0.1f)
+            weightCoefficient = 0.1f;
         stepSounds = new HashMap<>();
         random = new Random();
 

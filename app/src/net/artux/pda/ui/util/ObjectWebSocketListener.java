@@ -56,7 +56,7 @@ public class ObjectWebSocketListener<T> extends okhttp3.WebSocketListener {
 
     @Override
     public void onClosing(@NonNull WebSocket webSocket, int code, @NonNull String reason) {
-        Timber.d("WebSocket closing with code %i: %s", code, reason);
+        Timber.d("WebSocket closing with code %d: %s", code, reason);
         int NORMAL_CLOSURE_STATUS = 1000;
         webSocket.close(NORMAL_CLOSURE_STATUS, reason);
         onUpdateListener.onClose();

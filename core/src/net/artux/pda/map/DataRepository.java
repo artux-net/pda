@@ -71,6 +71,10 @@ public class DataRepository {
         propertyChangeSupport.firePropertyChange("storyData", oldStoryDataModel, storyDataModel);
     }
 
+    public void updateDataModel() {
+        setStoryDataModel(storyDataModel);
+    }
+
     public GameMap getGameMap() {
         return gameMap;
     }

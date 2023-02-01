@@ -70,28 +70,13 @@ public class ProfileHelper {
         }
     }
 
-    public static String getRang(int xp, Context context) {
-        return context.getResources().getStringArray(R.array.rang)[rang(xp)];
+    public static String getRangTitleByXp(int xp, Context context) {
+        ProfileModel.Rang rang = ProfileModel.getRang(xp);
+        return context.getResources().getStringArray(R.array.rang)[rang.getId()];
     }
 
-    public static String getRang(Context context, int xp) {
-        return context.getResources().getStringArray(R.array.rang)[rang(xp)];
-    }
-
-    private static int rang(int xp) {
-        if (xp < 500)
-            return 0;
-        else if (xp < 1500)
-            return 1;
-        else if (xp < 3500)
-            return 2;
-        else if (xp < 6000)
-            return 3;
-        else if (xp < 9000)
-            return 4;
-        else if (xp < 12000)
-            return 5;
-        else return 6;
+    public static String getRangTitleById(int id, Context context) {
+        return context.getResources().getStringArray(R.array.rang)[id];
     }
 
     public static String getDays(ProfileModel profileModel) {

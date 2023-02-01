@@ -1,6 +1,7 @@
 package net.artux.pda.map.ui.view;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -8,7 +9,11 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
 import net.artux.pda.map.ui.units.LazyImage;
+import net.artux.pda.map.ui.view.bars.Utils;
+import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ItemModel;
+import net.artux.pda.model.items.WeaponModel;
+import net.artux.pda.model.items.WearableModel;
 
 import java.text.DecimalFormat;
 
@@ -23,25 +28,57 @@ public class ItemView extends Table {
         super();
         iconFilename = "icons/items/" + itemModel.getIcon();
 
-
         //todo add counter
+        pad(5);
+
+        if (itemModel instanceof WearableModel) {
+            float condition = 100f;
+            if (itemModel instanceof WeaponModel)
+                condition = ((WeaponModel) itemModel).getCondition();
+            else if (itemModel instanceof ArmorModel)
+                condition = ((ArmorModel) itemModel).getCondition();
+
+            Color baseColor = new Color(1, 1, 0, 1);
+            float k = (condition - 75f) / 25f;
+            if (k > 0)
+                baseColor.r -= k;
+            else
+                baseColor.g -= k;
+            add(new Image(Utils.getColoredRegion(10, 10, baseColor))).left().uniformX();
+        } else add(new Image()).left().uniformX();
+
+
+        Label quantityLabel = new Label(itemModel.getQuantity() + "", subtitleStyle);
+        quantityLabel.setAlignment(Align.right);
+        add(quantityLabel)
+                .right()
+                .uniformX()
+                .fill();
+        row();
         image = new LazyImage(assetManager, iconFilename);
         image.setScaling(Scaling.fit);
         add(image)
-                .grow();
+                .grow()
+                .colspan(2);
         row();
 
         Label title = new Label(itemModel.getTitle(), titleStyle);
+        title.setWrap(true);
         title.setAlignment(Align.left);
         add(title)
-                .growX();
+                .growX()
+                .colspan(2);
         row();
 
         Label subtitle = new Label(formater.format(itemModel.getWeight() * itemModel.getQuantity()) + " кг.", subtitleStyle);
         subtitle.setAlignment(Align.right);
         add(subtitle)
-                .growX();
+                .growX()
+                .colspan(2);
         row();
     }
 
+    public Image getImage() {
+        return image;
+    }
 }
