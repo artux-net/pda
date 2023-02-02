@@ -9,7 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.di.scope.PerGameMap
@@ -59,13 +61,13 @@ class BackpackMenu @Inject constructor(
     fun updateWearableInfo() {
         val currentData = dataRepository.storyDataModelFlow.value
 
-        val armorModel = currentData.getEquippedWearable(ItemType.ARMOR) as ArmorModel
+        val armorModel = currentData.getEquippedWearable(ItemType.ARMOR) as ArmorModel?
         armorView.setWearableModel(armorModel)
 
-        var weaponModel = currentData.getEquippedWearable(ItemType.RIFLE) as WeaponModel
+        var weaponModel = currentData.getEquippedWearable(ItemType.RIFLE) as WeaponModel?
         rifleView.setWearableModel(weaponModel)
 
-        weaponModel = currentData.getEquippedWearable(ItemType.PISTOL) as WeaponModel
+        weaponModel = currentData.getEquippedWearable(ItemType.PISTOL) as WeaponModel?
         pistolView.setWearableModel(weaponModel)
     }
 
@@ -152,16 +154,17 @@ class BackpackMenu @Inject constructor(
                 }
                 update()
             } else if (itemModel is WearableModel) {
-                val current = dataRepository.storyDataModelFlow.value
+                val current = dataRepository.getCurrentStoryDataModel()
                 current.setCurrentWearable(itemModel as WearableModel?)
-                dataRepository.storyDataModelFlow.value = current
+                dataRepository.setStoryDataModel(current)
+                update()
                 soundsSystem.playSound(assetManager.get("audio/sounds/person/equip.ogg"))
             }
         }
         mainItemsView.setOnClickListener(onItemClickListener)
         background = Utils.getColoredDrawable(1, 1, Colors.backgroundColor)
         touchable = Touchable.enabled
-        runBlocking {
+        CoroutineScope(Dispatchers.Main).launch {
             dataRepository.storyDataModelFlow.collect {
                 update()
             }

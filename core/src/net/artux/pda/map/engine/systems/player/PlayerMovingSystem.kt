@@ -6,7 +6,9 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.math.Vector2
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.engine.components.HealthComponent
@@ -122,7 +124,7 @@ class PlayerMovingSystem @Inject constructor(
     }
 
     init {
-        runBlocking {
+         CoroutineScope(Dispatchers.Main).launch {
             dataRepository.storyDataModelFlow.collect {
                 val storyDataModel = it
                 weightCoefficient = 1.5f - storyDataModel.totalWeight / 60

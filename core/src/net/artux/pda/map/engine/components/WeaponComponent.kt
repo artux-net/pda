@@ -3,7 +3,9 @@ package net.artux.pda.map.engine.components
 import com.badlogic.ashley.core.Component
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Sound
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.artux.pda.map.DataRepository
 import net.artux.pda.model.items.ItemModel
 import net.artux.pda.model.items.ItemType
@@ -14,7 +16,7 @@ class WeaponComponent : Component {
     var selected: WeaponModel? = null
         private set
     private var bulletModel: ItemModel? = null
-    private var dataModel: StoryDataModel? = null
+    private lateinit var dataModel: StoryDataModel
     var magazine = 0
         private set
     private var stack = 0
@@ -31,14 +33,14 @@ class WeaponComponent : Component {
         this.assetManager = assetManager
 
         updateData(dataRepository.storyDataModelFlow.value)
-        runBlocking {
+        CoroutineScope(Dispatchers.Main).launch {
             dataRepository.storyDataModelFlow.collect{
                 updateData(it)
             }
         }
     }
 
-    fun updateData(dataModel: StoryDataModel?) {
+    fun updateData(dataModel: StoryDataModel) {
         this.dataModel = dataModel
         player = true
         switchWeapons()
@@ -90,7 +92,7 @@ class WeaponComponent : Component {
     var type = ItemType.RIFLE
     fun switchWeapons() {
         type = if (type === ItemType.RIFLE) ItemType.PISTOL else ItemType.RIFLE
-        setWeaponModel(dataModel!!.getEquippedWearable(type) as WeaponModel)
+        setWeaponModel(dataModel.getEquippedWearable(type) as WeaponModel?)
     }
 
     fun update(dt: Float) {
