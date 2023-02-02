@@ -31,8 +31,6 @@ import net.artux.pda.map.engine.components.player.PlayerComponent;
 import net.artux.pda.map.engine.components.states.StalkerState;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
-import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pda.model.user.UserModel;
 
 import java.util.ArrayList;
 
@@ -55,16 +53,16 @@ public class EntityBuilder {
         bulletTexture = assetManager.get("bullet.png", Texture.class);
     }
 
-    public Entity player(Vector2 position, DataRepository dataRepository, UserModel userModel) {
+    public Entity player(Vector2 position, DataRepository dataRepository) {
         return new Entity()
                 .add(new Position(position))
                 .add(new VelocityComponent())
                 .add(new VisionComponent())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
                 .add(new WeaponComponent(dataRepository, assetManager))
-                .add(new MoodComponent(userModel))
+                .add(new MoodComponent(dataRepository.getCurrentStoryDataModel()))
                 .add(new HealthComponent())
-                .add(new PlayerComponent(userModel, dataRepository.getStoryDataModel()));
+                .add(new PlayerComponent(dataRepository.getCurrentStoryDataModel()));
     }
 
     public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {

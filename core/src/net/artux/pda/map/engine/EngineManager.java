@@ -30,7 +30,6 @@ import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pda.model.user.UserModel;
 
 import java.beans.PropertyChangeListener;
 
@@ -40,7 +39,6 @@ import javax.inject.Inject;
 public class EngineManager extends InputListener implements Drawable, Disposable {
 
     private GameMap map;
-    private UserModel userModel;
     private Entity player;
     private Engine engine;
     private final DataRepository dataRepository;
@@ -74,16 +72,15 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     public EngineManager(MapComponent mapComponent, MissionsSystem missionsSystem) {
         this.dataRepository = mapComponent.getDataRepository();
         this.map = dataRepository.getGameMap();
-        this.userModel = dataRepository.getUserModel();
         this.engine = mapComponent.getEngine();
 
         Stage stage = mapComponent.gameStage();
 
-        StoryDataModel gdxData = dataRepository.getStoryDataModel();
+        StoryDataModel gdxData = dataRepository.getCurrentStoryDataModel();
         long loadTime = TimeUtils.millis();
 
         EntityBuilder entityBuilder = mapComponent.getEntityBuilder();
-        player = entityBuilder.player(Mappers.vector2(map.getDefPos()), dataRepository, userModel);
+        player = entityBuilder.player(Mappers.vector2(map.getDefPos()), dataRepository);
         engine.addEntity(player);
 
         if (controlPoints)
@@ -98,7 +95,13 @@ public class EngineManager extends InputListener implements Drawable, Disposable
                 .update(gdxData);
         missionsSystem.setActiveMission(missionsSystem.getActiveMission()); // finds points
 
-        dataRepository.addPropertyChangeListener(storyDataListener);
+        /*dataRepository.getStoryDataModelFlow().collect(new FlowCollector<StoryDataModel>() {
+            @Nullable
+            @Override
+            public Object emit(StoryDataModel storyDataModel, @NotNull Continuation<? super Unit> continuation) {
+                return null;
+            }
+        });*/
         stage.addListener(this);
         syncCameraPosition(stage);
         Gdx.app.log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");
@@ -130,7 +133,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         for (EntitySystem s : engine.getSystems()) {
             if (s instanceof Disposable) ((Disposable) s).dispose();
         }
-        dataRepository.removePropertyChangeListener(storyDataListener);
+        //dataRepository.removePropertyChangeListener(storyDataListener);
     }
 
     public Engine getEngine() {

@@ -22,8 +22,8 @@ public class AppModule {
 
     private final DataRepository dataRepository;
 
-    public AppModule(PlatformInterface platformInterface) {
-        this.dataRepository = new DataRepository(platformInterface);
+    public AppModule(DataRepository dataRepository) {
+        this.dataRepository = dataRepository;
     }
 
     @Provides

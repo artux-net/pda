@@ -24,11 +24,9 @@ import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +42,6 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Bundle args = getArguments();
         if (args != null) {
-            UserModel user = (UserModel) args.getSerializable("user");
             StoryModel storyModel = (StoryModel) args.getSerializable("story");
             StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
             GameMap map = (GameMap) args.getSerializable("map");
@@ -52,7 +49,6 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
             GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
                     .map(map)
-                    .user(user)
                     .story(storyModel)
                     .storyData(dataModel)
                     .items(items)
@@ -77,7 +73,6 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
         Timber.i("Core resumed");
         Bundle args = getArguments();
         if (args != null) {
-            UserModel user = (UserModel) args.getSerializable("user");
             StoryModel storyModel = (StoryModel) args.getSerializable("story");
             StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
             GameMap map = (GameMap) args.getSerializable("map");
@@ -86,15 +81,14 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             DataRepository dataRepository = gdxAdapter.getDataRepository();
             dataRepository.setStoryDataModel(dataModel);
             dataRepository.setGameMap(map);
-            dataRepository.setStoryModel(storyModel);
-            dataRepository.setUserModel(user);
-            dataRepository.setItems(items);
+            /*dataRepository.setStoryModel(storyModel);
+            dataRepository.setItems(items);*/
         }
         super.onResume();
     }
 
     @Override
-    public void send(final HashMap<String, String> data) {
+    public void send(final Map<String, String> data) {
         runOnUiThread(() -> {
             if (data != null) {
                 Timber.d("Got command: %s", data.toString());

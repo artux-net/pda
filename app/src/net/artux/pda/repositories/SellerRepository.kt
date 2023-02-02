@@ -4,6 +4,7 @@ import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.ItemsContainer
 import net.artux.pdanetwork.model.SellerDto
 import net.artux.pdanetwork.model.Status
+import net.artux.pdanetwork.model.StoryData
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,6 +18,7 @@ import kotlin.coroutines.suspendCoroutine
 class SellerRepository @Inject constructor(
     private val webservice: DefaultApi,
     private val cache: Cache<SellerDto>,
+    private val dataCache: Cache<StoryData>,
     private val itemsCache: Cache<ItemsContainer>
 ) {
 
@@ -104,6 +106,8 @@ class SellerRepository @Inject constructor(
                     ) {
                         val data = response.body()
                         if (data != null) {
+                            if (data.storyData != null)
+                                dataCache.put("story", data.storyData)
                             it.resume(Result.success(data))
                         } else
                             it.resume(Result.failure(Exception("Error with item")))

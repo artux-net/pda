@@ -83,7 +83,7 @@ public class MissionsSystem extends BaseSystem implements Disposable {
 
     public void updateData(StoryDataModel oldDataModel) {
         Set<String> oldParams = getParams(oldDataModel);
-        Set<String> params = getParams(dataRepository.getStoryDataModel());
+        Set<String> params = getParams(dataRepository.getCurrentStoryDataModel());
 
         params.removeIf(oldParams::contains);
         String[] paramArr = params.toArray(new String[]{});
@@ -103,7 +103,7 @@ public class MissionsSystem extends BaseSystem implements Disposable {
     }
 
     public String[] getParams() {
-        StoryDataModel dataModel = dataRepository.getStoryDataModel();
+        StoryDataModel dataModel = dataRepository.getCurrentStoryDataModel();
         return dataModel.getParameters().stream()
                 .map(ParameterModel::getKey).toArray(String[]::new);
     }

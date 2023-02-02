@@ -17,7 +17,6 @@ import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pda.model.user.UserModel;
 
 import java.util.Properties;
 
@@ -28,8 +27,8 @@ public class GdxAdapter extends ApplicationAdapter {
     private AssetManager assetManager;
     private long startHeap;
 
-    public GdxAdapter(PlatformInterface platformInterface) {
-        coreComponent = DaggerCoreComponent.builder().appModule(new AppModule(platformInterface)).build();
+    public GdxAdapter(DataRepository dataRepository) {
+        coreComponent = DaggerCoreComponent.builder().appModule(new AppModule(dataRepository)).build();
         gsc = coreComponent.getGSC();
     }
 
@@ -95,44 +94,40 @@ public class GdxAdapter extends ApplicationAdapter {
 
     public static class Builder {
 
-        GdxAdapter gdxAdapter;
+        private final DataRepository.Builder builder;
 
         public Builder(PlatformInterface platformInterface) {
-            gdxAdapter = new GdxAdapter(platformInterface);
-        }
-
-        public Builder user(UserModel userModel) {
-            gdxAdapter.coreComponent.getDataRepository().setUserModel(userModel);
-            return this;
+            builder = new DataRepository.Builder();
+            builder.platformInterface(platformInterface);
         }
 
         public Builder storyData(StoryDataModel dataModel) {
-            gdxAdapter.coreComponent.getDataRepository().setStoryDataModel(dataModel);
+            builder.storyDataModel(dataModel);
             return this;
         }
 
         public Builder story(StoryModel dataModel) {
-            gdxAdapter.coreComponent.getDataRepository().setStoryModel(dataModel);
+            builder.storyModel(dataModel);
             return this;
         }
 
         public Builder map(GameMap map) {
-            gdxAdapter.coreComponent.getDataRepository().setGameMap(map);
+            builder.gameMap(map);
             return this;
         }
 
         public Builder props(Properties properties) {
-            gdxAdapter.coreComponent.getDataRepository().setProperties(properties);
+            builder.properties(properties);
             return this;
         }
 
         public Builder items(ItemsContainerModel items) {
-            gdxAdapter.coreComponent.getDataRepository().setItems(items);
+            builder.items(items);
             return this;
         }
 
         public ApplicationAdapter build() {
-            return gdxAdapter;
+            return new GdxAdapter(builder.build());
         }
     }
 }

@@ -6,7 +6,7 @@ import net.artux.pdanetwork.model.Status;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(uses = StoryMapper.class)
 public interface StatusMapper {
 
     StatusMapper INSTANCE = Mappers.getMapper(StatusMapper.class);

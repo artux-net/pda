@@ -54,6 +54,13 @@ class QuestViewModel @javax.inject.Inject constructor(
     var currentStoryId: Int = -1
     var currentChapterId: Int = -1
 
+    fun updateStoryDataFromCache() {
+        repository.getCachedStoryData()
+            .map { mapper.dataModel(it) }
+            .onSuccess { storyData.postValue(it) }
+            .onFailure { status.postValue(StatusModel(it)) }
+    }
+
     fun getCurrentStory(): StoryModel {
         return repository.getCachedStory(currentStoryId)
             .map { mapper.story(it) }

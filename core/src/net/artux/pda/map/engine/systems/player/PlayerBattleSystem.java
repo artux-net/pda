@@ -53,7 +53,7 @@ public class PlayerBattleSystem extends BaseSystem {
         MoodComponent moodComponent = mm.get(player);
         VisionComponent playerVision = vm.get(player);
 
-        if (playerWeapon.reloading && !soundStarted) {
+        if (playerWeapon.getReloading() && !soundStarted) {
             soundsSystem.playSound(playerWeapon.getReloadSound());
             soundStarted = true;
         }

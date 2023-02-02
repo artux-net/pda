@@ -9,6 +9,7 @@ import net.artux.pda.model.items.MedicineModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.items.WearableModel;
 import net.artux.pda.model.user.Gang;
+import net.artux.pda.model.user.GangRelation;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ public class StoryDataModel implements Serializable {
     private int xp;
     private int pdaId;
     private Gang gang;
+    private GangRelation relations;
 
     private List<ParameterModel> parameters;
     private List<StoryStateModel> storyStates;

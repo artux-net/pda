@@ -3,8 +3,8 @@ package net.artux.pda.map.engine.components;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 
+import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.Gang;
-import net.artux.pda.model.user.UserModel;
 
 import java.util.Set;
 
@@ -25,13 +25,13 @@ public class MoodComponent implements Component {
     public boolean angryOnPlayer;
     public boolean ignorePlayer;
 
-    public MoodComponent(UserModel userModel) {
+    public MoodComponent(StoryDataModel storyDataModel) {
         player = true;
         angry = false;
-        group = userModel.getGang().getId();
+        group = storyDataModel.getGang().getId();
         relations = new Integer[9];
         for (Gang gang : Gang.values()) {
-            relations[gang.getId()] = userModel.getRelations().getFor(gang);
+            relations[gang.getId()] = storyDataModel.getRelations().getFor(gang);
         }
     }
 

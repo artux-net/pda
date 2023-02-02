@@ -36,7 +36,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Properties;
 
 import javax.inject.Named;
@@ -67,10 +66,7 @@ public class HeaderInterfaceModule {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.clicked(event, x, y);
                 Gdx.app.debug("UserInterface", "touched pause - user interface");
-                dataRepository.applyActions(Collections.emptyMap());
-                HashMap<String, String> data = new HashMap<>();
-                data.put("openPda", "");
-                dataRepository.getPlatformInterface().send(data);
+                dataRepository.sendData(Collections.singletonMap("openPda", ""));
             }
         });
 
@@ -81,7 +77,7 @@ public class HeaderInterfaceModule {
 
         Group missionsContainer = new Group();
         missionsContainer.setHeight(gameZone.getHeight());
-        missionsContainer.setWidth(gameZone.getWidth()/4);
+        missionsContainer.setWidth(gameZone.getWidth() / 4);
         missionsContainer.addActor(missionMenu);
 
         missionsButton.addListener(new ClickListener() {
@@ -153,9 +149,9 @@ public class HeaderInterfaceModule {
             debugMenu.addCheckBox("Ускорение движения", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    PlayerMovingSystem.speedup = ((CheckBox) actor).isChecked();
+                    PlayerMovingSystem.Companion.setSpeedup(((CheckBox) actor).isChecked());
                 }
-            }, PlayerMovingSystem.speedup);
+            }, PlayerMovingSystem.Companion.getSpeedup());
 
             debugMenu.addCheckBox("Вертикальная синхронизация", new ChangeListener() {
                 @Override
@@ -167,16 +163,16 @@ public class HeaderInterfaceModule {
             debugMenu.addCheckBox("Вечный бег", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    PlayerMovingSystem.alwaysRun = ((CheckBox) actor).isChecked();
+                    PlayerMovingSystem.Companion.setAlwaysRun(((CheckBox) actor).isChecked());
                 }
-            }, PlayerMovingSystem.alwaysRun);
+            }, PlayerMovingSystem.Companion.getAlwaysRun());
 
             debugMenu.addCheckBox("Учитывать столкновения", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    PlayerMovingSystem.playerWalls = ((CheckBox) actor).isChecked();
+                    PlayerMovingSystem.Companion.setPlayerWalls(((CheckBox) actor).isChecked());
                 }
-            }, PlayerMovingSystem.playerWalls);
+            }, PlayerMovingSystem.Companion.getPlayerWalls());
 
             debugMenu.addCheckBox("Отобразить стены игрока", new ChangeListener() {
                 @Override

@@ -106,7 +106,7 @@ class UserRepository @Inject constructor(
                     Timber.i("Got response")
                     if (data != null) {
                         memberCache.put("user", data)
-                        if (data.role != Profile.RoleEnum.USER.name)
+                        if (data.role.name != UserDto.RoleEnum.USER.name)
                             properties.setProperty(PropertyFields.TESTER_MODE, true.toString())
                         it.resume(Result.success(data))
                     } else {

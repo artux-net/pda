@@ -1,4 +1,4 @@
-package net.artux.pda.ui.activities;
+package net.artux.pda.ui.fragments.quest;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -31,7 +31,6 @@ import net.artux.pda.utils.URLHelper;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Map;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -46,7 +45,7 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
 
     private FragmentQuest3Binding binding;
 
-    static SellerFragment newInstance(int sellerId) {
+    public static SellerFragment newInstance(int sellerId) {
         SellerFragment sellerFragment = new SellerFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("seller", sellerId);
@@ -92,7 +91,6 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
                 binding.playerMoney.setText(getString(R.string.money, String.valueOf(dataModel.getMoney())));
             });
 
-            questViewModel.sync(Map.of());
             sellerViewModel.updateSeller(sellerId);
 
             sellerView.setLayoutManager(sellerAdapter.getLayoutManager(requireContext(), 3));
@@ -114,7 +112,7 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
                 }
             });
             sellerViewModel.getStatus().observe(getViewLifecycleOwner(), statusModel -> {
-                questViewModel.sync(Map.of()); //todo add to status optional story data
+                questViewModel.updateStoryDataFromCache();
                 sellerViewModel.updateSeller(sellerId);
                 Toast.makeText(requireContext(), statusModel.getDescription(), Toast.LENGTH_SHORT).show();
             });

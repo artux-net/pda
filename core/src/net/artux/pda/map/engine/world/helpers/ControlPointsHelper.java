@@ -11,7 +11,7 @@ public class ControlPointsHelper {
 
     public static void createControlPointsEntities(MapComponent coreComponent) {
         GameMap map = coreComponent.getDataRepository().getGameMap();
-        StoryDataModel storyDataModel = coreComponent.getDataRepository().getStoryDataModel();
+        StoryDataModel storyDataModel = coreComponent.getDataRepository().getCurrentStoryDataModel();
         EntityProcessorSystem processor = coreComponent.getEntityProcessor();
 
         if (map.getSpawns() != null)

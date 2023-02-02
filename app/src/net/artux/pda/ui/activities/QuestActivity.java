@@ -35,6 +35,7 @@ import net.artux.pda.databinding.FragmentNotificationBinding;
 import net.artux.pda.gdx.CoreFragment;
 import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.ui.fragments.quest.SellerFragment;
 import net.artux.pda.ui.fragments.quest.StageFragment;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.ui.viewmodels.SellerViewModel;
