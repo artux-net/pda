@@ -43,6 +43,8 @@ public class ClicksSystem extends IteratingSystem {
                 return true;
             }
         }
+
+
         return false;
     }
 }

@@ -5,13 +5,15 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import com.badlogic.gdx.utils.Align
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.artux.engine.ui.InputListener
 import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.di.scope.PerGameMap
@@ -30,9 +32,10 @@ import net.artux.pda.model.items.*
 import net.artux.pda.model.quest.story.StoryDataModel
 import javax.inject.Inject
 
+
 @PerGameMap
 class BackpackMenu @Inject constructor(
-    userInterface: UserInterface?,
+    userInterface: UserInterface,
     platformInterface: PlatformInterface,
     hud: HUD,
     textButton: SlotTextButton,
@@ -145,20 +148,97 @@ class BackpackMenu @Inject constructor(
             .left()
             .colspan(2)
             .growX()
-        val onItemClickListener = OnItemClickListener { itemModel: ItemModel? ->
-            if (itemModel is MedicineModel) {
-                val model = itemModel
-                if (model.quantity > 0) {
-                    model.quantity = model.quantity - 1
-                    playerSystem.healthComponent.treat(itemModel as MedicineModel?)
-                    soundsSystem.playSound(assetManager.get("audio/sounds/person/medicine.ogg"))
+        val onItemClickListener = object : OnItemClickListener {
+            override fun onTap(itemModel: ItemModel) {
+                if (itemModel is MedicineModel) {
+                    val model = itemModel
+                    if (model.quantity > 0) {
+                        model.quantity = model.quantity - 1
+                        playerSystem.healthComponent.treat(itemModel as MedicineModel?)
+                        soundsSystem.playSound(assetManager.get("audio/sounds/person/medicine.ogg"))
+                    }
+                    dataRepository.update()
+                } else if (itemModel is WearableModel) {
+                    lastDataModel.setCurrentWearable(itemModel as WearableModel?)
+                    soundsSystem.playSound(assetManager.get("audio/sounds/person/equip.ogg"))
+                    dataRepository.update()
                 }
-                dataRepository.update()
-            } else if (itemModel is WearableModel) {
-                lastDataModel.setCurrentWearable(itemModel as WearableModel?)
-                soundsSystem.playSound(assetManager.get("audio/sounds/person/equip.ogg"))
-                dataRepository.update()
             }
+
+            override fun onLongPress(itemModel: ItemModel) {
+                val label1 = Label(itemModel.title, titleLabelStyle)
+                label1.setAlignment(Align.center)
+
+                val tileSkin = Skin()
+
+                val textButtonStyle = TextButtonStyle()
+                textButtonStyle.up = Utils.getColoredDrawable(1,1,Colors.primaryColor)
+                textButtonStyle.font = titleLabelStyle.font
+                textButtonStyle.fontColor = Color.WHITE
+                tileSkin.add("default", textButtonStyle)
+
+                val btnYes = TextButton("Exit", tileSkin)
+                val btnNo = TextButton("Cancel", tileSkin)
+
+                val skinDialog : Skin = assetManager.get("data/skin/uiskin.json")
+                val dialog: Dialog = object : Dialog("", skinDialog) {
+
+                }
+                dialog.isModal = true
+                dialog.isMovable = false
+                dialog.isResizable = false
+
+                btnYes.addListener(object : InputListener() {
+                    override fun touchDown(
+                        event: InputEvent?, x: Float, y: Float,
+                        pointer: Int, button: Int
+                    ): Boolean {
+
+                        // Do whatever here for exit button
+                        //_parent.changeState("StateMenu")
+                        dialog.hide()
+                        dialog.cancel()
+                        dialog.remove()
+                        return true
+                    }
+                })
+
+                btnNo.addListener(object : InputListener() {
+                    override fun touchDown(
+                        event: InputEvent?, x: Float, y: Float,
+                        pointer: Int, button: Int
+                    ): Boolean {
+
+                        //Do whatever here for cancel
+                        dialog.cancel()
+                        dialog.hide()
+                        return true
+                    }
+                })
+
+                val drawable: Drawable = Utils.getColoredDrawable(1,1,Colors.backgroundColor)
+                dialog.background = drawable
+
+                val btnSize = 80f
+                val t = Table()
+                // t.debug();
+
+                // t.debug();
+                dialog.contentTable.add(label1).padTop(40f)
+
+                t.add(btnYes).width(btnSize).height(btnSize)
+                t.add(btnNo).width(btnSize).height(btnSize)
+
+                dialog.buttonTable.add(t).center().padBottom(80f)
+                dialog.show(stage).setPosition(
+                    parent.width / 2 - 720 / 2,
+                    parent.width - (parent.height - 40)
+                )
+
+                dialog.name = "quitDialog"
+                userInterface.stack.add(dialog)
+            }
+
         }
         mainItemsView.setOnClickListener(onItemClickListener)
         background = Utils.getColoredDrawable(1, 1, Colors.backgroundColor)
@@ -169,4 +249,6 @@ class BackpackMenu @Inject constructor(
             }
         }
     }
+
+
 }

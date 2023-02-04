@@ -88,7 +88,7 @@ public class ItemsHorizontalView extends Table {
                         @Override
                         public void clicked(InputEvent event, float x, float y) {
                             if (onItemClickListener != null)
-                                onItemClickListener.onClick(itemModel);
+                                onItemClickListener.onTap(itemModel);
                         }
                     });
                     itemsTable.add(itemView)

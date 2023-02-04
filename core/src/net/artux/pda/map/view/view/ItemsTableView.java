@@ -9,13 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
+import net.artux.engine.ui.InputListener;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.engine.AssetsFinder;
-import net.artux.pda.map.view.FontManager;
 import net.artux.pda.map.utils.Colors;
+import net.artux.pda.map.view.FontManager;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.List;
@@ -93,13 +93,23 @@ public class ItemsTableView extends Table {
                     ItemView itemView = new ItemView(itemModel, titleStyle, subtitleStyle, assetManager);
                     container.setActor(itemView);
                     container.fill();
-                    itemView.addListener(new ClickListener() {
+
+                    itemView.addListener(new InputListener() {
+
                         @Override
-                        public void clicked(InputEvent event, float x, float y) {
+                        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                             if (onItemClickListener != null)
-                                onItemClickListener.onClick(itemModel);
+                                onItemClickListener.onTap(itemModel);
+                        }
+
+                        @Override
+                        public boolean longPress(float x, float y) {
+                            if (onItemClickListener != null)
+                                onItemClickListener.onLongPress(itemModel);
+                            return true;
                         }
                     });
+
                     container.width(230);
                     container.minHeight(140);
 
