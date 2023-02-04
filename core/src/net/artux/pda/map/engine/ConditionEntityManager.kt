@@ -8,8 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.di.scope.PerGameMap
-import net.artux.pda.map.engine.components.PassivityComponent
-import net.artux.pda.map.engine.components.map.ConditionComponent
+import net.artux.pda.map.engine.ecs.components.PassivityComponent
+import net.artux.pda.map.engine.ecs.components.map.ConditionComponent
 import net.artux.pda.model.QuestUtil
 import net.artux.pda.model.quest.story.StoryDataModel
 import javax.inject.Inject

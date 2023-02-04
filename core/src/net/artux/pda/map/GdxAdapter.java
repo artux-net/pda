@@ -7,9 +7,9 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.di.AppModule;
-import net.artux.pda.map.di.CoreComponent;
-import net.artux.pda.map.di.DaggerCoreComponent;
+import net.artux.pda.map.di.components.CoreComponent;
+import net.artux.pda.map.di.components.DaggerCoreComponent;
+import net.artux.pda.map.di.modules.AppModule;
 import net.artux.pda.map.states.GameStateController;
 import net.artux.pda.map.states.State;
 import net.artux.pda.map.utils.PlatformInterface;

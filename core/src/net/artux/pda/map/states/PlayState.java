@@ -9,15 +9,15 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
+import net.artux.engine.resource.types.NetFile;
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.CoreComponent;
-import net.artux.pda.map.di.core.DaggerMapComponent;
-import net.artux.pda.map.di.core.MapComponent;
+import net.artux.pda.map.di.components.CoreComponent;
+import net.artux.pda.map.di.components.DaggerMapComponent;
+import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
-import net.artux.pda.map.engine.LevelBackgroundImage;
 import net.artux.pda.map.engine.data.GlobalData;
-import net.artux.engine.resource.types.NetFile;
+import net.artux.pda.map.view.LevelBackgroundImage;
 import net.artux.pda.model.map.GameMap;
 
 import javax.inject.Inject;

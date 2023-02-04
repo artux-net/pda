@@ -14,24 +14,18 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.core.MapComponent;
+import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.components.Position;
-import net.artux.pda.map.engine.components.WeaponComponent;
-import net.artux.pda.map.engine.components.player.PlayerComponent;
-import net.artux.pda.map.engine.entities.EntityBuilder;
-import net.artux.pda.map.engine.systems.Drawable;
-import net.artux.pda.map.engine.systems.player.CameraSystem;
-import net.artux.pda.map.engine.systems.player.InteractionSystem;
-import net.artux.pda.map.engine.systems.player.MissionsSystem;
-import net.artux.pda.map.engine.systems.player.PlayerSystem;
-import net.artux.pda.map.engine.world.helpers.ControlPointsHelper;
-import net.artux.pda.map.engine.world.helpers.QuestPointsHelper;
+import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.systems.Drawable;
+import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
+import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
+import net.artux.pda.map.engine.ecs.systems.player.MissionsSystem;
+import net.artux.pda.map.engine.helpers.ControlPointsHelper;
+import net.artux.pda.map.engine.helpers.EntityBuilder;
+import net.artux.pda.map.engine.helpers.QuestPointsHelper;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.map.GameMap;
-import net.artux.pda.model.quest.story.StoryDataModel;
-
-import java.beans.PropertyChangeListener;
 
 import javax.inject.Inject;
 
@@ -49,25 +43,6 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private boolean questPoints = true; //
     private boolean anomalies = true;
 
-    private final PropertyChangeListener storyDataListener = propertyChangeEvent -> {
-        if (propertyChangeEvent.getPropertyName().equals("storyData") && engine != null) {
-            StoryDataModel oldDataModel = (StoryDataModel) propertyChangeEvent.getOldValue();
-            StoryDataModel dataModel = (StoryDataModel) propertyChangeEvent.getNewValue();
-            PlayerSystem playerSystem = engine.getSystem(PlayerSystem.class);
-            if (playerSystem==null)
-                return;
-            Entity player = playerSystem.getPlayer();
-            if (player != null) {
-                PlayerComponent playerComponent = player.getComponent(PlayerComponent.class);
-                WeaponComponent weaponComponent = player.getComponent(WeaponComponent.class);
-
-                playerComponent.gdxData = dataModel;
-                weaponComponent.updateData(dataModel);
-                engine.getSystem(MissionsSystem.class).updateData(oldDataModel);
-            }
-        }
-    };
-
     @Inject
     public EngineManager(MapComponent mapComponent, MissionsSystem missionsSystem) {
         this.dataRepository = mapComponent.getDataRepository();
@@ -76,7 +51,6 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
         Stage stage = mapComponent.gameStage();
 
-        StoryDataModel gdxData = dataRepository.getCurrentStoryDataModel();
         long loadTime = TimeUtils.millis();
 
         EntityBuilder entityBuilder = mapComponent.getEntityBuilder();
@@ -91,8 +65,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
             AnomalyHelper.createAnomalies(mapComponent);*/
 
 //        RandomSpawnerHelper.init(coreComponent);
-        mapComponent.getConditionManager()
-                .update(gdxData);
+
         missionsSystem.setActiveMission(missionsSystem.getActiveMission()); // finds points
 
         /*dataRepository.getStoryDataModelFlow().collect(new FlowCollector<StoryDataModel>() {

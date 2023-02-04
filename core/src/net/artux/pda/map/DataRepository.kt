@@ -1,6 +1,8 @@
 package net.artux.pda.map
 
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import net.artux.pda.map.utils.PlatformInterface
 import net.artux.pda.model.QuestUtil
 import net.artux.pda.model.items.ItemsContainerModel
@@ -49,16 +51,22 @@ class DataRepository(
         )
     }
 
-    private var oldStoryDataModel = storyDataModel
-    var storyDataModelFlow: MutableStateFlow<StoryDataModel> = MutableStateFlow(storyDataModel)
+    var previousStoryDataModel = storyDataModel
+    var currentStoryDataModel = storyDataModel
+    private val dataModelFlow: MutableSharedFlow<StoryDataModel> = MutableSharedFlow(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    val storyDataModelFlow: SharedFlow<StoryDataModel> = dataModelFlow
 
-    fun setStoryDataModel(storyDataModel: StoryDataModel) {
-        oldStoryDataModel = storyDataModelFlow.value
-        storyDataModelFlow.value = storyDataModel
+    init {
+        setStoryDataModel(storyDataModel)
     }
 
-    fun getCurrentStoryDataModel(): StoryDataModel {
-        return storyDataModelFlow.value
+    fun setStoryDataModel(storyDataModel: StoryDataModel) {
+        previousStoryDataModel = currentStoryDataModel
+        currentStoryDataModel = storyDataModel
+        dataModelFlow.tryEmit(storyDataModel)
     }
 
     fun sendData(map: Map<String, String>) {
@@ -66,8 +74,12 @@ class DataRepository(
         platformInterface.send(map)
     }
 
+    fun update() {
+        setStoryDataModel(currentStoryDataModel)
+    }
+
     fun applyActions(actions: Map<String, List<String>>?) {
-        val summaryMap = HashMap(QuestUtil.difference(oldStoryDataModel, storyDataModel))
+        val summaryMap = HashMap(QuestUtil.difference(previousStoryDataModel, storyDataModel))
         if (actions != null && actions.isNotEmpty()) {
             summaryMap.putAll(actions)
             platformInterface.applyActions(summaryMap)

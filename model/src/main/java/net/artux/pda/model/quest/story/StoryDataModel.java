@@ -118,4 +118,6 @@ public class StoryDataModel implements Serializable {
             weight += item.getWeight() * item.getQuantity();
         return weight;
     }
+
+
 }
