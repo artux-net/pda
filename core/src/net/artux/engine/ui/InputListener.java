@@ -30,9 +30,10 @@ public class InputListener extends com.badlogic.gdx.scenes.scene2d.InputListener
 
     @Override
     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-        if (pointer == 0)
+        if (pointer == 0) {
             pointer1.set(x, y);
-        else
+            longPressFired = false;
+        } else
             pointer2.set(x, y);
 
         if (pointer == 1)
@@ -40,7 +41,7 @@ public class InputListener extends com.badlogic.gdx.scenes.scene2d.InputListener
 
         if (!longPressTask.isScheduled())
             Timer.schedule(longPressTask, longPressSeconds);
-        return super.touchDown(event, x, y, pointer, button);
+        return true;
     }
 
     public boolean longPress(float x, float y) {
@@ -49,12 +50,12 @@ public class InputListener extends com.badlogic.gdx.scenes.scene2d.InputListener
 
     @Override
     public boolean mouseMoved(InputEvent event, float x, float y) {
-        longPressTask.cancel();
         return super.mouseMoved(event, x, y);
     }
 
     @Override
     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+        longPressTask.cancel();
         super.touchUp(event, x, y, pointer, button);
     }
 }

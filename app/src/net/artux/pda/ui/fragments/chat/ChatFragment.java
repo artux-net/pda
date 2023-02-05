@@ -25,6 +25,7 @@ import net.artux.pda.model.UserMessage;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
+import net.artux.pda.ui.fragments.news.WebFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.stories.StoriesFragment;
 import net.artux.pda.ui.util.ObjectWebSocketListener;
@@ -218,6 +219,11 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
             }
         });
         builder.create().show();
+    }
+
+    @Override
+    public void onLinkClick(String url) {
+        navigationPresenter.addFragment(WebFragment.of("Переход по ссылке", url), true);
     }
 
 }

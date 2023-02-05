@@ -79,4 +79,9 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
 
     }
 
+    @Override
+    public void onLinkClick(String url) {
+
+    }
+
 }

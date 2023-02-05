@@ -3,13 +3,14 @@ package net.artux.pda.map.view
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
-import com.badlogic.gdx.utils.Align
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -166,36 +167,54 @@ class BackpackMenu @Inject constructor(
             }
 
             override fun onLongPress(itemModel: ItemModel) {
-                val label1 = Label(itemModel.title, titleLabelStyle)
-                label1.setAlignment(Align.center)
-
-                val tileSkin = Skin()
-
                 val textButtonStyle = TextButtonStyle()
-                textButtonStyle.up = Utils.getColoredDrawable(1,1,Colors.primaryColor)
+                textButtonStyle.up = Utils.getColoredDrawable(1, 1, Colors.primaryColor)
                 textButtonStyle.font = titleLabelStyle.font
                 textButtonStyle.fontColor = Color.WHITE
-                tileSkin.add("default", textButtonStyle)
 
-                val btnYes = TextButton("Exit", tileSkin)
-                val btnNo = TextButton("Cancel", tileSkin)
+                val btnYes = TextButton("Выбросить", textButtonStyle)
+                val btnNo = TextButton("Отменить", textButtonStyle)
 
-                val skinDialog : Skin = assetManager.get("data/skin/uiskin.json")
+                val skinDialog: Skin = userInterface.skin
                 val dialog: Dialog = object : Dialog("", skinDialog) {
+                    override fun getPrefHeight(): Float {
+                        return 300f
+                    }
 
+                    override fun getPrefWidth(): Float {
+                        return 400f
+                    }
                 }
+                dialog.debug()
                 dialog.isModal = true
                 dialog.isMovable = false
                 dialog.isResizable = false
+
+                val slider = Slider(1f, itemModel.quantity.toFloat(), 1f, false, skin)
+                slider.style.knob.minWidth = 50f
+                slider.style.knob.minHeight = 50f
+                val weightLabel =
+                    Label(localeBundle.get("item.weight", itemModel.weight), titleLabelStyle)
+                slider.addListener(object : ChangeListener() {
+                    override fun changed(event: ChangeEvent?, actor: Actor?) {
+                        weightLabel.setText(
+                            localeBundle.get(
+                                "item.weight",
+                                itemModel.weight * slider.value.toInt()
+                            )
+                        )
+                    }
+                })
 
                 btnYes.addListener(object : InputListener() {
                     override fun touchDown(
                         event: InputEvent?, x: Float, y: Float,
                         pointer: Int, button: Int
                     ): Boolean {
+                        val q = slider.value.toInt()
+                        itemModel.quantity -= q
+                        dataRepository.update()
 
-                        // Do whatever here for exit button
-                        //_parent.changeState("StateMenu")
                         dialog.hide()
                         dialog.cancel()
                         dialog.remove()
@@ -208,34 +227,35 @@ class BackpackMenu @Inject constructor(
                         event: InputEvent?, x: Float, y: Float,
                         pointer: Int, button: Int
                     ): Boolean {
-
-                        //Do whatever here for cancel
                         dialog.cancel()
                         dialog.hide()
                         return true
                     }
                 })
 
-                val drawable: Drawable = Utils.getColoredDrawable(1,1,Colors.backgroundColor)
+                val drawable: Drawable = Utils.getColoredDrawable(1, 1, Colors.backgroundColor)
                 dialog.background = drawable
 
-                val btnSize = 80f
                 val t = Table()
-                // t.debug();
+                t.defaults().space(20f)
 
-                // t.debug();
-                dialog.contentTable.add(label1).padTop(40f)
+                dialog.text(localeBundle.get("item.throw", itemModel.title), titleLabelStyle)
+                dialog.contentTable.row()
+                dialog.contentTable.add(slider).growX()
+                dialog.contentTable.row()
+                dialog.contentTable.add(weightLabel).center().growX()
 
-                t.add(btnYes).width(btnSize).height(btnSize)
-                t.add(btnNo).width(btnSize).height(btnSize)
 
-                dialog.buttonTable.add(t).center().padBottom(80f)
-                dialog.show(stage).setPosition(
+                t.add(btnYes).grow().uniform()
+                t.add(btnNo).grow().uniform()
+
+                dialog.buttonTable.add(t).grow()
+                dialog.show(stage)
+                /*.setPosition(
                     parent.width / 2 - 720 / 2,
-                    parent.width - (parent.height - 40)
-                )
+                    parent.height / 2 - (parent.height - 40)
+                )*/
 
-                dialog.name = "quitDialog"
                 userInterface.stack.add(dialog)
             }
 

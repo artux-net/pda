@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 
 import net.artux.pda.map.engine.AssetsFinder;
@@ -18,10 +19,12 @@ public class UserInterface extends Group {
 
     private final Group gameZone;
     private final UIFrame uiFrame;
+    private final Skin skin;
 
-    public UserInterface(AssetsFinder assetsFinder, MapBorder mapBorder, Camera uiCamera, Camera camera) {
+    public UserInterface(Skin skin, AssetsFinder assetsFinder, MapBorder mapBorder, Camera uiCamera, Camera camera) {
         super();
         this.stack = new Stack();
+        this.skin = skin;
 
         font = assetsFinder.getFontManager().getFont(24);
         uiFrame = new UIFrame(assetsFinder.getManager(), camera, uiCamera, mapBorder, font);
@@ -51,6 +54,10 @@ public class UserInterface extends Group {
         stack.add(gameZone);
 
         addActor(stack);
+    }
+
+    public Skin getSkin() {
+        return skin;
     }
 
     public Stack getStack() {

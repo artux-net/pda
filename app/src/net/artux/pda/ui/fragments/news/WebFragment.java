@@ -21,18 +21,27 @@ import net.artux.pda.R;
 import net.artux.pda.model.news.ArticleModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 
-public class OpenNewsFragment extends BaseFragment {
+public class WebFragment extends BaseFragment {
 
     private WebView content;
 
-    public static OpenNewsFragment of(ArticleModel articleModel) {
-        OpenNewsFragment openNewsFragment = new OpenNewsFragment();
+    public static WebFragment of(ArticleModel articleModel) {
+        WebFragment webFragment = new WebFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable("id", articleModel.getId());
         bundle.putString("title", articleModel.getTitle());
         bundle.putString("url", articleModel.getUrl());
-        openNewsFragment.setArguments(bundle);
-        return openNewsFragment;
+        webFragment.setArguments(bundle);
+        return webFragment;
+    }
+
+    public static WebFragment of(String title, String url) {
+        WebFragment webFragment = new WebFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("title", title);
+        bundle.putString("url", url);
+        webFragment.setArguments(bundle);
+        return webFragment;
     }
 
     @Nullable

@@ -2,7 +2,10 @@ package net.artux.pda.ui.fragments.chat.adapters;
 
 import android.annotation.SuppressLint;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.URLSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -115,8 +118,34 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                 infoView.setText(formatter.format(instant));
                 messageView.setMovementMethod(LinkMovementMethod.getInstance());
             }
-            messageView.setText(Html.fromHtml(userMessage.getContent(), Html.FROM_HTML_MODE_LEGACY));
+            setTextViewHTML(messageView, userMessage.getContent());
         }
+    }
+
+    protected void setTextViewHTML(TextView text, String html)
+    {
+        CharSequence sequence = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+        SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
+        URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
+        for(URLSpan span : urls) {
+            makeLinkClickable(strBuilder, span);
+        }
+        text.setText(strBuilder);
+        text.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
+    protected void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span)
+    {
+        int start = strBuilder.getSpanStart(span);
+        int end = strBuilder.getSpanEnd(span);
+        int flags = strBuilder.getSpanFlags(span);
+        ClickableSpan clickable = new ClickableSpan() {
+            public void onClick(View view) {
+                listener.onLinkClick(span.getURL());
+            }
+        };
+        strBuilder.setSpan(clickable, start, end, flags);
+        strBuilder.removeSpan(span);
     }
 
     public interface MessageClickListener {
@@ -124,6 +153,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         void onClick(UserMessage message);
 
         void onLongClick(UserMessage message);
+
+        void onLinkClick(String url);
 
     }
 

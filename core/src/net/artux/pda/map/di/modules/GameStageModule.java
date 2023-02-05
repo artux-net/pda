@@ -49,8 +49,8 @@ public class GameStageModule {
 
     @Provides
     @PerGameMap
-    public UserInterface userInterface(AssetsFinder finder, MapOrientationSystem mapOrientationSystem, @Named("uiStage") Stage uiStage, @Named("gameStage") Stage stage) {
-        UserInterface userInterface = new UserInterface(finder, mapOrientationSystem.getMapBorder(), uiStage.getCamera(), stage.getCamera());
+    public UserInterface userInterface(Skin skin, AssetsFinder finder, MapOrientationSystem mapOrientationSystem, @Named("uiStage") Stage uiStage, @Named("gameStage") Stage stage) {
+        UserInterface userInterface = new UserInterface(skin, finder, mapOrientationSystem.getMapBorder(), uiStage.getCamera(), stage.getCamera());
         uiStage.addActor(userInterface);
         return userInterface;
     }
