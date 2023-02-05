@@ -36,7 +36,7 @@ public class UserMessage implements Serializable {
     public UserMessage(String senderLogin, String message, String avatarId) {
         author = new UserModel();
         author.setLogin(senderLogin);
-        author.setAvatar("avatars/a" + avatarId + ".png");
+        author.setAvatar(avatarId);
 
         content = message;
         timestamp = Instant.now();

@@ -21,6 +21,7 @@ import net.artux.pda.map.engine.ecs.components.Position;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.StalkerComponent;
 import net.artux.pda.map.engine.ecs.components.TimeComponent;
+import net.artux.pda.map.view.LootMenu;
 import net.artux.pda.map.view.UserInterface;
 
 import java.time.Instant;
@@ -34,6 +35,7 @@ import javax.inject.Inject;
 public class DeadCheckerSystem extends BaseSystem {
 
     private Group gameZone;
+    private LootMenu lootMenu;
     private Label.LabelStyle labelStyle;
     private boolean deadMessage;
     private DataRepository dataRepository;
@@ -46,7 +48,7 @@ public class DeadCheckerSystem extends BaseSystem {
     private Random random = new Random();
 
     @Inject
-    public DeadCheckerSystem(UserInterface userInterface, DataRepository dataRepository, AssetManager assetManager) {
+    public DeadCheckerSystem(UserInterface userInterface, LootMenu lootMenu, DataRepository dataRepository, AssetManager assetManager) {
         super(Family.all(HealthComponent.class, Position.class).get());
         this.gameZone = userInterface;
         this.assetManager = assetManager;
@@ -54,6 +56,7 @@ public class DeadCheckerSystem extends BaseSystem {
         this.dataRepository = dataRepository;
         labelStyle = userInterface.getLabelStyle();
         labelStyle.fontColor = Color.RED;
+        this.lootMenu = lootMenu;
     }
 
     @Override
@@ -77,24 +80,8 @@ public class DeadCheckerSystem extends BaseSystem {
                         deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, new InteractiveComponent.InteractListener() {
                                     @Override
                                     public void interact() {
-                                        //todo open stalker menu
-                                        /*switch (random.nextInt(4)) {
-                                            case 0:
-                                                dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("85:1")));
-                                                break;
-                                            case 1:
-                                                dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("83:2")));
-                                                break;
-                                            case 2:
-                                                dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("84:1")));
-                                                break;
-                                            case 3:
-                                                dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("85:2")));
-                                                break;
-                                            case 4:
-                                                dataRepository.applyActions(Collections.singletonMap("add", Collections.singletonList("83:1")));
-                                                break;
-                                        }*/
+                                        lootMenu.updateBot(stalkerComponent.getName(), stalkerComponent.getAvatar(), stalkerComponent.getInventory());
+                                        userInterface.getStack().add(lootMenu);
 
                                         getEngine().removeEntity(deadEntity);
                                     }

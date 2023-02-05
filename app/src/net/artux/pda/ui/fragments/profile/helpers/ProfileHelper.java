@@ -71,8 +71,8 @@ public class ProfileHelper {
     }
 
     public static String getRangTitleByXp(int xp, Context context) {
-        ProfileModel.Rang rang = ProfileModel.getRang(xp);
-        return context.getResources().getStringArray(R.array.rang)[rang.getId()];
+        //ProfileModel.Rang rang = ProfileModel.getRang(xp); TODO
+        return context.getResources().getStringArray(R.array.rang)[0];
     }
 
     public static String getRangTitleById(int id, Context context) {

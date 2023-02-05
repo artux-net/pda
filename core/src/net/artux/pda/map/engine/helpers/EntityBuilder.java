@@ -11,8 +11,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.repository.ContentGenerator;
-import net.artux.pda.map.engine.ecs.systems.statemachine.MessagingCodes;
 import net.artux.pda.map.engine.ecs.components.BulletComponent;
 import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
 import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
@@ -29,10 +27,10 @@ import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.WeaponComponent;
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
 import net.artux.pda.map.engine.ecs.components.states.StalkerState;
+import net.artux.pda.map.engine.ecs.systems.statemachine.MessagingCodes;
+import net.artux.pda.map.repository.ContentGenerator;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
-
-import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -46,9 +44,10 @@ public class EntityBuilder {
     private final Texture bulletTexture;
 
     @Inject
-    public EntityBuilder(AssetManager assetManager) {
+
+    public EntityBuilder(AssetManager assetManager, ContentGenerator contentGenerator) {
         this.assetManager = assetManager;
-        this.contentGenerator = new ContentGenerator();
+        this.contentGenerator = contentGenerator;
 
         bulletTexture = assetManager.get("bullet.png", Texture.class);
     }
@@ -67,6 +66,8 @@ public class EntityBuilder {
 
     public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {
         Position position = pm.get(author);
+        if (target == null) // TODO
+            return new Entity();
         Vector2 targetPosition = pm.get(target);
         targetPosition = getPointNear(targetPosition.cpy(), weaponModel.getPrecision());
 
@@ -133,7 +134,7 @@ public class EntityBuilder {
                 .add(healthComponent)
                 .add(group)
                 .add(group.getMood())
-                .add(new StalkerComponent(contentGenerator.generateName(), new ArrayList<>()))
+                .add(new StalkerComponent(contentGenerator.generateName(), contentGenerator.generateAvatar(), contentGenerator.getRandomItems()))
                 .add(new WeaponComponent(w, assetManager))
                 .add(statesComponent)
                 .add(new GroupTargetMovingComponent(group))

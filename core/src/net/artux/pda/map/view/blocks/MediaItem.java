@@ -1,20 +1,25 @@
 package net.artux.pda.map.view.blocks;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
+import net.artux.pda.map.view.units.LazyImage;
+
 public class MediaItem extends Table {
 
+    private final LazyImage image;
     private final Label titleLabel;
     private final Label subtitleLabel;
 
-    public MediaItem(Image image, String title, String subtitle, Label.LabelStyle titleStyle, Label.LabelStyle subtitleStyle) {
+    public MediaItem(String imageFilename, String title, String subtitle, Label.LabelStyle titleStyle, Label.LabelStyle subtitleStyle, AssetManager assetManager) {
         super();
 
+        image = new LazyImage(assetManager);
+        image.setFilename(imageFilename);
         image.setScaling(Scaling.fit);
         add(image)
                 .fill();
@@ -34,11 +39,15 @@ public class MediaItem extends Table {
                 .growX();
     }
 
-    public void setTitle(String title){
+    public void setImage(String imageFilename){
+        image.setFilename(imageFilename);
+    }
+
+    public void setTitle(String title) {
         titleLabel.setText(title);
     }
 
-    public void setSubtitle(String subtitle){
+    public void setSubtitle(String subtitle) {
         subtitleLabel.setText(subtitle);
     }
 

@@ -6,10 +6,15 @@ import static com.badlogic.gdx.math.MathUtils.random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.model.UserMessage;
+import net.artux.pda.model.items.ItemModel;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
+@PerGameMap
 public class ContentGenerator {
 
     private final String folder = "templates/";
@@ -18,14 +23,16 @@ public class ContentGenerator {
     private final String[] messages;
     private final String[] actions;
     private final String[] locations;
+    private final ItemsGenerator itemsGenerator;
 
     @Inject
-    public ContentGenerator() {
+    public ContentGenerator(ItemsGenerator itemsGenerator) {
         names = readFile(folder + "names");
         nicks = readFile(folder + "nicks");
         messages = readFile(folder + "messages");
         locations = readFile(folder + "locations");
         actions = readFile(folder + "actions");
+        this.itemsGenerator = itemsGenerator;
     }
 
     private String[] readFile(String file) {
@@ -34,16 +41,24 @@ public class ContentGenerator {
         return text.split("\\r?\\n");
     }
 
-    public String generateName(){
-        return names[random(0, names.length-1)] + " " +
-                nicks[random(0, nicks.length-1)];
+    public String generateName() {
+        return names[random(0, names.length - 1)] + " " +
+                nicks[random(0, nicks.length - 1)];
     }
 
-    public String generateMessageContent(){
-        return messages[random(0, messages.length-1)];
+    public String generateMessageContent() {
+        return messages[random(0, messages.length - 1)];
     }
 
-    public UserMessage generateMessage(){
-        return new UserMessage(generateName(), generateMessageContent(), String.valueOf(random(1, 30)));
+    public UserMessage generateMessage() {
+        return new UserMessage(generateName(), generateMessageContent(), generateAvatar());
+    }
+
+    public String generateAvatar() {
+        return "avatars/a" + random(1, 30) + ".png";
+    }
+
+    public List<ItemModel> getRandomItems() {
+        return itemsGenerator.getRandomItems();
     }
 }

@@ -1,7 +1,5 @@
 package net.artux.pda.map.engine.ecs.components;
 
-import static com.badlogic.gdx.math.MathUtils.random;
-
 import com.badlogic.ashley.core.Component;
 
 import net.artux.pda.model.items.ItemModel;
@@ -12,13 +10,21 @@ public class StalkerComponent implements Component {
 
     private String name;
     public String group;
-    public int avatar;
+    public String avatar;
     private List<ItemModel> inventory;
 
-    public StalkerComponent(String name, List<ItemModel> inventory) {
+    public StalkerComponent(String name, String avatar, List<ItemModel> inventory) {
         this.name = name;
+        this.avatar = avatar;
         this.inventory = inventory;
-        avatar = random(0, 30);
+    }
+
+    public List<ItemModel> getInventory() {
+        return inventory;
+    }
+
+    public String getAvatar() {
+        return avatar;
     }
 
     public String getName() {

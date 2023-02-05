@@ -75,7 +75,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             binding.profileRating.text =
                 getString(R.string.xp_p, model.xp.toString())
 
-            val currentRang = model.rang
+           /* val currentRang = model.rang // TODO
             val nextRang = currentRang.nextRang
 
             binding.currentRangTextView.text = ProfileHelper.getRangTitleById(currentRang.id, view.context)
@@ -86,7 +86,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 binding.xpProgressBar.max = nextRang.xp
                 binding.xpProgressBar.progress = model.xp
             }
-
+*/
             binding.profileFriends.text =
                 view.context.getString(R.string.friends, model.friends.toString())
             binding.profileFriends.setOnClickListener(this)
