@@ -3,14 +3,7 @@ package net.artux.pda.ui.util;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.LinkedList;
-import java.util.List;
 
 import okhttp3.WebSocket;
 import timber.log.Timber;
@@ -21,13 +14,10 @@ public class ObjectWebSocketListener<T> extends okhttp3.WebSocketListener {
     private final Gson gson;
     private final Class<T> clazz;
 
-    private final Type listType;
-
     public ObjectWebSocketListener(Class<T> clazz, Gson gson, OnUpdateListener<T> onUpdateListener) {
         this.gson = gson;
         this.onUpdateListener = onUpdateListener;
         this.clazz = clazz;
-        listType = TypeToken.getParameterized(LinkedList.class, clazz).getType();
     }
 
     @Override
@@ -41,14 +31,8 @@ public class ObjectWebSocketListener<T> extends okhttp3.WebSocketListener {
         Timber.d("WebSocket got message %s", text);
 
         try {
-            JsonElement element = JsonParser.parseString(text);
-            if (element.isJsonArray()) {
-                List<T> list = gson.fromJson(text, listType);
-                onUpdateListener.onList(list);
-            } else {
-                T t = gson.fromJson(text, clazz);
-                onUpdateListener.onMessage(t);
-            }
+            T t = gson.fromJson(text, clazz);
+            onUpdateListener.onMessage(t);
         } catch (JsonSyntaxException e) {
             Timber.e(e);
         }
@@ -72,8 +56,6 @@ public class ObjectWebSocketListener<T> extends okhttp3.WebSocketListener {
         void onOpen();
 
         void onMessage(T t);
-
-        void onList(List<T> list);
 
         void onClose();
     }

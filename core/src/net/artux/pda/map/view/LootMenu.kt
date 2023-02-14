@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -15,31 +16,26 @@ import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.engine.AssetsFinder
-import net.artux.pda.map.engine.ecs.systems.SoundsSystem
-import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem
 import net.artux.pda.map.utils.Colors
-import net.artux.pda.map.utils.PlatformInterface
 import net.artux.pda.map.view.blocks.MediaItem
 import net.artux.pda.map.view.blocks.SlotTextButton
 import net.artux.pda.map.view.view.ItemsTableView
 import net.artux.pda.map.view.view.OnItemClickListener
 import net.artux.pda.map.view.view.bars.Utils
 import net.artux.pda.model.items.ItemModel
+import net.artux.pda.model.items.ItemsHelper
 import net.artux.pda.model.quest.story.StoryDataModel
+import org.apache.commons.lang3.SerializationUtils
 import javax.inject.Inject
 
 
 @PerGameMap
 class LootMenu @Inject constructor(
-    userInterface: UserInterface,
-    platformInterface: PlatformInterface,
     textButton: SlotTextButton,
     assetsFinder: AssetsFinder,
-    playerSystem: PlayerSystem,
     private val localeBundle: LocaleBundle,
     private val dataRepository: DataRepository,
-    skin: Skin,
-    soundsSystem: SoundsSystem
+    skin: Skin
 ) : Table() {
 
     private var assetManager: AssetManager
@@ -50,7 +46,8 @@ class LootMenu @Inject constructor(
     private var botInfo: MediaItem
     private var botItemsView: ItemsTableView
 
-    private lateinit var lastDataModel: StoryDataModel
+    private var lastDataModel: StoryDataModel
+    private var lastBotItems: MutableList<ItemModel> = mutableListOf()
 
     fun update(dataModel: StoryDataModel) {
         lastDataModel = dataModel
@@ -59,9 +56,12 @@ class LootMenu @Inject constructor(
             val models = dataModel.allItems
             mainItemsView.update(models)
         }
+        botItemsView.update(lastBotItems)
     }
 
     fun updateBot(nickname: String, avatar: String, items: List<ItemModel>) {
+        lastBotItems.clear()
+        lastBotItems.addAll(items)
         Gdx.app.postRunnable {
             botInfo.setTitle(nickname)
             botInfo.setImage(avatar)
@@ -78,7 +78,7 @@ class LootMenu @Inject constructor(
             .pad(10f)
             .space(20f)
         defaults().fill()
-        lastDataModel = dataRepository.currentStoryDataModel
+        lastDataModel = dataRepository.storyDataModel
         fontManager = assetsFinder.fontManager
 
         val titleLabelStyle = fontManager.getLabelStyle(38, Color.WHITE)
@@ -90,20 +90,29 @@ class LootMenu @Inject constructor(
         textButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent, x: Float, y: Float) {
                 super.clicked(event, x, y)
+                dataRepository.applyActions(emptyMap())
                 remove()
             }
         })
 
         add(textButton)
             .left()
-            .row()
+        add(Label("", titleLabelStyle)).growX()
+
+        row()
 
         botInfo = MediaItem("", "", "", titleLabelStyle, subtitleStyle, assetManager)
-        mainInfo = MediaItem("avatar/1.png",
-            lastDataModel.name + " " + lastDataModel.nickname, "", titleLabelStyle, subtitleStyle, assetManager)
-        //TODO avatar
-        leftTable.add(botInfo).growX().uniform()
-        leftTable.add(mainInfo).growX().uniform()
+        mainInfo = MediaItem(
+            lastDataModel.avatar,
+            lastDataModel.name + " " + lastDataModel.nickname,
+            "",
+            titleLabelStyle,
+            subtitleStyle,
+            assetManager
+        )
+
+        leftTable.add(botInfo).growX().uniformX()
+        leftTable.add(mainInfo).growX().uniformX()
 
         leftTable.row()
 
@@ -115,8 +124,8 @@ class LootMenu @Inject constructor(
             skin
         )
         leftTable.add(botItemsView)
-            .uniform()
             .grow()
+            .uniformY()
 
         mainItemsView = ItemsTableView(
             localeBundle["main.inventory"],
@@ -126,39 +135,42 @@ class LootMenu @Inject constructor(
             skin
         )
 
-        leftTable.add(mainItemsView)
-            .uniform()
-            .grow()
 
+        leftTable.add(mainItemsView)
+            .grow()
+            .uniformY()
 
         add(leftTable)
+            .colspan(2)
             .grow()
 
 
-        val onItemClickListener = object : OnItemClickListener {
+        val stalkerItemClickListener = object : OnItemClickListener {
             override fun onTap(itemModel: ItemModel) {
-                /*if (itemModel is MedicineModel) {
-                    val model = itemModel
-                    if (model.quantity > 0) {
-                        model.quantity = model.quantity - 1
-                        playerSystem.healthComponent.treat(itemModel as MedicineModel?)
-                        soundsSystem.playSound(assetManager.get("audio/sounds/person/medicine.ogg"))
-                    }
-                    dataRepository.update()
-                } else if (itemModel is WearableModel) {
-                    lastDataModel.setCurrentWearable(itemModel as WearableModel?)
-                    soundsSystem.playSound(assetManager.get("audio/sounds/person/equip.ogg"))
-                    dataRepository.update()
-                }*/
+                lastBotItems.remove(itemModel)
+                lastDataModel.addItem(itemModel)
+                dataRepository.update()
             }
 
             override fun onLongPress(itemModel: ItemModel) {
 
             }
-
         }
 
-        botItemsView.setOnClickListener(onItemClickListener)
+        val playerItemClickListener = object : OnItemClickListener {
+            override fun onTap(itemModel: ItemModel) {
+                ItemsHelper.add(lastBotItems, SerializationUtils.clone(itemModel))
+                itemModel.quantity = 0
+                dataRepository.update()
+            }
+
+            override fun onLongPress(itemModel: ItemModel) {
+
+            }
+        }
+        mainItemsView.setOnClickListener(playerItemClickListener)
+
+        botItemsView.setOnClickListener(stalkerItemClickListener)
         background = Utils.getColoredDrawable(1, 1, Colors.backgroundColor)
         touchable = Touchable.enabled
         CoroutineScope(Dispatchers.Main).launch {

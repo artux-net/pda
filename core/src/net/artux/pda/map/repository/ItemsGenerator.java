@@ -23,18 +23,18 @@ public class ItemsGenerator {
 
     @Inject
     public ItemsGenerator(DataRepository dataRepository) {
-        dataModel = dataRepository.getCurrentStoryDataModel();
+        dataModel = dataRepository.getStoryDataModel();
         allItems = dataRepository.getItems();
     }
 
     public List<ItemModel> getRandomItems() {
         List<ItemModel> items = new LinkedList<>();
         if (random() > 0.3f) {
-            if (random() > 0.3) {
+            if (random() > 0.3f) {
                 items.add(generateByRang(allItems.getWeapons()));
             }
 
-            if (random() > 0.1) {
+            if (random() > 0.1f) {
                 items.add(generateByRang(allItems.getArmors()));
             }
 
@@ -75,10 +75,12 @@ public class ItemsGenerator {
         StoryDataModel.Rang rang = dataModel.getRang();
         int lastIndex = itemModels.size() - 1;
         if (rangsLen <= itemModels.size()) {
-            int maxIndex = (rang.getId() / rangsLen) * lastIndex;
-            return itemModels.get(random(maxIndex));
-        } else
-            return itemModels.get(random(lastIndex));
+            lastIndex = (rang.getId() / rangsLen) * lastIndex;
+        }
+
+        ItemModel item = itemModels.get(random(lastIndex));
+        item.setQuantity(1);
+        return itemModels.get(random(lastIndex));
     }
 
 }

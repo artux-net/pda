@@ -1,7 +1,7 @@
 package net.artux.pda.repositories
 
 import net.artux.pda.model.Summary
-import net.artux.pda.model.UserMessage
+import net.artux.pda.model.chat.UserMessage
 import javax.inject.Inject
 import javax.inject.Singleton
 

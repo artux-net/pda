@@ -16,7 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.model.UserMessage;
+import net.artux.pda.model.chat.ChatUpdate;
+import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
@@ -25,6 +26,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
@@ -50,8 +52,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void addMessage(UserMessage userMessage) {
-        messages.add(userMessage);
+    public void update(ChatUpdate update) {
+        if (update.getUpdatesByType(UserMessage.Type.OLD).size() > 0){
+            messages = update.getUpdatesByType(UserMessage.Type.OLD);
+        }
+
+        for (UserMessage msg : update.getUpdatesByType(UserMessage.Type.DELETE))
+            messages.removeIf(userMessage -> msg.getId().equals(userMessage.getId()));
+
+        for (UserMessage msg : update.getUpdatesByType(UserMessage.Type.UPDATE))
+            messages.forEach(userMessage -> {
+                if (msg.getId().equals(userMessage.getId())) {
+                    userMessage.setContent(msg.getContent());
+                }
+            });
+
+        messages.addAll(update.getUpdatesByType(UserMessage.Type.NEW));
+        messages.addAll(update.getEvents().stream().map(UserMessage::event).collect(Collectors.toList()));
         notifyDataSetChanged();
     }
 
@@ -122,20 +139,18 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
     }
 
-    protected void setTextViewHTML(TextView text, String html)
-    {
+    protected void setTextViewHTML(TextView text, String html) {
         CharSequence sequence = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
         SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
         URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
-        for(URLSpan span : urls) {
+        for (URLSpan span : urls) {
             makeLinkClickable(strBuilder, span);
         }
         text.setText(strBuilder);
         text.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
-    protected void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span)
-    {
+    protected void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span) {
         int start = strBuilder.getSpanStart(span);
         int end = strBuilder.getSpanEnd(span);
         int flags = strBuilder.getSpanFlags(span);

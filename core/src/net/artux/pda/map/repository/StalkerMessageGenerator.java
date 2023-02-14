@@ -7,9 +7,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
-import net.artux.pda.map.repository.ContentGenerator;
 import net.artux.pda.map.view.blocks.MessagesPlane;
-import net.artux.pda.model.UserMessage;
+import net.artux.pda.model.chat.UserMessage;
 
 import javax.inject.Inject;
 

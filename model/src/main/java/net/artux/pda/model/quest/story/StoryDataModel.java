@@ -15,6 +15,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.Data;
 
@@ -41,9 +42,72 @@ public class StoryDataModel implements Serializable {
     private List<ArtifactModel> artifacts;
     private List<ItemModel> bullets;
 
+    public String getAvatar() {
+        if (avatar.contains("http"))
+            return avatar;
+        else return "avatars/a" + avatar + ".png";
+    }
+
     public boolean containsCurrent() {
         return getCurrentState() != null;
     }
+
+    public <T extends ItemModel> void addItem(T item) {
+        if (item.getType().isCountable()) {
+            addAsCountable(item);
+        } else {
+            item.setQuantity(1);
+            addAsNotCountable(item);
+        }
+    }
+
+    private <T extends ItemModel> void addAsNotCountable(T item) {
+        ItemType type = item.getType();
+        if (type.isWearable()) {
+            boolean userWears = getEquippedWearable(type) != null;
+            ((WearableModel) item).setEquipped(!userWears);
+        }
+        item.setQuantity(1);
+        addAsIs(item);
+    }
+
+    private <T extends ItemModel> void addAsCountable(T itemEntity) {
+        Optional<? extends ItemModel> optionalItem = getAllItems()
+                .stream()
+                .filter(item -> item.getBaseId() == itemEntity.getBaseId())
+                .findFirst();
+        if (optionalItem.isPresent()) {
+            ItemModel item = optionalItem.get();
+            item.setQuantity(item.getQuantity() + itemEntity.getQuantity());
+        } else {
+            addAsIs(itemEntity);
+        }
+    }
+
+    private <T extends ItemModel> void addAsIs(T itemEntity) {
+        switch (itemEntity.getType()) {
+            case BULLET:
+                getBullets().add(itemEntity);
+                break;
+            case ARMOR:
+                getArmors().add((ArmorModel) itemEntity);
+                break;
+            case PISTOL:
+            case RIFLE:
+                getWeapons().add((WeaponModel) itemEntity);
+                break;
+            case ARTIFACT:
+                getArtifacts().add((ArtifactModel) itemEntity);
+                break;
+            case DETECTOR:
+                getDetectors().add((DetectorModel) itemEntity);
+                break;
+            case MEDICINE:
+                getMedicines().add((MedicineModel) itemEntity);
+                break;
+        }
+    }
+
 
     public StoryStateModel getCurrentState() {
         if (storyStates != null)

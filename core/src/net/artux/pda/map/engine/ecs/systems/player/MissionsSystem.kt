@@ -69,7 +69,7 @@ class MissionsSystem @Inject constructor(
         CoroutineScope(Dispatchers.Main).launch {
             dataRepository.storyDataModelFlow.collect {
                 currentStoryDataModel = it
-                updateData(dataRepository.previousStoryDataModel)
+                updateData(dataRepository.storyDataModel)
             }
         }
     }
@@ -87,7 +87,7 @@ class MissionsSystem @Inject constructor(
         for (m in updatedMissions) {
             val checkpointModel = m.getCurrentCheckpoint(*paramArr)
             messagesPlane.addMessage(
-                "avatars/a0.jpg", "Задание обновлено: " + m.title,
+                "avatars/a0.png", "Задание обновлено: " + m.title,
                 "Новая цель: " + checkpointModel.title, MessagesPlane.Length.SHORT
             )
             soundsSystem.playSound(missionUpdatedSound)

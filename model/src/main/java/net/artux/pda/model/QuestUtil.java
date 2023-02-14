@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class QuestUtil {
 
@@ -95,18 +96,26 @@ public class QuestUtil {
     }
 
     public static Map<String, List<String>> difference(StoryDataModel oldData, StoryDataModel newData) {
+        List<ItemModel> oldItems = oldData.getAllItems();
         List<String> itemDifferences = new LinkedList<>();
+        List<String> newItems = newData.getAllItems()
+                .stream()
+                .filter(itemModel -> itemModel.getId() == null)
+                .map(itemModel -> itemModel.getBaseId() + ":" + itemModel.getQuantity())
+                .collect(Collectors.toList());
+
+        HashMap<String, List<String>> response = new HashMap<>(Collections.singletonMap("add_items", newItems));
+
         for (ItemModel newItem : newData.getAllItems()) {
-            Optional<ItemModel> difference = oldData.getAllItems()
-                    .stream()
-                    .filter(itemModel -> itemModel.getId().equals(newItem.getId()) &&
+            Optional<ItemModel> difference = oldItems.stream()
+                    .filter(itemModel -> itemModel.getId() != null && itemModel.getId().equals(newItem.getId()) &&
                             itemModel.getQuantity() != newItem.getQuantity())
                     .findFirst();
-            difference.ifPresent(itemModel -> {
-                itemDifferences.add(newItem.getId() + ":" + newItem.getQuantity());
-            });
+            difference.ifPresent(itemModel -> itemDifferences.add(newItem.getId() + ":" + newItem.getQuantity()));
         }
-        return Collections.singletonMap("item", itemDifferences);
+        response.put("item", itemDifferences);
+
+        return response;
     }
 
 }

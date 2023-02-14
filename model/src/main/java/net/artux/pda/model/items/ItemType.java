@@ -6,6 +6,16 @@ public enum ItemType {
         public int getTypeId() {
             return 4;
         }
+
+        @Override
+        public boolean isWearable() {
+            return true;
+        }
+
+        @Override
+        public boolean isCountable() {
+            return false;
+        }
     },
     PISTOL {
         @Override
@@ -13,6 +23,15 @@ public enum ItemType {
             return 0;
         }
 
+        @Override
+        public boolean isWearable() {
+            return true;
+        }
+
+        @Override
+        public boolean isCountable() {
+            return false;
+        }
     },
     RIFLE {
         @Override
@@ -20,6 +39,15 @@ public enum ItemType {
             return 1;
         }
 
+        @Override
+        public boolean isWearable() {
+            return true;
+        }
+
+        @Override
+        public boolean isCountable() {
+            return false;
+        }
     },
     MEDICINE {
         @Override
@@ -34,6 +62,10 @@ public enum ItemType {
             return 3;
         }
 
+        @Override
+        public boolean isWearable() {
+            return true;
+        }
     },
     DETECTOR {
         @Override
@@ -41,6 +73,15 @@ public enum ItemType {
             return 5;
         }
 
+        @Override
+        public boolean isWearable() {
+            return true;
+        }
+
+        @Override
+        public boolean isCountable() {
+            return false;
+        }
     },
     BULLET {
         @Override
@@ -65,5 +106,13 @@ public enum ItemType {
                 return type;
         }
         return ItemType.ITEM;
+    }
+
+    public boolean isWearable() {
+        return false;
+    }
+
+    public boolean isCountable() {
+        return true;
     }
 }

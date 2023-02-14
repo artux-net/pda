@@ -4,6 +4,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 
 /**
@@ -15,28 +16,38 @@ import com.badlogic.gdx.utils.Timer;
 
 public class InputListener extends com.badlogic.gdx.scenes.scene2d.InputListener {
 
+    private final static int maxPointers = 10;
+    private float tapRectangleWidth;
+    private float tapRectangleHeight;
+    private boolean inTapRectangle;
+    private long tapCountInterval = 400L;
     boolean longPressFired;
     private static final float longPressSeconds = 1.1f;
 
-    Vector2 pointer1 = new Vector2();
-    private final Vector2 pointer2 = new Vector2();
+    private Array<Vector2> initialPointers = new Array<>(maxPointers);
+    private Array<Vector2> pointers = new Array<>(maxPointers);
 
     private final Timer.Task longPressTask = new Timer.Task() {
         @Override
         public void run() {
-            if (!longPressFired) longPressFired = longPress(pointer1.x, pointer1.y);
+            if (!longPressFired)
+                longPressFired = longPress(pointers.get(0).x, pointers.get(0).y);
         }
     };
 
     @Override
     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-        if (pointer == 0) {
+        if (pointer >= maxPointers) return false;
+        initialPointers.get(pointer).set(x, y);
+        /*if (pointer == 0) {
             pointer1.set(x, y);
             longPressFired = false;
+            tapRectangleCenterX = x;
+            tapRectangleCenterY = y;
         } else
-            pointer2.set(x, y);
+            pointer2.set(x, y);*/
 
-        if (pointer == 1)
+        if (pointer > 0)
             longPressTask.cancel();
 
         if (!longPressTask.isScheduled())
@@ -55,7 +66,16 @@ public class InputListener extends com.badlogic.gdx.scenes.scene2d.InputListener
 
     @Override
     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+/*
+        // check if we are still tapping.
+        if (inTapRectangle && !isWithinTapRectangle(x, y, tapRectangleCenterX, tapRectangleCenterY))
+            inTapRectangle = false;*/
+
         longPressTask.cancel();
         super.touchUp(event, x, y, pointer, button);
+    }
+
+    private boolean isWithinTapRectangle(float x, float y, float centerX, float centerY) {
+        return Math.abs(x - centerX) < tapRectangleWidth && Math.abs(y - centerY) < tapRectangleHeight;
     }
 }

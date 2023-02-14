@@ -59,9 +59,9 @@ public class EntityBuilder {
                 .add(new VisionComponent())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
                 .add(new WeaponComponent(dataRepository, assetManager))
-                .add(new MoodComponent(dataRepository.getCurrentStoryDataModel()))
+                .add(new MoodComponent(dataRepository.getStoryDataModel()))
                 .add(new HealthComponent())
-                .add(new PlayerComponent(dataRepository.getCurrentStoryDataModel()));
+                .add(new PlayerComponent(dataRepository.getStoryDataModel()));
     }
 
     public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {

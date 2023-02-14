@@ -28,6 +28,7 @@ public class ItemView extends Table {
         String iconFilename = "icons/items/" + itemModel.getIcon();
 
         pad(5);
+        Label quantityLabel = new Label(itemModel.getQuantity() + "", subtitleStyle);
 
         if (itemModel instanceof WearableModel) {
             float condition = 100f;
@@ -35,6 +36,8 @@ public class ItemView extends Table {
                 condition = ((WeaponModel) itemModel).getCondition();
             else if (itemModel instanceof ArmorModel)
                 condition = ((ArmorModel) itemModel).getCondition();
+            if (((WearableModel) itemModel).isEquipped())
+                quantityLabel.setText("<!>");
 
             Color baseColor = new Color(1, 1, 0, 1);
             float k = (condition - 75f) / 25f;
@@ -46,12 +49,13 @@ public class ItemView extends Table {
         } else add(new Image()).left().uniformX();
 
 
-        Label quantityLabel = new Label(itemModel.getQuantity() + "", subtitleStyle);
+
         quantityLabel.setAlignment(Align.right);
         add(quantityLabel)
                 .right()
                 .uniformX()
                 .fill();
+
         row();
         image = new LazyImage(assetManager, iconFilename);
         image.setScaling(Scaling.fit);

@@ -9,6 +9,7 @@ import androidx.appcompat.content.res.AppCompatResources;
 import com.bumptech.glide.Glide;
 
 import net.artux.pda.R;
+import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.ProfileModel;
 import net.artux.pda.utils.URLHelper;
@@ -71,8 +72,8 @@ public class ProfileHelper {
     }
 
     public static String getRangTitleByXp(int xp, Context context) {
-        //ProfileModel.Rang rang = ProfileModel.getRang(xp); TODO
-        return context.getResources().getStringArray(R.array.rang)[0];
+        StoryDataModel.Rang rang = StoryDataModel.getRang(xp);
+        return context.getResources().getStringArray(R.array.rang)[rang.getId()];
     }
 
     public static String getRangTitleById(int id, Context context) {

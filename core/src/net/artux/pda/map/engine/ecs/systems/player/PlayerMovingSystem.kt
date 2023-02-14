@@ -132,7 +132,7 @@ class PlayerMovingSystem @Inject constructor(
             }
         }
 
-        weightCoefficient = 1.5f - dataRepository.currentStoryDataModel.totalWeight / 60
+        weightCoefficient = 1.5f - dataRepository.storyDataModel.totalWeight / 60
         if (weightCoefficient < 0.1f) weightCoefficient = 0.1f
         stepSounds = HashMap()
         random = Random()

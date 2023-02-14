@@ -1,5 +1,7 @@
 package net.artux.pda.map
 
+import com.badlogic.gdx.Gdx
+import com.google.gson.Gson
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -9,18 +11,18 @@ import net.artux.pda.model.items.ItemsContainerModel
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.quest.StoryModel
 import net.artux.pda.model.quest.story.StoryDataModel
+import org.apache.commons.lang3.SerializationUtils
 import java.util.*
 
 
 class DataRepository(
     val platformInterface: PlatformInterface,
-    private val storyDataModel: StoryDataModel,
+    var storyDataModel: StoryDataModel,
     var gameMap: GameMap,
     val items: ItemsContainerModel,
     val storyModel: StoryModel,
     val properties: Properties
 ) {
-
 
     data class Builder(
         var platformInterface: PlatformInterface? = null,
@@ -51,7 +53,6 @@ class DataRepository(
         )
     }
 
-    var previousStoryDataModel = storyDataModel
     var currentStoryDataModel = storyDataModel
     private val dataModelFlow: MutableSharedFlow<StoryDataModel> = MutableSharedFlow(
         replay = 1,
@@ -59,12 +60,13 @@ class DataRepository(
     )
     val storyDataModelFlow: SharedFlow<StoryDataModel> = dataModelFlow
 
+    val gson = Gson()
     init {
-        setStoryDataModel(storyDataModel)
+        dataModelFlow.tryEmit(storyDataModel)
     }
 
-    fun setStoryDataModel(storyDataModel: StoryDataModel) {
-        previousStoryDataModel = currentStoryDataModel
+    fun setUserData(storyDataModel: StoryDataModel) {
+        this.storyDataModel = SerializationUtils.clone(storyDataModel)
         currentStoryDataModel = storyDataModel
         dataModelFlow.tryEmit(storyDataModel)
     }
@@ -75,13 +77,14 @@ class DataRepository(
     }
 
     fun update() {
-        setStoryDataModel(currentStoryDataModel)
+        dataModelFlow.tryEmit(currentStoryDataModel)
     }
 
     fun applyActions(actions: Map<String, List<String>>?) {
-        val summaryMap = HashMap(QuestUtil.difference(previousStoryDataModel, storyDataModel))
-        if (actions != null && actions.isNotEmpty()) {
+        val summaryMap = HashMap(QuestUtil.difference(storyDataModel, currentStoryDataModel))
+        if (actions != null) {
             summaryMap.putAll(actions)
+            Gdx.app.log("ACTIONS", "$summaryMap")
             platformInterface.applyActions(summaryMap)
         }
     }

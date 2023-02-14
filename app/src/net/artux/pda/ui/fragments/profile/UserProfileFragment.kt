@@ -9,6 +9,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import net.artux.pda.R
 import net.artux.pda.databinding.FragmentListBinding
 import net.artux.pda.databinding.FragmentProfileBinding
+import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.ui.activities.hierarhy.BaseFragment
 import net.artux.pda.ui.fragments.additional.AdditionalFragment
 import net.artux.pda.ui.fragments.chat.ChatFragment
@@ -75,7 +76,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             binding.profileRating.text =
                 getString(R.string.xp_p, model.xp.toString())
 
-           /* val currentRang = model.rang // TODO
+            val currentRang = StoryDataModel.getRang(model.xp)
             val nextRang = currentRang.nextRang
 
             binding.currentRangTextView.text = ProfileHelper.getRangTitleById(currentRang.id, view.context)
@@ -86,7 +87,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 binding.xpProgressBar.max = nextRang.xp
                 binding.xpProgressBar.progress = model.xp
             }
-*/
+
             binding.profileFriends.text =
                 view.context.getString(R.string.friends, model.friends.toString())
             binding.profileFriends.setOnClickListener(this)

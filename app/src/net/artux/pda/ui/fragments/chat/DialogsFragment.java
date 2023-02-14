@@ -20,8 +20,6 @@ import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
 import net.artux.pda.ui.util.ObjectWebSocketListener;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -60,11 +58,6 @@ public class DialogsFragment extends BaseFragment implements DialogsAdapter.OnCl
 
             @Override
             public void onMessage(ConversationModel conversationModel) {
-
-            }
-
-            @Override
-            public void onList(List<ConversationModel> list) {
 
             }
 

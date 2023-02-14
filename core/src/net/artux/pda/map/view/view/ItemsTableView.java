@@ -2,6 +2,7 @@ package net.artux.pda.map.view.view;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
@@ -9,9 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Align;
 
-import net.artux.engine.ui.InputListener;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.utils.Colors;
@@ -94,21 +95,22 @@ public class ItemsTableView extends Table {
                     container.setActor(itemView);
                     container.fill();
 
-                    itemView.addListener(new InputListener() {
+                    itemView.addListener(new ActorGestureListener() {
 
                         @Override
-                        public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                            super.touchUp(event, x, y, pointer, button);
+                        public void tap(InputEvent event, float x, float y, int count, int button) {
+                            super.tap(event, x, y, count, button);
                             if (onItemClickListener != null)
                                 onItemClickListener.onTap(itemModel);
                         }
 
                         @Override
-                        public boolean longPress(float x, float y) {
+                        public boolean longPress(Actor actor, float x, float y) {
                             if (onItemClickListener != null)
                                 onItemClickListener.onLongPress(itemModel);
                             return true;
                         }
+
                     });
 
                     container.width(230);

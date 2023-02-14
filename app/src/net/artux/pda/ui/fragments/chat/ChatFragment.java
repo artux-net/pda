@@ -21,7 +21,8 @@ import net.artux.pda.R;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.databinding.FragmentChatBinding;
 import net.artux.pda.model.ConversationModel;
-import net.artux.pda.model.UserMessage;
+import net.artux.pda.model.chat.ChatUpdate;
+import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
@@ -30,7 +31,8 @@ import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.stories.StoriesFragment;
 import net.artux.pda.ui.util.ObjectWebSocketListener;
 
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.inject.Inject;
 
@@ -55,7 +57,8 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     private TextInputEditText mInputEditText;
     private WebSocket ws;
     private FragmentChatBinding binding;
-    private ObjectWebSocketListener<UserMessage> userMessageObjectWebSocketListener;
+    private ObjectWebSocketListener<ChatUpdate> userMessageObjectWebSocketListener;
+    private final Timer timer = new Timer();
 
     static ChatFragment with(UserModel userModel) {
         ChatFragment chatFragment1 = new ChatFragment();
@@ -106,29 +109,33 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
             builder.show();
         }
 
-        userMessageObjectWebSocketListener = new ObjectWebSocketListener<>(UserMessage.class, gson, new ObjectWebSocketListener.OnUpdateListener<>() {
+        userMessageObjectWebSocketListener = new ObjectWebSocketListener<>(ChatUpdate.class, gson, new ObjectWebSocketListener.OnUpdateListener<>() {
             @Override
             public void onOpen() {
                 navigationPresenter.setLoadingState(false);
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        ws.send("");
+                    }
+                }, 1000 * 60 * 2);
             }
 
             @Override
-            public void onMessage(UserMessage userMessage) {
+            public void onMessage(ChatUpdate update) {
                 requireActivity().runOnUiThread(() -> {
-                    mChatAdapter.addMessage(userMessage);
-                    mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount() - 1);
+                    mChatAdapter.update(update);
+                    if (mChatAdapter.getItemCount() > 0)
+                        mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount() - 1);
                 });
 
             }
 
             @Override
-            public void onList(List<UserMessage> list) {
-                requireActivity().runOnUiThread(() -> mChatAdapter.setItems(list));
-            }
-
-            @Override
             public void onClose() {
                 navigationPresenter.setLoadingState(false);
+                timer.purge();
+                timer.cancel();
             }
         });
 

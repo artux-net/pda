@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.model.StatusModel
-import net.artux.pda.model.UserMessage
+import net.artux.pda.model.chat.UserMessage
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.mapper.ItemMapper
 import net.artux.pda.model.mapper.StageMapper
@@ -181,7 +181,12 @@ class QuestViewModel @javax.inject.Inject constructor(
     fun chooseTransfer(transfer: TransferModel) {
         viewModelScope.launch {
             if (stage.value!!.type == StageType.DIALOG) {
-                summaryMessages.add(UserMessage(storyData.value, transfer.text))
+                summaryMessages.add(
+                    UserMessage(
+                        storyData.value,
+                        transfer.text
+                    )
+                )
             }
 
             val chapterStage = chapter.value!!.getStage(transfer.stageId)

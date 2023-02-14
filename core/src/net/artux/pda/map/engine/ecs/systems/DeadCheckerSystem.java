@@ -27,7 +27,6 @@ import net.artux.pda.map.view.UserInterface;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
-import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -45,7 +44,6 @@ public class DeadCheckerSystem extends BaseSystem {
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
     private AssetManager assetManager;
-    private Random random = new Random();
 
     @Inject
     public DeadCheckerSystem(UserInterface userInterface, LootMenu lootMenu, DataRepository dataRepository, AssetManager assetManager) {
@@ -70,31 +68,29 @@ public class DeadCheckerSystem extends BaseSystem {
             Position position = pm.get(entity);
 
             if (healthComponent.isDead()) {
-                if (random.nextInt(10) < 5) {
-                    final Entity deadEntity = new Entity();
-                    deadEntity.add(new Position(position.getPosition()))
-                            .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4));
+                final Entity deadEntity = new Entity();
+                deadEntity.add(new Position(position.getPosition()))
+                        .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4));
 
-                    if (entity != getPlayer()) {
-                        StalkerComponent stalkerComponent = entity.getComponent(StalkerComponent.class);
-                        deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, new InteractiveComponent.InteractListener() {
-                                    @Override
-                                    public void interact() {
-                                        lootMenu.updateBot(stalkerComponent.getName(), stalkerComponent.getAvatar(), stalkerComponent.getInventory());
-                                        userInterface.getStack().add(lootMenu);
+                if (entity != getPlayer()) {
+                    StalkerComponent stalkerComponent = entity.getComponent(StalkerComponent.class);
+                    deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, new InteractiveComponent.InteractListener() {
+                                @Override
+                                public void interact() {
+                                    lootMenu.updateBot(stalkerComponent.getName(), stalkerComponent.getAvatar(), stalkerComponent.getInventory());
+                                    userInterface.getStack().add(lootMenu);
 
-                                        getEngine().removeEntity(deadEntity);
-                                    }
-                                }))
-                                .add(new TimeComponent(Instant.now().plus(1, ChronoUnit.MINUTES),
-                                        () -> getEngine().removeEntity(entity)))
-                                .add(stalkerComponent);
-                    } else {
-                        getEngine().removeEntity(getPlayer());
-                    }
-
-                    getEngine().addEntity(deadEntity);
+                                    getEngine().removeEntity(deadEntity);
+                                }
+                            }))
+                            .add(new TimeComponent(Instant.now().plus(1, ChronoUnit.MINUTES),
+                                    () -> getEngine().removeEntity(entity)))
+                            .add(stalkerComponent);
+                } else {
+                    getEngine().removeEntity(getPlayer());
                 }
+
+                getEngine().addEntity(deadEntity);
                 getEngine().removeEntity(entity);
             }
         }

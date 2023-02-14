@@ -7,7 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.model.UserMessage;
+import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.List;

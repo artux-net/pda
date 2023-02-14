@@ -20,9 +20,14 @@ public class MediaItem extends Table {
 
         image = new LazyImage(assetManager);
         image.setFilename(imageFilename);
+        image.setAlign(Align.left);
         image.setScaling(Scaling.fit);
         add(image)
-                .fill();
+                .left()
+                .fill()
+                .maxWidth(150)
+                .maxHeight(100)
+                .uniformY();
 
         VerticalGroup verticalGroup = new VerticalGroup();
         verticalGroup.left();
@@ -39,7 +44,7 @@ public class MediaItem extends Table {
                 .growX();
     }
 
-    public void setImage(String imageFilename){
+    public void setImage(String imageFilename) {
         image.setFilename(imageFilename);
     }
 

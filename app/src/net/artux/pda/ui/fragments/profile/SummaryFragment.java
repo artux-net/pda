@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.model.UserMessage;
+import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.additional.SummaryAdditionalFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;

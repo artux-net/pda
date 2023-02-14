@@ -65,7 +65,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         questViewModel = provider.get(QuestViewModel.class);
         questViewModel.getStoryData().observe(getViewLifecycleOwner(), storyDataModel ->
-                gdxAdapter.getDataRepository().setStoryDataModel(storyDataModel));
+                gdxAdapter.getDataRepository().setUserData(storyDataModel));
     }
 
     @Override
@@ -73,16 +73,12 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
         Timber.i("Core resumed");
         Bundle args = getArguments();
         if (args != null) {
-            StoryModel storyModel = (StoryModel) args.getSerializable("story");
             StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
             GameMap map = (GameMap) args.getSerializable("map");
-            ItemsContainerModel items = (ItemsContainerModel) args.getSerializable("items");
 
             DataRepository dataRepository = gdxAdapter.getDataRepository();
-            dataRepository.setStoryDataModel(dataModel);
+            dataRepository.setUserData(dataModel);
             dataRepository.setGameMap(map);
-            /*dataRepository.setStoryModel(storyModel);
-            dataRepository.setItems(items);*/
         }
         super.onResume();
     }

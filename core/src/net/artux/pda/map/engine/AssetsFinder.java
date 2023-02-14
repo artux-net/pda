@@ -48,8 +48,7 @@ public class AssetsFinder implements Disposable {
         if (assetManager == null) {
             assetManager = new AssetManager();
 
-            assetManager.load("avatars/a0.jpg", Texture.class);
-            for (int i = 1; i < 31; i++) {
+            for (int i = 0; i < 31; i++) {
                 assetManager.load("avatars/a" + i + ".png", Texture.class);
             }
 

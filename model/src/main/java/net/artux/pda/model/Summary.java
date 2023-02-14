@@ -1,5 +1,7 @@
 package net.artux.pda.model;
 
+import net.artux.pda.model.chat.UserMessage;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;

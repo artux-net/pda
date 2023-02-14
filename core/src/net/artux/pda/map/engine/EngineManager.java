@@ -21,6 +21,7 @@ import net.artux.pda.map.engine.ecs.systems.Drawable;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.ecs.systems.player.MissionsSystem;
+import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
 import net.artux.pda.map.engine.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.helpers.EntityBuilder;
 import net.artux.pda.map.engine.helpers.QuestPointsHelper;
@@ -36,8 +37,6 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private Entity player;
     private Engine engine;
     private final DataRepository dataRepository;
-
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class); //todo remove from here
 
     private boolean controlPoints = true;
     private boolean questPoints = true; //
@@ -114,7 +113,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     }
 
     public void updateOnlyPlayer() {
-        pm.get(player).set(Mappers.vector2(dataRepository.getGameMap().getDefPos()));
+        engine.getSystem(PlayerSystem.class).getPosition().set(Mappers.vector2(dataRepository.getGameMap().getDefPos()));
         engine.getSystem(InteractionSystem.class).setProcessing(true);
     }
 }
