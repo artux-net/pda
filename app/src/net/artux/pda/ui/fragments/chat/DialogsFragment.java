@@ -87,6 +87,9 @@ public class DialogsFragment extends BaseFragment implements DialogsAdapter.OnCl
         binding.groupChatBtn.setOnClickListener(view1 ->
                 navigationPresenter.addFragment(ChatFragment.asGroupChat(), true));
 
+        binding.rpChatBtn.setOnClickListener(view1 ->
+                navigationPresenter.addFragment(ChatFragment.asRPChat(), true));
+
         binding.addChatBtn.setOnClickListener(view1 -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
             builder.setTitle(R.string.any_select_action);

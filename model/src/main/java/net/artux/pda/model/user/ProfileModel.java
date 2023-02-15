@@ -21,7 +21,6 @@ public class ProfileModel {
     private GangRelation relations;
 
     private int achievements;
-    private int group;
 
     private int friendStatus;
     /*
@@ -39,9 +38,8 @@ public class ProfileModel {
     public ProfileModel(UserModel userModel) {
         this.login = userModel.getLogin();
         this.name = userModel.getName();
-        this.group = userModel.getGang().getId();
         this.avatar = userModel.getAvatar();
-        this.pdaId = userModel.getPdaId();
+        this.pdaId = Math.toIntExact(userModel.getPdaId());
         this.xp = userModel.getXp();
         this.registration = userModel.getRegistration();
     }

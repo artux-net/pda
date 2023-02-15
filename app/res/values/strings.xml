@@ -211,4 +211,5 @@
     <string name="buy_question">Вы хотите купить %s?</string>
     <string name="group_relation">Отношение группировок</string>
     <string name="progress">Прогресс</string>
+    <string name="rp_chat_channel">RP</string>
 </resources>

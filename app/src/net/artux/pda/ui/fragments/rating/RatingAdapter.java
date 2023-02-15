@@ -71,8 +71,11 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
             ProfileHelper.setAvatar(avatar, userInfo.avatar);
             title.setText(title.getContext().getString(R.string.rating_title, userInfo.login,
                     String.valueOf(userInfo.pdaId), String.valueOf(ProfileHelper.getRangTitleByXp(userInfo.xp, title.getContext()))));
-            desc.setText(desc.getContext().getString(R.string.rating_desc, ProfileHelper.getGroup(desc.getContext(), userInfo.group),
-                    ProfileHelper.getDays(userInfo.registration), userInfo.location));
+
+            desc.setText(desc.getContext().getString(R.string.rating_desc,
+                    ProfileHelper.getGroup(desc.getContext(), userInfo.gang.getId()),
+                    ProfileHelper.getDays(userInfo.registration)));
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

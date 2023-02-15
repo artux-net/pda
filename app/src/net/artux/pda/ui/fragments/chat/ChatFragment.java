@@ -89,6 +89,14 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         return chatFragment;
     }
 
+    public static BaseFragment asRPChat() {
+        ChatFragment chatFragment = new ChatFragment();
+        Bundle bundle1 = new Bundle();
+        bundle1.putBoolean("rp", true);
+        chatFragment.setArguments(bundle1);
+        return chatFragment;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -157,7 +165,10 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         String path = BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API;
         navigationPresenter.setLoadingState(true);
         if (args != null) {
-            if (args.containsKey("group")) {
+            if (args.containsKey("rp")) {
+                builder.url(path + "rp");
+                navigationPresenter.setTitle("RP chat");
+            } else if (args.containsKey("group")) {
                 builder.url(path + "groups");
                 navigationPresenter.setTitle("Group chat");
             } else {
@@ -208,24 +219,26 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
 
     @Override
     public void onClick(UserMessage message) {
-        if (navigationPresenter != null)
+        if (navigationPresenter != null && message.getAuthor().getId() != null)
             navigationPresenter.addFragment(UserProfileFragment
                     .of(message.getAuthor().getId()), true);
     }
 
     @Override
     public void onLongClick(UserMessage message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
-        builder.setTitle(getString(R.string.any_select_action));
-        builder.setItems(getResources().getStringArray(R.array.message_actions), (dialogInterface, i) -> {
-            switch (i) {
-                default:
-                    navigationPresenter.addFragment(ChatFragment.with(message.getAuthor()), true);
-                case 1:
-                    navigationPresenter.addFragment(UserProfileFragment.of(message.getAuthor().getId()), true);
-            }
-        });
-        builder.create().show();
+        if (message.getAuthor().getId() != null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+            builder.setTitle(getString(R.string.any_select_action));
+            builder.setItems(getResources().getStringArray(R.array.message_actions), (dialogInterface, i) -> {
+                switch (i) {
+                    default:
+                        navigationPresenter.addFragment(ChatFragment.with(message.getAuthor()), true);
+                    case 1:
+                        navigationPresenter.addFragment(UserProfileFragment.of(message.getAuthor().getId()), true);
+                }
+            });
+            builder.create().show();
+        }
     }
 
     @Override

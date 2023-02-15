@@ -33,8 +33,6 @@ public interface UserMapper {
 
     ProfileModel model(Profile profile);
 
-    RegisterUserModel model(RegisterUserDto dto);
-
     RegisterUserDto model(RegisterUserModel model);
 
     GangRelation relation(GangRelationDto dto);

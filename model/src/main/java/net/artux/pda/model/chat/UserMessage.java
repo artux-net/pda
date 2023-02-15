@@ -28,7 +28,7 @@ public class UserMessage implements Serializable {
         author = new UserModel();
         author.setLogin(storyDataModel.getLogin());
         author.setAvatar(storyDataModel.getAvatar());
-        author.setPdaId(storyDataModel.getPdaId());
+        author.setPdaId((long) storyDataModel.getPdaId());
         author.setNickname(storyDataModel.getNickname());
         author.setGang(storyDataModel.getGang());
 
@@ -40,7 +40,10 @@ public class UserMessage implements Serializable {
         author = new UserModel();
         author.setLogin(senderLogin);
         author.setAvatar(avatarId);
-
+        author.setName(senderLogin);
+        author.setNickname("");
+        author.setRole(UserModel.Role.ADMIN);
+        author.setPdaId(-1L);
         content = message;
         timestamp = Instant.now();
     }

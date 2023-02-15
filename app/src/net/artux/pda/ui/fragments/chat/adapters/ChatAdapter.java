@@ -53,7 +53,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @SuppressLint("NotifyDataSetChanged")
     public void update(ChatUpdate update) {
-        if (update.getUpdatesByType(UserMessage.Type.OLD).size() > 0){
+        if (update.getUpdatesByType(UserMessage.Type.OLD).size() > 0) {
             messages = update.getUpdatesByType(UserMessage.Type.OLD);
         }
 
@@ -115,13 +115,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             UserModel userModel = userMessage.getAuthor();
 
             if (userModel != null) {
-                nicknameView.setText(userModel.getLogin());
+                nicknameView.setText(userModel.getName() + " " + userModel.getNickname());
                 itemView.setOnLongClickListener(view -> {
                     listener.onLongClick(userMessage);
                     return false;
                 });
                 itemView.setOnClickListener(view -> listener.onClick(userMessage));
-                if (userModel.getPdaId() < 0 || userModel.getGang() == null) {
+                if (userModel.getPdaId() == null || userModel.getPdaId() < 0 || userModel.getGang() == null) {
                     infoView.setText(" [PDA ###]"
                             + " - " + formatter.format(instant));
                 } else {
@@ -129,6 +129,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                             + infoView.getContext().getResources().getStringArray(R.array.groups)[userModel.getGang().getId()] // группировка
                             + " - " + formatter.format(instant));
                 }
+
+                if (userModel.getRole() != null && userModel.getRole() != UserModel.Role.USER)
+                    infoView.setText(infoView.getText() + " " + userModel.getRole());
+
                 ProfileHelper.setAvatar(avatarView, userModel.getAvatar());
             } else {
                 nicknameView.setText("System ");

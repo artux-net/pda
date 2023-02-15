@@ -39,7 +39,7 @@ public class SummaryFragment extends BaseFragment implements ChatAdapter.Message
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        navigationPresenter.setTitle(getString(R.string.selectSummary));
         summaryViewModel = new ViewModelProvider(requireActivity()).get(SummaryViewModel.class);
 
         RecyclerView recyclerView = view.findViewById(R.id.list);

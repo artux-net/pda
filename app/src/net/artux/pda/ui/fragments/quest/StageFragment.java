@@ -83,7 +83,7 @@ public class StageFragment extends Fragment {
             usualStageBinding.scrollScene.setOnClickListener(v -> mainText.setEffect(false));
         } else {
             chapterOverBinding.sceneTitle.setText(stage.getTitle());
-            chapterOverBinding.sceneText.setText(stage.getContent());
+            chapterOverBinding.sceneText.setmText(stage.getContent());
 
             List<TransferModel> transfers = stage.getTransfers();
 

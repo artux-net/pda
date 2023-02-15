@@ -137,9 +137,9 @@ class QuestRepository @Inject constructor(
         }
     }
 
-    suspend fun setWearableItem(id: UUID, type: String): Result<Status> {
+    suspend fun setWearableItem(id: UUID): Result<Status> {
         return suspendCoroutine {
-            defaultApi.setItem(id, type).enqueue(object : Callback<Status> {
+            defaultApi.setItem(id).enqueue(object : Callback<Status> {
                 override fun onResponse(
                     call: Call<Status>,
                     response: Response<Status>

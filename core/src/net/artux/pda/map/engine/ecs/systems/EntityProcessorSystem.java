@@ -104,7 +104,6 @@ public class EntityProcessorSystem extends EntitySystem {
     public void addBulletToEngine(Entity entity, Entity target, WeaponModel weaponModel) {
         Entity bullet = builder.bullet(entity, target, weaponModel);
         getEngine().addEntity(bullet);
-
     }
 
     public void generateTakeSpawnGroup(Vector2 randomTransferPosition, Vector2 attackTarget) {

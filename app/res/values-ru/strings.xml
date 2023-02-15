@@ -73,7 +73,7 @@
     <string name="weight">%1$s кг</string>
     <string name="wr_message">Написать сообщение</string>
     <string name="okay">Окей</string>
-    <string name="rating_desc">Группировка - %1$s, в зоне уже %2$s, последний раз замечен на территории %3$s</string>
+    <string name="rating_desc">Группировка - %1$s, в зоне уже %2$s</string>
     <string name="item_desc">Цена: %1$s \nВес: %2$s \nКоличество: %3$s - %4$s кг всего\n</string>
     <string name="weapon_desc">Точность: %1$s \nСкорость: %2$s \nУрон: %3$s \nСостояние: %4$s \n</string>
     <string name="armor_desc">Термо: %1$s \nЭлектро: %2$s \nХим: %3$s \nРадио: %4$s \nПси: %5$s \nУрон: %6$s \nСостояние: %7$s \n</string>

@@ -34,6 +34,7 @@ import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentNotificationBinding;
 import net.artux.pda.gdx.CoreFragment;
 import net.artux.pda.model.quest.Stage;
+import net.artux.pda.model.quest.StageType;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.ui.fragments.quest.SellerFragment;
 import net.artux.pda.ui.fragments.quest.StageFragment;
@@ -119,7 +120,10 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
                     .addToBackStack("stage")
                     .commit();
 
-            setTitle(stageModel.getTitle());
+            if (stageModel.getType() != StageType.CHAPTER_OVER)
+                setTitle(stageModel.getTitle());
+            else
+                setTitle("");
             findViewById(R.id.navbar).setVisibility(View.VISIBLE);
         });
 

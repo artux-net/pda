@@ -26,12 +26,19 @@
                android:text="@string/group_chat_channel"
                android:layout_weight="1"/>
 
+           <Button
+               android:id="@+id/rpChatBtn"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:text="@string/rp_chat_channel"
+               android:layout_weight="1"/>
+
            <ImageButton
                android:id="@+id/addChatBtn"
                android:layout_width="match_parent"
                android:layout_height="match_parent"
                android:src="@drawable/ic_add"
-               android:layout_weight="1.5" />
+               android:layout_weight="1" />
 
        </LinearLayout>
 
