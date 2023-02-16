@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -33,6 +35,8 @@ public class PlayState extends State {
     private final EngineManager engineManager;
     private final AssetManager assetManager;
     private final CoreComponent coreComponent;
+    private World world;
+    private Box2DDebugRenderer boxDebugRenderer= new Box2DDebugRenderer();
     Texture background;
 
     @Inject
@@ -118,12 +122,14 @@ public class PlayState extends State {
     public void update(float dt) {
         uistage.act(dt);
         stage.act(dt);
+        world.step(1/90f, 6, 2);
         engineManager.update(dt);
     }
 
     @Override
     public void render() {
         stage.draw();
+        boxDebugRenderer.render(world, stage.getCamera().combined);
         stage.getBatch().begin();
         engineManager.draw(stage.getBatch(), 1);
         stage.getBatch().end();
