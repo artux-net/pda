@@ -4,11 +4,12 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.physics.box2d.World;
 
 import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.map.engine.ecs.components.ClickComponent;
 import net.artux.pda.map.engine.ecs.components.InteractiveComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.map.ConditionComponent;
 import net.artux.pda.map.engine.ecs.components.map.PointComponent;
@@ -35,22 +36,22 @@ public class QuestPointsHelper {
 
         for (Point point : map.getPoints()) {
             if (point.getData().containsKey("static"))
-                engine.addEntity(pointEntity(coreComponent, point));
+                engine.addEntity(pointEntity(coreComponent, point, coreComponent.getWorld()));
             else if (point.getData().containsKey("chapter")) {
                 if ((Integer.parseInt(point.getData().get("chapter")) == storyStateModel.getChapterId()
                         || Integer.parseInt(point.getData().get("chapter")) == 0))
-                    engine.addEntity(pointEntity(coreComponent, point));
-            } else engine.addEntity(pointEntity(coreComponent, point));
+                    engine.addEntity(pointEntity(coreComponent, point, coreComponent.getWorld()));
+            } else engine.addEntity(pointEntity(coreComponent, point, coreComponent.getWorld()));
         }
     }
 
-    private static Entity pointEntity(MapComponent coreComponent, final Point point) {
+    private static Entity pointEntity(MapComponent coreComponent, final Point point, World world) {
         Engine engine = coreComponent.getEngine();
         AssetManager assetManager = coreComponent.getAssetsManager();
         PlatformInterface platformInterface = coreComponent.getDataRepository().getPlatformInterface();
 
         Entity entity = new Entity()
-                .add(new Position(Mappers.vector2(point.getPos())))
+                .add(new BodyComponent(Mappers.vector2(point.getPos()), world))
 
                 .add(new InteractiveComponent(point.getName(), point.getType(), () -> platformInterface.send(point.getData())))
                 .add(new ClickComponent(23, () -> engine.getSystem(RenderSystem.class)

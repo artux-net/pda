@@ -12,7 +12,7 @@ import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.GroupComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VelocityComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent;
@@ -29,12 +29,12 @@ public class SpawnSystem extends IteratingSystem {
     private final DataRepository dataRepository;
 
     private final ComponentMapper<SpawnComponent> sm = ComponentMapper.getFor(SpawnComponent.class);
-    private final ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<GroupComponent> gm = ComponentMapper.getFor(GroupComponent.class);
 
     @Inject
     public SpawnSystem(DataRepository dataRepository) {
-        super(Family.all(VisionComponent.class, Position.class, VelocityComponent.class).exclude(PassivityComponent.class).get());
+        super(Family.all(VisionComponent.class, BodyComponent.class, VelocityComponent.class).exclude(PassivityComponent.class).get());
         this.dataRepository = dataRepository;
     }
 
@@ -43,10 +43,10 @@ public class SpawnSystem extends IteratingSystem {
         super.addedToEngine(engine);
         spawns = engine.getEntitiesFor(
                 Family
-                        .all(SpawnComponent.class, Position.class)
+                        .all(SpawnComponent.class, BodyComponent.class)
                         .exclude(PassivityComponent.class, VelocityComponent.class)
                         .get());
-        groupEntities = engine.getEntitiesFor(Family.all(GroupComponent.class, Position.class).get());
+        groupEntities = engine.getEntitiesFor(Family.all(GroupComponent.class, BodyComponent.class).get());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SpawnSystem extends IteratingSystem {
         super.update(deltaTime);
         for (int i = 0; i < spawns.size(); i++) {
             SpawnComponent spawnComponent = sm.get(spawns.get(i));
-            Position spawnPosition = pm.get(spawns.get(i));
+            BodyComponent spawnBodyComponent = pm.get(spawns.get(i));
 
             List<Entity> entities = spawnComponent.getGroupComponent().getEntities();
             entities.removeIf(e -> getEntities().indexOf(e, true) < 0);
@@ -70,7 +70,7 @@ public class SpawnSystem extends IteratingSystem {
                 for (Entity entity : groupEntities) {
                     GroupComponent group = gm.get(entity);
                     if (!(group.getTargeting() instanceof SpawnComponent)) {
-                        float dst = group.getCenterPoint().dst(spawnPosition);
+                        float dst = group.getCenterPoint().dst(spawnBodyComponent.getPosition());
                         if (minDstGroup == null
                                 || dst < minDst) {
                             minDstGroup = group;

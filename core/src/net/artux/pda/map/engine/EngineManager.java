@@ -1,6 +1,5 @@
 package net.artux.pda.map.engine;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
@@ -16,7 +15,6 @@ import com.badlogic.gdx.utils.TimeUtils;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.ecs.components.Position;
 import net.artux.pda.map.engine.ecs.systems.Drawable;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;

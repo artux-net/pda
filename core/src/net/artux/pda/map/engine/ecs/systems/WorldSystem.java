@@ -10,6 +10,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.pda.map.di.scope.PerGameMap;
@@ -17,7 +18,7 @@ import net.artux.pda.map.repository.RandomPosition;
 import net.artux.pda.map.engine.ecs.components.AnomalyComponent;
 import net.artux.pda.map.engine.ecs.components.ArtifactComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.VelocityComponent;
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
@@ -39,20 +40,22 @@ public class WorldSystem extends EntitySystem implements Disposable {
 
     private final AssetManager assetManager;
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<AnomalyComponent> am = ComponentMapper.getFor(AnomalyComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private ComponentMapper<HealthComponent> hcm = ComponentMapper.getFor(HealthComponent.class);
     private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
 
-    private CameraSystem cameraSystem;
-    private SoundsSystem soundsSystem;
+    private final CameraSystem cameraSystem;
+    private final SoundsSystem soundsSystem;
+    private final World world;
     private Timer timer;
     public static boolean radiation = true;
 
     @Inject
-    public WorldSystem(AssetManager assetManager, CameraSystem cameraSystem, SoundsSystem soundsSystem) {
+    public WorldSystem(AssetManager assetManager, CameraSystem cameraSystem, SoundsSystem soundsSystem, World world) {
         this.assetManager = assetManager;
+        this.world = world;
         timer = new Timer();
         this.cameraSystem = cameraSystem;
         this.soundsSystem = soundsSystem;
@@ -61,8 +64,8 @@ public class WorldSystem extends EntitySystem implements Disposable {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        anomalies = engine.getEntitiesFor(Family.all(AnomalyComponent.class, Position.class).get());
-        entities = engine.getEntitiesFor(Family.all(HealthComponent.class, Position.class, VelocityComponent.class).get());
+        anomalies = engine.getEntitiesFor(Family.all(AnomalyComponent.class, BodyComponent.class).get());
+        entities = engine.getEntitiesFor(Family.all(HealthComponent.class, BodyComponent.class, VelocityComponent.class).get());
         generateGroup();
     }
 
@@ -71,16 +74,16 @@ public class WorldSystem extends EntitySystem implements Disposable {
         super.update(deltaTime);
         boolean player = false;
         for (int i = 0; i < entities.size(); i++) {
-            Position position = pm.get(entities.get(i));
+            BodyComponent bodyComponent = pm.get(entities.get(i));
             VelocityComponent velocityComponent = vm.get(entities.get(i));
             HealthComponent healthComponent = hcm.get(entities.get(i));
             if (radiation)
                 healthComponent.damage(healthComponent.radiation * deltaTime * 0.01f);
 
             for (int j = 0; j < anomalies.size(); j++) {
-                Position position1 = pm.get(anomalies.get(j));
+                BodyComponent bodyComponent1 = pm.get(anomalies.get(j));
                 AnomalyComponent anomalyComponent = am.get(anomalies.get(j));
-                if (position1.getPosition().dst(position.getPosition()) < anomalyComponent.size) {
+                if (bodyComponent1.getPosition().dst(bodyComponent.getPosition()) < anomalyComponent.size) {
                     if (velocityComponent.len() > anomalyComponent.maxVelocity)
                         healthComponent.damage(anomalyComponent.damage);
                     if (radiation)
@@ -89,12 +92,10 @@ public class WorldSystem extends EntitySystem implements Disposable {
                     if (pcm.has(entities.get(i)))
                         if (random.nextDouble() > 0.999f) {
                             soundsSystem.playSound();
-                            Entity entity = new Entity();
-                            entity.add(new Position(randomPosition
-                                    .getRandomAround(position1.getPosition(),
-                                            anomalyComponent.size)));
-                            entity.add(new SpriteComponent(assetManager.get("yellow.png", Texture.class), 1, 1));
-                            entity.add(new ArtifactComponent());
+                            Entity entity = new Entity()
+                                    .add(new BodyComponent(RandomPosition.getRandomAround(bodyComponent1.getPosition(), anomalyComponent.size), world))
+                                    .add(new SpriteComponent(assetManager.get("yellow.png", Texture.class), 1, 1))
+                                    .add(new ArtifactComponent());
                             getEngine().addEntity(entity);
                         }
 

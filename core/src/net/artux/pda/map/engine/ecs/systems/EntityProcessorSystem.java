@@ -9,19 +9,20 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.repository.RandomPosition;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.ClickComponent;
 import net.artux.pda.map.engine.ecs.components.GroupComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.map.ConditionComponent;
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent;
 import net.artux.pda.map.engine.helpers.EntityBuilder;
 import net.artux.pda.map.model.GangRelations;
+import net.artux.pda.map.repository.RandomPosition;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.map.SpawnModel;
@@ -37,16 +38,18 @@ import javax.inject.Inject;
 @PerGameMap
 public class EntityProcessorSystem extends EntitySystem {
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
 
     private final EntityBuilder builder;
     private final AssetManager assetManager;
     private final RenderSystem renderSystem;
     private final GangRelations gangRelations;
+    private final World world;
 
     @Inject
-    public EntityProcessorSystem(EntityBuilder entityBuilder, AssetManager assetManager, RenderSystem renderSystem) {
+    public EntityProcessorSystem(EntityBuilder entityBuilder, AssetManager assetManager, RenderSystem renderSystem, World world) {
         super();
+        this.world = world;
         builder = entityBuilder;
         this.renderSystem = renderSystem;
         this.assetManager = assetManager;
@@ -74,7 +77,8 @@ public class EntityProcessorSystem extends EntitySystem {
             else
                 controlPoint.add(new ConditionComponent(Collections.emptyMap()));
 
-            controlPoint.add(new Position(Mappers.vector2(spawnModel.getPos())))
+            controlPoint
+                    .add(new BodyComponent(Mappers.vector2(spawnModel.getPos()), world))
                     .add(spawnComponent)
                     .add(new ClickComponent(spawnModel.getR(),
                             () -> renderSystem.showText(spawnComponent.desc(), Mappers.vector2(spawnModel.getPos()))));

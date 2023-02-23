@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 
 import javax.inject.Inject;
@@ -23,7 +23,7 @@ public class VisionSystem extends BaseSystem implements Drawable {
 
     private static final float VISION_DISTANCE = 150f;
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
@@ -32,7 +32,7 @@ public class VisionSystem extends BaseSystem implements Drawable {
 
     @Inject
     public VisionSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem) {
-        super(Family.all(VisionComponent.class, Position.class).exclude(PassivityComponent.class).get());
+        super(Family.all(VisionComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
         enemyTarget = new Sprite(assetManager.get("transfer.png", Texture.class));
         enemyTarget.setSize(16, 16);
@@ -41,7 +41,7 @@ public class VisionSystem extends BaseSystem implements Drawable {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        Position positionComponent1 = pm.get(entity);
+        BodyComponent bodyComponentComponent1 = pm.get(entity);
         VisionComponent visionComponent1 = vcm.get(entity);
         visionComponent1.clear();
 
@@ -51,11 +51,11 @@ public class VisionSystem extends BaseSystem implements Drawable {
             if (entity2 == entity)
                 continue;
 
-            Position positionComponent2 = pm.get(entity2);
-            float dst = positionComponent1.dst(positionComponent2);
+            BodyComponent bodyComponentComponent2 = pm.get(entity2);
+            float dst = bodyComponentComponent1.getPosition().dst(bodyComponentComponent2.getPosition());
 
             if (dst < VISION_DISTANCE
-                    && !mapOrientationSystem.collides(positionComponent1, positionComponent2)) {
+                    && !mapOrientationSystem.collides(bodyComponentComponent1.getPosition(), bodyComponentComponent2.getPosition())) {
                 visionComponent1.addVisibleEntity(entity2);
             }
         }

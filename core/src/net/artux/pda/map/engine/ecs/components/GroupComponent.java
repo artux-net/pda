@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class GroupComponent implements Component {
 
-    ComponentMapper<Position> positionComponentComponentMapper = ComponentMapper.getFor(Position.class);
+    ComponentMapper<BodyComponent> positionComponentComponentMapper = ComponentMapper.getFor(BodyComponent.class);
 
     private final Gang gang;
     private final MessageDispatcher dispatcher;
@@ -43,8 +43,8 @@ public class GroupComponent implements Component {
         Vector2 centerPoint = new Vector2();
         for (Entity e :
                 entities) {
-            Position pos = positionComponentComponentMapper.get(e);
-            centerPoint.add(pos);
+            BodyComponent pos = positionComponentComponentMapper.get(e);
+            centerPoint.add(pos.getPosition());
         }
         centerPoint.scl(1f / entities.size());
         return centerPoint;

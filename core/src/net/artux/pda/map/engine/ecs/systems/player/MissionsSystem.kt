@@ -17,8 +17,8 @@ import net.artux.engine.pathfinding.own.Digraph
 import net.artux.engine.pathfinding.own.DijkstraPathFinder
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.di.scope.PerGameMap
+import net.artux.pda.map.engine.ecs.components.BodyComponent
 import net.artux.pda.map.engine.ecs.components.PassivityComponent
-import net.artux.pda.map.engine.ecs.components.Position
 import net.artux.pda.map.engine.ecs.components.map.QuestComponent
 import net.artux.pda.map.engine.ecs.systems.BaseSystem
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem
@@ -42,13 +42,13 @@ class MissionsSystem @Inject constructor(
     private val cameraSystem: CameraSystem
 ) : BaseSystem(
     Family.all(
-        Position::class.java, QuestComponent::class.java
+        BodyComponent::class.java, QuestComponent::class.java
     ).exclude(
         PassivityComponent::class.java
     ).get()
 ), Disposable {
     private val pm = ComponentMapper.getFor(
-        Position::class.java
+        BodyComponent::class.java
     )
     private val qcm = ComponentMapper.getFor(
         QuestComponent::class.java
@@ -139,7 +139,7 @@ class MissionsSystem @Inject constructor(
             if (missionModels.isNotEmpty())
                 setActiveMission(missionModels[0])
             else if (entities.size() > 0)
-                setTargetPosition(pm[entities.first()])
+                setTargetPosition(pm[entities.first()].position)
         }
     }
 
@@ -159,7 +159,7 @@ class MissionsSystem @Inject constructor(
             val position = pm[questEntity]
             if (questComponent.contains(chapter, stage)) {
                 found = true
-                setTargetPosition(position)
+                setTargetPosition(position.position)
             }
         }
         if (!found) {

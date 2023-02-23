@@ -4,11 +4,19 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.engine.resource.types.NetFile;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.model.map.GameMap;
 
+import javax.inject.Inject;
+
+@PerGameMap
 public class MapBorder implements Disposable {
 
     private final Texture playerLayout;
@@ -19,7 +27,8 @@ public class MapBorder implements Disposable {
     private int tileWidth;
     private int tileHeight;
 
-    public MapBorder(AssetManager finder, GameMap map) {
+    @Inject
+    public MapBorder(AssetManager finder, GameMap map, World world, TiledMap tiledMap) {
         mobLayout = (Texture) finder.get(map.getTilesTexture(), NetFile.class).file;//todo get from asset manager
         playerLayout = (Texture) finder.get(map.getBoundsTexture(), NetFile.class).file;
 
@@ -30,6 +39,23 @@ public class MapBorder implements Disposable {
         if (playerLayout != null) {
             prepareTexture(playerLayout);
             playerPixmap = playerLayout.getTextureData().consumePixmap();
+
+            BodyDef groundBodyDef = new BodyDef();
+            groundBodyDef.allowSleep = true;
+            groundBodyDef.active = false;
+            PolygonShape groundBox = new PolygonShape();
+            groundBox.setAsBox(1, 1);
+            for (int x = 0; x < playerPixmap.getWidth(); x++) {
+                for (int y = 0; y < playerPixmap.getHeight(); y++) {
+                    if (getPlayerTileType(x, y) == TiledNode.TILE_WALL) {
+                       /* groundBodyDef.position.set(x, y);
+                        Body groundBody = world.createBody(groundBodyDef);
+                        groundBody.createFixture(groundBox, 0.0f);*/
+                    }
+                }
+            }
+            groundBox.dispose();
+
         }
     }
 
@@ -73,6 +99,26 @@ public class MapBorder implements Disposable {
 
     public int getTileType(float x, float y) {
         int value = mobPixmap.getPixel((int) x, mobLayout.getHeight() - (int) y);
+
+        float r = ((value & 0xff000000) >>> 24) / 255f;
+        float g = ((value & 0x00ff0000) >>> 16) / 255f;
+        float b = ((value & 0x0000ff00) >>> 8) / 255f;
+
+        if (r == 1 && b == 1 && g == 1)
+            return TiledNode.TILE_EMPTY;
+        if (r == 1)
+            return TiledNode.TILE_WALL;
+        if (g == 1 && b == 1)
+            return TiledNode.TILE_SWAMP;
+        if (b == 1)
+            return TiledNode.TILE_ROAD;
+        if (g == 1)
+            return TiledNode.TILE_GRASS;
+        return TiledNode.TILE_EMPTY;
+    }
+
+    public int getPlayerTileType(int x, int y) {
+        int value = playerPixmap.getPixel(x, playerPixmap.getHeight() - y);
 
         float r = ((value & 0xff000000) >>> 24) / 255f;
         float g = ((value & 0x00ff0000) >>> 16) / 255f;

@@ -27,6 +27,7 @@ import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -100,6 +101,13 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
                 }
             }
         });
+    }
+
+    @Override
+    public void openPDA() {
+        Map<String, String> data = new HashMap<>();
+        data.put("openPda", "");
+        send(data);
     }
 
     @Override

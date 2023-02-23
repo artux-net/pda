@@ -7,7 +7,7 @@ import com.badlogic.ashley.core.Family;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.InteractiveComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.systems.BaseSystem;
 
 import java.util.Collection;
@@ -21,10 +21,10 @@ public class InteractionSystem extends BaseSystem {
 
     @Inject
     public InteractionSystem() {
-        super(Family.all(InteractiveComponent.class, Position.class).exclude(PassivityComponent.class).get());
+        super(Family.all(InteractiveComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
     }
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
     private final Set<InteractiveComponent> interactiveComponents = new HashSet<>();
 
@@ -34,12 +34,12 @@ public class InteractionSystem extends BaseSystem {
         interactiveComponents.clear();
 
         for (int i = 0; i < getEntities().size(); i++) {
-            Position position = pm.get(getEntities().get(i));
+            BodyComponent bodyComponent = pm.get(getEntities().get(i));
             final InteractiveComponent interactiveComponent = im.get(getEntities().get(i));
 
-            Position playerPosition = pm.get(getPlayer());
+            BodyComponent playerBodyComponent = pm.get(getPlayer());
 
-            if (playerPosition.getPosition().dst(position.getPosition()) < 35f) {
+            if (playerBodyComponent.getPosition().dst(bodyComponent.getPosition()) < 35f) {
                 if (interactiveComponent.type != InteractiveComponent.Type.ACTION) {
                     interactiveComponents.add(interactiveComponent);
                 } else {

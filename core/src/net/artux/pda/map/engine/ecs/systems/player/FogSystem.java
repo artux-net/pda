@@ -10,7 +10,7 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.ecs.systems.BaseSystem;
@@ -23,7 +23,7 @@ public class FogSystem extends BaseSystem {
 
     private static final float VISION_DISTANCE = 150f;
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<FogOfWarComponent> fwm = ComponentMapper.getFor(FogOfWarComponent.class);
     private ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
@@ -34,7 +34,7 @@ public class FogSystem extends BaseSystem {
 
     @Inject
     public FogSystem(SoundsSystem soundsSystem, CameraSystem cameraSystem) {
-        super(Family.all(Position.class, FogOfWarComponent.class).exclude(PassivityComponent.class).get());
+        super(Family.all(BodyComponent.class, FogOfWarComponent.class).exclude(PassivityComponent.class).get());
         this.soundsSystem = soundsSystem;
         this.cameraSystem = cameraSystem;
 
@@ -46,15 +46,15 @@ public class FogSystem extends BaseSystem {
         super.update(deltaTime);
         ImmutableArray<Entity> entities = getEntities();
         Entity player = getPlayer();
-        Position playerPosition = pm.get(player);
+        BodyComponent playerBodyComponent = pm.get(player);
 
         int entitiesVisibleByPlayer = 0;
         for (int i = 0; i < entities.size(); i++) {
             Entity entity1 = entities.get(i);
-            Position firstPosition = pm.get(entity1);
+            BodyComponent firstBodyComponent = pm.get(entity1);
             FogOfWarComponent fogOfWarComponent = fwm.get(entity1);
 
-            float dst = firstPosition.dst(playerPosition);
+            float dst = firstBodyComponent.getPosition().dst(playerBodyComponent.getPosition());
 
             float visibleCoefficient;
             if (dst < 200) {
@@ -67,7 +67,7 @@ public class FogSystem extends BaseSystem {
             fogOfWarComponent.setVisionCoefficient(visibleCoefficient);
 
             if (fogOfWarComponent.isVisible()
-                    && frustum.pointInFrustum(firstPosition.getX(), firstPosition.getY(), 0)) {
+                    && frustum.pointInFrustum(firstBodyComponent.getX(), firstBodyComponent.getY(), 0)) {
                 if (!fogOfWarComponent.isCameraVisible
                         && !cameraSystem.isDetached()) {
                     soundsSystem.playStalkerDetection();

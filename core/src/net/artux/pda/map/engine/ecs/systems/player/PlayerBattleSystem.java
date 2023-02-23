@@ -9,7 +9,7 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.WeaponComponent;
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
@@ -27,7 +27,7 @@ public class PlayerBattleSystem extends BaseSystem {
     private final EntityProcessorSystem entityProcessorSystem;
     private final SoundsSystem soundsSystem;
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<VisionComponent> vm = ComponentMapper.getFor(VisionComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
     private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
@@ -37,7 +37,7 @@ public class PlayerBattleSystem extends BaseSystem {
     @Inject
     public PlayerBattleSystem(EntityProcessorSystem entityProcessorSystem, SoundsSystem soundsSystem) {
         super(Family.all(PlayerComponent.class, HealthComponent.class, VisionComponent.class,
-                MoodComponent.class, Position.class, WeaponComponent.class).exclude(PassivityComponent.class).get());
+                MoodComponent.class, BodyComponent.class, WeaponComponent.class).exclude(PassivityComponent.class).get());
         this.entityProcessorSystem = entityProcessorSystem;
         this.soundsSystem = soundsSystem;
     }
@@ -66,7 +66,7 @@ public class PlayerBattleSystem extends BaseSystem {
                     if (playerShoot && playerWeapon.shoot()) {
                         soundStarted = false;
                         entityProcessorSystem.addBulletToEngine(player, moodComponent.getEnemy(), playerWeapon.getSelected());
-                        soundsSystem.playSoundAtDistance(playerWeapon.getShotSound(), pm.get(moodComponent.getEnemy()));
+                        soundsSystem.playSoundAtDistance(playerWeapon.getShotSound(), pm.get(moodComponent.getEnemy()).getPosition());
                     }
         }/*else{
             if (playerShoot && playerWeapon.shoot()) {

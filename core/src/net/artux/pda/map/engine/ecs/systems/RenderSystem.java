@@ -23,7 +23,7 @@ import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.model.entities.RelationType;
 
@@ -42,7 +42,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
     private ComponentMapper<FogOfWarComponent> fog = ComponentMapper.getFor(FogOfWarComponent.class);
     private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
     private ImmutableArray<Entity> relationalEntities;
@@ -52,7 +52,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
     @Inject
     public RenderSystem(@Named("gameStage") Stage stage, AssetsFinder assetsFinder) {
-        super(Family.all(SpriteComponent.class, Position.class).exclude(PassivityComponent.class).get());
+        super(Family.all(SpriteComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
         this.stage = stage;
 
         font = assetsFinder.getFontManager().getFont(16);
@@ -78,7 +78,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        relationalEntities = engine.getEntitiesFor(Family.all(MoodComponent.class, Position.class).exclude(SpriteComponent.class).get());
+        relationalEntities = engine.getEntitiesFor(Family.all(MoodComponent.class, BodyComponent.class).exclude(SpriteComponent.class).get());
     }
 
     public void showText(String text, float x, float y) {
@@ -117,7 +117,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
         ImmutableArray<Entity> entities = getEntities();
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
-            Position position = pm.get(entity);
+            BodyComponent bodyComponent = pm.get(entity);
             SpriteComponent spriteComponent = sm.get(entity);
             Sprite sprite = spriteComponent.sprite;
             if (!showAll && fog.has(entity)) {
@@ -125,14 +125,14 @@ public class RenderSystem extends BaseSystem implements Drawable {
                 batch.setColor(sprite.getColor());
             }
 
-            batch.draw(sprite, position.getX() - sprite.getOriginX(), position.getY() - sprite.getOriginY(), sprite.getOriginX(),
+            batch.draw(sprite, bodyComponent.getX() - sprite.getOriginX(), bodyComponent.getY() - sprite.getOriginY(), sprite.getOriginX(),
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), spriteComponent.getRotation());
             batch.setColor(Color.WHITE);
         }
 
         for (int i = 0; i < relationalEntities.size(); i++) {
             Entity entity = relationalEntities.get(i);
-            Position position = pm.get(entity);
+            BodyComponent bodyComponent = pm.get(entity);
 
             MoodComponent moodComponent = mm.get(getPlayer());
             MoodComponent entityMoodComponent = mm.get(entity);
@@ -142,7 +142,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
                 sprite.setAlpha(fog.get(entity).visionCoefficient);
                 batch.setColor(sprite.getColor());
             }
-            batch.draw(sprite, position.getX() - sprite.getOriginX(), position.getY() - sprite.getOriginY(), sprite.getOriginX(),
+            batch.draw(sprite, bodyComponent.getX() - sprite.getOriginX(), bodyComponent.getY() - sprite.getOriginY(), sprite.getOriginX(),
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), 0);
             batch.setColor(Color.WHITE);
         }

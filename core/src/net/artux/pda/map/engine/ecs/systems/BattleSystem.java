@@ -12,7 +12,7 @@ import net.artux.pda.map.engine.ecs.components.BulletComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VelocityComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.WeaponComponent;
@@ -28,7 +28,7 @@ public class BattleSystem extends BaseSystem {
     private final EntityProcessorSystem entityProcessorSystem;
     private final SoundsSystem soundsSystem;
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<VisionComponent> vm = ComponentMapper.getFor(VisionComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
@@ -38,7 +38,7 @@ public class BattleSystem extends BaseSystem {
     @Inject
     public BattleSystem(SoundsSystem soundsSystem, EntityProcessorSystem entityProcessorSystem) {
         super(Family.all(HealthComponent.class, VisionComponent.class,
-                MoodComponent.class, Position.class, WeaponComponent.class).exclude(PlayerComponent.class, PassivityComponent.class).get());
+                MoodComponent.class, BodyComponent.class, WeaponComponent.class).exclude(PlayerComponent.class, PassivityComponent.class).get());
         this.entityProcessorSystem = entityProcessorSystem;
         this.soundsSystem = soundsSystem;
     }
@@ -46,7 +46,7 @@ public class BattleSystem extends BaseSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        bullets = engine.getEntitiesFor(Family.all(Position.class, VelocityComponent.class, BulletComponent.class).get());
+        bullets = engine.getEntitiesFor(Family.all(BodyComponent.class, VelocityComponent.class, BulletComponent.class).get());
     }
 
     @Override
@@ -54,15 +54,15 @@ public class BattleSystem extends BaseSystem {
         super.update(deltaTime);
         for (Entity bullet : bullets) {
             BulletComponent bulletComponent = bcm.get(bullet);
-            Position bulletPosition = pm.get(bullet);
+            Vector2 bulletBodyComponent = pm.get(bullet).getPosition();
             Vector2 targetPosition = bulletComponent.getTargetPosition();
 
-            Position targetEntityPosition = pm.get(bulletComponent.getTarget());
+            Vector2 targetEntityBodyComponent = pm.get(bulletComponent.getTarget()).getPosition();
             MoodComponent targetEntityMood = mm.get(bulletComponent.getTarget());
             HealthComponent targetEntityHealth = hm.get(bulletComponent.getTarget());
 
-            float dstToTarget = bulletPosition.dst(targetPosition);
-            if (targetEntityPosition.epsilonEquals(bulletPosition, 4f)) {
+            float dstToTarget = bulletBodyComponent.dst(targetPosition);
+            if (targetEntityBodyComponent.epsilonEquals(bulletBodyComponent, 4f)) {
                 targetEntityHealth.damage(bulletComponent.getDamage());
 
                 if (!targetEntityMood.hasEnemy()) {
@@ -90,7 +90,7 @@ public class BattleSystem extends BaseSystem {
             if (visionComponent.isSeeing(moodComponent.getEnemy()))
                 if (entityWeapon.shoot()) {
                     entityProcessorSystem.addBulletToEngine(entity, moodComponent.getEnemy(), entityWeapon.getSelected());
-                    soundsSystem.playSoundAtDistance(entityWeapon.getShotSound(), pm.get(moodComponent.getEnemy()));
+                    soundsSystem.playSoundAtDistance(entityWeapon.getShotSound(), pm.get(moodComponent.getEnemy()).getPosition());
                 }
         //todo count dst
     }

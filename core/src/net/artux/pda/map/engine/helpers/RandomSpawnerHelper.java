@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.di.components.MapComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent;
 import net.artux.pda.map.engine.ecs.components.map.TransferComponent;
 import net.artux.pda.map.engine.ecs.systems.EntityProcessorSystem;
@@ -22,7 +22,7 @@ import java.util.Properties;
 
 public class RandomSpawnerHelper {
 
-    private static ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private static ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private static ComponentMapper<SpawnComponent> sm = ComponentMapper.getFor(SpawnComponent.class);
 
     public static void init(MapComponent coreComponent) {
@@ -35,8 +35,8 @@ public class RandomSpawnerHelper {
         SpawnSystem spawnSystem = engine.getSystem(SpawnSystem.class);
         MapOrientationSystem mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
         Properties properties = coreComponent.getDataRepository().getProperties();
-        ImmutableArray<Entity> transfers = engine.getEntitiesFor(Family.all(Position.class, TransferComponent.class).get());
-        ImmutableArray<Entity> spawns = engine.getEntitiesFor(Family.all(Position.class, SpawnComponent.class).get());
+        ImmutableArray<Entity> transfers = engine.getEntitiesFor(Family.all(BodyComponent.class, TransferComponent.class).get());
+        ImmutableArray<Entity> spawns = engine.getEntitiesFor(Family.all(BodyComponent.class, SpawnComponent.class).get());
 
         float groupFreq = Float.parseFloat((String) properties.get(PropertyFields.GROUP_BOT_FREQ));
         timerSystem.addTimerAction(groupFreq, new TimerSystem.TimerListener() {
@@ -47,11 +47,11 @@ public class RandomSpawnerHelper {
                 if (randomTransfer == null)
                     randomTransferPosition = mapOrientationSystem.getRandomFreePoint(cameraSystem.getCamera());
                 else
-                    randomTransferPosition = pm.get(randomTransfer);
+                    randomTransferPosition = pm.get(randomTransfer).getPosition();
 
                 Entity targetSpawn = spawnSystem.getEmptySpawn();
                 if (targetSpawn != null) {
-                    Vector2 spawnPosition = pm.get(targetSpawn);
+                    Vector2 spawnPosition = pm.get(targetSpawn).getPosition();
                     entityProcessorSystem.generateTakeSpawnGroup(randomTransferPosition, spawnPosition);
                     return;
                 }

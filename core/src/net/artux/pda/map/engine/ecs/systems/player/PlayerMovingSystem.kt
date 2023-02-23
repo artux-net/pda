@@ -13,9 +13,9 @@ import net.artux.engine.pathfinding.TiledNode
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.engine.data.GlobalData
+import net.artux.pda.map.engine.ecs.components.BodyComponent
 import net.artux.pda.map.engine.ecs.components.HealthComponent
 import net.artux.pda.map.engine.ecs.components.PassivityComponent
-import net.artux.pda.map.engine.ecs.components.Position
 import net.artux.pda.map.engine.ecs.components.VelocityComponent
 import net.artux.pda.map.engine.ecs.systems.BaseSystem
 import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem
@@ -30,7 +30,7 @@ class PlayerMovingSystem @Inject constructor(
     dataRepository: DataRepository
 ) : BaseSystem(
     Family.all(
-        VelocityComponent::class.java, Position::class.java
+        VelocityComponent::class.java, BodyComponent::class.java
     ).exclude(
         PassivityComponent::class.java
     ).get()
@@ -39,7 +39,7 @@ class PlayerMovingSystem @Inject constructor(
     private val RUN_MOVEMENT = 30f
     private val PLAYER_MULTIPLICATION = 6f
     private val pm = ComponentMapper.getFor(
-        Position::class.java
+        BodyComponent::class.java
     )
     private val vm = ComponentMapper.getFor(
         VelocityComponent::class.java
@@ -76,24 +76,15 @@ class PlayerMovingSystem @Inject constructor(
         }
         healthComponent.stamina += staminaDifference
         if (!stepVector.isZero) {
-            val newX = position.getX() + stepVector.x
-            val newY = position.getY() + stepVector.y
+            val newX = position.x + stepVector.x
+            val newY = position.y + stepVector.y
             if (playerWalls) {
-                if (insideMap(
-                        newX,
-                        position.getY()
-                    )
-                ) position.position.x += stepVector.x * mapOrientationSystem.mapBorder.getK(
-                    newX,
-                    position.getY()
-                )
-                if (insideMap(
-                        position.getX(),
-                        newY
-                    )
-                ) position.position.y += stepVector.y * mapOrientationSystem.mapBorder.getK(
-                    position.getX(),
-                    newY
+                position.getBody().applyLinearImpulse(
+                    stepVector.x * MOVEMENT * 10,
+                    stepVector.y * MOVEMENT * 10,
+                    position.x,
+                    position.y,
+                    true
                 )
             } else {
                 if (insideMap(newX, position.getY())) position.position.x = newX
@@ -125,7 +116,7 @@ class PlayerMovingSystem @Inject constructor(
     }
 
     init {
-         CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             dataRepository.storyDataModelFlow.collect {
                 val storyDataModel = it
                 weightCoefficient = 1.5f - storyDataModel.totalWeight / 60

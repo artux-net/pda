@@ -26,7 +26,7 @@ class PlayerSystem @Inject constructor(
 ) :
     BaseSystem(Family.one().get()), Disposable {
     private val pm = ComponentMapper.getFor(
-        Position::class.java
+        BodyComponent::class.java
     )
     private val mm = ComponentMapper.getFor(
         MoodComponent::class.java
@@ -106,7 +106,7 @@ class PlayerSystem @Inject constructor(
     val healthComponent: HealthComponent
         get() = hm[player]
     val position: Vector2
-        get() = pm[player]
+        get() = pm[player].position
 
     override fun dispose() {
         savePreferences()

@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.Scaling;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.map.PointComponent;
 import net.artux.pda.map.engine.ecs.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
@@ -47,7 +47,7 @@ public class MissionMenu extends Table {
     private final AssetManager assetManager;
     private final boolean testMode;
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<PointComponent> pcm = ComponentMapper.getFor(PointComponent.class);
 
     @Inject
@@ -127,7 +127,7 @@ public class MissionMenu extends Table {
             Label.LabelStyle labelStyle = assetsFinder.getFontManager().getLabelStyle(32, Color.WHITE);
             for (final Entity pointEntity : missionsSystem.getEngine()
                     .getEntitiesFor(Family.all(PointComponent.class, PointComponent.class).exclude(PassivityComponent.class).get())) {
-                Position position = pm.get(pointEntity);
+                BodyComponent bodyComponent = pm.get(pointEntity);
                 PointComponent point = pcm.get(pointEntity);
                 Texture texture = QuestPointsHelper.getPointTexture(assetManager, point.getType());
                 if (texture != null) {
@@ -139,13 +139,13 @@ public class MissionMenu extends Table {
                         @Override
                         public void tap(InputEvent event, float x, float y, int count, int button) {
                             super.tap(event, x, y, count, button);
-                            missionsSystem.setTargetPosition(position);
+                            missionsSystem.setTargetPosition(bodyComponent.getPosition());
                         }
 
                         @Override
                         public boolean longPress(Actor actor, float x, float y) {
                             if (testMode)
-                                playerSystem.getPosition().set(position);
+                                playerSystem.getPosition().set(bodyComponent.getPosition());
                             return super.longPress(actor, x, y);
                         }
                     });

@@ -8,9 +8,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
 
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.BulletComponent;
 import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
 import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
@@ -18,7 +23,6 @@ import net.artux.pda.map.engine.ecs.components.GroupComponent;
 import net.artux.pda.map.engine.ecs.components.GroupTargetMovingComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.StalkerComponent;
 import net.artux.pda.map.engine.ecs.components.StatesComponent;
@@ -37,24 +41,44 @@ import javax.inject.Inject;
 @PerGameMap
 public class EntityBuilder {
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
 
     private final AssetManager assetManager;
     private final ContentGenerator contentGenerator;
     private final Texture bulletTexture;
+    private final World world;
 
     @Inject
-
-    public EntityBuilder(AssetManager assetManager, ContentGenerator contentGenerator) {
+    public EntityBuilder(AssetManager assetManager, ContentGenerator contentGenerator, World world) {
         this.assetManager = assetManager;
         this.contentGenerator = contentGenerator;
+        this.world = world;
 
         bulletTexture = assetManager.get("bullet.png", Texture.class);
     }
 
     public Entity player(Vector2 position, DataRepository dataRepository) {
         return new Entity()
-                .add(new Position(position))
+                .add(new BodyComponent(() -> {
+                    BodyDef bodyDef = new BodyDef();
+                    bodyDef.type = BodyDef.BodyType.DynamicBody;
+                    bodyDef.position.set(position);
+
+                    com.badlogic.gdx.physics.box2d.Body body = world.createBody(bodyDef);
+                    body.setLinearDamping(10);
+                    CircleShape circle = new CircleShape();
+                    circle.setRadius(6f);
+
+                    FixtureDef fixtureDef = new FixtureDef();
+                    fixtureDef.shape = circle;
+                    fixtureDef.density = 0.5f;
+                    fixtureDef.friction = 0;
+
+                    body.createFixture(fixtureDef);
+
+                    circle.dispose();
+                    return body;
+                }))
                 .add(new VelocityComponent())
                 .add(new VisionComponent())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
@@ -65,24 +89,24 @@ public class EntityBuilder {
     }
 
     public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {
-        Position position = pm.get(author);
+        BodyComponent bodyComponent = pm.get(author);
         if (target == null) // TODO
             return new Entity();
-        Vector2 targetPosition = pm.get(target);
+        Vector2 targetPosition = pm.get(target).getPosition();
         targetPosition = getPointNear(targetPosition.cpy(), weaponModel.getPrecision());
 
         float targetX = targetPosition.x;
         float targetY = targetPosition.y;
 
-        float vX = (float) ((targetX - position.x) /
-                Math.sqrt(((targetX - position.x) * (targetX - position.x)) + ((targetY - position.y) * (targetY - position.y))));
-        float vY = (float) ((targetY - position.y) /
-                Math.sqrt(((targetY - position.y) * (targetY - position.y)) + ((targetX - position.x) * (targetX - position.x))));
+        float vX = (float) ((targetX - bodyComponent.getX()) /
+                Math.sqrt(((targetX - bodyComponent.getX()) * (targetX - bodyComponent.getX())) + ((targetY - bodyComponent.getY()) * (targetY - bodyComponent.getY()))));
+        float vY = (float) ((targetY - bodyComponent.getY()) /
+                Math.sqrt(((targetY - bodyComponent.getY()) * (targetY - bodyComponent.getY())) + ((targetX - bodyComponent.getX()) * (targetX - bodyComponent.getY()))));
 
         vX *= weaponModel.getSpeed();
         vY *= weaponModel.getSpeed();
 
-        Vector2 direction = targetPosition.cpy().sub(position);
+        Vector2 direction = targetPosition.cpy().sub(bodyComponent.getPosition());
         float degrees = (float) (Math.atan2(
                 -direction.x,
                 direction.y
@@ -92,7 +116,7 @@ public class EntityBuilder {
         spriteComponent.setRotation(degrees + 90);
 
         return new Entity()
-                .add(new Position(position))
+                .add(new BodyComponent(bodyComponent.getPosition(), world))
                 .add(new VelocityComponent(vX, vY, true))
                 .add(spriteComponent)
                 .add(new FogOfWarComponent())
@@ -127,7 +151,26 @@ public class EntityBuilder {
         group.getDispatcher().addListener(statesComponent, MessagingCodes.ATTACKED);
 
         entity
-                .add(new Position(position))
+                .add(new BodyComponent(() -> {
+                    BodyDef bodyDef = new BodyDef();
+                    bodyDef.type = BodyDef.BodyType.DynamicBody;
+                    bodyDef.position.set(position);
+
+                    com.badlogic.gdx.physics.box2d.Body body = world.createBody(bodyDef);
+                    body.setLinearDamping(10);
+                    CircleShape circle = new CircleShape();
+                    circle.setRadius(6f);
+
+                    FixtureDef fixtureDef = new FixtureDef();
+                    fixtureDef.shape = circle;
+                    fixtureDef.density = 0.5f;
+                    fixtureDef.friction = 0;
+
+                    body.createFixture(fixtureDef);
+
+                    circle.dispose();
+                    return body;
+                }))
                 .add(new GraphMotionComponent(null))
                 .add(new VelocityComponent())
                 .add(new VisionComponent())

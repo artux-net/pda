@@ -2,14 +2,15 @@ package net.artux.pda.map.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 import net.artux.engine.resource.types.NetFile;
 import net.artux.pda.map.DataRepository;
@@ -35,8 +36,10 @@ public class PlayState extends State {
     private final EngineManager engineManager;
     private final AssetManager assetManager;
     private final CoreComponent coreComponent;
-    private World world;
-    private Box2DDebugRenderer boxDebugRenderer= new Box2DDebugRenderer();
+
+    private final World world;
+    private final Box2DDebugRenderer boxDebugRenderer = new Box2DDebugRenderer();
+    private final OrthogonalTiledMapRenderer renderer;
     Texture background;
 
     @Inject
@@ -53,9 +56,12 @@ public class PlayState extends State {
                 .coreComponent(coreComponent)
                 .build();
 
+        world = mapComponent.getWorld();
         engineManager = mapComponent.getManager();
         stage = mapComponent.gameStage();
         uistage = mapComponent.uiStage();
+        renderer = mapComponent.getRenderer();
+        renderer.setView((OrthographicCamera) stage.getCamera());
 
         mapComponent.getUserInterface();
         mapComponent.initInterface();
@@ -66,10 +72,10 @@ public class PlayState extends State {
         background = (Texture) assetManager.get(gameMap.getTexture(), NetFile.class).file;
         GlobalData.mapWidth = background.getWidth();
         GlobalData.mapHeight = background.getHeight();
-        Image mapTexture = new Image(background);
+        /*Image mapTexture = new Image(background);
         if (!stage.getActors().contains(mapTexture, false))
             stage.addActor(mapTexture);
-        mapTexture.setZIndex(1);
+        mapTexture.setZIndex(1);*/
 
         Texture levelTexture = assetManager.get("textures/defaults/blur.png", Texture.class);
         if (levelBackgroundImage == null) {
@@ -122,13 +128,15 @@ public class PlayState extends State {
     public void update(float dt) {
         uistage.act(dt);
         stage.act(dt);
-        world.step(1/90f, 6, 2);
+        world.step(1 / 60f, 3, 2);
+        renderer.setView((OrthographicCamera) stage.getCamera());
         engineManager.update(dt);
     }
 
     @Override
     public void render() {
         stage.draw();
+        renderer.render();
         boxDebugRenderer.render(world, stage.getCamera().combined);
         stage.getBatch().begin();
         engineManager.draw(stage.getBatch(), 1);
@@ -149,6 +157,7 @@ public class PlayState extends State {
         assetManager.unload(gameMap.getBoundsTexture());
 
         stage.dispose();
+        renderer.dispose();
         uistage.dispose();
         engineManager.dispose();
     }

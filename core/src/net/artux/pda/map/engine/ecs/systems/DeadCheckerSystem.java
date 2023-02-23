@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -15,9 +16,9 @@ import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.InteractiveComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.StalkerComponent;
 import net.artux.pda.map.engine.ecs.components.TimeComponent;
@@ -40,19 +41,21 @@ public class DeadCheckerSystem extends BaseSystem {
     private DataRepository dataRepository;
     private UserInterface userInterface;
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
     private AssetManager assetManager;
+    private final World world;
 
     @Inject
-    public DeadCheckerSystem(UserInterface userInterface, LootMenu lootMenu, DataRepository dataRepository, AssetManager assetManager) {
-        super(Family.all(HealthComponent.class, Position.class).get());
+    public DeadCheckerSystem(UserInterface userInterface, LootMenu lootMenu, DataRepository dataRepository, AssetManager assetManager, World world) {
+        super(Family.all(HealthComponent.class, BodyComponent.class).get());
         this.gameZone = userInterface;
         this.assetManager = assetManager;
         this.userInterface = userInterface;
         this.dataRepository = dataRepository;
         labelStyle = userInterface.getLabelStyle();
+        this.world = world;
         labelStyle.fontColor = Color.RED;
         this.lootMenu = lootMenu;
     }
@@ -65,24 +68,21 @@ public class DeadCheckerSystem extends BaseSystem {
             Entity entity = getEntities().get(i);
 
             HealthComponent healthComponent = hm.get(entity);
-            Position position = pm.get(entity);
+            BodyComponent bodyComponent = pm.get(entity);
 
             if (healthComponent.isDead()) {
                 final Entity deadEntity = new Entity();
-                deadEntity.add(new Position(position.getPosition()))
+                deadEntity.add(new BodyComponent(bodyComponent.getPosition(), world))
                         .add(new SpriteComponent(assetManager.get("gray.png", Texture.class), 4, 4));
 
                 if (entity != getPlayer()) {
                     StalkerComponent stalkerComponent = entity.getComponent(StalkerComponent.class);
-                    deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, new InteractiveComponent.InteractListener() {
-                                @Override
-                                public void interact() {
-                                    lootMenu.updateBot(stalkerComponent.getName(), stalkerComponent.getAvatar(), stalkerComponent.getInventory());
-                                    userInterface.getStack().add(lootMenu);
+                    deadEntity.add(new InteractiveComponent("Обыскать: " + stalkerComponent.getName(), 5, () -> {
+                        lootMenu.updateBot(stalkerComponent.getName(), stalkerComponent.getAvatar(), stalkerComponent.getInventory());
+                        userInterface.getStack().add(lootMenu);
 
-                                    getEngine().removeEntity(deadEntity);
-                                }
-                            }))
+                        getEngine().removeEntity(deadEntity);
+                    }))
                             .add(new TimeComponent(Instant.now().plus(1, ChronoUnit.MINUTES),
                                     () -> getEngine().removeEntity(entity)))
                             .add(stalkerComponent);

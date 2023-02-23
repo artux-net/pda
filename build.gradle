@@ -1,3 +1,5 @@
+import org.ajoberstar.grgit.Grgit
+
 buildscript {
     ext.kotlin_version = '1.7.10'
     ext.dagger_version = "2.43.2"
@@ -17,10 +19,25 @@ buildscript {
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$dagger_version"
+
+        classpath 'org.ajoberstar.grgit:grgit-core:5.0.0'
     }
 
 }
 
+
+task hello {
+    doLast {
+        Grgit.clone(dir: "$projectDir/app/assets/maps", uri: 'https://github.com/artux-net/pda-maps.git')
+        Grgit.fetch()
+
+    }
+}
+
+task copyDeps(type: Copy) {
+    from(sourceSets.main.runtimeClasspath)
+    into('build/jarsfolder/')
+}
 
 allprojects {
     version = '1.0'
@@ -68,9 +85,10 @@ project(":app") {
         api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
 
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
         natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
     }
 }
 

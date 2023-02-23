@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
-import net.artux.pda.map.engine.ecs.components.Position;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VelocityComponent;
 import net.artux.engine.pathfinding.FlatTiledNode;
 import net.artux.engine.pathfinding.TiledManhattanDistance;
@@ -21,7 +21,7 @@ import javax.inject.Inject;
 @PerGameMap
 public class MovementTargetingSystem extends IteratingSystem {
 
-    private ComponentMapper<Position> pm = ComponentMapper.getFor(Position.class);
+    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
 
@@ -32,7 +32,7 @@ public class MovementTargetingSystem extends IteratingSystem {
 
     @Inject
     public MovementTargetingSystem(MapOrientationSystem mapOrientationSystem) {
-        super(Family.all(VelocityComponent.class, Position.class, GraphMotionComponent.class).get());
+        super(Family.all(VelocityComponent.class, BodyComponent.class, GraphMotionComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
     }
 
@@ -51,7 +51,7 @@ public class MovementTargetingSystem extends IteratingSystem {
         for (int i = 0; i < getEntities().size(); i++) {
             Entity entity = getEntities().get(i);
 
-            Position position = pm.get(entity);
+            BodyComponent bodyComponent = pm.get(entity);
             VelocityComponent velocityComponent = vm.get(entity);
             GraphMotionComponent targetMovingComponent = gmm.get(entity);
 
@@ -60,7 +60,7 @@ public class MovementTargetingSystem extends IteratingSystem {
                 Vector2 target = targetMovingComponent.movementTarget;
 
                 if (mapOrientationSystem.isGraphActive()) {
-                    FlatTiledNode startNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(position.getX(), position.getY());
+                    FlatTiledNode startNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(bodyComponent.getX(), bodyComponent.getY());
                     FlatTiledNode endNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(targetMovingComponent.movementTarget.x, targetMovingComponent.movementTarget.y);
                     if (targetMovingComponent.getPath().nodes.size == 0 || !targetMovingComponent.getPath().nodes.peek().equals(endNode)) {
                         //пути нет и конец не совпадает
@@ -76,7 +76,7 @@ public class MovementTargetingSystem extends IteratingSystem {
                         if (targetMovingComponent.iterator == null)
                             targetMovingComponent.iterator = targetMovingComponent.getPath().iterator();
                         if (targetMovingComponent.tempTarget == null
-                                || position.getPosition().dst(
+                                || bodyComponent.getPosition().dst(
                                 new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY)) < 5) {
                             if (targetMovingComponent.iterator.hasNext()) {
                                 targetMovingComponent.tempTarget = targetMovingComponent.iterator.next();
@@ -93,8 +93,8 @@ public class MovementTargetingSystem extends IteratingSystem {
                     }
                 }
 
-                Vector2 unit = new Vector2(target.x - position.getX(),
-                        target.y - position.getY());
+                Vector2 unit = new Vector2(target.x - bodyComponent.getX(),
+                        target.y - bodyComponent.getY());
 
                 unit.scl(1 / unit.len());
                 velocityComponent.setVelocity(unit);

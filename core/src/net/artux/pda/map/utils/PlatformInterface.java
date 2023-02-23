@@ -11,6 +11,8 @@ public interface PlatformInterface {
 
     void restart();
 
+    void openPDA();
+
     void rewardedAd();
 
     void debug(String msg);

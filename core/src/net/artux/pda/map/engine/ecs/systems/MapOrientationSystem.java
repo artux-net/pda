@@ -7,18 +7,16 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.ai.utils.Ray;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.engine.pathfinding.FlatTiledGraph;
 import net.artux.engine.pathfinding.FlatTiledNode;
 import net.artux.engine.pathfinding.MapBorder;
 import net.artux.engine.pathfinding.TiledManhattanDistance;
 import net.artux.engine.pathfinding.TiledRaycastCollisionDetector;
-import net.artux.pda.model.map.GameMap;
+import net.artux.pda.map.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 
@@ -35,9 +33,9 @@ public class MapOrientationSystem extends EntitySystem implements Disposable {
     private final Ray<Vector2> ray;
 
     @Inject
-    public MapOrientationSystem(AssetManager assetsFinder, GameMap map) {
+    public MapOrientationSystem(MapBorder mapBorder) {
         ray = new Ray<>(Vector2.Zero, Vector2.Zero);
-        this.mapBorder = new MapBorder(assetsFinder, map);
+        this.mapBorder = mapBorder;
 
         if (mapBorder.isMobTilesActive()) {
             this.worldGraph = new FlatTiledGraph(mapBorder);
