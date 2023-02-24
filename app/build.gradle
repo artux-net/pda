@@ -19,7 +19,7 @@ task downloadAPI {
     def uc = url.openConnection()
     def userPass = "pass"
     def basicAuth = "Basic " + new String(Base64.getEncoder().encode(userPass.getBytes()))
-    uc.setRequestProperty ("Authorization", basicAuth)
+    uc.setRequestProperty("Authorization", basicAuth)
 
     def f = new File('app/api.json')
     uc.getInputStream().transferTo(new FileOutputStream(f))
@@ -35,9 +35,9 @@ swaggerSources {
     }
 }
 
-
 gradle.projectsEvaluated {
     preBuild.dependsOn downloadAPI
+    preBuild.dependsOn copyMaps
     preBuild.dependsOn swaggerSources.pdanetwork.code
 }
 
@@ -114,6 +114,10 @@ ext {
     androidx_version = "2.5.1"
 }
 
+configurations {
+    localDeps
+}
+
 dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     //mapstruct
@@ -184,10 +188,20 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$dagger_version"
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
+    //gdx - assets
+    localDeps 'com.github.artux-net:pda-maps:main-SNAPSHOT'
+
     //appodeal
-    implementation ('com.appodeal.ads:sdk:3.0.2.0') {
+    implementation('com.appodeal.ads:sdk:3.0.2.0') {
         exclude group: 'com.appodeal.ads.sdk.services', module: 'facebook_analytics'
     }
+}
+
+task copyMaps(type: Copy) {
+    from zipTree(configurations.localDeps.copy().files[0])
+    into "/assets/maps"
+    exclude '**/META-INF/**'
+    println 'Done'
 }
 
 task copyAndroidNatives {
