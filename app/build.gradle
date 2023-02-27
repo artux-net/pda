@@ -189,7 +189,7 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
     //gdx - assets
-    localDeps 'com.github.artux-net:pda-maps:main-SNAPSHOT'
+    localDeps 'com.github.artux-net:pda-maps:0.4'
 
     //appodeal
     implementation('com.appodeal.ads:sdk:3.0.2.0') {

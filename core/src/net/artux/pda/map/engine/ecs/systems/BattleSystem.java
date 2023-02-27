@@ -8,11 +8,11 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.BulletComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VelocityComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.WeaponComponent;
@@ -86,12 +86,12 @@ public class BattleSystem extends BaseSystem {
         VisionComponent visionComponent = vm.get(entity);
         entityWeapon.update(deltaTime);
 
-        if (moodComponent.hasEnemy())
+       /* if (moodComponent.hasEnemy())
             if (visionComponent.isSeeing(moodComponent.getEnemy()))
                 if (entityWeapon.shoot()) {
                     entityProcessorSystem.addBulletToEngine(entity, moodComponent.getEnemy(), entityWeapon.getSelected());
                     soundsSystem.playSoundAtDistance(entityWeapon.getShotSound(), pm.get(moodComponent.getEnemy()).getPosition());
-                }
+                }*/
         //todo count dst
     }
 

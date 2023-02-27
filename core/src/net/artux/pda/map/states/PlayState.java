@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -38,7 +37,6 @@ public class PlayState extends State {
     private final CoreComponent coreComponent;
 
     private final World world;
-    private final Box2DDebugRenderer boxDebugRenderer = new Box2DDebugRenderer();
     private final OrthogonalTiledMapRenderer renderer;
     Texture background;
 
@@ -80,7 +78,7 @@ public class PlayState extends State {
         Texture levelTexture = assetManager.get("textures/defaults/blur.png", Texture.class);
         if (levelBackgroundImage == null) {
             levelBackgroundImage = new LevelBackgroundImage(levelTexture, stage.getCamera());
-            stage.addActor(levelBackgroundImage);
+            //stage.addActor(levelBackgroundImage);
             levelBackgroundImage.setZIndex(0);
         }
     }
@@ -135,9 +133,9 @@ public class PlayState extends State {
 
     @Override
     public void render() {
+        //boxDebugRenderer.render(world, stage.getCamera().combined);
         stage.draw();
         renderer.render();
-        boxDebugRenderer.render(world, stage.getCamera().combined);
         stage.getBatch().begin();
         engineManager.draw(stage.getBatch(), 1);
         stage.getBatch().end();

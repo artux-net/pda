@@ -8,6 +8,8 @@ import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -18,27 +20,38 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
 
 public class MapBodyBuilder {
 
     // The pixels per tile. If your tiles are 16x16, this is set to 16f
     private static float ppt = 0;
 
-    public static Array<Body> buildShapes(TiledMap map, float pixels, World world) {
+    public static void buildShapes(TiledMap map, float pixels, World world) {
         ppt = pixels;
         MapObjects objects = map.getLayers().get("objects").getObjects();
+        initObjects(objects, world,0,0);
+        TiledMapTileLayer tileLayer = (TiledMapTileLayer) map.getLayers().get("tiles");
 
-        Array<Body> bodies = new Array<Body>();
+        for (int x = 0; x < tileLayer.getWidth(); x++) {
+            for (int y = 0; y < tileLayer.getHeight(); y++) {
+                TiledMapTileLayer.Cell cell = tileLayer.getCell(x, y);
+                if (cell != null) {
+                    TiledMapTile tile = cell.getTile();
+                    if (tile.getObjects().getCount() > 0)
+                        initObjects(tile.getObjects(), world, x * tileLayer.getTileWidth(), y * tileLayer.getTileHeight());
+                }
+            }
+        }
+    }
 
+    private static void initObjects(MapObjects objects, World world, int xSwift, int ySwift) {
+        BodyDef bd = new BodyDef();
         for (MapObject object : objects) {
-
             if (object instanceof TextureMapObject) {
                 continue;
             }
 
             Shape shape;
-
             if (object instanceof RectangleMapObject) {
                 shape = getRectangle((RectangleMapObject) object);
             } else if (object instanceof PolygonMapObject) {
@@ -51,16 +64,14 @@ public class MapBodyBuilder {
                 continue;
             }
 
-            BodyDef bd = new BodyDef();
+            bd.position.set(xSwift, ySwift);
             bd.type = BodyDef.BodyType.StaticBody;
             Body body = world.createBody(bd);
-            body.createFixture(shape, 1);
 
-            bodies.add(body);
+            body.createFixture(shape, 1);
 
             shape.dispose();
         }
-        return bodies;
     }
 
     private static PolygonShape getRectangle(RectangleMapObject rectangleObject) {

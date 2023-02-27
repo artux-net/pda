@@ -11,6 +11,7 @@ public class GameMap implements Serializable {
 
     private int id;
     private String title;
+    private String tmx;
     private String texture;
     private String tilesTexture;
     private String boundsTexture;

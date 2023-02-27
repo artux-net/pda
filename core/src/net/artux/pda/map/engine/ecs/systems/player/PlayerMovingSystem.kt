@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import net.artux.engine.pathfinding.TiledNode
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.di.scope.PerGameMap
-import net.artux.pda.map.engine.data.GlobalData
 import net.artux.pda.map.engine.ecs.components.BodyComponent
 import net.artux.pda.map.engine.ecs.components.HealthComponent
 import net.artux.pda.map.engine.ecs.components.PassivityComponent
@@ -25,28 +24,23 @@ import javax.inject.Inject
 
 @PerGameMap
 class PlayerMovingSystem @Inject constructor(
-    assetManager: AssetManager,
-    private val mapOrientationSystem: MapOrientationSystem,
-    dataRepository: DataRepository
+    val assetManager: AssetManager,
+    val mapOrientationSystem: MapOrientationSystem,
+    val dataRepository: DataRepository
 ) : BaseSystem(
-    Family.all(
-        VelocityComponent::class.java, BodyComponent::class.java
-    ).exclude(
-        PassivityComponent::class.java
-    ).get()
+    Family
+        .all(VelocityComponent::class.java, BodyComponent::class.java)
+        .exclude(PassivityComponent::class.java).get()
 ) {
+
+    private val pm = ComponentMapper.getFor(BodyComponent::class.java)
+    private val vm = ComponentMapper.getFor(VelocityComponent::class.java)
+    private val hm = ComponentMapper.getFor(HealthComponent::class.java)
+
     private val MOVEMENT = 20f
     private val RUN_MOVEMENT = 30f
     private val PLAYER_MULTIPLICATION = 6f
-    private val pm = ComponentMapper.getFor(
-        BodyComponent::class.java
-    )
-    private val vm = ComponentMapper.getFor(
-        VelocityComponent::class.java
-    )
-    private val hm = ComponentMapper.getFor(
-        HealthComponent::class.java
-    )
+
     private var weightCoefficient = 0f
     private var stepSounds: HashMap<Int, ImmutablePair<Sound, Sound>>
     private var left = false
@@ -57,10 +51,12 @@ class PlayerMovingSystem @Inject constructor(
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
+
         val entity = player
         val position = pm[entity]
         val velocityComponent = vm[entity]
         velocityComponent.velocity = velocityComponent.cpy()
+
         if (alwaysRun) velocityComponent.isRunning = true
         val stepVector: Vector2
         val currentVelocity = velocityComponent.cpy().scl(weightCoefficient)
@@ -76,38 +72,29 @@ class PlayerMovingSystem @Inject constructor(
         }
         healthComponent.stamina += staminaDifference
         if (!stepVector.isZero) {
-            val newX = position.x + stepVector.x
-            val newY = position.y + stepVector.y
-            if (playerWalls) {
-                position.getBody().applyLinearImpulse(
-                    stepVector.x * MOVEMENT * 10,
-                    stepVector.y * MOVEMENT * 10,
-                    position.x,
-                    position.y,
-                    true
-                )
-            } else {
-                if (insideMap(newX, position.getY())) position.position.x = newX
-                if (insideMap(position.getX(), newY)) position.position.y = newY
-            }
-            stepsDistance += stepVector.len()
-            if (stepsDistance >= oneSoundDistance) {
-                stepsDistance = 0f
-                var type = mapOrientationSystem.mapBorder.getTileType(position.x, position.y)
-                if (!stepSounds.containsKey(type) || random.nextInt(4) == 0) type =
-                    TiledNode.TILE_EMPTY
-                if (left) stepSounds[type]!!.left.play(stepVolume * currentVelocity.len()) else stepSounds[type]!!.right.play(
-                    stepVolume * currentVelocity.len()
-                )
-                left = !left
-            }
+            position.getBody().applyLinearImpulse(
+                stepVector.x * MOVEMENT,
+                stepVector.y * MOVEMENT,
+                position.x,
+                position.y,
+                true
+            )
         }
+        stepsDistance += stepVector.len()
+        if (stepsDistance >= oneSoundDistance) {
+            stepsDistance = 0f
+            var type = mapOrientationSystem.mapBorder.getTileType(position.x, position.y)
+            if (!stepSounds.containsKey(type) || random.nextInt(4) == 0) type =
+                TiledNode.TILE_EMPTY
+            if (left) stepSounds[type]!!.left.play(stepVolume * currentVelocity.len()) else stepSounds[type]!!.right.play(
+                stepVolume * currentVelocity.len()
+            )
+            left = !left
+        }
+
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {}
-    fun insideMap(x: Float, y: Float): Boolean {
-        return x <= GlobalData.mapWidth && x >= 0 && y <= GlobalData.mapHeight && y >= 0
-    }
 
     companion object {
         var playerWalls = true
