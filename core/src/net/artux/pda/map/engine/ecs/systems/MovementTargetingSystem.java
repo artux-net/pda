@@ -30,6 +30,8 @@ public class MovementTargetingSystem extends IteratingSystem {
     private PathSmoother<FlatTiledNode, Vector2> pathSmoother;
     MapOrientationSystem mapOrientationSystem;
 
+    private float MOVEMENT_FORCE = 30f; // H per step
+
     @Inject
     public MovementTargetingSystem(MapOrientationSystem mapOrientationSystem) {
         super(Family.all(VelocityComponent.class, BodyComponent.class, GraphMotionComponent.class).get());
@@ -65,7 +67,7 @@ public class MovementTargetingSystem extends IteratingSystem {
                     if (targetMovingComponent.getPath().nodes.size == 0 || !targetMovingComponent.getPath().nodes.peek().equals(endNode)) {
                         //пути нет и конец не совпадает
                         targetMovingComponent.reset();
-                        if (endNode.type != FlatTiledNode.TILE_WALL) {
+                        if (endNode.type.isWalkable()) {
                             //если конец не стена можем искать
                             pathFinder.searchNodePath(startNode, endNode, heuristic, targetMovingComponent.getPath());
                             pathSmoother.smoothPath(targetMovingComponent.getPath());
@@ -98,6 +100,16 @@ public class MovementTargetingSystem extends IteratingSystem {
 
                 unit.scl(1 / unit.len());
                 velocityComponent.setVelocity(unit);
+
+                if (!unit.isZero()) {
+                    bodyComponent.getBody().applyLinearImpulse(
+                            unit.x * MOVEMENT_FORCE,
+                            unit.y * MOVEMENT_FORCE,
+                            bodyComponent.getPosition().x,
+                            bodyComponent.getPosition().y,
+                            true
+                    );
+                }
             }
         }
     }

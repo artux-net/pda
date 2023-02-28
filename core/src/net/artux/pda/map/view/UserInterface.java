@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 
 import net.artux.pda.map.engine.AssetsFinder;
-import net.artux.engine.pathfinding.MapBorder;
+import net.artux.engine.pathfinding.TiledNavigator;
 
 public class UserInterface extends Group {
 
@@ -21,13 +21,13 @@ public class UserInterface extends Group {
     private final UIFrame uiFrame;
     private final Skin skin;
 
-    public UserInterface(Skin skin, AssetsFinder assetsFinder, MapBorder mapBorder, Camera uiCamera, Camera camera) {
+    public UserInterface(Skin skin, AssetsFinder assetsFinder, TiledNavigator tiledNavigator, Camera uiCamera, Camera camera) {
         super();
         this.stack = new Stack();
         this.skin = skin;
 
         font = assetsFinder.getFontManager().getFont(24);
-        uiFrame = new UIFrame(assetsFinder.getManager(), camera, uiCamera, mapBorder, font);
+        uiFrame = new UIFrame(assetsFinder.getManager(), camera, uiCamera, tiledNavigator, font);
         uiFrame.setFillParent(true);
         addActor(uiFrame);
 

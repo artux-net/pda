@@ -7,8 +7,8 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 
-import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
+import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
 
 public abstract class BaseSystem extends IteratingSystem {
@@ -39,7 +39,8 @@ public abstract class BaseSystem extends IteratingSystem {
     protected Entity getPlayer() {
         if (player != null)
             return player;
-
+        if (getEngine() == null)
+            return null;
         ImmutableArray<Entity> players = getEngine().getEntitiesFor(playerFamily);
         if (players.size() > 0) {
             player = players.first();

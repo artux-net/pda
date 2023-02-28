@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -38,6 +39,7 @@ public class PlayState extends State {
 
     private final World world;
     private final OrthogonalTiledMapRenderer renderer;
+
     Texture background;
 
     @Inject
@@ -53,6 +55,7 @@ public class PlayState extends State {
         MapComponent mapComponent = DaggerMapComponent.builder()
                 .coreComponent(coreComponent)
                 .build();
+
 
         world = mapComponent.getWorld();
         engineManager = mapComponent.getManager();
@@ -122,20 +125,23 @@ public class PlayState extends State {
         gsm.removeInputProcessor(uistage);
     }
 
+    float minDt = Float.MAX_VALUE;
+
     @Override
     public void update(float dt) {
         uistage.act(dt);
         stage.act(dt);
-        world.step(1 / 60f, 3, 2);
+        dt = Math.min(minDt, dt);
+        world.step(dt, 3, 2);
         renderer.setView((OrthographicCamera) stage.getCamera());
         engineManager.update(dt);
     }
 
     @Override
     public void render() {
-        //boxDebugRenderer.render(world, stage.getCamera().combined);
-        stage.draw();
         renderer.render();
+        stage.draw();
+
         stage.getBatch().begin();
         engineManager.draw(stage.getBatch(), 1);
         stage.getBatch().end();
@@ -151,8 +157,6 @@ public class PlayState extends State {
     @Override
     public void dispose() {
         assetManager.unload(gameMap.getTexture());
-        assetManager.unload(gameMap.getTilesTexture());
-        assetManager.unload(gameMap.getBoundsTexture());
 
         stage.dispose();
         renderer.dispose();

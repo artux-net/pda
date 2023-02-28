@@ -9,8 +9,8 @@ import com.badlogic.gdx.math.Vector2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.artux.engine.pathfinding.TiledNode
 import net.artux.pda.map.DataRepository
+import net.artux.pda.map.ai.TileType
 import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.engine.ecs.components.BodyComponent
 import net.artux.pda.map.engine.ecs.components.HealthComponent
@@ -37,17 +37,18 @@ class PlayerMovingSystem @Inject constructor(
     private val vm = ComponentMapper.getFor(VelocityComponent::class.java)
     private val hm = ComponentMapper.getFor(HealthComponent::class.java)
 
-    private val MOVEMENT = 20f
-    private val RUN_MOVEMENT = 30f
+    private val MOVEMENT_FORCE = 30f // H per step
+    private val RUN_MOVEMENT = MOVEMENT_FORCE * 2
     private val PLAYER_MULTIPLICATION = 6f
 
-    private var weightCoefficient = 0f
-    private var stepSounds: HashMap<Int, ImmutablePair<Sound, Sound>>
+    private var stepSounds: EnumMap<TileType, ImmutablePair<Sound, Sound>>
     private var left = false
     private val stepVolume = 0.15f
-    private val oneSoundDistance = 5.7f
+    private val oneStepDistance = 0.36f
+    private val oneRunStepDistance = 0.7f
     private var stepsDistance = 0f
     private var random: Random
+    private var lastPosition = Vector2()
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
@@ -59,7 +60,8 @@ class PlayerMovingSystem @Inject constructor(
 
         if (alwaysRun) velocityComponent.isRunning = true
         val stepVector: Vector2
-        val currentVelocity = velocityComponent.cpy().scl(weightCoefficient)
+        val currentVelocity = velocityComponent.cpy()
+
         if (speedup) currentVelocity.scl(PLAYER_MULTIPLICATION)
         val healthComponent = hm[entity]
         var staminaDifference = 0f
@@ -68,28 +70,40 @@ class PlayerMovingSystem @Inject constructor(
             if (!alwaysRun && entity === player) staminaDifference = -0.1f
         } else {
             if (healthComponent.stamina < 100) staminaDifference = 0.06f
-            stepVector = currentVelocity.scl(deltaTime).scl(MOVEMENT)
+            stepVector = currentVelocity.scl(deltaTime).scl(MOVEMENT_FORCE)
         }
         healthComponent.stamina += staminaDifference
         if (!stepVector.isZero) {
             position.getBody().applyLinearImpulse(
-                stepVector.x * MOVEMENT,
-                stepVector.y * MOVEMENT,
+                stepVector.x * MOVEMENT_FORCE,
+                stepVector.y * MOVEMENT_FORCE,
                 position.x,
                 position.y,
                 true
             )
         }
-        stepsDistance += stepVector.len()
-        if (stepsDistance >= oneSoundDistance) {
+
+        stepsDistance += lastPosition.dst2(position.position)
+        lastPosition.set(position.position)
+
+        val limit = if(velocityComponent.isRunning)
+            oneRunStepDistance
+        else
+            oneStepDistance
+
+        if (stepsDistance >= limit) {
             stepsDistance = 0f
             var type = mapOrientationSystem.mapBorder.getTileType(position.x, position.y)
-            if (!stepSounds.containsKey(type) || random.nextInt(4) == 0) type =
-                TiledNode.TILE_EMPTY
-            if (left) stepSounds[type]!!.left.play(stepVolume * currentVelocity.len()) else stepSounds[type]!!.right.play(
-                stepVolume * currentVelocity.len()
-            )
+            if (!stepSounds.containsKey(type) || random.nextInt(4) == 0)
+                type = TileType.EMPTY
+
+            val sound: Sound = if (left)
+                stepSounds[type]!!.left
+            else
+                stepSounds[type]!!.right
             left = !left
+
+            sound.play(stepVolume * currentVelocity.len())
         }
 
     }
@@ -106,29 +120,35 @@ class PlayerMovingSystem @Inject constructor(
         CoroutineScope(Dispatchers.Main).launch {
             dataRepository.storyDataModelFlow.collect {
                 val storyDataModel = it
-                weightCoefficient = 1.5f - storyDataModel.totalWeight / 60
+                if (isPlayerActive)
+                    pm[player].body.massData.mass = storyDataModel.totalWeight
             }
         }
 
-        weightCoefficient = 1.5f - dataRepository.storyDataModel.totalWeight / 60
-        if (weightCoefficient < 0.1f) weightCoefficient = 0.1f
-        stepSounds = HashMap()
+        //pm[player].body.massData.mass = dataRepository.storyDataModel.totalWeight
+
+        stepSounds = EnumMap(TileType::class.java)
         random = Random()
         val prefix = "audio/sounds/steps/"
-        stepSounds[TiledNode.TILE_EMPTY] =
+        stepSounds[TileType.EMPTY] =
             ImmutablePair.of(
                 assetManager.get(prefix + "empty1.ogg"),
                 assetManager.get(prefix + "empty2.ogg")
             )
-        stepSounds[TiledNode.TILE_ROAD] = ImmutablePair.of(
+        stepSounds[TileType.GROUND] =
+            ImmutablePair.of(
+                assetManager.get(prefix + "empty1.ogg"),
+                assetManager.get(prefix + "empty2.ogg")
+            )
+        stepSounds[TileType.ROAD] = ImmutablePair.of(
             assetManager.get(prefix + "road1.ogg"),
             assetManager.get(prefix + "road2.ogg")
         )
-        stepSounds[TiledNode.TILE_GRASS] = ImmutablePair.of(
+        stepSounds[TileType.GRASS] = ImmutablePair.of(
             assetManager.get(prefix + "grass1.ogg"),
             assetManager.get(prefix + "grass2.ogg")
         )
-        stepSounds[TiledNode.TILE_SWAMP] =
+        stepSounds[TileType.SWAMP] =
             ImmutablePair.of(
                 assetManager.get(prefix + "swamp1.ogg"),
                 assetManager.get(prefix + "swamp2.ogg")

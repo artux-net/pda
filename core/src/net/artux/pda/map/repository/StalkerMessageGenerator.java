@@ -41,6 +41,8 @@ public class StalkerMessageGenerator {
     }
 
     public UserMessage generateMessage() {
-        return new UserMessage(contentGenerator.generateName(), contentGenerator.generateMessageContent(), String.valueOf(random(1, 30)));
+        return new UserMessage(contentGenerator.generateName(),
+                contentGenerator.generateMessageContent(),
+                "avatars/a" + random(1, 30) + ".png");
     }
 }

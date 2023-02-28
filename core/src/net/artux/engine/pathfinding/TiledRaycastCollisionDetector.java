@@ -8,17 +8,17 @@ import com.badlogic.gdx.math.Vector2;
 public class TiledRaycastCollisionDetector<N extends TiledNode<N>> implements RaycastCollisionDetector<Vector2> {
     TiledGraph<N> worldMap;
 
-    public TiledRaycastCollisionDetector (TiledGraph<N> worldMap) {
+    public TiledRaycastCollisionDetector(TiledGraph<N> worldMap) {
         this.worldMap = worldMap;
     }
 
     // See http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
     @Override
-    public boolean collides (Ray<Vector2> ray) {
-        int x0 = (int)ray.start.x;
-        int y0 = (int)ray.start.y;
-        int x1 = (int)ray.end.x;
-        int y1 = (int)ray.end.y;
+    public boolean collides(Ray<Vector2> ray) {
+        int x0 = (int) ray.start.x;
+        int y0 = (int) ray.start.y;
+        int x1 = (int) ray.end.x;
+        int y1 = (int) ray.end.y;
 
         int tmp;
         boolean steep = Math.abs(y1 - y0) > Math.abs(x1 - x0);
@@ -50,7 +50,7 @@ public class TiledRaycastCollisionDetector<N extends TiledNode<N>> implements Ra
         int ystep = (y0 < y1 ? 1 : -1);
         for (int x = x0; x <= x1; x++) {
             N tile = steep ? worldMap.getNode(y, x) : worldMap.getNode(x, y);
-            if (tile.type == TiledNode.TILE_WALL) return true; // We've hit a wall
+            if (!tile.type.isWalkable()) return true; // We've hit a wall
             error += deltay;
             if (error + error >= deltax) {
                 y += ystep;
@@ -62,7 +62,7 @@ public class TiledRaycastCollisionDetector<N extends TiledNode<N>> implements Ra
     }
 
     @Override
-    public boolean findCollision (Collision<Vector2> outputCollision, Ray<Vector2> inputRay) {
+    public boolean findCollision(Collision<Vector2> outputCollision, Ray<Vector2> inputRay) {
         throw new UnsupportedOperationException();
     }
 }

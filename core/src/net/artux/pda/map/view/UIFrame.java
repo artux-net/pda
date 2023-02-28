@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.Align;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.data.PlayerData;
-import net.artux.engine.pathfinding.MapBorder;
+import net.artux.engine.pathfinding.TiledNavigator;
 import net.artux.pda.map.view.view.bars.Utils;
 import net.artux.pda.map.utils.Colors;
 
@@ -36,7 +36,7 @@ public class UIFrame extends WidgetGroup {
     private final Table rightGroup;
 
     @Inject
-    public UIFrame(AssetManager assetManager, Camera usualCamera, Camera uiCamera, MapBorder mapBorder, BitmapFont font) {
+    public UIFrame(AssetManager assetManager, Camera usualCamera, Camera uiCamera, TiledNavigator tiledNavigator, BitmapFont font) {
         super();
         this.camera = usualCamera;
 
@@ -106,7 +106,7 @@ public class UIFrame extends WidgetGroup {
         Slider.SliderStyle style = new Slider.SliderStyle();
         style.knob = new TextureRegionDrawable(Utils.getColoredRegion(1, 1, primaryColor));
         style.knob.setMinHeight((int) (standardFrameSize - frameOffset));
-        horizontalSlider = new Slider(0, mapBorder.getMapWidth(), 1, false, style);
+        horizontalSlider = new Slider(0, tiledNavigator.getMapWidth(), 1, false, style);
         horizontalSlider.setSize(w - standardFrameSize - getHeaderLeftX(), standardFrameSize - additionalSizes * 2);
         horizontalSlider.setPosition(getHeaderLeftX(), additionalSizes);
         addActor(horizontalSlider);
@@ -114,7 +114,7 @@ public class UIFrame extends WidgetGroup {
         style = new Slider.SliderStyle();
         style.knob = Utils.getColoredDrawable(1, 1, primaryColor);
         style.knob.setMinWidth((int) (standardFrameSize - frameOffset));
-        verticalSlider = new Slider(0, mapBorder.getMapHeight(), 1, true, style);
+        verticalSlider = new Slider(0, tiledNavigator.getMapHeight(), 1, true, style);
 
         verticalSlider.setSize(standardFrameSize - frameOffset, h - topFrameHeight - standardFrameSize);
         verticalSlider.setPosition(w - standardFrameSize + frameOffset / 2, standardFrameSize);

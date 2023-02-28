@@ -67,7 +67,7 @@ public class EntityBuilder {
                     com.badlogic.gdx.physics.box2d.Body body = world.createBody(bodyDef);
                     body.setLinearDamping(10);
                     CircleShape circle = new CircleShape();
-                    circle.setRadius(6f);
+                    circle.setRadius(3f);
 
                     FixtureDef fixtureDef = new FixtureDef();
                     fixtureDef.shape = circle;
@@ -159,7 +159,7 @@ public class EntityBuilder {
                     com.badlogic.gdx.physics.box2d.Body body = world.createBody(bodyDef);
                     body.setLinearDamping(10);
                     CircleShape circle = new CircleShape();
-                    circle.setRadius(6f);
+                    circle.setRadius(3f);
 
                     FixtureDef fixtureDef = new FixtureDef();
                     fixtureDef.shape = circle;

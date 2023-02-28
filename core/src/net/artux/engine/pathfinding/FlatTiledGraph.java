@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
-    public static final int tileSize = 8;
 
+    private int tileSize;
     public int sizeX;
     public int sizeY;
 
@@ -15,17 +15,16 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
     public static boolean diagonal;
     public FlatTiledNode startNode;
 
-    public FlatTiledGraph(MapBorder mapBorder) {
-        this.sizeX = mapBorder.getMapWidth()/ tileSize;
-        this.sizeY = mapBorder.getMapHeight() / tileSize;
+    public FlatTiledGraph(TiledNavigator tiledNavigator) {
+        this.sizeX = tiledNavigator.getLayer().getWidth();
+        this.sizeY = tiledNavigator.getLayer().getHeight();
+        tileSize = tiledNavigator.getLayer().getTileHeight();
         this.nodes = new Array<>(sizeX * sizeY);
         diagonal = true;
 
-        mapBorder.setTilesSize(sizeX, sizeY);
-
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
-                nodes.add(new FlatTiledNode(this, x, y, x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, mapBorder.getTileTypeInTileForMob(x, y), 4));
+                nodes.add(new FlatTiledNode(this, x, y, x * tileSize + tileSize / 2, y * tileSize + tileSize / 2, tiledNavigator.getTileTypeInTileForMob(x, y), 4));
             }
         }
 
@@ -33,14 +32,7 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
             int idx = x * sizeY;
             for (int y = 0; y < sizeY; y++) {
                 FlatTiledNode n = nodes.get(idx + y);
-                /*if (x > 0 && y>0)
-                    addConnection(n, -1, -1);
-                if (x > 0 && y < sizeY - 1)
-                    addConnection(n, -1, +1);
-                if (x < sizeX - 1 && y < sizeY - 1)
-                    addConnection(n, +1, +1);
-                if (x < sizeX - 1 && y>0)
-                    addConnection(n, +1, -1);*/
+
                 if (x > 0) addConnection(n, -1, 0);
                 if (y > 0) addConnection(n, 0, -1);
                 if (x < sizeX - 1) addConnection(n, 1, 0);
@@ -61,15 +53,6 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
             yTile = sizeY - 1;
 
         return getNode(xTile, yTile);
-    }
-
-    public int getTypeInPosition(float x, float y) {
-        int xTile = (int) (x / tileSize);
-        int yTile = (int) (y / tileSize);
-
-        if (x * sizeY + y >= nodes.size) {
-            return TiledNode.TILE_WALL;
-        } else return getNode(xTile, yTile).type;
     }
 
     public FlatTiledNode getNodeInPosition(Vector2 vector2) {
@@ -103,13 +86,12 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
 
     private void addConnection(FlatTiledNode n, int xOffset, int yOffset) {
         FlatTiledNode target = getNode(n.x + xOffset, n.y + yOffset);
-        if (target.type != FlatTiledNode.TILE_WALL)
-            n.getConnections().add(new FlatTiledConnection(this, n, target, target.type));
+        if (target.type.isWalkable())
+            n.getConnections().add(new FlatTiledConnection(this, n, target, target.type.getWeight()));
     }
 
     public void dispose() {
-        for (FlatTiledNode node :
-                nodes) {
+        for (FlatTiledNode node : nodes) {
             node.graph = null;
             for (Connection<FlatTiledNode> c : node.connections) {
                 FlatTiledConnection flatTiledConnection = (FlatTiledConnection) c;

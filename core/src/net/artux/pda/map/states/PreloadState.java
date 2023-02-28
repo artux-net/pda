@@ -64,8 +64,6 @@ public class PreloadState extends State {
 
     private void loadMap() {
         assetManager.load(gameMap.getTexture(), NetFile.class);
-        assetManager.load(gameMap.getBoundsTexture(), NetFile.class);
-        assetManager.load(gameMap.getTilesTexture(), NetFile.class);
     }
 
     public void resume() {

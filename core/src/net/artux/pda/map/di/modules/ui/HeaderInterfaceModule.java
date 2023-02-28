@@ -188,12 +188,12 @@ public class HeaderInterfaceModule {
                 }
             }, false);
 
-            debugMenu.addCheckBox("Отобразить карту ИИ", new ChangeListener() {
+            debugMenu.addCheckBox("Отобразить все слои карты", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    MapLoggerSystem.showTiles = ((CheckBox) actor).isChecked();
+                    engine.getSystem(MapLoggerSystem.class).debugTiledMap(((CheckBox) actor).isChecked());
                 }
-            }, MapLoggerSystem.showTiles);
+            }, false);
             debugMenu.addCheckBox("Пути ИИ", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {

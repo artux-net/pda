@@ -3,6 +3,7 @@ package net.artux.pda.map.engine;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.CircleMapObject;
+import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -11,6 +12,9 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Ellipse;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -29,8 +33,9 @@ public class MapBodyBuilder {
     public static void buildShapes(TiledMap map, float pixels, World world) {
         ppt = pixels;
         MapObjects objects = map.getLayers().get("objects").getObjects();
-        initObjects(objects, world,0,0);
+        initObjects(objects, world, 0, 0);
         TiledMapTileLayer tileLayer = (TiledMapTileLayer) map.getLayers().get("tiles");
+        tileLayer.setVisible(false);
 
         for (int x = 0; x < tileLayer.getWidth(); x++) {
             for (int y = 0; y < tileLayer.getHeight(); y++) {
@@ -58,8 +63,8 @@ public class MapBodyBuilder {
                 shape = getPolygon((PolygonMapObject) object);
             } else if (object instanceof PolylineMapObject) {
                 shape = getPolyline((PolylineMapObject) object);
-            } else if (object instanceof CircleMapObject) {
-                shape = getCircle((CircleMapObject) object);
+            } else if (object instanceof EllipseMapObject) {
+                shape = getEllipse((EllipseMapObject) object);
             } else {
                 continue;
             }
@@ -68,22 +73,83 @@ public class MapBodyBuilder {
             bd.type = BodyDef.BodyType.StaticBody;
             Body body = world.createBody(bd);
 
-            body.createFixture(shape, 1);
+            body.createFixture(shape, 0);
 
             shape.dispose();
         }
     }
 
-    private static PolygonShape getRectangle(RectangleMapObject rectangleObject) {
-        Rectangle rectangle = rectangleObject.getRectangle();
-        PolygonShape polygon = new PolygonShape();
+    private static Shape getEllipse(EllipseMapObject object) {
+        Ellipse rectangle = object.getEllipse();
+
         Vector2 size = new Vector2((rectangle.x + rectangle.width * 0.5f) / ppt,
                 (rectangle.y + rectangle.height * 0.5f) / ppt);
-        polygon.setAsBox(rectangle.width * 0.5f / ppt,
-                rectangle.height * 0.5f / ppt,
-                size,
-                0.0f);
-        return polygon;
+
+        if (rectangle.width == rectangle.height)
+            return getCircle(new CircleMapObject(size.x, size.y, rectangle.height * 0.5f));
+
+        Float rotation = (Float) object.getProperties().get("rotation");
+        if (rotation == null)
+            rotation = 0f;
+        return createEllipse(size.x, size.y, rectangle.width, rectangle.height, rotation, 24);
+    }
+
+    private static ChainShape createEllipse(float positionX, float positionY, float width, float height, float rotation, int STEPS) {
+        ChainShape ellipse = new ChainShape();
+        Vector2[] verts = new Vector2[STEPS];
+
+        float halfWidth = width / 2;
+        float halfHeight = height / 2;
+
+        final float originX = -halfWidth;
+        final float originY = halfHeight;
+
+        rotation = -rotation;
+        final float cos = MathUtils.cosDeg(rotation);
+        final float sin = MathUtils.sinDeg(rotation);
+
+        for (int i = 0; i < STEPS; i++) {
+            float t = (float) (i * 2 * Math.PI) / STEPS;
+            verts[i] = new Vector2((float) (halfWidth * Math.cos(t)), (float) (halfHeight * Math.sin(t)));
+
+            float x = verts[i].x - originX;
+            float y = verts[i].y - originY;
+
+            if (rotation != 0) {
+                float oldX = x;
+                x = cos * x - sin * y;
+                y = sin * oldX + cos * y;
+            }
+
+            verts[i].set(positionX + x + originX, positionY + y + originY);
+        }
+
+        ellipse.createLoop(verts);
+        return ellipse;
+    }
+
+    private static PolygonShape getRectangle(RectangleMapObject rectangleObject) {
+        Rectangle rectangle = rectangleObject.getRectangle();
+
+        float halfWidth = rectangle.width * 0.5f;
+        float halfHeight = rectangle.height * 0.5f;
+
+        float[] rectangleVertices = new float[]{
+                halfWidth, halfHeight,
+                halfWidth, -halfHeight,
+                -halfWidth, -halfHeight,
+                -halfWidth, halfHeight
+        };
+
+        Polygon polygon = new Polygon(rectangleVertices);
+        polygon.setPosition(rectangle.x + halfWidth, rectangle.y + halfHeight);
+        Float rotation = (Float) rectangleObject.getProperties().get("rotation");
+        if (rotation == null)
+            rotation = 0f;
+        polygon.setRotation(-rotation);
+        polygon.setOrigin(-halfWidth, halfHeight);
+
+        return getPolygon(new PolygonMapObject(polygon));
     }
 
     private static CircleShape getCircle(CircleMapObject circleObject) {
@@ -101,7 +167,6 @@ public class MapBodyBuilder {
         float[] worldVertices = new float[vertices.length];
 
         for (int i = 0; i < vertices.length; ++i) {
-            System.out.println(vertices[i]);
             worldVertices[i] = vertices[i] / ppt;
         }
 

@@ -1,7 +1,6 @@
 package net.artux.pda.map.engine.helpers;
 
 import static com.badlogic.gdx.math.MathUtils.random;
-import static net.artux.engine.pathfinding.TiledNode.TILE_WALL;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -34,7 +33,7 @@ public class AnomalyHelper {
         for (int i = 0; i < random(5, 9); i++) {
             Vector2 position = new Vector2(random.nextInt(GlobalData.mapWidth), random.nextInt(GlobalData.mapHeight));
             if (mapOrientationSystem.isGraphActive())
-                while (mapOrientationSystem.getWorldGraph().getNodeInPosition(position.x, position.y).type == TILE_WALL)
+                while (!mapOrientationSystem.getWorldGraph().getNodeInPosition(position.x, position.y).type.isWalkable())
                     position = new Vector2(random.nextInt(GlobalData.mapWidth), random.nextInt(GlobalData.mapHeight));
 
             Entity anomaly = new Entity();

@@ -7,15 +7,20 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
-import net.artux.engine.pathfinding.FlatTiledGraph;
 import net.artux.engine.pathfinding.FlatTiledNode;
 import net.artux.engine.pathfinding.TiledSmoothableGraphPath;
+import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 @PerGameMap
 public class MapLoggerSystem extends IteratingSystem implements Drawable, Disposable {
@@ -25,15 +30,22 @@ public class MapLoggerSystem extends IteratingSystem implements Drawable, Dispos
     private final ShapeRenderer sr;
 
     private MapOrientationSystem mapOrientationSystem;
+    private TiledMap tiledMap;
+    private World world;
+    private Stage stage;
+    private final Box2DDebugRenderer boxDebugRenderer;
 
     public static boolean showPlayerWalls = false;
-    public static boolean showTiles = false;
     public static boolean showPaths = false;
 
     @Inject
-    public MapLoggerSystem(MapOrientationSystem mapOrientationSystem) {
+    public MapLoggerSystem(MapOrientationSystem mapOrientationSystem, TiledMap tiledMap, World world, @Named("gameStage") Stage stage) {
         super(Family.all(GraphMotionComponent.class).get(), -100);
+        this.world = world;
+        this.stage = stage;
+        this.tiledMap = tiledMap;
         sr = new ShapeRenderer();
+        boxDebugRenderer = new Box2DDebugRenderer();
         this.mapOrientationSystem = mapOrientationSystem;
     }
 
@@ -47,42 +59,34 @@ public class MapLoggerSystem extends IteratingSystem implements Drawable, Dispos
 
     }
 
+    public void debugTiledMap(boolean debug) {
+        if (debug) {
+            for (MapLayer layer : tiledMap.getLayers()) {
+                layer.setVisible(true);
+                layer.setOpacity(0.5f);
+            }
+        } else {
+            for (MapLayer layer : tiledMap.getLayers()) {
+                layer.setOpacity(1f);
+            }
+            tiledMap.getLayers().get("tiles").setVisible(false);
+        }
+    }
+
     @Override
     public void dispose() {
+        boxDebugRenderer.dispose();
         sr.dispose();
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         if (showPlayerWalls) {
-            batch.draw(mapOrientationSystem.getMapBorder().getPlayerLayout(), 0, 0);
+            boxDebugRenderer.render(world, stage.getCamera().combined);
         }
 
         batch.end();
         sr.setProjectionMatrix(batch.getProjectionMatrix());
-        if (showTiles) {
-            sr.begin(ShapeRenderer.ShapeType.Filled);
-            for (int x = 0; x < mapOrientationSystem.getWorldGraph().sizeX; x++) {
-                for (int y = 0; y < mapOrientationSystem.getWorldGraph().sizeY; y++) {
-                    switch (mapOrientationSystem.getWorldGraph().getNode(x, y).type) {
-                        case FlatTiledNode.TILE_WALL:
-                            sr.setColor(Color.RED);
-                            sr.rect(x * FlatTiledGraph.tileSize, y * FlatTiledGraph.tileSize, FlatTiledGraph.tileSize, FlatTiledGraph.tileSize);
-                            break;
-                        case FlatTiledNode.TILE_ROAD:
-                            sr.setColor(Color.BLUE);
-                            sr.rect(x * FlatTiledGraph.tileSize, y * FlatTiledGraph.tileSize, FlatTiledGraph.tileSize, FlatTiledGraph.tileSize);
-                            break;
-                        case FlatTiledNode.TILE_GRASS:
-                            sr.setColor(Color.GREEN);
-                            sr.rect(x * FlatTiledGraph.tileSize, y * FlatTiledGraph.tileSize, FlatTiledGraph.tileSize, FlatTiledGraph.tileSize);
-                            break;
-                    }
-
-                }
-            }
-            sr.end();
-        }
 
         if (showPaths) {
             sr.setColor(Color.ORANGE);
