@@ -90,8 +90,7 @@ public class EntityBuilder {
 
     public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {
         BodyComponent bodyComponent = pm.get(author);
-        if (target == null) // TODO
-            return new Entity();
+
         Vector2 targetPosition = pm.get(target).getPosition();
         targetPosition = getPointNear(targetPosition.cpy(), weaponModel.getPrecision());
 
@@ -116,8 +115,7 @@ public class EntityBuilder {
         spriteComponent.setRotation(degrees + 90);
 
         return new Entity()
-                .add(new BodyComponent(bodyComponent.getPosition(), world))
-                .add(new VelocityComponent(vX, vY, true))
+                .add(new BodyComponent(bodyComponent.getPosition(), BodyDef.BodyType.KinematicBody, world).velocity(vX, vY))
                 .add(spriteComponent)
                 .add(new FogOfWarComponent())
                 .add(new BulletComponent(author, target, targetPosition, weaponModel.getDamage()));

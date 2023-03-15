@@ -14,20 +14,19 @@ public class BodyComponent implements Component {
         this.body = bodyBuilder.init();
     }
 
-    public BodyComponent(Vector2 vector2, World world){
+    public BodyComponent(Vector2 vector2, World world) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(vector2);
         bodyDef.active = false;
         body = world.createBody(bodyDef);
     }
 
-    public BodyComponent(Vector2 vector2, BodyDef.BodyType type, World world){
+    public BodyComponent(Vector2 vector2, BodyDef.BodyType type, World world) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(vector2);
         bodyDef.type = type;
         body = world.createBody(bodyDef);
     }
-
 
     public Body getBody() {
         return body;
@@ -49,4 +48,12 @@ public class BodyComponent implements Component {
         return body.getPosition().y;
     }
 
+    public BodyComponent velocity(float vX, float vY) {
+        body.setType(BodyDef.BodyType.KinematicBody);
+        //body.setLinearDamping(-10000);
+        body.setLinearVelocity(vX, vY);
+        //body.setTransform(body.getPosition().x, body.getPosition().y, 30f);
+        body.setBullet(true);
+        return this;
+    }
 }

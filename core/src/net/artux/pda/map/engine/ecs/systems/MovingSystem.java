@@ -1,36 +1,47 @@
 package net.artux.pda.map.engine.ecs.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.data.GlobalData;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VelocityComponent;
-import net.artux.pda.map.engine.data.GlobalData;
 
 import javax.inject.Inject;
 
-@PerGameMap
 public class MovingSystem extends BaseSystem {
 
-    private final float MOVEMENT = 20f;
-    private final float RUN_MOVEMENT = 30f;
-
     private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
-    private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
-    private MapOrientationSystem mapOrientationSystem;
+    private World world;
 
     @Inject
-    public MovingSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem) {
-        super(Family.all(VelocityComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
-        this.mapOrientationSystem = mapOrientationSystem;
+    public MovingSystem(World world) {
+        super(Family.all(BodyComponent.class).exclude(PassivityComponent.class).get());
+        this.world = world;
+    }
+
+    @Override
+    public void addedToEngine(Engine engine) {
+        super.addedToEngine(engine);
+        engine.addEntityListener(Family.all(BodyComponent.class).exclude(PassivityComponent.class).get(), new EntityListener() {
+            @Override
+            public void entityAdded(Entity entity) {
+
+            }
+
+            @Override
+            public void entityRemoved(Entity entity) {
+                world.destroyBody(pm.get(entity).body);
+            }
+        });
     }
 
     @Override
@@ -40,9 +51,7 @@ public class MovingSystem extends BaseSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        if (entity == getPlayer())
-            return;
-
+/*
         BodyComponent bodyComponent = pm.get(entity);
         VelocityComponent velocityComponent = vm.get(entity);
         Vector2 stepVector;
@@ -78,12 +87,7 @@ public class MovingSystem extends BaseSystem {
             }
         }
         if (!velocityComponent.isConstant() && entity != getPlayer())
-            velocityComponent.set(0, 0);
+            velocityComponent.set(0, 0);*/
     }
-
-    public boolean insideMap(float x, float y) {
-        return (x <= GlobalData.mapWidth && x >= 0) && (y <= GlobalData.mapHeight && y >= 0);
-    }
-
 
 }

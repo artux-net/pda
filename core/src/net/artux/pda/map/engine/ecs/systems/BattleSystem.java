@@ -46,7 +46,7 @@ public class BattleSystem extends BaseSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        bullets = engine.getEntitiesFor(Family.all(BodyComponent.class, VelocityComponent.class, BulletComponent.class).get());
+        bullets = engine.getEntitiesFor(Family.all(BodyComponent.class, BulletComponent.class).get());
     }
 
     @Override
@@ -86,12 +86,12 @@ public class BattleSystem extends BaseSystem {
         VisionComponent visionComponent = vm.get(entity);
         entityWeapon.update(deltaTime);
 
-       /* if (moodComponent.hasEnemy())
+        if (moodComponent.hasEnemy())
             if (visionComponent.isSeeing(moodComponent.getEnemy()))
                 if (entityWeapon.shoot()) {
                     entityProcessorSystem.addBulletToEngine(entity, moodComponent.getEnemy(), entityWeapon.getSelected());
                     soundsSystem.playSoundAtDistance(entityWeapon.getShotSound(), pm.get(moodComponent.getEnemy()).getPosition());
-                }*/
+                }
         //todo count dst
     }
 
