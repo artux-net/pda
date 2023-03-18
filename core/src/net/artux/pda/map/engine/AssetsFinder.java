@@ -8,6 +8,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -53,7 +54,10 @@ public class AssetsFinder implements Disposable {
             }
 
             FileHandle ui = assetManager.getFileHandleResolver().resolve("ui");
-            loadRecursively(assetManager, ui, true, Texture.class);
+            loadRecursively(assetManager, ui, true,  Texture.class);
+
+            FileHandle shaders = assetManager.getFileHandleResolver().resolve("shaders");
+            loadRecursively(assetManager, shaders, true, ShaderProgram.class);
 
             assetManager.load("data/uiskin.atlas", TextureAtlas.class);
             assetManager.load("quest.png", Texture.class);

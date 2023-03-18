@@ -6,12 +6,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.engine.resource.types.NetFile;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.components.CoreComponent;
@@ -39,6 +39,7 @@ public class PlayState extends State {
 
     private final World world;
     private final OrthogonalTiledMapRenderer renderer;
+    private PostProcessing postProcessing;
 
     Texture background;
 
@@ -56,13 +57,13 @@ public class PlayState extends State {
                 .coreComponent(coreComponent)
                 .build();
 
-
         world = mapComponent.getWorld();
         engineManager = mapComponent.getManager();
         stage = mapComponent.gameStage();
         uistage = mapComponent.uiStage();
         renderer = mapComponent.getRenderer();
         renderer.setView((OrthographicCamera) stage.getCamera());
+        postProcessing = mapComponent.getPostProcessing();
 
         mapComponent.getUserInterface();
         mapComponent.initInterface();
@@ -84,11 +85,6 @@ public class PlayState extends State {
             //stage.addActor(levelBackgroundImage);
             levelBackgroundImage.setZIndex(0);
         }
-    }
-
-
-    public GameMap getGameMap() {
-        return gameMap;
     }
 
     @Override
@@ -125,26 +121,28 @@ public class PlayState extends State {
         gsm.removeInputProcessor(uistage);
     }
 
-    float minDt = Float.MAX_VALUE;
-
     @Override
     public void update(float dt) {
         uistage.act(dt);
         stage.act(dt);
-        dt = Math.min(minDt, dt);
-        world.step(dt, 3, 2);
+        world.step(1 / 90f, 3, 2);
         renderer.setView((OrthographicCamera) stage.getCamera());
         engineManager.update(dt);
     }
 
     @Override
     public void render() {
+        postProcessing.begin();
         renderer.render();
         stage.draw();
 
         stage.getBatch().begin();
         engineManager.draw(stage.getBatch(), 1);
         stage.getBatch().end();
+
+        postProcessing.end();
+        postProcessing.process();
+
         uistage.draw(); // ui always last
     }
 
@@ -158,6 +156,7 @@ public class PlayState extends State {
     public void dispose() {
         assetManager.unload(gameMap.getTexture());
 
+        postProcessing.dispose();
         stage.dispose();
         renderer.dispose();
         uistage.dispose();

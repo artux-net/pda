@@ -25,6 +25,7 @@ public class BodyComponent implements Component {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(vector2);
         bodyDef.type = type;
+        bodyDef.bullet = true;
         body = world.createBody(bodyDef);
     }
 
@@ -48,12 +49,15 @@ public class BodyComponent implements Component {
         return body.getPosition().y;
     }
 
-    public BodyComponent velocity(float vX, float vY) {
-        body.setType(BodyDef.BodyType.KinematicBody);
-        //body.setLinearDamping(-10000);
-        body.setLinearVelocity(vX, vY);
+    public BodyComponent velocity(double vX, double vY) {
+        body.setLinearDamping(0);
+        body.setLinearVelocity((float) vX, (float) vY);
         //body.setTransform(body.getPosition().x, body.getPosition().y, 30f);
-        body.setBullet(true);
+        return this;
+    }
+
+    public BodyComponent impulse(float x, float y){
+        body.applyForceToCenter(x, y, true);
         return this;
     }
 }

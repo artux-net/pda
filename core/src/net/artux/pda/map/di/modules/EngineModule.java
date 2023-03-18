@@ -29,8 +29,6 @@ public class EngineModule {
         Engine engine = new Engine();
         for (EntitySystem system : systems)
             engine.addSystem(system);
-        System.out.println(engine);
-        System.out.println(engine.getSystems().toString());
         return engine;
     }
 

@@ -2,6 +2,7 @@ package net.artux.pda.map.di.components;
 
 import com.badlogic.gdx.assets.AssetManager;
 
+import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.modules.AppModule;

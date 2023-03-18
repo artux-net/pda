@@ -5,12 +5,14 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -18,16 +20,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 
+import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.model.entities.RelationType;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.util.HashMap;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,11 +53,12 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
     private ImmutableArray<Entity> relationalEntities;
     private final HashMap<RelationType, Sprite> relationalSprites;
+    private final PostProcessing.ShaderGroup blurGroup;
 
     public static boolean showAll = false;
 
     @Inject
-    public RenderSystem(@Named("gameStage") Stage stage, AssetsFinder assetsFinder) {
+    public RenderSystem(@Named("gameStage") Stage stage, AssetsFinder assetsFinder, PostProcessing postProcessing) {
         super(Family.all(SpriteComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
         this.stage = stage;
 
@@ -73,6 +80,19 @@ public class RenderSystem extends BaseSystem implements Drawable {
         relationalSprites.put(RelationType.ENEMY, redSprite);
         relationalSprites.put(RelationType.NEUTRAL, yellowSprite);
         relationalSprites.put(RelationType.FRIEND, greenSprite);
+
+        ShaderProgram shaderProgram = assetManager.get("shaders/blur.frag");
+        blurGroup = postProcessing.loadShaderGroup(
+                List.of(Pair.of(shaderProgram, shaderProgram1 -> {
+                            shaderProgram1.setUniformf("dir", 1f, 0);
+                            shaderProgram1.setUniformf("radius", effect);
+                            shaderProgram1.setUniformf("resolution", Gdx.graphics.getWidth());
+                        }),
+                        Pair.of(shaderProgram, shaderProgram12 -> {
+                            shaderProgram12.setUniformf("dir", 0, 1f);
+                            shaderProgram12.setUniformf("radius", effect);
+                            shaderProgram12.setUniformf("resolution", Gdx.graphics.getHeight());
+                        })));
     }
 
     @Override
@@ -113,6 +133,14 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
 
     @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+        if (effect > 0) {
+            effect -= deltaTime;
+        }
+    }
+
+    @Override
     public void draw(Batch batch, float parentAlpha) {
         ImmutableArray<Entity> entities = getEntities();
         for (int i = 0; i < entities.size(); i++) {
@@ -146,7 +174,16 @@ public class RenderSystem extends BaseSystem implements Drawable {
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), 0);
             batch.setColor(Color.WHITE);
         }
+        blurGroup.setEnabled(effect > 0);
 
+    }
+
+    float set = 0;
+    float effect = 0;
+
+    public void setEffect(int seconds) {
+        effect += seconds;
+        set = seconds;
     }
 
     @Override

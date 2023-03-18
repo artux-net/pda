@@ -29,6 +29,7 @@ import net.artux.pda.map.engine.ecs.components.StatesComponent;
 import net.artux.pda.map.engine.ecs.components.VelocityComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.WeaponComponent;
+import net.artux.pda.map.engine.ecs.components.effects.Effects;
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
 import net.artux.pda.map.engine.ecs.components.states.StalkerState;
 import net.artux.pda.map.engine.ecs.systems.statemachine.MessagingCodes;
@@ -81,6 +82,7 @@ public class EntityBuilder {
                 }))
                 .add(new VelocityComponent())
                 .add(new VisionComponent())
+                .add(new Effects())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
                 .add(new WeaponComponent(dataRepository, assetManager))
                 .add(new MoodComponent(dataRepository.getStoryDataModel()))
@@ -92,18 +94,12 @@ public class EntityBuilder {
         BodyComponent bodyComponent = pm.get(author);
 
         Vector2 targetPosition = pm.get(target).getPosition();
-        targetPosition = getPointNear(targetPosition.cpy(), weaponModel.getPrecision());
+        targetPosition = getPointNear(targetPosition, weaponModel.getPrecision());
 
-        float targetX = targetPosition.x;
-        float targetY = targetPosition.y;
+        Vector2 velocityUnit = targetPosition.cpy().sub(bodyComponent.getPosition()).nor();
 
-        float vX = (float) ((targetX - bodyComponent.getX()) /
-                Math.sqrt(((targetX - bodyComponent.getX()) * (targetX - bodyComponent.getX())) + ((targetY - bodyComponent.getY()) * (targetY - bodyComponent.getY()))));
-        float vY = (float) ((targetY - bodyComponent.getY()) /
-                Math.sqrt(((targetY - bodyComponent.getY()) * (targetY - bodyComponent.getY())) + ((targetX - bodyComponent.getX()) * (targetX - bodyComponent.getY()))));
-
-        vX *= weaponModel.getSpeed();
-        vY *= weaponModel.getSpeed();
+        float vX = velocityUnit.x * weaponModel.getSpeed() * 1000;
+        float vY = velocityUnit.y * weaponModel.getSpeed() * 1000;
 
         Vector2 direction = targetPosition.cpy().sub(bodyComponent.getPosition());
         float degrees = (float) (Math.atan2(
@@ -115,7 +111,7 @@ public class EntityBuilder {
         spriteComponent.setRotation(degrees + 90);
 
         return new Entity()
-                .add(new BodyComponent(bodyComponent.getPosition(), BodyDef.BodyType.KinematicBody, world).velocity(vX, vY))
+                .add(new BodyComponent(bodyComponent.getPosition(), BodyDef.BodyType.KinematicBody, world).velocity((double) vX * 10000, (double) vY * 10000))
                 .add(spriteComponent)
                 .add(new FogOfWarComponent())
                 .add(new BulletComponent(author, target, targetPosition, weaponModel.getDamage()));
@@ -172,6 +168,7 @@ public class EntityBuilder {
                 .add(new GraphMotionComponent(null))
                 .add(new VelocityComponent())
                 .add(new VisionComponent())
+                .add(new Effects())
                 .add(healthComponent)
                 .add(group)
                 .add(group.getMood())

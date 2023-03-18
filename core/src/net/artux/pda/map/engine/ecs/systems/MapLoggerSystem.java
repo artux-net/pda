@@ -46,6 +46,7 @@ public class MapLoggerSystem extends IteratingSystem implements Drawable, Dispos
         this.tiledMap = tiledMap;
         sr = new ShapeRenderer();
         boxDebugRenderer = new Box2DDebugRenderer();
+        boxDebugRenderer.setDrawVelocities(true);
         this.mapOrientationSystem = mapOrientationSystem;
     }
 

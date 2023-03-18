@@ -24,7 +24,7 @@ public class SoundsSystem extends BaseSystem {
 
     private final List<Sound> detections = new ArrayList<>();
     private final List<Music> backgrounds = new ArrayList<>();
-    private Sound anomaly;
+
     private final Random random = new Random();
     private final AssetManager assetManager;
     private static float VOLUME = 1f;
@@ -42,7 +42,7 @@ public class SoundsSystem extends BaseSystem {
         super.addedToEngine(engine);
         detections.add(assetManager.get("audio/sounds/pda/contact_0.ogg", Sound.class));
         detections.add(assetManager.get("audio/sounds/pda/contact_1.ogg", Sound.class));
-        anomaly = assetManager.get("audio/sounds/pda/d-beep.ogg", Sound.class);
+
 
         backgrounds.add(assetManager.get("audio/music/1.ogg", Music.class));
         backgrounds.add(assetManager.get("audio/music/2.ogg", Music.class));
@@ -111,8 +111,6 @@ public class SoundsSystem extends BaseSystem {
         }
     }
 
-    public void playSound() {
-        anomaly.play(VOLUME);
-    }
+
 
 }

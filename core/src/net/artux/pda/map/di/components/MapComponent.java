@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.modules.EngineModule;
 import net.artux.pda.map.di.modules.ui.UserInterfaceModule;
@@ -60,5 +61,7 @@ public interface MapComponent extends CoreComponent {
     OrthogonalTiledMapRenderer getRenderer();
 
     ConditionEntityManager getConditionManager();
+
+    PostProcessing getPostProcessing();
 
 }

@@ -119,7 +119,7 @@ configurations {
 }
 
 dependencies {
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation "androidx.multidex:multidex:2.0.1"
     //mapstruct
     implementation 'org.mapstruct:mapstruct:1.5.2.Final'
     kapt 'org.mapstruct:mapstruct-processor:1.5.2.Final'
@@ -193,7 +193,7 @@ dependencies {
     localDeps 'com.github.artux-net:pda-maps:0.7'
 
     //appodeal
-    implementation('com.appodeal.ads:sdk:3.0.2.0') {
+    implementation('com.appodeal.ads:sdk:3.0.2.+') {
         exclude group: 'com.appodeal.ads.sdk.services', module: 'facebook_analytics'
     }
 }

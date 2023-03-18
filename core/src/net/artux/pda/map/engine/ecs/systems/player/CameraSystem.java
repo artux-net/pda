@@ -27,7 +27,6 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     private ClicksSystem clicksSystem;
     private GameMap map;
 
-    private ComponentMapper<PlayerComponent> cm = ComponentMapper.getFor(PlayerComponent.class);
     private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 
@@ -143,8 +142,8 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     }
 
     private void internalMoveBy(float x, float y) {
-        camera.position.x += x * camera.zoom;
-        camera.position.y += y * camera.zoom;
+        camera.translate(x * camera.zoom, y * camera.zoom);
+        camera.update(true);
     }
 
     public void moveBy(float x, float y) {
@@ -152,10 +151,11 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
         float newY = camera.position.y + y * camera.zoom;
         if (isPlayerActive()) {
             if (newX <= GlobalData.mapWidth && newX >= 0)
-                camera.position.set(newX, camera.position.y, 0);
+                camera.translate(x * camera.zoom, 0);
             if (newY <= GlobalData.mapHeight && newY >= 0)
-                camera.position.set(camera.position.x, newY, 0);
+                camera.translate(0, y * camera.zoom);
         }
+        camera.update(true);
     }
 
     float currentZoom;

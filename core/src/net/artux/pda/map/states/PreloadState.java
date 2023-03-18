@@ -99,6 +99,7 @@ public class PreloadState extends State {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             label.setText(e.getMessage());
 
             progressLabel.setText("Click here to exit.");

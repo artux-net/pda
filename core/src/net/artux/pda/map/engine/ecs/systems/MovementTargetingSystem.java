@@ -4,7 +4,9 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.systems.IntervalSystem;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
@@ -19,7 +21,7 @@ import net.artux.engine.pathfinding.TiledManhattanDistance;
 import javax.inject.Inject;
 
 @PerGameMap
-public class MovementTargetingSystem extends IteratingSystem {
+public class MovementTargetingSystem extends IntervalSystem {
 
     private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
@@ -31,10 +33,11 @@ public class MovementTargetingSystem extends IteratingSystem {
     MapOrientationSystem mapOrientationSystem;
 
     private float MOVEMENT_FORCE = 30f; // H per step
+    private ImmutableArray<Entity> entities;
 
     @Inject
     public MovementTargetingSystem(MapOrientationSystem mapOrientationSystem) {
-        super(Family.all(VelocityComponent.class, BodyComponent.class, GraphMotionComponent.class).get());
+        super(1);
         this.mapOrientationSystem = mapOrientationSystem;
     }
 
@@ -42,23 +45,23 @@ public class MovementTargetingSystem extends IteratingSystem {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
 
+        entities = engine.getEntitiesFor(Family.all(VelocityComponent.class, BodyComponent.class, GraphMotionComponent.class).get());
+
         heuristic = mapOrientationSystem.getHeuristic();
         pathFinder = mapOrientationSystem.getPathFinder();
         pathSmoother = mapOrientationSystem.getPathSmoother();
     }
 
     @Override
-    public void update(float deltaTime) {
-        super.update(deltaTime);
-        for (int i = 0; i < getEntities().size(); i++) {
-            Entity entity = getEntities().get(i);
+    protected void updateInterval() {
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity = entities.get(i);
 
             BodyComponent bodyComponent = pm.get(entity);
             VelocityComponent velocityComponent = vm.get(entity);
             GraphMotionComponent targetMovingComponent = gmm.get(entity);
 
             if (targetMovingComponent.isActive()) {
-
                 Vector2 target = targetMovingComponent.movementTarget;
 
                 if (mapOrientationSystem.isGraphActive()) {
@@ -112,10 +115,5 @@ public class MovementTargetingSystem extends IteratingSystem {
                 }
             }
         }
-    }
-
-    @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-
     }
 }

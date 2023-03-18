@@ -1,31 +1,57 @@
 package net.artux.pda.map.engine.ecs.components;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.Timer;
+
+import net.artux.pda.map.model.Anomaly;
 
 public class AnomalyComponent implements Component {
 
-    private String name;
-    public int size;
-    public float maxVelocity;
-    public float damage;
+    private final Anomaly anomaly;
+    private final int size;
+    private long timeToActivate;
+    private Timer.Task delayedInteraction;
 
-    public AnomalyComponent(String name, int size, float maxVelocity, float damage) {
-        this.name = name;
+    public AnomalyComponent(Anomaly anomaly, int size) {
+        this.anomaly = anomaly;
         this.size = size;
-        this.maxVelocity = maxVelocity;
-        this.damage = damage;
     }
 
-    public String getName() {
-        return name;
+    public boolean isScheduled(){
+        if (delayedInteraction != null && delayedInteraction.isScheduled())
+            return true;
+        else
+            return false;
     }
 
-    public String desc(){
+    public Anomaly getAnomaly() {
+        return anomaly;
+    }
+
+    public void setDelayedInteraction(Timer.Task delayedInteraction) {
+        timeToActivate = delayedInteraction.getExecuteTimeMillis();
+        this.delayedInteraction = delayedInteraction;
+    }
+
+    public long getTimeToActivate() {
+        return timeToActivate;
+    }
+
+    public Timer.Task getDelayedInteraction() {
+        return delayedInteraction;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public String desc() {
         return "Объект: " +
                 "Аномалия" +
                 '\n' +
                 "Наименование: " +
-                name +
+                getAnomaly().getName() +
                 '\n' +
                 "Размер: " +
                 size * 2;

@@ -20,6 +20,7 @@ import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.ecs.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
+import net.artux.pda.map.engine.helpers.AnomalyHelper;
 import net.artux.pda.map.engine.helpers.ControlPointsHelper;
 import net.artux.pda.map.engine.helpers.EntityBuilder;
 import net.artux.pda.map.engine.helpers.QuestPointsHelper;
@@ -58,8 +59,8 @@ public class EngineManager extends InputListener implements Drawable, Disposable
             ControlPointsHelper.createControlPointsEntities(mapComponent);
         if (questPoints)
             QuestPointsHelper.createQuestPointsEntities(mapComponent);
-      /*  if (anomalies)
-            AnomalyHelper.createAnomalies(mapComponent);*/
+        if (anomalies)
+            AnomalyHelper.createAnomalies(mapComponent);
 
 //        RandomSpawnerHelper.init(coreComponent);
 

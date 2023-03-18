@@ -16,6 +16,7 @@ import net.artux.engine.pathfinding.TiledManhattanDistance;
 import net.artux.engine.pathfinding.TiledNavigator;
 import net.artux.engine.pathfinding.TiledRaycastCollisionDetector;
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 
 import javax.inject.Inject;
 
@@ -31,12 +32,14 @@ public class MapOrientationSystem extends EntitySystem {
     private TiledRaycastCollisionDetector<FlatTiledNode> collisionDetector;
     private final Ray<Vector2> ray;
     private final int tileSize;
+    private final Camera camera;
 
     @Inject
-    public MapOrientationSystem(TiledNavigator tiledNavigator) {
+    public MapOrientationSystem(TiledNavigator tiledNavigator, CameraSystem cameraSystem) {
         ray = new Ray<>(Vector2.Zero, Vector2.Zero);
         this.tiledNavigator = tiledNavigator;
         tileSize = tiledNavigator.getLayer().getTileHeight();
+        camera = cameraSystem.getCamera();
 
         this.worldGraph = new FlatTiledGraph(tiledNavigator);
         heuristic = new TiledManhattanDistance<>();
@@ -65,7 +68,7 @@ public class MapOrientationSystem extends EntitySystem {
         return worldGraph;
     }
 
-    public Vector2 getRandomFreePoint(Camera camera) {
+    public Vector2 getRandomFreePoint() {
         int x;
         int y;
         Vector2 result;

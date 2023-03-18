@@ -45,7 +45,7 @@ public class RandomSpawnerHelper {
                 Entity randomTransfer = transfers.random();
                 Vector2 randomTransferPosition;
                 if (randomTransfer == null)
-                    randomTransferPosition = mapOrientationSystem.getRandomFreePoint(cameraSystem.getCamera());
+                    randomTransferPosition = mapOrientationSystem.getRandomFreePoint();
                 else
                     randomTransferPosition = pm.get(randomTransfer).getPosition();
 
@@ -63,8 +63,7 @@ public class RandomSpawnerHelper {
 
         float singleFreq = Float.parseFloat((String) properties.get(PropertyFields.SINGLE_BOT_FREQ));
         timerSystem.addTimerAction(singleFreq, () -> entityProcessorSystem
-                .addEntity(entityBuilder.randomStalker(()
-                -> mapOrientationSystem.getRandomFreePoint(cameraSystem.getCamera()))));
+                .addEntity(entityBuilder.randomStalker(mapOrientationSystem::getRandomFreePoint)));
     }
 
 }

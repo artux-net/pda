@@ -9,11 +9,15 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.RayCastCallback;
+import com.badlogic.gdx.physics.box2d.World;
 
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 
 import javax.inject.Inject;
@@ -29,11 +33,14 @@ public class VisionSystem extends BaseSystem implements Drawable {
 
     private final MapOrientationSystem mapOrientationSystem;
     private final Sprite enemyTarget;
+    private final World world;
 
     @Inject
-    public VisionSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem) {
+    public VisionSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem, World world) {
         super(Family.all(VisionComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
+        this.world = world;
+
         enemyTarget = new Sprite(assetManager.get("transfer.png", Texture.class));
         enemyTarget.setSize(16, 16);
         enemyTarget.setOriginCenter();
@@ -55,11 +62,20 @@ public class VisionSystem extends BaseSystem implements Drawable {
             float dst = bodyComponentComponent1.getPosition().dst(bodyComponentComponent2.getPosition());
 
             if (dst < VISION_DISTANCE
-                    && !mapOrientationSystem.collides(bodyComponentComponent1.getPosition(), bodyComponentComponent2.getPosition())) {
-                visionComponent1.addVisibleEntity(entity2);
-            }
+                    && !mapOrientationSystem.collides(bodyComponentComponent1.getPosition(), bodyComponentComponent2.getPosition()))
+                world.rayCast(new RayCastCallback() {
+                    @Override
+                    public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+                        if (fixture.getBody().getType() == BodyDef.BodyType.DynamicBody)
+                            visionComponent1.addVisibleEntity(entity2);
+                        return 0;
+                    }
+                }, bodyComponentComponent1.getPosition(), bodyComponentComponent2.getPosition());
+
+
         }
     }
+
 
     @Override
     public void draw(Batch batch, float parentAlpha) {

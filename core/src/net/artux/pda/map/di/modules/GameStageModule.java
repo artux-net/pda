@@ -3,11 +3,13 @@ package net.artux.pda.map.di.modules;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem;
@@ -36,7 +38,7 @@ public class GameStageModule {
     @Named("uiStage")
     public Stage uiStage() {
         ScreenViewport screenViewport = new ScreenViewport();
-        screenViewport.setUnitsPerPixel(Math.min(1920.0f/Gdx.graphics.getWidth(),1080.0f/Gdx.graphics.getHeight()));
+        screenViewport.setUnitsPerPixel(Math.min(1920.0f / Gdx.graphics.getWidth(), 1080.0f / Gdx.graphics.getHeight()));
         return new Stage(screenViewport);
     }
 
@@ -78,6 +80,5 @@ public class GameStageModule {
         logger.put("Density", Gdx.app.getGraphics(), "getDensity");
         return logger;
     }
-
 
 }

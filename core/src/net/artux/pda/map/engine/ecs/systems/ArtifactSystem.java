@@ -48,7 +48,7 @@ public class ArtifactSystem extends BaseSystem {
                 float timeLimit = dst / distanceForDetector;
                 timeCount += deltaTime;
                 if (timeCount > timeLimit * 5) {
-                    soundsSystem.playSound();
+                    //soundsSystem.playSound();
                     timeCount = 0;
                 }
 

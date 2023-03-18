@@ -2,6 +2,8 @@ package net.artux.pda.map.di.modules;
 
 import com.badlogic.ashley.core.EntitySystem;
 
+import net.artux.pda.map.engine.ecs.systems.EffectsSystem;
+import net.artux.pda.map.engine.ecs.systems.EffectsSystem_Factory;
 import net.artux.pda.map.engine.ecs.systems.EntityProcessorSystem;
 import net.artux.pda.map.engine.ecs.systems.ArtifactSystem;
 import net.artux.pda.map.engine.ecs.systems.BattleSystem;
@@ -16,7 +18,7 @@ import net.artux.pda.map.engine.ecs.systems.SpawnSystem;
 import net.artux.pda.map.engine.ecs.systems.statemachine.StatesSystem;
 import net.artux.pda.map.engine.ecs.systems.TimerSystem;
 import net.artux.pda.map.engine.ecs.systems.VisionSystem;
-import net.artux.pda.map.engine.ecs.systems.WorldSystem;
+import net.artux.pda.map.engine.ecs.systems.AnomalySystem;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.engine.ecs.systems.player.ClicksSystem;
 import net.artux.pda.map.engine.ecs.systems.player.FogSystem;
@@ -79,7 +81,7 @@ public abstract class EngineSystemsModule {
 
     @IntoSet
     @Binds
-    public abstract EntitySystem worldSystem(WorldSystem worldSystem);
+    public abstract EntitySystem worldSystem(AnomalySystem anomalySystem);
 
     @IntoSet
     @Binds
@@ -123,5 +125,9 @@ public abstract class EngineSystemsModule {
 
     @IntoSet
     @Binds
-    public abstract EntitySystem EntityProcessor(EntityProcessorSystem EntityProcessorSystem);
+    public abstract EntitySystem entityProcessorSystem(EntityProcessorSystem entityProcessorSystem);
+
+    @IntoSet
+    @Binds
+    public abstract EntitySystem effectsSystem(EffectsSystem effectsSystem);
 }
