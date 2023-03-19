@@ -75,3 +75,4 @@ lint/reports/
 
 #pda maps
 app/assets/maps/
+app/api.json

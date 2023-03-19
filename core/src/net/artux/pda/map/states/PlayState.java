@@ -39,7 +39,7 @@ public class PlayState extends State {
 
     private final World world;
     private final OrthogonalTiledMapRenderer renderer;
-    private PostProcessing postProcessing;
+    private final PostProcessing postProcessing;
 
     Texture background;
 
