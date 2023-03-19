@@ -16,18 +16,16 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import javax.inject.Inject;
 
 @PerGameMap
 public class PostProcessing implements Disposable {
 
-    private boolean enabled = true;
-    private final LinkedList<ShaderGroup> shaderGroups;
+    private final HashMap<String, ShaderGroup> shaderGroups;
     private final FrameBuffer fbo;
     private final Batch batch;
     private final ShaderProgram defaultShader;
@@ -35,7 +33,7 @@ public class PostProcessing implements Disposable {
 
     @Inject
     public PostProcessing() {
-        this.shaderGroups = new LinkedList<>();
+        this.shaderGroups = new HashMap<>();
         this.batch = new SpriteBatch();
         defaultShader = batch.getShader();
 
@@ -44,11 +42,8 @@ public class PostProcessing implements Disposable {
         fbo = frameBufferBuilder.build();
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
 
-    public ShaderGroup loadShaderGroup(List<Pair<ShaderProgram, ShaderSetup>> shaderPrograms) {
+    public ShaderGroup loadShaderGroup(String key, List<Pair<ShaderProgram, ShaderSetup>> shaderPrograms) {
         List<ShaderContainer> containers = new LinkedList<>();
         for (Pair<ShaderProgram, ShaderSetup> e : shaderPrograms) {
             if (!e.getLeft().isCompiled())
@@ -58,22 +53,18 @@ public class PostProcessing implements Disposable {
             containers.add(new ShaderContainer(e.getLeft(), helpBuffer, e.getRight()));
         }
         ShaderGroup group = ShaderGroup.of(containers);
-        shaderGroups.addFirst(group);
+        shaderGroups.put(key, group);
         return group;
     }
 
-    void removeShader(ShaderProgram shaderProgram) {
-        if (defaultShader == shaderProgram)
-            return;
-        Optional<ShaderGroup> container = shaderGroups.stream()
-                .filter(group -> group.contains(shaderProgram))
-                .findFirst();
+    boolean removeGroup(String key) {
+        ShaderGroup shaderGroup = shaderGroups.get(key);
+        if (shaderGroup == null)
+            return false;
 
-        container.ifPresent(group -> {
-            group.dispose();
-            shaderGroups.remove(group);
-        });
-
+        shaderGroup.dispose();
+        shaderGroups.remove(key);
+        return true;
     }
 
     public void begin() {
@@ -86,7 +77,7 @@ public class PostProcessing implements Disposable {
 
     private Texture processedTexture() {
         Texture texture = fbo.getColorBufferTexture();
-        for (ShaderGroup group : shaderGroups) {
+        for (ShaderGroup group : shaderGroups.values()) {
             for (ShaderContainer container : group.getShaders()) {
                 batch.setShader(container.shader);
                 FrameBuffer frameBuffer = container.buffer;
@@ -110,7 +101,7 @@ public class PostProcessing implements Disposable {
 
     public void process() {
         Texture texture;
-        if (enabled)
+        if (shaderGroups.values().size() > 0)
             texture = processedTexture();
         else
             texture = fbo.getColorBufferTexture();
@@ -139,10 +130,6 @@ public class PostProcessing implements Disposable {
             return new ShaderGroup(containers);
         }
 
-        static ShaderGroup of(ShaderContainer shaderContainer) {
-            return new ShaderGroup(Collections.singletonList(shaderContainer));
-        }
-
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
@@ -167,29 +154,17 @@ public class PostProcessing implements Disposable {
         private final ShaderSetup setup;
         private final FrameBuffer buffer;
 
-        private boolean enabled = true;
-
         ShaderContainer(ShaderProgram shader, FrameBuffer frameBuffer, ShaderSetup setup) {
             this.shader = shader;
             this.setup = setup;
             this.buffer = frameBuffer;
         }
 
-        public ShaderProgram getShader() {
-            return shader;
-        }
 
         public void apply() {
             setup.apply(shader);
         }
 
-        public FrameBuffer getBuffer() {
-            return buffer;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
     }
 
     public interface ShaderSetup {

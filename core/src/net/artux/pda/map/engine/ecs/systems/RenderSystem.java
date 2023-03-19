@@ -82,7 +82,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
         relationalSprites.put(RelationType.FRIEND, greenSprite);
 
         ShaderProgram shaderProgram = assetManager.get("shaders/blur.frag");
-        blurGroup = postProcessing.loadShaderGroup(
+        blurGroup = postProcessing.loadShaderGroup("blur",
                 List.of(Pair.of(shaderProgram, shaderProgram1 -> {
                             shaderProgram1.setUniformf("dir", 1f, 0);
                             shaderProgram1.setUniformf("radius", effect);
