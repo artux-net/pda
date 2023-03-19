@@ -37,7 +37,7 @@ jobs:
       - uses: r0adkll/upload-google-play@v1
         id: upload
         with:
-          serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
+          serviceAccountJsonPlainText: ${{SERVICE_ACCOUNT_JSON}}
           packageName: net.artux.pda
           releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
           track: internalsharing
