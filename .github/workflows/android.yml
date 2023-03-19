@@ -48,4 +48,6 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Сборка ${{github.run_number}}: ${{ github.event.commits[0].message }} \n \n Ссылка для скачивания: ${{steps.upload.outputs.internalSharingDownloadUrl}}
+            Сборка ${{github.run_number}}: ${{ github.event.commits[0].message }} 
+            
+            Ссылка для скачивания: ${{steps.upload.outputs.internalSharingDownloadUrl}}
