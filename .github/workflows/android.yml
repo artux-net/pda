@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
 
 jobs:
   assemble_job:
@@ -37,11 +34,18 @@ jobs:
           keyStorePassword: ${{ secrets.keystore_password }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}   
           
-      - name: Send apk to Artux channel
+      - uses: r0adkll/upload-google-play@v1
+        id: upload
+        with:
+          serviceAccountJsonPlainText: ${{ SERVICE_ACCOUNT_JSON }}
+          packageName: net.artux.pda
+          releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          track: internalsharing
+          
+      - name: Send message to Artux channel
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Сборка ${{github.run_number}}: ${{ github.event.commits[0].message }}
-          document: ${{steps.sign_apk.outputs.signedReleaseFile}}
+            Сборка ${{github.run_number}}: ${{ github.event.commits[0].message }} \n \n Ссылка для скачивания: ${{steps.upload.outputs.internalSharingDownloadUrl}}
