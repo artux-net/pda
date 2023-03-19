@@ -200,7 +200,7 @@ dependencies {
 
 task copyMaps(type: Copy) {
     from zipTree(configurations.localDeps.copy().files[0])
-    into "/app/assets/maps"
+    into "assets/maps"
     exclude '**/META-INF/**'
     println 'Done'
 }
