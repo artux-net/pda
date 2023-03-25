@@ -2,11 +2,11 @@ package net.artux.pda.map.di.components;
 
 import com.badlogic.gdx.assets.AssetManager;
 
-import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.di.modules.AppModule;
 import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.states.ErrorState;
 import net.artux.pda.map.states.GameStateController;
 import net.artux.pda.map.states.PlayState;
 import net.artux.pda.map.states.PreloadState;
@@ -27,6 +27,8 @@ public interface CoreComponent {
     PreloadState getPreloadState();
 
     PlayState getPlayState();
+
+    ErrorState getErrorState();
 
     GameStateController getGSC();
 

@@ -41,6 +41,7 @@ public class GdxAdapter extends ApplicationAdapter {
     @Override
     public void create() {
         assetManager = coreComponent.getAssetsManager();
+
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         Gdx.app.log("GDX", "GDX load stared, version " + Gdx.app.getVersion());
         long loadMills = TimeUtils.millis();
@@ -61,8 +62,8 @@ public class GdxAdapter extends ApplicationAdapter {
 
     @Override
     public void resize(int width, int height) {
-        super.resize(width, height);
-        gsc.resize(width, height);
+        //super.resize(width, height);
+        //gsc.resize(width, height);
     }
 
     @Override

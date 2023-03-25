@@ -32,26 +32,18 @@ public class PlayState extends State {
     public Stage stage;
     public Stage uistage;
 
-    private LevelBackgroundImage levelBackgroundImage;
     private final EngineManager engineManager;
-    private final AssetManager assetManager;
     private final CoreComponent coreComponent;
 
     private final World world;
     private final OrthogonalTiledMapRenderer renderer;
     private final PostProcessing postProcessing;
 
-    Texture background;
-
     @Inject
     public PlayState(final GameStateController gsm, DataRepository dataRepository, GameMap gameMap, CoreComponent coreComponent) {
         super(gsm, dataRepository);
         this.gameMap = gameMap;
         this.coreComponent = coreComponent;
-
-        AssetsFinder assetsFinder = coreComponent.getAssetsFinder();
-        assetManager = assetsFinder.getManager();
-        assetManager.finishLoading();//make sure everything loaded
 
         MapComponent mapComponent = DaggerMapComponent.builder()
                 .coreComponent(coreComponent)
@@ -67,24 +59,6 @@ public class PlayState extends State {
 
         mapComponent.getUserInterface();
         mapComponent.initInterface();
-        loadMap();
-    }
-
-    private void loadMap() {
-        background = (Texture) assetManager.get(gameMap.getTexture(), NetFile.class).file;
-        GlobalData.mapWidth = background.getWidth();
-        GlobalData.mapHeight = background.getHeight();
-        /*Image mapTexture = new Image(background);
-        if (!stage.getActors().contains(mapTexture, false))
-            stage.addActor(mapTexture);
-        mapTexture.setZIndex(1);*/
-
-        Texture levelTexture = assetManager.get("textures/defaults/blur.png", Texture.class);
-        if (levelBackgroundImage == null) {
-            levelBackgroundImage = new LevelBackgroundImage(levelTexture, stage.getCamera());
-            //stage.addActor(levelBackgroundImage);
-            levelBackgroundImage.setZIndex(0);
-        }
     }
 
     @Override
@@ -148,14 +122,12 @@ public class PlayState extends State {
 
     @Override
     public void resize(int w, int h) {
-        stage.getViewport().update(w, h, false);
+        //stage.getViewport().update(w, h, false);
         //uistage.getViewport().update(w, h, false);
     }
 
     @Override
     public void dispose() {
-        assetManager.unload(gameMap.getTexture());
-
         postProcessing.dispose();
         stage.dispose();
         renderer.dispose();

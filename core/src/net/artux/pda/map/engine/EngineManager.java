@@ -42,7 +42,8 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private boolean anomalies = true;
 
     @Inject
-    public EngineManager(MapComponent mapComponent, MissionsSystem missionsSystem) {
+    public EngineManager(MapComponent mapComponent, MissionsSystem missionsSystem,
+                         ConditionEntityManager conditionEntityManager) {
         this.dataRepository = mapComponent.getDataRepository();
         this.map = dataRepository.getGameMap();
         this.engine = mapComponent.getEngine();
@@ -62,6 +63,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         if (anomalies)
             AnomalyHelper.createAnomalies(mapComponent);
 
+        conditionEntityManager.update();
 //        RandomSpawnerHelper.init(coreComponent);
 
         missionsSystem.setActiveMission(missionsSystem.getActiveMission()); // finds points
@@ -112,7 +114,10 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     }
 
     public void updateOnlyPlayer() {
-        engine.getSystem(PlayerSystem.class).getPosition().set(Mappers.vector2(dataRepository.getGameMap().getDefPos()));
+        engine.getSystem(PlayerSystem.class)
+                .getPosition()
+                .set(Mappers.vector2(dataRepository.getGameMap().getDefPos()));
         engine.getSystem(InteractionSystem.class).setProcessing(true);
+
     }
 }

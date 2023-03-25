@@ -47,17 +47,20 @@ class MissionsSystem @Inject constructor(
         PassivityComponent::class.java
     ).get()
 ), Disposable {
+
     private val pm = ComponentMapper.getFor(
         BodyComponent::class.java
     )
+
     private val qcm = ComponentMapper.getFor(
         QuestComponent::class.java
     )
+
     private val pixelsPerMeter = 3f
     private val mapDigraph: Digraph<GameMap>
     private val pathFinder: DijkstraPathFinder<GameMap>
     private val missionUpdatedSound: Sound
-    private lateinit var currentStoryDataModel: StoryDataModel
+    private var currentStoryDataModel: StoryDataModel
     private var activeMission: MissionModel? = null
     private var targetPosition: Vector2? = null
 
@@ -72,6 +75,8 @@ class MissionsSystem @Inject constructor(
                 updateData(dataRepository.storyDataModel)
             }
         }
+
+        currentStoryDataModel = dataRepository.storyDataModel
     }
 
     override fun addedToEngine(engine: Engine) {

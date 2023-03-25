@@ -3,7 +3,6 @@ package net.artux.pda.map.di.modules;
 import com.badlogic.ashley.core.EntitySystem;
 
 import net.artux.pda.map.engine.ecs.systems.EffectsSystem;
-import net.artux.pda.map.engine.ecs.systems.EffectsSystem_Factory;
 import net.artux.pda.map.engine.ecs.systems.EntityProcessorSystem;
 import net.artux.pda.map.engine.ecs.systems.ArtifactSystem;
 import net.artux.pda.map.engine.ecs.systems.BattleSystem;
@@ -11,7 +10,6 @@ import net.artux.pda.map.engine.ecs.systems.DeadCheckerSystem;
 import net.artux.pda.map.engine.ecs.systems.MapLoggerSystem;
 import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.ecs.systems.MovementTargetingSystem;
-import net.artux.pda.map.engine.ecs.systems.MovingSystem;
 import net.artux.pda.map.engine.ecs.systems.RenderSystem;
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
 import net.artux.pda.map.engine.ecs.systems.SpawnSystem;
@@ -106,10 +104,6 @@ public abstract class EngineSystemsModule {
     @IntoSet
     @Binds
     public abstract EntitySystem visionSystem(VisionSystem visionSystem);
-
-    @IntoSet
-    @Binds
-    public abstract EntitySystem movingSystem(MovingSystem movingSystem);
 
     @IntoSet
     @Binds

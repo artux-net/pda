@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-@PerGameMap
 public class PostProcessing implements Disposable {
 
     private final HashMap<String, ShaderGroup> shaderGroups;

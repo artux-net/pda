@@ -19,34 +19,27 @@ import net.artux.engine.resource.types.NetFile;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.view.FontManager;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 public class AssetsFinder implements Disposable {
 
-    public static final String cachePath = "cache/";
-
     public AssetManager assetManager;
-    private final Map<String, Texture> textureMap;
     private final FontManager fontManager;
     private final Properties properties;
 
     @Inject
     public AssetsFinder(Properties properties) {
         fontManager = new FontManager();
-        textureMap = new HashMap<>();
         this.properties = properties;
     }
 
     public AssetManager getManager() {
-        ObjectMap<String, Object> fontsMap = new ObjectMap<>();
-        fontsMap.put("font", fontManager.getDisposableFont(FontManager.LIBERAL_FONT, 24));
-        fontsMap.put("title", fontManager.getDisposableFont(FontManager.IMPERIAL_FONT, 28));
-        Gdx.app.log("Assets", "Setup assets.");
         if (assetManager == null) {
+            Gdx.app.log("Assets", "Setup assets for loading.");
             assetManager = new AssetManager();
 
             for (int i = 0; i < 31; i++) {
@@ -54,7 +47,7 @@ public class AssetsFinder implements Disposable {
             }
 
             FileHandle ui = assetManager.getFileHandleResolver().resolve("ui");
-            loadRecursively(assetManager, ui, true,  Texture.class);
+            loadRecursively(assetManager, ui, true, Texture.class);
 
             FileHandle shaders = assetManager.getFileHandleResolver().resolve("shaders");
             loadRecursively(assetManager, shaders, true, ShaderProgram.class);
@@ -73,6 +66,10 @@ public class AssetsFinder implements Disposable {
             assetManager.load("gray.png", Texture.class);
             assetManager.load("controlPoint.png", Texture.class);
 
+            ObjectMap<String, Object> fontsMap = new ObjectMap<>();
+            fontsMap.put("font", fontManager.getDisposableFont(FontManager.LIBERAL_FONT, 24));
+            fontsMap.put("title", fontManager.getDisposableFont(FontManager.IMPERIAL_FONT, 28));
+
             SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter("skins/cloud/cloud-form-ui.atlas", fontsMap);
             assetManager.load("skins/cloud/cloud-form-ui.json", Skin.class, skinParameter);
 
@@ -88,6 +85,8 @@ public class AssetsFinder implements Disposable {
             assetManager.setLoader(NetFile.class, new NetTextureAssetLoader(properties));
             assetManager.setLoader(LocaleBundle.class, new LocaleBundleLoader(assetManager.getFileHandleResolver()));
             assetManager.load("locale/ui.properties", LocaleBundle.class);
+        } else {
+            Gdx.app.log("Assets", "Assets are already set. Return cache.");
         }
         return assetManager;
     }
@@ -98,16 +97,6 @@ public class AssetsFinder implements Disposable {
 
     public FontManager getFontManager() {
         return fontManager;
-    }
-
-    public Texture getLocal(String path) {
-        if (textureMap.containsKey(path))
-            return textureMap.get(path);
-        if (path == null || path.equals(""))
-            return null;
-        Texture texture = new Texture(Gdx.files.local(cachePath + path));
-        textureMap.put(path, texture);
-        return texture;
     }
 
     private void loadRecursively(AssetManager assetManager, FileHandle fileHandle, boolean recursively, Class<? extends Disposable> clazz) {
@@ -128,14 +117,9 @@ public class AssetsFinder implements Disposable {
 
     @Override
     public void dispose() {
-        for (Map.Entry<String, Texture> e :
-                textureMap.entrySet()) {
-            if (e.getValue() != null)
-                e.getValue().dispose();
-        }
-
         fontManager.dispose();
         assetManager.dispose();
         assetManager = null;
+        Gdx.app.log("Assets", "Disposed.");
     }
 }

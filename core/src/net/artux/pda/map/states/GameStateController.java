@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 
+import net.artux.pda.map.di.components.CoreComponent;
+
 import java.util.Stack;
 
 import javax.inject.Inject;
@@ -14,10 +16,12 @@ public class GameStateController {
 
     private final Stack<net.artux.pda.map.states.State> states;
     private final InputMultiplexer multiplexer = new InputMultiplexer();
+    private final CoreComponent coreComponent;
 
     @Inject
-    public GameStateController() {
+    public GameStateController(CoreComponent coreComponent) {
         states = new Stack<>();
+        this.coreComponent = coreComponent;
     }
 
     public void push(net.artux.pda.map.states.State state) {
@@ -28,7 +32,7 @@ public class GameStateController {
     }
 
     public void resume() {
-                states.peek().resume();
+        states.peek().resume();
     }
 
     public State peek() {
@@ -52,8 +56,14 @@ public class GameStateController {
     }
 
     public void update(float dt) {
-        if (states.size() > 0)
-            states.peek().update(dt);
+        try {
+            if (states.size() > 0)
+                states.peek().update(dt);
+        } catch (Exception e) {
+            ErrorState errorState = coreComponent.getErrorState();
+            errorState.setThrowable(e);
+            set(errorState);
+        }
     }
 
     public void resize(int width, int height) {
@@ -62,8 +72,14 @@ public class GameStateController {
     }
 
     public void render() {
-        if (states.size() > 0)
-            states.peek().render();
+        try {
+            if (states.size() > 0)
+                states.peek().render();
+        } catch (Exception e) {
+            ErrorState errorState = coreComponent.getErrorState();
+            errorState.setThrowable(e);
+            set(errorState);
+        }
     }
 
     public void addInputProcessor(InputProcessor inputProcessor) {
@@ -78,7 +94,7 @@ public class GameStateController {
             multiplexer.removeProcessor(inputProcessor);
     }
 
-    public void clearInputProcessors(){
+    public void clearInputProcessors() {
         multiplexer.clear();
     }
 }

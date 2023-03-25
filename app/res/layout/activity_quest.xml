@@ -25,69 +25,7 @@
     </ImageSwitcher>
 
 
-    <RelativeLayout
-        android:id="@+id/navbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <ImageButton
-            android:id="@+id/closeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_margin="10dp"
-            android:background="@null"
-            android:src="@drawable/ic_close" />
-
-        <ImageButton
-            android:id="@+id/exitButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/closeButton"
-            android:layout_alignBottom="@id/closeButton"
-            android:layout_toEndOf="@id/closeButton"
-            android:background="@null"
-            android:src="@drawable/ic_exit_story" />
-
-        <TextView
-            android:id="@+id/sceneTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/exitButton"
-            android:layout_alignBottom="@id/exitButton"
-            android:layout_marginStart="10dp"
-            android:gravity="center"
-            android:layout_toEndOf="@id/exitButton"
-            android:textSize="20sp" />
-
-        <ImageView
-            android:id="@+id/log"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/sceneTime"
-            android:layout_alignBottom="@+id/sceneTime"
-            android:layout_marginEnd="10dp"
-            android:layout_toStartOf="@id/musicSetup"
-            android:src="@drawable/ic_bug" />
-
-        <ImageView
-            android:id="@+id/musicSetup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/sceneTime"
-            android:layout_alignBottom="@+id/sceneTime"
-            android:layout_toStartOf="@id/sceneTime"
-            android:src="@drawable/ic_vol_on" />
-
-        <TextView
-            android:id="@+id/sceneTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:layout_margin="10dp"
-            android:layout_alignParentEnd="true"/>
-
-    </RelativeLayout>
 
     <FrameLayout
         android:id="@+id/containerView"

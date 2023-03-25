@@ -117,18 +117,17 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
             mFragmentTransaction
                     .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                     .add(R.id.containerView, stageFragment, "stage")
-                    .addToBackStack("stage")
-                    .commit();
+                    .commitNow();
 
             if (stageModel.getType() != StageType.CHAPTER_OVER)
                 setTitle(stageModel.getTitle());
             else
                 setTitle("");
-            findViewById(R.id.navbar).setVisibility(View.VISIBLE);
+            //findViewById(R.id.navbar).setVisibility(View.VISIBLE);
         });
 
         questViewModel.getMap().observe(this, map -> {
-            findViewById(R.id.navbar).setVisibility(View.GONE);
+            //findViewById(R.id.navbar).setVisibility(View.GONE);
             FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
             if (coreFragment == null)
                 coreFragment = new CoreFragment();
@@ -149,11 +148,10 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
                 }
             }
             mFragmentTransaction
-                    .replace(R.id.containerView, coreFragment)
-                    .addToBackStack("core");
+                    .replace(R.id.containerView, coreFragment);
 
             mFragmentTransaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-            mFragmentTransaction.commit();
+            mFragmentTransaction.commitNow();
         });
 
         questViewModel.getLoadingState().observe(this, flag -> {
@@ -224,12 +222,12 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
 
         questViewModel.getBackground().observe(this, this::setBackground);
 
-        tvTime = findViewById(R.id.sceneTime);
+        /*tvTime = findViewById(R.id.sceneTime);
         musicImage = findViewById(R.id.musicSetup);
         musicImage.setOnClickListener(this);
         findViewById(R.id.closeButton).setOnClickListener(this);
         findViewById(R.id.exitButton).setOnClickListener(this);
-        findViewById(R.id.log).setOnClickListener(this);
+        findViewById(R.id.log).setOnClickListener(this);*/
         switcher = findViewById(R.id.switcher);
         switcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
         switcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
@@ -325,8 +323,8 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
-        tvTime.setText(timeFormatter.format(Instant.now()));
-        timeChangeReceiver = new BroadcastReceiver() {
+//        tvTime.setText(timeFormatter.format(Instant.now()));
+/*        timeChangeReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context ctx, Intent intent) {
                 if (intent.getAction() != null && intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0)
@@ -334,7 +332,7 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
             }
         };
 
-        registerReceiver(timeChangeReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+        registerReceiver(timeChangeReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));*/
     }
 
     @Override

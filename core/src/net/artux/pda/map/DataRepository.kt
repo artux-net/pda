@@ -23,6 +23,7 @@ class DataRepository(
     val storyModel: StoryModel,
     val properties: Properties
 ) {
+    val TAG = "Data Repository"
 
     data class Builder(
         var platformInterface: PlatformInterface? = null,
@@ -32,6 +33,7 @@ class DataRepository(
         var storyModel: StoryModel? = null,
         var properties: Properties? = null
     ) {
+
 
         fun platformInterface(platformInterface: PlatformInterface) =
             apply { this.platformInterface = platformInterface }
@@ -61,11 +63,13 @@ class DataRepository(
     val storyDataModelFlow: SharedFlow<StoryDataModel> = dataModelFlow
 
     val gson = Gson()
+
     init {
         dataModelFlow.tryEmit(storyDataModel)
     }
 
     fun setUserData(storyDataModel: StoryDataModel) {
+        Gdx.app.log(TAG, "Story data updated.")
         this.storyDataModel = SerializationUtils.clone(storyDataModel)
         currentStoryDataModel = storyDataModel
         dataModelFlow.tryEmit(storyDataModel)

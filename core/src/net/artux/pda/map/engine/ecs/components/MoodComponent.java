@@ -58,6 +58,8 @@ public class MoodComponent implements Component {
             return true;
         if (angry)
             return true;
+        if (moodComponent.player)
+            return moodComponent.relations[group] < -2;
         else
             //usual compare
             response = moodComponent.group < 0 // is animal

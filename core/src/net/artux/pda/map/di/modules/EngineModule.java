@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.MapBodyBuilder;
+import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.model.map.GameMap;
 
 import java.util.Set;

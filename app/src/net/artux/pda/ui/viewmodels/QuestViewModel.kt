@@ -154,11 +154,8 @@ class QuestViewModel @javax.inject.Inject constructor(
                     } else
                         status.postValue(StatusModel("Указан тип стадии - карта, но не id не задан"))
                 }
-                5, 6 -> {
-                    // data - действие
-                    processData(chapterStage.data)
-                }
                 else -> {
+                    processData(chapterStage.data)
                     background.postValue(chapterStage.backgroundUrl)
                     if (storyData.value != null) {
                         notification.postValue(
@@ -260,7 +257,9 @@ class QuestViewModel @javax.inject.Inject constructor(
         repository.clearCache()
     }
 
-    fun processData(data: Map<String, String>) {
+    fun processData(data: Map<String, String>?) {
+        if (data == null)
+            return
         loadingState.postValue(true)
         if (data.containsKey("over")) {
             actionsMap["over"] = mutableListOf("")

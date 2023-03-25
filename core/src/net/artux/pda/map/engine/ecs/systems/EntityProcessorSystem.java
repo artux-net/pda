@@ -3,8 +3,11 @@ package net.artux.pda.map.engine.ecs.systems;
 import static com.badlogic.gdx.math.MathUtils.random;
 
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -55,6 +58,22 @@ public class EntityProcessorSystem extends EntitySystem {
         this.assetManager = assetManager;
         JsonReader reader = new JsonReader(Gdx.files.internal("config/mobs.json").reader());
         gangRelations = new Gson().fromJson(reader, GangRelations.class);
+    }
+
+    @Override
+    public void addedToEngine(Engine engine) {
+        super.addedToEngine(engine);
+        engine.addEntityListener(Family.all(BodyComponent.class).get(), new EntityListener() {
+            @Override
+            public void entityAdded(Entity entity) {
+
+            }
+
+            @Override
+            public void entityRemoved(Entity entity) {
+                world.destroyBody(pm.get(entity).body);
+            }
+        });
     }
 
     public void addEntity(Entity entity) {

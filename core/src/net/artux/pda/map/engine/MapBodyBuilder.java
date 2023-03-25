@@ -25,6 +25,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 
+import net.artux.pda.map.engine.data.GlobalData;
+
 public class MapBodyBuilder {
 
     // The pixels per tile. If your tiles are 16x16, this is set to 16f
@@ -35,6 +37,10 @@ public class MapBodyBuilder {
         MapObjects objects = map.getLayers().get("objects").getObjects();
         initObjects(objects, world, 0, 0);
         TiledMapTileLayer tileLayer = (TiledMapTileLayer) map.getLayers().get("tiles");
+
+        GlobalData.mapWidth = tileLayer.getWidth() * tileLayer.getTileWidth();
+        GlobalData.mapHeight = tileLayer.getHeight() * tileLayer.getTileHeight();
+
         tileLayer.setVisible(false);
 
         for (int x = 0; x < tileLayer.getWidth(); x++) {

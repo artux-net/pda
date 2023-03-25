@@ -16,8 +16,7 @@ public class BodyComponent implements Component {
 
     public BodyComponent(Vector2 vector2, World world) {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(vector2);
-        bodyDef.active = false;
+        bodyDef.position.set(vector2.x, vector2.y);
         body = world.createBody(bodyDef);
     }
 
@@ -56,7 +55,7 @@ public class BodyComponent implements Component {
         return this;
     }
 
-    public BodyComponent impulse(float x, float y){
+    public BodyComponent impulse(float x, float y) {
         body.applyForceToCenter(x, y, true);
         return this;
     }
