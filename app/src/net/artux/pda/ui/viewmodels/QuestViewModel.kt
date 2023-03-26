@@ -154,8 +154,10 @@ class QuestViewModel @javax.inject.Inject constructor(
                     } else
                         status.postValue(StatusModel("Указан тип стадии - карта, но не id не задан"))
                 }
-                else -> {
+                5,6 -> {
                     processData(chapterStage.data)
+                }
+                else -> {
                     background.postValue(chapterStage.backgroundUrl)
                     if (storyData.value != null) {
                         notification.postValue(

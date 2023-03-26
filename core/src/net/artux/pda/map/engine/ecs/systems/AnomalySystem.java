@@ -92,7 +92,7 @@ public class AnomalySystem extends EntitySystem {
 
                 somebodyIsInAnomaly = true;
                 if (radiation)
-                    healthComponent.radiation += 0.006;
+                    healthComponent.radiation(0.006f);
 
 
                 if (pcm.has(entities.get(i)))

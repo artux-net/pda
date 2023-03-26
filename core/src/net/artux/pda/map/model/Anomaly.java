@@ -23,7 +23,7 @@ public enum Anomaly {
         public void interact(Engine engine, Entity entity) {
             pm.get(entity).body.setLinearVelocity(random(-600000, 600000), random(-600000, 600000));
             hcm.get(entity).damage(random(10, 30));
-            hcm.get(entity).stamina -= random(20, 40);
+            hcm.get(entity).stamina(-random(20, 40));
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.FLY, 1);
         }
     },

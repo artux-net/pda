@@ -116,7 +116,7 @@ class PlayerSystem @Inject constructor(
         if (isPlayerActive) {
             val preferences = Gdx.app.getPreferences("player")
             val healthComponent = healthComponent
-            preferences.putFloat("health", healthComponent.value)
+            preferences.putFloat("health", healthComponent.health)
             preferences.putFloat("radiation", healthComponent.radiation)
             preferences.flush()
         }
@@ -126,8 +126,8 @@ class PlayerSystem @Inject constructor(
         if (isPlayerActive) {
             val preferences = Gdx.app.getPreferences("player")
             val healthComponent = healthComponent
-            healthComponent.value = preferences.getFloat("health", 100f)
-            if (healthComponent.isDead) healthComponent.value = 50f
+            healthComponent.health = preferences.getFloat("health", 100f)
+            if (healthComponent.isDead) healthComponent.health = 50f
             healthComponent.radiation = preferences.getFloat("radiation", 0f)
         }
     }

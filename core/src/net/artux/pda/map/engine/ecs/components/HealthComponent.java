@@ -8,46 +8,84 @@ public class HealthComponent implements Component {
 
     private boolean immortal = false;
 
-    public float value;
-    public float stamina;
-    public float radiation;
+    private Float health;
+    private Float stamina;
+    private Float radiation;
 
     public HealthComponent() {
-        value = 100;
-        stamina = 100;
+        health = 100f;
+        stamina = 100f;
+        radiation = 0f;
     }
 
     public void setImmortal(boolean immortal) {
         this.immortal = immortal;
     }
 
+    public float getHealth() {
+        return health;
+    }
+
+    public float getStamina() {
+        return stamina;
+    }
+
+    public float getRadiation() {
+        return radiation;
+    }
+
     public boolean isDead() {
-        return value < 1;
+        return health < 1;
+    }
+
+    public void setHealth(Float health) {
+        this.health = health;
+    }
+
+    public void setRadiation(Float radiation) {
+        this.radiation = radiation;
     }
 
     public void damage(float damage) {
-        if (!immortal)
-            value -= damage;
+        health(-damage);
     }
 
-    public void treat(float med) {
-        if (value + med < 100)
-            value += med;
-        else
-            value = 100;
+    public void health(float value) {
+        if (immortal)
+            return;
+
+        float result = health + value;
+        if (result > 0)
+            if (result > 100)
+                health = 100f;
+            else
+                health = result;
+        else health = 0f;
     }
 
-    public void decreaseRadiation(float value) {
-        if (value < 0)
-            value = -value;
-        if (radiation - value > 0)
-            radiation -= value;
-        else radiation = 0;
+    public void stamina(float value) {
+        float result = stamina + value;
+        if (result > 0)
+            if (result > 100)
+                stamina = 100f;
+            else
+                stamina = result;
+        else stamina = 0f;
+    }
+
+    public void radiation(float value) {
+        float result = radiation + value;
+        if (result > 0)
+            if (result > 100)
+                radiation = 100f;
+            else
+                radiation = result;
+        else radiation = 0f;
     }
 
     public void treat(MedicineModel model) {
-        treat(model.getHealth());
+        health(model.getHealth());
         stamina += model.getStamina();
-        decreaseRadiation(model.getRadiation());
+        radiation(model.getRadiation());
     }
 }

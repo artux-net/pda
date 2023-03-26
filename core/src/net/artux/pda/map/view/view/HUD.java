@@ -76,9 +76,9 @@ public class HUD extends Button {
             return;
         }
 
-        healthBar.updateValue(healthComponent.value);
-        staminaBar.updateValue(healthComponent.stamina);
-        radiationBar.updateValue(healthComponent.radiation);
+        healthBar.updateValue(healthComponent.getHealth());
+        staminaBar.updateValue(healthComponent.getStamina());
+        radiationBar.updateValue(healthComponent.getRadiation());
     }
 
 }

@@ -284,7 +284,7 @@ public class UserInterfaceModule {
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                         HealthComponent healthComponent = hm.get(playerSystem.getPlayer());
-                        if (healthComponent.stamina > 10f)
+                        if (healthComponent.getStamina() > 10f)
                             vcm.get(playerSystem.getPlayer()).running = true;
                         return super.touchDown(event, x, y, pointer, button);
                     }

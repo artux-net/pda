@@ -72,7 +72,7 @@ class PlayerMovingSystem @Inject constructor(
             if (healthComponent.stamina < 100) staminaDifference = 0.06f
             stepVector = currentVelocity.scl(deltaTime).scl(MOVEMENT_FORCE)
         }
-        healthComponent.stamina += staminaDifference
+        healthComponent.stamina(staminaDifference)
         if (!stepVector.isZero) {
             position.getBody().applyLinearImpulse(
                 stepVector.x * MOVEMENT_FORCE,

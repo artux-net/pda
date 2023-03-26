@@ -21,7 +21,7 @@ import net.artux.engine.pathfinding.TiledManhattanDistance;
 import javax.inject.Inject;
 
 @PerGameMap
-public class MovementTargetingSystem extends IntervalSystem {
+public class MovementTargetingSystem extends BaseSystem {
 
     private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
@@ -33,11 +33,10 @@ public class MovementTargetingSystem extends IntervalSystem {
     MapOrientationSystem mapOrientationSystem;
 
     private float MOVEMENT_FORCE = 30f; // H per step
-    private ImmutableArray<Entity> entities;
 
     @Inject
     public MovementTargetingSystem(MapOrientationSystem mapOrientationSystem) {
-        super(1);
+        super(Family.all(VelocityComponent.class, BodyComponent.class, GraphMotionComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
     }
 
@@ -45,75 +44,70 @@ public class MovementTargetingSystem extends IntervalSystem {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
 
-        entities = engine.getEntitiesFor(Family.all(VelocityComponent.class, BodyComponent.class, GraphMotionComponent.class).get());
-
         heuristic = mapOrientationSystem.getHeuristic();
         pathFinder = mapOrientationSystem.getPathFinder();
         pathSmoother = mapOrientationSystem.getPathSmoother();
     }
 
     @Override
-    protected void updateInterval() {
-        for (int i = 0; i < entities.size(); i++) {
-            Entity entity = entities.get(i);
+    protected void processEntity(Entity entity, float deltaTime) {
+        BodyComponent bodyComponent = pm.get(entity);
+        VelocityComponent velocityComponent = vm.get(entity);
+        GraphMotionComponent targetMovingComponent = gmm.get(entity);
 
-            BodyComponent bodyComponent = pm.get(entity);
-            VelocityComponent velocityComponent = vm.get(entity);
-            GraphMotionComponent targetMovingComponent = gmm.get(entity);
+        if (targetMovingComponent.isActive()) {
+            Vector2 target = targetMovingComponent.movementTarget;
 
-            if (targetMovingComponent.isActive()) {
-                Vector2 target = targetMovingComponent.movementTarget;
-
-                if (mapOrientationSystem.isGraphActive()) {
-                    FlatTiledNode startNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(bodyComponent.getX(), bodyComponent.getY());
-                    FlatTiledNode endNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(targetMovingComponent.movementTarget.x, targetMovingComponent.movementTarget.y);
-                    if (targetMovingComponent.getPath().nodes.size == 0 || !targetMovingComponent.getPath().nodes.peek().equals(endNode)) {
-                        //пути нет и конец не совпадает
-                        targetMovingComponent.reset();
-                        if (endNode.type.isWalkable()) {
-                            //если конец не стена можем искать
-                            pathFinder.searchNodePath(startNode, endNode, heuristic, targetMovingComponent.getPath());
-                            pathSmoother.smoothPath(targetMovingComponent.getPath());
-                        } else {
-                            targetMovingComponent.movementTarget = null;
-                        }
+            if (mapOrientationSystem.isGraphActive()) {
+                FlatTiledNode startNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(bodyComponent.getX(), bodyComponent.getY());
+                FlatTiledNode endNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(targetMovingComponent.movementTarget.x, targetMovingComponent.movementTarget.y);
+                if (targetMovingComponent.getPath().nodes.size == 0 || !targetMovingComponent.getPath().nodes.peek().equals(endNode)) {
+                    //пути нет и конец не совпадает
+                    targetMovingComponent.reset();
+                    if (endNode.type.isWalkable()) {
+                        //если конец не стена можем искать
+                        pathFinder.searchNodePath(startNode, endNode, heuristic, targetMovingComponent.getPath());
+                        pathSmoother.smoothPath(targetMovingComponent.getPath());
                     } else {
-                        if (targetMovingComponent.iterator == null)
-                            targetMovingComponent.iterator = targetMovingComponent.getPath().iterator();
-                        if (targetMovingComponent.tempTarget == null
-                                || bodyComponent.getPosition().dst(
-                                new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY)) < 5) {
-                            if (targetMovingComponent.iterator.hasNext()) {
-                                targetMovingComponent.tempTarget = targetMovingComponent.iterator.next();
-                                target = new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY);
-                            } else {
-                                targetMovingComponent.getPath().clear();
-                                targetMovingComponent.movementTarget = null;
-                                targetMovingComponent.tempTarget = null;
-                                targetMovingComponent.iterator = null;
-                                target = Vector2.Zero;
-                            }
-                        } else
-                            target = new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY); // движемся к узлу
+                        targetMovingComponent.movementTarget = null;
                     }
+                } else {
+                    if (targetMovingComponent.iterator == null)
+                        targetMovingComponent.iterator = targetMovingComponent.getPath().iterator();
+                    if (targetMovingComponent.tempTarget == null
+                            || bodyComponent.getPosition().dst(
+                            new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY)) < 5) {
+                        if (targetMovingComponent.iterator.hasNext()) {
+                            targetMovingComponent.tempTarget = targetMovingComponent.iterator.next();
+                            target = new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY);
+                        } else {
+                            targetMovingComponent.getPath().clear();
+                            targetMovingComponent.movementTarget = null;
+                            targetMovingComponent.tempTarget = null;
+                            targetMovingComponent.iterator = null;
+                            target = Vector2.Zero;
+                        }
+                    } else
+                        target = new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY); // движемся к узлу
                 }
+            }
 
-                Vector2 unit = new Vector2(target.x - bodyComponent.getX(),
-                        target.y - bodyComponent.getY());
+            Vector2 unit = new Vector2(target.x - bodyComponent.getX(),
+                    target.y - bodyComponent.getY());
 
-                unit.scl(1 / unit.len());
-                velocityComponent.setVelocity(unit);
+            unit.scl(1 / unit.len());
+            velocityComponent.setVelocity(unit);
 
-                if (!unit.isZero()) {
-                    bodyComponent.getBody().applyLinearImpulse(
-                            unit.x * MOVEMENT_FORCE,
-                            unit.y * MOVEMENT_FORCE,
-                            bodyComponent.getPosition().x,
-                            bodyComponent.getPosition().y,
-                            true
-                    );
-                }
+            if (!unit.isZero()) {
+                bodyComponent.getBody().applyLinearImpulse(
+                        unit.x * MOVEMENT_FORCE,
+                        unit.y * MOVEMENT_FORCE,
+                        bodyComponent.getPosition().x,
+                        bodyComponent.getPosition().y,
+                        true
+                );
             }
         }
     }
+
 }
