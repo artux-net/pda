@@ -45,7 +45,7 @@ public class RootInterfaceModule {
         FontManager fontManager = assetsFinder.getFontManager();
         style.font = fontManager.getFont(24);
         style.fontColor = Color.WHITE;
-        style.up = new TextureRegionDrawable(assetsFinder.getManager().get("ui/slots/slot_wide.png", Texture.class));
+        style.up = new TextureRegionDrawable(assetsFinder.getManager().get("textures/ui/slots/slot_wide.png", Texture.class));
         return style;
     }
 

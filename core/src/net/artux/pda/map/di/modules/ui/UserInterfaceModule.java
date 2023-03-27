@@ -30,7 +30,7 @@ import net.artux.pda.map.engine.ecs.components.WeaponComponent;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerBattleSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
-import net.artux.pda.map.repository.StalkerMessageGenerator;
+import net.artux.pda.map.controllers.notification.NotificationController;
 import net.artux.pda.map.view.BackpackMenu;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.MessagesPlane;
@@ -55,11 +55,11 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initJoyTable(StalkerMessageGenerator stalkerMessageGenerator, MessagesPlane messagesPlane, @Named("joyTable") Table joyTable, @Named("gameZone") Group gameZone, AssetsFinder assetsFinder, PlayerSystem playerSystem) {
+    public Actor initJoyTable(NotificationController notificationController, MessagesPlane messagesPlane, @Named("joyTable") Table joyTable, @Named("gameZone") Group gameZone, AssetsFinder assetsFinder, PlayerSystem playerSystem) {
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
         AssetManager assetManager = assetsFinder.getManager();
-        style.knob = new TextureRegionDrawable(assetManager.get("ui/touchpad/knob.png", Texture.class));
-        style.background = new TextureRegionDrawable(assetManager.get("ui/touchpad/back.png", Texture.class));
+        style.knob = new TextureRegionDrawable(assetManager.get("textures/ui/touchpad/knob.png", Texture.class));
+        style.background = new TextureRegionDrawable(assetManager.get("textures/ui/touchpad/back.png", Texture.class));
         style.knob.setMinHeight(170);
         style.knob.setMinWidth(170);
 
@@ -101,7 +101,7 @@ public class UserInterfaceModule {
         assistantBlock.add(actionsTable);
         actionsTable.add();
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-        style.up = new TextureRegionDrawable(assetManager.get("ui/slots/slot.png", Texture.class));
+        style.up = new TextureRegionDrawable(assetManager.get("textures/ui/slots/slot.png", Texture.class));
         assistantBlock.addAction(new Action() {
 
             @Override
@@ -113,13 +113,13 @@ public class UserInterfaceModule {
                         String icon;
                         switch (component.type) {
                             case FINDING:
-                                icon = "ui/icons/icon_search.png";
+                                icon = "textures/ui/icons/icon_search.png";
                                 break;
                             case TRANSFER:
-                                icon = "ui/icons/ic_transfer.png";
+                                icon = "textures/ui/icons/ic_transfer.png";
                                 break;
                             default:
-                                icon = "ui/icons/icon_dialog.png";
+                                icon = "textures/ui/icons/icon_dialog.png";
                                 break;
                         }
 
@@ -127,7 +127,7 @@ public class UserInterfaceModule {
                         float pad = textureRegion.getRegionHeight() * 0.15f;
 
                         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-                        style.up = new TextureRegionDrawable(assetManager.get("ui/buttonBack.png", Texture.class));
+                        style.up = new TextureRegionDrawable(assetManager.get("textures/ui/buttonBack.png", Texture.class));
                         style.imageUp = new TextureRegionDrawable(textureRegion);
 
                         ImageButton button = new ImageButton(style);
@@ -227,7 +227,7 @@ public class UserInterfaceModule {
                                   PlayerBattleSystem battleSystem, AssetManager assetManager) {
         float offset = 50;
         float step = 60;
-        controlTable.add(addInteractButton(assetManager, "ui/icons/icon_shoot.png", new ClickListener() {
+        controlTable.add(addInteractButton(assetManager, "textures/ui/icons/icon_shoot.png", new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 battleSystem.setPlayerShoot(true);
@@ -243,7 +243,7 @@ public class UserInterfaceModule {
 
         controlTable.row();
 
-        controlTable.add(addInteractButton(assetManager, "ui/icons/icon_target.png", new ChangeListener() {
+        controlTable.add(addInteractButton(assetManager, "textures/ui/icons/icon_target.png", new ChangeListener() {
             private final ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
             private final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
@@ -271,7 +271,7 @@ public class UserInterfaceModule {
         })).padRight(offset += step);
         controlTable.row();
 
-        controlTable.add(addInteractButton(assetManager, "ui/icons/icon_run.png", new ClickListener() {
+        controlTable.add(addInteractButton(assetManager, "textures/ui/icons/icon_run.png", new ClickListener() {
                     private final ComponentMapper<VelocityComponent> vcm = ComponentMapper.getFor(VelocityComponent.class);
                     private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
@@ -299,7 +299,7 @@ public class UserInterfaceModule {
 
     private ImageButton addInteractButton(AssetManager assetManager, String iconPath, EventListener listener) {
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-        style.up = new TextureRegionDrawable(assetManager.get("ui/buttonBack.png", Texture.class));
+        style.up = new TextureRegionDrawable(assetManager.get("textures/ui/buttonBack.png", Texture.class));
         TextureRegion textureRegion = new TextureRegion(assetManager.get(iconPath, Texture.class));
         float pad = textureRegion.getRegionHeight() * 0.15f;
         style.imageUp = new TextureRegionDrawable(textureRegion);

@@ -46,9 +46,6 @@ public class AssetsFinder implements Disposable {
                 assetManager.load("avatars/a" + i + ".png", Texture.class);
             }
 
-            FileHandle ui = assetManager.getFileHandleResolver().resolve("ui");
-            loadRecursively(assetManager, ui, true, Texture.class);
-
             FileHandle shaders = assetManager.getFileHandleResolver().resolve("shaders");
             loadRecursively(assetManager, shaders, true, ShaderProgram.class);
 

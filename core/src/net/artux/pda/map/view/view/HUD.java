@@ -30,7 +30,7 @@ public class HUD extends Button {
         top();
         left();
 
-        TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(assetManager.get("ui/bar/hudBackground.png", Texture.class));
+        TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(assetManager.get("textures/ui/bar/hudBackground.png", Texture.class));
         ButtonStyle buttonStyle = new ButtonStyle();
         buttonStyle.up = textureRegionDrawable;
         setStyle(buttonStyle);
@@ -38,7 +38,7 @@ public class HUD extends Button {
         setSize(textureRegionDrawable.getRegion().getRegionWidth(), textureRegionDrawable.getRegion().getRegionHeight());
         defaults().pad(5);
         float iconSize = 18f;
-        Image actor = new Image(assetManager.get("ui/bar/ic_health.png", Texture.class));
+        Image actor = new Image(assetManager.get("textures/ui/bar/ic_health.png", Texture.class));
         actor.setScaling(Scaling.fill);
         add(actor).size(iconSize);
         healthBar = new Bar(Color.RED);
@@ -46,7 +46,7 @@ public class HUD extends Button {
                 .growX()
                 .colspan(2);
 
-        actor = new Image(assetManager.get("ui/bar/ic_stamina.png", Texture.class));
+        actor = new Image(assetManager.get("textures/ui/bar/ic_stamina.png", Texture.class));
         actor.setScaling(Scaling.fill);
         row();
         add(actor).size(iconSize);
@@ -57,7 +57,7 @@ public class HUD extends Button {
 
         row();
 
-        actor = new Image(assetManager.get("ui/bar/ic_radiation.png", Texture.class));
+        actor = new Image(assetManager.get("textures/ui/bar/ic_radiation.png", Texture.class));
         actor.setScaling(Scaling.fill);
         add(actor).size(iconSize);
         radiationBar = new Bar(Color.GREEN);

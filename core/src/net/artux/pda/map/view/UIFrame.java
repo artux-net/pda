@@ -91,7 +91,7 @@ public class UIFrame extends WidgetGroup {
         Table headerTable = new Table();
         headerTable.setPosition(headerLeftX, headerBottomY);
         headerTable.setSize((w - getHeaderLeftX() * 2), headerHeight);
-        headerTable.setBackground(new TextureRegionDrawable(assetManager.get("ui/title_background.png", Texture.class)));
+        headerTable.setBackground(new TextureRegionDrawable(assetManager.get("textures/ui/title_background.png", Texture.class)));
         addActor(headerTable);
 
         headerTable.add(leftGroup)

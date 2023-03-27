@@ -14,6 +14,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Timer;
 
+import net.artux.engine.utils.LocaleBundle;
+import net.artux.pda.map.controllers.notification.NotificationController;
+import net.artux.pda.map.controllers.notification.NotificationType;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.AnomalyComponent;
 import net.artux.pda.map.engine.ecs.components.ArtifactComponent;
@@ -40,25 +43,31 @@ public class AnomalySystem extends EntitySystem {
     private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private ComponentMapper<HealthComponent> hcm = ComponentMapper.getFor(HealthComponent.class);
     private ComponentMapper<AnomalyComponent> am = ComponentMapper.getFor(AnomalyComponent.class);
+    private ComponentMapper<SpriteComponent> scm = ComponentMapper.getFor(SpriteComponent.class);
 
     private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
 
     private final CameraSystem cameraSystem;
     private final SoundsSystem soundsSystem;
+    private final NotificationController notificationController;
+    private final LocaleBundle localeBundle;
     private final World world;
-    private Timer timer;
     private Sound anomaly;
 
     public static boolean radiation = true;
 
     @Inject
-    public AnomalySystem(AssetManager assetManager, CameraSystem cameraSystem, SoundsSystem soundsSystem, World world) {
-        this.assetManager = assetManager;
+    public AnomalySystem(AssetManager assetManager, CameraSystem cameraSystem,
+                         SoundsSystem soundsSystem, NotificationController notificationController,
+                         World world, LocaleBundle localeBundle) {
         this.world = world;
-        timer = new Timer();
-        anomaly = assetManager.get("audio/sounds/pda/d-beep.ogg", Sound.class);
+        this.assetManager = assetManager;
+        this.localeBundle = localeBundle;
         this.cameraSystem = cameraSystem;
         this.soundsSystem = soundsSystem;
+        this.notificationController = notificationController;
+
+        anomaly = assetManager.get("audio/sounds/pda/d-beep.ogg", Sound.class);
     }
 
     @Override
@@ -72,22 +81,41 @@ public class AnomalySystem extends EntitySystem {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
+        boolean playerNearAnomaly = false;
         boolean playerIsInAnomaly = false;
         AnomalyComponent playerAnomaly = null;
 
         for (int j = 0; j < anomalies.size(); j++) {
-            BodyComponent anomalyBody = pm.get(anomalies.get(j));
-            AnomalyComponent anomaly = am.get(anomalies.get(j));
+            Entity anomalyEntity = anomalies.get(j);
+            BodyComponent anomalyBody = pm.get(anomalyEntity);
+            AnomalyComponent anomaly = am.get(anomalyEntity);
 
             boolean somebodyIsInAnomaly = false;
             for (int i = 0; i < entities.size(); i++) {
-                BodyComponent bodyComponent = pm.get(entities.get(i));
-                HealthComponent healthComponent = hcm.get(entities.get(i));
+                Entity entity = entities.get(i);
+                BodyComponent bodyComponent = pm.get(entity);
+                HealthComponent healthComponent = hcm.get(entity);
+                boolean player = pcm.has(entity);
 
                 //if (radiation)
                 //  healthComponent.damage(healthComponent.radiation * deltaTime * 0.01f);
+                float dst = anomalyBody.getPosition().dst(bodyComponent.getPosition());
+                if (dst < anomaly.getSize() + 30f
+                        && player) {
+                    playerNearAnomaly = true;
 
-                if (anomalyBody.getPosition().dst(bodyComponent.getPosition()) > anomaly.getSize())
+                    if (!scm.has(anomalyEntity)) {
+                        float size = anomaly.getSize();
+                        anomalyEntity.add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size * 2, size * 2));
+                        notificationController.notify(NotificationType.ATTENTION,
+                                localeBundle.get("main.anomaly.found"),
+                                anomaly.getAnomaly().getName());
+                    }
+
+                }
+
+
+                if (dst > anomaly.getSize())
                     continue;
 
                 somebodyIsInAnomaly = true;
@@ -95,23 +123,20 @@ public class AnomalySystem extends EntitySystem {
                     healthComponent.radiation(0.006f);
 
 
-                if (pcm.has(entities.get(i)))
-                    if (random.nextDouble() > 0.999f) {
-                        //soundsSystem.playSound();
-                        Entity entity = new Entity()
-                                .add(new BodyComponent(RandomPosition.getRandomAround(anomalyBody.getPosition(), anomaly.getSize()), world))
-                                .add(new SpriteComponent(assetManager.get("yellow.png", Texture.class), 1, 1))
-                                .add(new ArtifactComponent());
-                        getEngine().addEntity(entity);
-                    }
+                if (!player)
+                    continue;
 
-                if (!playerIsInAnomaly) {
-                    playerIsInAnomaly = pcm.has(entities.get(i));
-                    if (playerIsInAnomaly) {
-                        playerAnomaly = anomaly;
-                    }
-
+                if (random.nextDouble() > 0.999f) {
+                    //soundsSystem.playSound();
+                    Entity artifact = new Entity()
+                            .add(new BodyComponent(RandomPosition.getRandomAround(anomalyBody.getPosition(), anomaly.getSize()), world))
+                            .add(new SpriteComponent(assetManager.get("yellow.png", Texture.class), 1, 1))
+                            .add(new ArtifactComponent());
+                    getEngine().addEntity(artifact);
                 }
+                playerIsInAnomaly = true;
+                playerAnomaly = anomaly;
+
             }
             if (somebodyIsInAnomaly) {
                 //delay act
@@ -141,10 +166,16 @@ public class AnomalySystem extends EntitySystem {
         if (playerIsInAnomaly) {
             timeToPlay -= deltaTime;
             if (timeToPlay < 0) {
-                anomaly.play();
+                soundsSystem.playSound(anomaly);
                 long currentMillis = System.nanoTime() / 1000000;
                 long milsDif = playerAnomaly.getTimeToActivate() - currentMillis;
                 timeToPlay = milsDif / (1000f * 10);
+            }
+        } else if (playerNearAnomaly) {
+            timeToPlay -= deltaTime;
+            if (timeToPlay < 0) {
+                soundsSystem.playSound(anomaly);
+                timeToPlay = 1f;
             }
         }
     }

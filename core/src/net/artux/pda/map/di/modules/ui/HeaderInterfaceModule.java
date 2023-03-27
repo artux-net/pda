@@ -58,7 +58,7 @@ public class HeaderInterfaceModule {
                             Label.LabelStyle labelStyle, UIFrame uiFrame,
                             AssetManager assetManager, DataRepository dataRepository) {
 
-        TextureRegionDrawable pauseDrawable = new TextureRegionDrawable(assetManager.get("ui/exit.png", Texture.class));
+        TextureRegionDrawable pauseDrawable = new TextureRegionDrawable(assetManager.get("textures/ui/exit.png", Texture.class));
         Button.ButtonStyle pauseButtonStyle = new Button.ButtonStyle(pauseDrawable, pauseDrawable, pauseDrawable);
         Button pauseButton = new Button(pauseButtonStyle);
         pauseButton.addListener(new ClickListener() {
@@ -71,7 +71,7 @@ public class HeaderInterfaceModule {
         });
 
         ImageButton.ImageButtonStyle occupationsButtonStyle = new ImageButton.ImageButtonStyle();
-        occupationsButtonStyle.up = new TextureRegionDrawable(assetManager.get("ui/burger.png", Texture.class));
+        occupationsButtonStyle.up = new TextureRegionDrawable(assetManager.get("textures/ui/burger.png", Texture.class));
         ImageButton missionsButton = new ImageButton(occupationsButtonStyle);
         missionsButton.getImage().setScaling(Scaling.fit);
 
@@ -125,7 +125,7 @@ public class HeaderInterfaceModule {
                                Engine engine, AssetManager assetManager, Properties properties) {
         if (properties.getProperty(PropertyFields.TESTER_MODE, "false").equals("true")) {
             Button.ButtonStyle bugStyle = new Button.ButtonStyle();
-            bugStyle.up = new TextureRegionDrawable(assetManager.get("ui/bug.png", Texture.class));
+            bugStyle.up = new TextureRegionDrawable(assetManager.get("textures/ui/bug.png", Texture.class));
 
             final Button debugButton = new Button(bugStyle);
             final DebugMenu debugMenu = new DebugMenu(skin, labelStyle);

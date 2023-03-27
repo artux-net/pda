@@ -85,9 +85,9 @@ public class EffectsSystem extends BaseSystem {
 
     private enum Radiation {
         EMPTY(0, 0),
-        WEAK(0.03f, 1f),
-        MIDDLE(0.09f, 0.4f),
-        STRONG(0.015f, 0.2f);
+        WEAK(0.03f, 0.2f),
+        MIDDLE(0.09f, 0.15f),
+        STRONG(0.015f, 0.1f);
 
         private final float damage;
         private final float geigerTime;

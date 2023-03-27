@@ -41,11 +41,8 @@ public class AnomalyHelper {
 
     public static void createAnomalies(MapComponent coreComponent) {
         Engine engine = coreComponent.getEngine();
-        EffectsSystem effectsSystem = engine.getSystem(EffectsSystem.class);
         AssetManager assetManager = coreComponent.getAssetsManager();
         TiledMap tiledMap = coreComponent.getTiledMap();
-        Random random = new Random(Calendar.getInstance().get(Calendar.MINUTE) / 5);
-        MapOrientationSystem mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
 
         TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("tiles");
         Set<Vector2> anomalyPotentialPositions = new HashSet<>();
@@ -87,7 +84,7 @@ public class AnomalyHelper {
 
             final Vector2 finalPosition = position;
             anomaly.add(new BodyComponent(finalPosition, coreComponent.getWorld()))
-                    .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size))
+
                     .add(anomalyComponent)
                     .add(new ClickComponent(size / 2, new ClickComponent.ClickListener() {
                         @Override

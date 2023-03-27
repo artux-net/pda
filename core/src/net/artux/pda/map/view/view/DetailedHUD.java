@@ -35,7 +35,7 @@ public class DetailedHUD extends HUD {
                 .left()
                 .colspan(2);
 
-        directionImage = new Image(assetManager.get("ui/direction.png", Texture.class));
+        directionImage = new Image(assetManager.get("textures/ui/direction.png", Texture.class));
         directionImage.setScaling(Scaling.fit);
         directionImage.setOrigin(Align.center);
 

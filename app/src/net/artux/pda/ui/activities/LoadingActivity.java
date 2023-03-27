@@ -42,7 +42,7 @@ public class LoadingActivity extends AppCompatActivity {
 
         Glide.with(this)
                 .asGif()
-                .load(Uri.parse("file:///android_asset/ui/load.gif"))
+                .load(Uri.parse("file:///android_asset/textures/ui/load.gif"))
                 .listener(new RequestListener<GifDrawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {

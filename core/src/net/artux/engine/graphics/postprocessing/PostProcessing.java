@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+@PerGameMap
 public class PostProcessing implements Disposable {
 
     private final HashMap<String, ShaderGroup> shaderGroups;
@@ -53,6 +54,7 @@ public class PostProcessing implements Disposable {
         }
         ShaderGroup group = ShaderGroup.of(containers);
         shaderGroups.put(key, group);
+        Gdx.app.debug("PostProcessing", "Shader loaded: " + key);
         return group;
     }
 
