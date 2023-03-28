@@ -62,7 +62,7 @@ public class NotificationController {
     public UserMessage generateMessage() {
         return new UserMessage(contentGenerator.generateName(),
                 contentGenerator.generateMessageContent(),
-                "avatars/a" + random(1, 30) + ".png");
+                "textures/avatars/a" + random(1, 30) + ".png");
     }
 
 }

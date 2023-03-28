@@ -92,7 +92,7 @@ public class DetailItemView extends Table {
             else if (itemModel instanceof ArmorModel)
                 condition = ((ArmorModel) itemModel).getCondition();
 
-            image.setFilename("icons/items/" + itemModel.getIcon());
+            image.setFilename("textures/icons/items/" + itemModel.getIcon());
             image.setVisible(true);
             titleLabel.setText(itemModel.getTitle());
             //descLabel.setText(getDesc(localeBundle, itemModel)); // todo there is a bug with new lines

@@ -53,7 +53,7 @@ public class EntityBuilder {
         this.contentGenerator = contentGenerator;
         this.world = world;
 
-        bulletTexture = assetManager.get("bullet.png", Texture.class);
+        bulletTexture = assetManager.get("textures/icons/entity/bullet.png", Texture.class);
     }
 
     public Entity player(Vector2 position, DataRepository dataRepository) {

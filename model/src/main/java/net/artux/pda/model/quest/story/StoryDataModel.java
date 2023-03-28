@@ -45,7 +45,7 @@ public class StoryDataModel implements Serializable {
     public String getAvatar() {
         if (avatar.contains("http"))
             return avatar;
-        else return "avatars/a" + avatar + ".png";
+        else return "textures/avatars/a" + avatar + ".png";
     }
 
     public boolean containsCurrent() {

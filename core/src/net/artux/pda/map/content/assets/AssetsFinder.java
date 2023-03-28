@@ -43,15 +43,14 @@ public class AssetsFinder implements Disposable {
             assetManager = new AssetManager();
 
             for (int i = 0; i < 31; i++) {
-                assetManager.load("avatars/a" + i + ".png", Texture.class);
+                assetManager.load("textures/avatars/a" + i + ".png", Texture.class);
             }
 
             FileHandle shaders = assetManager.getFileHandleResolver().resolve("shaders");
             loadRecursively(assetManager, shaders, true, ShaderProgram.class);
 
-            assetManager.load("data/uiskin.atlas", TextureAtlas.class);
             assetManager.load("quest.png", Texture.class);
-            assetManager.load("bullet.png", Texture.class);
+            assetManager.load("textures/icons/entity/bullet.png", Texture.class);
             assetManager.load("seller.png", Texture.class);
             assetManager.load("quest1.png", Texture.class);
             assetManager.load("cache.png", Texture.class);

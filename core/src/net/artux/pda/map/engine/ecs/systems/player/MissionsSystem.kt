@@ -92,7 +92,7 @@ class MissionsSystem @Inject constructor(
         for (m in updatedMissions) {
             val checkpointModel = m.getCurrentCheckpoint(*paramArr)
             messagesPlane.addMessage(
-                "avatars/a0.png", "Задание обновлено: " + m.title,
+                "textures/avatars/a0.png", "Задание обновлено: " + m.title,
                 "Новая цель: " + checkpointModel.title, MessagesPlane.Length.SHORT
             )
             soundsSystem.playSound(missionUpdatedSound)

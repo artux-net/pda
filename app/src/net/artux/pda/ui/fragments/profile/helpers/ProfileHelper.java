@@ -59,7 +59,7 @@ public class ProfileHelper {
                     .into(imageView);
         else if (isInteger(avatar))
             Glide.with(context)
-                    .load(Uri.parse("file:///android_asset/avatars/a" + (Integer.parseInt(avatar) + 1) + ".png"))
+                    .load(Uri.parse("file:///android_asset/textures/avatars/a" + (Integer.parseInt(avatar) + 1) + ".png"))
                     .into(imageView);
         else {
             avatar = URLHelper.getResourceURL(avatar);

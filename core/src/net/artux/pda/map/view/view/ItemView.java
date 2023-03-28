@@ -25,7 +25,7 @@ public class ItemView extends Table {
 
     public ItemView(ItemModel itemModel, Label.LabelStyle titleStyle, Label.LabelStyle subtitleStyle, AssetManager assetManager) {
         super();
-        String iconFilename = "icons/items/" + itemModel.getIcon();
+        String iconFilename = "textures/icons/items/" + itemModel.getIcon();
 
         pad(5);
         Label quantityLabel = new Label(itemModel.getQuantity() + "", subtitleStyle);

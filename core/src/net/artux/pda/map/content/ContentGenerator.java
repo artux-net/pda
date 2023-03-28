@@ -55,7 +55,7 @@ public class ContentGenerator {
     }
 
     public String generateAvatar() {
-        return "avatars/a" + random(1, 30) + ".png";
+        return "textures/avatars/a" + random(1, 30) + ".png";
     }
 
     public List<ItemModel> getRandomItems() {

@@ -68,7 +68,7 @@ public class AvatarsAdapter extends RecyclerView.Adapter<AvatarsAdapter.ViewHold
         void bind(int id){
             id++;
             Glide.with(avatar)
-                    .load(Uri.parse("file:///android_asset/avatars/a"+id+".png"))
+                    .load(Uri.parse("file:///android_asset/textures/avatars/a"+id+".png"))
                     .centerInside()
                     .into(avatar);
 
