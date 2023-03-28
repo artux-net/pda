@@ -11,9 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 import net.artux.engine.utils.LocaleBundle;
-import net.artux.pda.map.engine.AssetsFinder;
-import net.artux.pda.map.view.FontManager;
+import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.utils.Colors;
+import net.artux.pda.map.view.FontManager;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.List;

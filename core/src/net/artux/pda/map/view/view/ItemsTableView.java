@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Align;
 
 import net.artux.engine.utils.LocaleBundle;
-import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.FontManager;
 import net.artux.pda.model.items.ItemModel;

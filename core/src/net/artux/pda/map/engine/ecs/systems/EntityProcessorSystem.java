@@ -16,17 +16,16 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.content.EntityBuilder;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.ClickComponent;
 import net.artux.pda.map.engine.ecs.components.GroupComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.map.ConditionComponent;
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent;
-import net.artux.pda.map.engine.helpers.EntityBuilder;
-import net.artux.pda.map.model.GangRelations;
-import net.artux.pda.map.repository.RandomPosition;
+import net.artux.pda.map.engine.ecs.entities.model.GangRelations;
 import net.artux.pda.map.utils.Mappers;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.user.Gang;
@@ -34,6 +33,7 @@ import net.artux.pda.model.user.Gang;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -41,7 +41,7 @@ import javax.inject.Inject;
 @PerGameMap
 public class EntityProcessorSystem extends EntitySystem {
 
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
 
     private final EntityBuilder builder;
     private final AssetManager assetManager;
@@ -117,7 +117,7 @@ public class EntityProcessorSystem extends EntitySystem {
         List<Entity> pointEntities = new LinkedList<>();
         GroupComponent groupComponent = new GroupComponent(gang, relations, pointEntities, params);
         for (int i = 0; i < n; i++) {
-            Entity entity = builder.spawnStalker(RandomPosition.getRandomAround(pos, 15), groupComponent);
+            Entity entity = builder.spawnStalker(getRandomAround(pos, 15), groupComponent);
             getEngine().addEntity(entity);
             pointEntities.add(entity);
         }
@@ -142,6 +142,16 @@ public class EntityProcessorSystem extends EntitySystem {
             GroupComponent group = generateGroup(randomTransferPosition, enemyGang, gangRelations.get(enemyGang), random(4, 7), Collections.emptySet());
             group.setTargeting(spawnComponent::getPosition);
         }
+    }
+
+
+    static Random random = new Random();
+
+    public static Vector2 getRandomAround(Vector2 point, int r) {
+        int min = -r;
+        float offsetX = random.nextInt(r - min) + min;
+        float offsetY = random.nextInt(r - min) + min;
+        return point.cpy().add(offsetX, offsetY);
     }
 
 

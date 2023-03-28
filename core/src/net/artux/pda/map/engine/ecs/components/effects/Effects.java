@@ -1,7 +1,6 @@
 package net.artux.pda.map.engine.ecs.components.effects;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.gdx.utils.Timer;
 
 import java.util.EnumSet;
 

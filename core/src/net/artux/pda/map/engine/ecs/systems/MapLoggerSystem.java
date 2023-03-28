@@ -16,8 +16,8 @@ import com.badlogic.gdx.utils.Disposable;
 
 import net.artux.engine.pathfinding.FlatTiledNode;
 import net.artux.engine.pathfinding.TiledSmoothableGraphPath;
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,10 +29,9 @@ public class MapLoggerSystem extends IteratingSystem implements Drawable, Dispos
 
     private final ShapeRenderer sr;
 
-    private MapOrientationSystem mapOrientationSystem;
-    private TiledMap tiledMap;
-    private World world;
-    private Stage stage;
+    private final TiledMap tiledMap;
+    private final World world;
+    private final Stage stage;
     private final Box2DDebugRenderer boxDebugRenderer;
 
     public static boolean showPlayerWalls = false;
@@ -47,7 +46,6 @@ public class MapLoggerSystem extends IteratingSystem implements Drawable, Dispos
         sr = new ShapeRenderer();
         boxDebugRenderer = new Box2DDebugRenderer();
         boxDebugRenderer.setDrawVelocities(true);
-        this.mapOrientationSystem = mapOrientationSystem;
     }
 
     @Override

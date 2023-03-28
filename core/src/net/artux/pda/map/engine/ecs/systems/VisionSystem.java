@@ -14,11 +14,11 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 
@@ -27,9 +27,9 @@ public class VisionSystem extends BaseSystem implements Drawable {
 
     private static final float VISION_DISTANCE = 150f;
 
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
-    private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
+    private final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
     private final MapOrientationSystem mapOrientationSystem;
     private final Sprite enemyTarget;
@@ -63,13 +63,10 @@ public class VisionSystem extends BaseSystem implements Drawable {
 
             if (dst < VISION_DISTANCE
                     && !mapOrientationSystem.collides(bodyComponentComponent1.getPosition(), bodyComponentComponent2.getPosition()))
-                world.rayCast(new RayCastCallback() {
-                    @Override
-                    public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
-                        if (fixture.getBody().getType() == BodyDef.BodyType.DynamicBody)
-                            visionComponent1.addVisibleEntity(entity2);
-                        return 0;
-                    }
+                world.rayCast((fixture, point, normal, fraction) -> {
+                    if (fixture.getBody().getType() == BodyDef.BodyType.DynamicBody)
+                        visionComponent1.addVisibleEntity(entity2);
+                    return 0;
                 }, bodyComponentComponent1.getPosition(), bodyComponentComponent2.getPosition());
 
 

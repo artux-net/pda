@@ -6,12 +6,18 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
+import net.artux.pda.map.engine.ecs.entities.BodyBuilder;
+
 public class BodyComponent implements Component {
 
     public final Body body;
 
-    public BodyComponent(BodyBuilder bodyBuilder) {
-        this.body = bodyBuilder.init();
+    public BodyComponent(BodyBuilder bodyBuilder, Vector2 position, World world) {
+        this.body = bodyBuilder.init(position, world);
+    }
+
+    public BodyComponent(Body body) {
+        this.body = body;
     }
 
     public BodyComponent(Vector2 vector2, World world) {
@@ -30,10 +36,6 @@ public class BodyComponent implements Component {
 
     public Body getBody() {
         return body;
-    }
-
-    public interface BodyBuilder {
-        Body init();
     }
 
     public Vector2 getPosition() {

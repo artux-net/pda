@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Scaling;
 
-import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.view.FontManager;
 import net.artux.pda.model.quest.CheckpointModel;
 import net.artux.pda.model.quest.MissionModel;

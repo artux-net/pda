@@ -9,13 +9,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VelocityComponent;
-import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
-import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.ecs.systems.BaseSystem;
 import net.artux.pda.map.utils.Mappers;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.map.GameMap;
 
 import javax.inject.Inject;
@@ -23,23 +22,22 @@ import javax.inject.Inject;
 @PerGameMap
 public class CameraSystem extends BaseSystem implements GestureDetector.GestureListener {
 
-    private OrthographicCamera camera;
-    private ClicksSystem clicksSystem;
-    private GameMap map;
+    private final OrthographicCamera camera;
+    private final ClicksSystem clicksSystem;
+    private final GameMap map;
 
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
 
-    private Vector2 cameraV2Position = new Vector2();
-    private Vector2 cameraSpeed = new Vector2();
+    private final Vector2 cameraV2Position = new Vector2();
+    private final Vector2 cameraSpeed = new Vector2();
 
-    private float initialZoom = 0.5f;
-    private static float maxZoom = 1f;
-    private static float minZoom = 0.1f;
-    private static float maxLimit = 0.8f;
-    private static float minLimit = 0.4f;
-    private static float zoomingSpeed = 2f;
-    private static float specialZoomValue = 0.2f;
+    private static final float maxZoom = 1f;
+    private static final float minZoom = 0.1f;
+    private static final float maxLimit = 0.8f;
+    private static final float minLimit = 0.4f;
+    private static final float zoomingSpeed = 2f;
+    private static final float specialZoomValue = 0.2f;
     boolean detached;
     boolean specialZoom = false;
 
@@ -54,7 +52,7 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        camera.zoom = initialZoom;
+        camera.zoom = 0.5f;
 
         camera.position.x = Mappers.vector2(map.getDefPos()).x;
         camera.position.y = Mappers.vector2(map.getDefPos()).y;

@@ -5,18 +5,18 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.ClickComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 
 @PerGameMap
 public class ClicksSystem extends IteratingSystem {
 
-    private ComponentMapper<ClickComponent> cm = ComponentMapper.getFor(ClickComponent.class);
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<ClickComponent> cm = ComponentMapper.getFor(ClickComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
 
     @Inject
     public ClicksSystem() {

@@ -9,13 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
-import net.artux.pda.map.view.view.bars.Utils;
 import net.artux.pda.map.utils.Colors;
+import net.artux.pda.map.view.view.bars.Utils;
 
 public class DebugMenu extends Table {
 
-    private Label label;
-    private Table content;
+    private final Table content;
 
     public DebugMenu(Skin skin, Label.LabelStyle labelStyle) {
         super(skin);
@@ -23,7 +22,7 @@ public class DebugMenu extends Table {
         top();
         left();
 
-        label = new Label("Режим тестирования", labelStyle);
+        Label label = new Label("Режим тестирования", labelStyle);
         top();
         add(label);
         row();

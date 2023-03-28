@@ -14,8 +14,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Timer;
 
-import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.content.assets.AssetsFinder;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.map.view.FontManager;
 
 import java.time.Instant;

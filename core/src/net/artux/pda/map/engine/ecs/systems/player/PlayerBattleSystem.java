@@ -5,17 +5,17 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.WeaponComponent;
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
 import net.artux.pda.map.engine.ecs.systems.BaseSystem;
-import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
 import net.artux.pda.map.engine.ecs.systems.EntityProcessorSystem;
+import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import java.util.LinkedList;
 
@@ -27,10 +27,10 @@ public class PlayerBattleSystem extends BaseSystem {
     private final EntityProcessorSystem entityProcessorSystem;
     private final SoundsSystem soundsSystem;
 
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<VisionComponent> vm = ComponentMapper.getFor(VisionComponent.class);
-    private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
-    private ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<VisionComponent> vm = ComponentMapper.getFor(VisionComponent.class);
+    private final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    private final ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
     private boolean playerShoot = false;
 

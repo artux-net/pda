@@ -16,13 +16,13 @@ import net.artux.engine.pathfinding.own.Connection
 import net.artux.engine.pathfinding.own.Digraph
 import net.artux.engine.pathfinding.own.DijkstraPathFinder
 import net.artux.pda.map.DataRepository
-import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.engine.ecs.components.BodyComponent
 import net.artux.pda.map.engine.ecs.components.PassivityComponent
 import net.artux.pda.map.engine.ecs.components.map.QuestComponent
 import net.artux.pda.map.engine.ecs.systems.BaseSystem
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem
 import net.artux.pda.map.utils.Mappers
+import net.artux.pda.map.utils.di.scope.PerGameMap
 import net.artux.pda.map.view.blocks.MessagesPlane
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.map.Point

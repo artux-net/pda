@@ -8,19 +8,17 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Timer;
 
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
 import net.artux.pda.map.engine.ecs.components.GroupTargetMovingComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.StatesComponent;
-import net.artux.pda.map.engine.ecs.components.VelocityComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.WeaponComponent;
 import net.artux.pda.model.items.WeaponModel;
-
-import java.util.TimerTask;
 
 public enum StalkerState implements State<Entity> {
 
@@ -48,13 +46,13 @@ public enum StalkerState implements State<Entity> {
         public void enter(final Entity entity) {
             final StatesComponent statesComponent = sm.get(entity);
             gmm.get(entity).disable();
-            timer.schedule(new TimerTask() {
+            Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
                     if (statesComponent.isInState(STANDING))
                         statesComponent.changeState(FIND_TARGET);
                 }
-            }, 1000 * (Math.abs(random.nextLong() % 30)));
+            }, Math.abs(random.nextLong() % 30));
 
         }
 
@@ -162,17 +160,14 @@ public enum StalkerState implements State<Entity> {
         return precision * 3;
     }
 
-    protected ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
-    protected ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
-    protected ComponentMapper<VelocityComponent> vmm = ComponentMapper.getFor(VelocityComponent.class);
-    protected ComponentMapper<VisionComponent> visionMapper = ComponentMapper.getFor(VisionComponent.class);
-    protected ComponentMapper<GroupTargetMovingComponent> tmm = ComponentMapper.getFor(GroupTargetMovingComponent.class);
-    protected ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
-    protected ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    protected ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
-    protected ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
-
-    protected java.util.Timer timer = new java.util.Timer();
+    protected final ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
+    protected final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
+    protected final ComponentMapper<VisionComponent> visionMapper = ComponentMapper.getFor(VisionComponent.class);
+    protected final ComponentMapper<GroupTargetMovingComponent> tmm = ComponentMapper.getFor(GroupTargetMovingComponent.class);
+    protected final ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
+    protected final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    protected final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    protected final ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
     @Override
     public void enter(Entity entity) {

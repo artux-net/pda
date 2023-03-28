@@ -20,16 +20,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Scaling;
 
-import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.content.QuestPointsHelper;
+import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
 import net.artux.pda.map.engine.ecs.components.map.ConditionComponent;
 import net.artux.pda.map.engine.ecs.components.map.PointComponent;
 import net.artux.pda.map.engine.ecs.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
-import net.artux.pda.map.engine.helpers.QuestPointsHelper;
 import net.artux.pda.map.utils.Colors;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.map.view.blocks.ImageTextButton;
 import net.artux.pda.map.view.blocks.MissionBlock;
 import net.artux.pda.map.view.blocks.SlotTextButton;
@@ -49,9 +49,9 @@ public class MissionMenu extends Table {
     private final AssetManager assetManager;
     private final boolean testMode;
 
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<PointComponent> pcm = ComponentMapper.getFor(PointComponent.class);
-    private ComponentMapper<ConditionComponent> ccm = ComponentMapper.getFor(ConditionComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<PointComponent> pcm = ComponentMapper.getFor(PointComponent.class);
+    private final ComponentMapper<ConditionComponent> ccm = ComponentMapper.getFor(ConditionComponent.class);
 
     @Inject
     public MissionMenu(@Named("testerMode") boolean testMode, PlayerSystem playerSystem, MissionsSystem missionsSystem, TextButton.TextButtonStyle textButtonStyle,

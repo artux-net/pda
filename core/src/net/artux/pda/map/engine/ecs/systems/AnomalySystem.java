@@ -15,17 +15,15 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.engine.utils.LocaleBundle;
-import net.artux.pda.map.controllers.notification.NotificationController;
-import net.artux.pda.map.controllers.notification.NotificationType;
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.AnomalyComponent;
-import net.artux.pda.map.engine.ecs.components.ArtifactComponent;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
-import net.artux.pda.map.repository.RandomPosition;
+import net.artux.pda.map.managers.notification.NotificationController;
+import net.artux.pda.map.managers.notification.NotificationType;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import java.util.Random;
 
@@ -36,23 +34,22 @@ public class AnomalySystem extends EntitySystem {
 
     private ImmutableArray<Entity> anomalies;
     private ImmutableArray<Entity> entities;
-    private Random random = new Random();
+    private final Random random = new Random();
 
     private final AssetManager assetManager;
 
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<HealthComponent> hcm = ComponentMapper.getFor(HealthComponent.class);
-    private ComponentMapper<AnomalyComponent> am = ComponentMapper.getFor(AnomalyComponent.class);
-    private ComponentMapper<SpriteComponent> scm = ComponentMapper.getFor(SpriteComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<HealthComponent> hcm = ComponentMapper.getFor(HealthComponent.class);
+    private final ComponentMapper<AnomalyComponent> am = ComponentMapper.getFor(AnomalyComponent.class);
+    private final ComponentMapper<SpriteComponent> scm = ComponentMapper.getFor(SpriteComponent.class);
 
-    private ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
+    private final ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
 
     private final CameraSystem cameraSystem;
     private final SoundsSystem soundsSystem;
     private final NotificationController notificationController;
     private final LocaleBundle localeBundle;
-    private final World world;
-    private Sound anomaly;
+    private final Sound anomaly;
 
     public static boolean radiation = true;
 
@@ -60,7 +57,6 @@ public class AnomalySystem extends EntitySystem {
     public AnomalySystem(AssetManager assetManager, CameraSystem cameraSystem,
                          SoundsSystem soundsSystem, NotificationController notificationController,
                          World world, LocaleBundle localeBundle) {
-        this.world = world;
         this.assetManager = assetManager;
         this.localeBundle = localeBundle;
         this.cameraSystem = cameraSystem;
@@ -127,12 +123,12 @@ public class AnomalySystem extends EntitySystem {
                     continue;
 
                 if (random.nextDouble() > 0.999f) {
-                    //soundsSystem.playSound();
+                    /*//soundsSystem.playSound();
                     Entity artifact = new Entity()
-                            .add(new BodyComponent(RandomPosition.getRandomAround(anomalyBody.getPosition(), anomaly.getSize()), world))
+                            .add(new BodyComponent(getRandomAround(anomalyBody.getPosition(), anomaly.getSize()), world))
                             .add(new SpriteComponent(assetManager.get("yellow.png", Texture.class), 1, 1))
                             .add(new ArtifactComponent());
-                    getEngine().addEntity(artifact);
+                    getEngine().addEntity(artifact);*/
                 }
                 playerIsInAnomaly = true;
                 playerAnomaly = anomaly;

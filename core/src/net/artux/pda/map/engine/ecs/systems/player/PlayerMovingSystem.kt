@@ -10,14 +10,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.pda.map.DataRepository
-import net.artux.pda.map.ai.TileType
-import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.engine.ecs.components.BodyComponent
 import net.artux.pda.map.engine.ecs.components.HealthComponent
 import net.artux.pda.map.engine.ecs.components.PassivityComponent
 import net.artux.pda.map.engine.ecs.components.VelocityComponent
+import net.artux.pda.map.engine.ecs.entities.ai.TileType
 import net.artux.pda.map.engine.ecs.systems.BaseSystem
 import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem
+import net.artux.pda.map.utils.di.scope.PerGameMap
 import org.apache.commons.lang3.tuple.ImmutablePair
 import java.util.*
 import javax.inject.Inject

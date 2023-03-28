@@ -8,8 +8,8 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Disposable;
 
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.TimeComponent;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import java.time.Instant;
 import java.util.Timer;

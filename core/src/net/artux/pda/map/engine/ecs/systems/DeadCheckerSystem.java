@@ -15,13 +15,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.InteractiveComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.StalkerComponent;
 import net.artux.pda.map.engine.ecs.components.TimeComponent;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.map.view.LootMenu;
 import net.artux.pda.map.view.UserInterface;
 
@@ -34,17 +34,17 @@ import javax.inject.Inject;
 @PerGameMap
 public class DeadCheckerSystem extends BaseSystem {
 
-    private Group gameZone;
-    private LootMenu lootMenu;
-    private Label.LabelStyle labelStyle;
+    private final Group gameZone;
+    private final LootMenu lootMenu;
+    private final Label.LabelStyle labelStyle;
     private boolean deadMessage;
-    private DataRepository dataRepository;
-    private UserInterface userInterface;
+    private final DataRepository dataRepository;
+    private final UserInterface userInterface;
 
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
-    private AssetManager assetManager;
+    private final AssetManager assetManager;
     private final World world;
 
     @Inject

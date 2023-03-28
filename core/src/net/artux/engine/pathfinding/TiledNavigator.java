@@ -3,8 +3,8 @@ package net.artux.engine.pathfinding;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 
-import net.artux.pda.map.ai.TileType;
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.ecs.entities.ai.TileType;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 

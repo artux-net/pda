@@ -9,13 +9,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.engine.pathfinding.TiledNavigator;
-import net.artux.pda.map.ai.TileType;
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
 import net.artux.pda.map.engine.ecs.components.effects.Effect;
 import net.artux.pda.map.engine.ecs.components.effects.Effects;
+import net.artux.pda.map.engine.ecs.entities.ai.TileType;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 

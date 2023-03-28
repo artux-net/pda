@@ -14,12 +14,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.engine.pathfinding.TiledNavigator;
 import net.artux.pda.map.engine.data.GlobalData;
 import net.artux.pda.map.engine.data.PlayerData;
-import net.artux.engine.pathfinding.TiledNavigator;
-import net.artux.pda.map.view.view.bars.Utils;
 import net.artux.pda.map.utils.Colors;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
+import net.artux.pda.map.view.view.bars.Utils;
 
 import javax.inject.Inject;
 

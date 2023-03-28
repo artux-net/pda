@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.model.Triple;
+import net.artux.pda.map.utils.model.Triple;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

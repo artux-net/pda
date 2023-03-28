@@ -7,15 +7,15 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.ai.msg.MessageManager;
 
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.StatesComponent;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 
 @PerGameMap
 public class StatesSystem extends IteratingSystem {
 
-    private ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
+    private final ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
 
     private final MessageManager messageManager = MessageManager.getInstance();
 

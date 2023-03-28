@@ -5,10 +5,10 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.components.ArtifactComponent;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.map.view.UserInterface;
 
 import javax.inject.Inject;
@@ -16,24 +16,18 @@ import javax.inject.Inject;
 @PerGameMap
 public class ArtifactSystem extends BaseSystem {
 
-    private SoundsSystem soundsSystem;
-    private UserInterface userInterface;
-    private ComponentMapper<BodyComponent> pcm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<PlayerComponent> pm = ComponentMapper.getFor(PlayerComponent.class);
+    private final ComponentMapper<BodyComponent> pcm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<PlayerComponent> pm = ComponentMapper.getFor(PlayerComponent.class);
 
     @Inject
-    public ArtifactSystem(SoundsSystem soundsSystem, UserInterface userInterface) {
+    public ArtifactSystem() {
         super(Family.all(ArtifactComponent.class, BodyComponent.class).get());
-        this.soundsSystem = soundsSystem;
-        this.userInterface = userInterface;
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
     }
-
-    private final float distanceForDetector = 100;
 
     private float timeCount = 0;
 
@@ -44,6 +38,7 @@ public class ArtifactSystem extends BaseSystem {
             BodyComponent bodyComponent = pcm.get(getEntities().get(i));
             BodyComponent playerComponent = pcm.get(getPlayer());
             float dst = bodyComponent.getPosition().dst(playerComponent.getPosition());
+            float distanceForDetector = 100;
             if (dst < distanceForDetector) {
                 float timeLimit = dst / distanceForDetector;
                 timeCount += deltaTime;

@@ -4,11 +4,11 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.InteractiveComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.systems.BaseSystem;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -24,8 +24,8 @@ public class InteractionSystem extends BaseSystem {
         super(Family.all(InteractiveComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
     }
 
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
     private final Set<InteractiveComponent> interactiveComponents = new HashSet<>();
 
     @Override

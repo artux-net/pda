@@ -1,10 +1,9 @@
 package net.artux.pda.map.engine.ecs.components;
 
 import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Timer;
 
-import net.artux.pda.map.model.Anomaly;
+import net.artux.pda.map.engine.ecs.entities.model.Anomaly;
 
 public class AnomalyComponent implements Component {
 
@@ -19,10 +18,7 @@ public class AnomalyComponent implements Component {
     }
 
     public boolean isScheduled(){
-        if (delayedInteraction != null && delayedInteraction.isScheduled())
-            return true;
-        else
-            return false;
+        return delayedInteraction != null && delayedInteraction.isScheduled();
     }
 
     public Anomaly getAnomaly() {

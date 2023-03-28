@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import org.apache.commons.lang3.tuple.Pair;
 

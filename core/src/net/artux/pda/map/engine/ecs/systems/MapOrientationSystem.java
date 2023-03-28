@@ -8,28 +8,27 @@ import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.ai.utils.Ray;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
 
 import net.artux.engine.pathfinding.FlatTiledGraph;
 import net.artux.engine.pathfinding.FlatTiledNode;
 import net.artux.engine.pathfinding.TiledManhattanDistance;
 import net.artux.engine.pathfinding.TiledNavigator;
 import net.artux.engine.pathfinding.TiledRaycastCollisionDetector;
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 
 @PerGameMap
 public class MapOrientationSystem extends EntitySystem {
 
-    private FlatTiledGraph worldGraph;
+    private final FlatTiledGraph worldGraph;
     private final TiledNavigator tiledNavigator;
 
-    private TiledManhattanDistance<FlatTiledNode> heuristic;
-    private IndexedAStarPathFinder<FlatTiledNode> pathFinder;
-    private PathSmoother<FlatTiledNode, Vector2> pathSmoother;
-    private TiledRaycastCollisionDetector<FlatTiledNode> collisionDetector;
+    private final TiledManhattanDistance<FlatTiledNode> heuristic;
+    private final IndexedAStarPathFinder<FlatTiledNode> pathFinder;
+    private final PathSmoother<FlatTiledNode, Vector2> pathSmoother;
+    private final TiledRaycastCollisionDetector<FlatTiledNode> collisionDetector;
     private final Ray<Vector2> ray;
     private final int tileSize;
     private final Camera camera;

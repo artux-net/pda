@@ -21,14 +21,14 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.engine.graphics.postprocessing.PostProcessing;
-import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.AssetsFinder;
+import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
-import net.artux.pda.map.model.entities.RelationType;
+import net.artux.pda.map.engine.ecs.entities.model.entities.RelationType;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -41,15 +41,14 @@ import javax.inject.Named;
 @PerGameMap
 public class RenderSystem extends BaseSystem implements Drawable {
 
-    private Stage stage;
+    private final Stage stage;
 
-    private BitmapFont font;
-    private Label.LabelStyle labelStyle;
+    private final Label.LabelStyle labelStyle;
 
-    private ComponentMapper<FogOfWarComponent> fog = ComponentMapper.getFor(FogOfWarComponent.class);
-    private ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    private final ComponentMapper<FogOfWarComponent> fog = ComponentMapper.getFor(FogOfWarComponent.class);
+    private final ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
     private ImmutableArray<Entity> relationalEntities;
     private final HashMap<RelationType, Sprite> relationalSprites;
@@ -62,7 +61,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
         super(Family.all(SpriteComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
         this.stage = stage;
 
-        font = assetsFinder.getFontManager().getFont(16);
+        BitmapFont font = assetsFinder.getFontManager().getFont(16);
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
 
         AssetManager assetManager = assetsFinder.getManager();

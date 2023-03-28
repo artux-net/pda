@@ -1,9 +1,7 @@
 package net.artux.pda.map.states;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -12,15 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.artux.engine.graphics.postprocessing.PostProcessing;
-import net.artux.engine.resource.types.NetFile;
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.components.CoreComponent;
-import net.artux.pda.map.di.components.DaggerMapComponent;
-import net.artux.pda.map.di.components.MapComponent;
-import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.pda.map.engine.EngineManager;
-import net.artux.pda.map.engine.data.GlobalData;
-import net.artux.pda.map.view.LevelBackgroundImage;
+import net.artux.pda.map.utils.di.components.CoreComponent;
+import net.artux.pda.map.utils.di.components.DaggerMapComponent;
+import net.artux.pda.map.utils.di.components.MapComponent;
 import net.artux.pda.model.map.GameMap;
 
 import javax.inject.Inject;

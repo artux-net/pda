@@ -17,12 +17,12 @@ import kotlinx.coroutines.launch
 import net.artux.engine.ui.InputListener
 import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.map.DataRepository
-import net.artux.pda.map.di.scope.PerGameMap
-import net.artux.pda.map.engine.AssetsFinder
+import net.artux.pda.map.content.assets.AssetsFinder
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem
 import net.artux.pda.map.utils.Colors
 import net.artux.pda.map.utils.PlatformInterface
+import net.artux.pda.map.utils.di.scope.PerGameMap
 import net.artux.pda.map.view.blocks.SlotTextButton
 import net.artux.pda.map.view.view.DetailItemView
 import net.artux.pda.map.view.view.HUD

@@ -11,10 +11,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.pda.map.DataRepository
-import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.engine.ecs.components.*
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent
 import net.artux.pda.map.engine.ecs.systems.BaseSystem
+import net.artux.pda.map.utils.di.scope.PerGameMap
 import net.artux.pda.map.view.UserInterface
 import net.artux.pda.model.quest.story.StoryDataModel
 import javax.inject.Inject
@@ -101,8 +101,6 @@ class PlayerSystem @Inject constructor(
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {}
-    val playerComponent: PlayerComponent
-        get() = pmm[player]
     val healthComponent: HealthComponent
         get() = hm[player]
     val position: Vector2

@@ -9,8 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 
-import net.artux.pda.map.engine.AssetsFinder;
 import net.artux.engine.pathfinding.TiledNavigator;
+import net.artux.pda.map.content.assets.AssetsFinder;
 
 public class UserInterface extends Group {
 

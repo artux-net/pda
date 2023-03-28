@@ -8,9 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.ecs.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.map.view.UserInterface;
 
 import javax.inject.Inject;

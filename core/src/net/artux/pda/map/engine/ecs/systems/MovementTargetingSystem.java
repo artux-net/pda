@@ -4,35 +4,32 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.systems.IntervalSystem;
-import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
-import net.artux.pda.map.engine.ecs.components.VelocityComponent;
 import net.artux.engine.pathfinding.FlatTiledNode;
 import net.artux.engine.pathfinding.TiledManhattanDistance;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
+import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
+import net.artux.pda.map.engine.ecs.components.VelocityComponent;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 
 @PerGameMap
 public class MovementTargetingSystem extends BaseSystem {
 
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
-    private ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
+    private final ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
 
     private TiledManhattanDistance<FlatTiledNode> heuristic;
     private IndexedAStarPathFinder<FlatTiledNode> pathFinder;
     private PathSmoother<FlatTiledNode, Vector2> pathSmoother;
     MapOrientationSystem mapOrientationSystem;
 
-    private float MOVEMENT_FORCE = 30f; // H per step
+    private final float MOVEMENT_FORCE = 30f; // H per step
 
     @Inject
     public MovementTargetingSystem(MapOrientationSystem mapOrientationSystem) {

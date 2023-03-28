@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.components.CoreComponent;
+import net.artux.pda.map.utils.di.components.CoreComponent;
 import net.artux.pda.model.map.GameMap;
 
 import java.text.DecimalFormat;

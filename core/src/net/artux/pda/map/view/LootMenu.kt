@@ -14,9 +14,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.map.DataRepository
-import net.artux.pda.map.di.scope.PerGameMap
-import net.artux.pda.map.engine.AssetsFinder
+import net.artux.pda.map.content.assets.AssetsFinder
 import net.artux.pda.map.utils.Colors
+import net.artux.pda.map.utils.di.scope.PerGameMap
 import net.artux.pda.map.view.blocks.MediaItem
 import net.artux.pda.map.view.blocks.SlotTextButton
 import net.artux.pda.map.view.view.ItemsTableView

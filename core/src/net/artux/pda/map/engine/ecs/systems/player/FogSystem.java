@@ -6,27 +6,21 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Frustum;
 
-import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
-import net.artux.pda.map.engine.ecs.components.MoodComponent;
-import net.artux.pda.map.engine.ecs.components.PassivityComponent;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
-import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.data.PlayerData;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
+import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
+import net.artux.pda.map.engine.ecs.components.PassivityComponent;
 import net.artux.pda.map.engine.ecs.systems.BaseSystem;
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 
 @PerGameMap
 public class FogSystem extends BaseSystem {
 
-    private static final float VISION_DISTANCE = 150f;
-
-    private ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private ComponentMapper<FogOfWarComponent> fwm = ComponentMapper.getFor(FogOfWarComponent.class);
-    private ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
-    private ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<FogOfWarComponent> fwm = ComponentMapper.getFor(FogOfWarComponent.class);
 
     private final SoundsSystem soundsSystem;
     private final CameraSystem cameraSystem;
@@ -59,7 +53,7 @@ public class FogSystem extends BaseSystem {
             float visibleCoefficient;
             if (dst < 200) {
                 visibleCoefficient = 1;
-                entitiesVisibleByPlayer +=1;
+                entitiesVisibleByPlayer += 1;
             } else if (dst > 270)
                 visibleCoefficient = 0;
             else

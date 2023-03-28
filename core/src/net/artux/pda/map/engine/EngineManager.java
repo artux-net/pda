@@ -13,18 +13,19 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.di.components.MapComponent;
-import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.content.AnomalyHelper;
+import net.artux.pda.map.content.ControlPointsHelper;
+import net.artux.pda.map.content.EntityBuilder;
+import net.artux.pda.map.content.QuestPointsHelper;
 import net.artux.pda.map.engine.ecs.systems.Drawable;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.ecs.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
-import net.artux.pda.map.engine.helpers.AnomalyHelper;
-import net.artux.pda.map.engine.helpers.ControlPointsHelper;
-import net.artux.pda.map.engine.helpers.EntityBuilder;
-import net.artux.pda.map.engine.helpers.QuestPointsHelper;
+import net.artux.pda.map.managers.ConditionEntityManager;
 import net.artux.pda.map.utils.Mappers;
+import net.artux.pda.map.utils.di.components.MapComponent;
+import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.map.GameMap;
 
 import javax.inject.Inject;
@@ -32,14 +33,14 @@ import javax.inject.Inject;
 @PerGameMap
 public class EngineManager extends InputListener implements Drawable, Disposable {
 
-    private GameMap map;
-    private Entity player;
-    private Engine engine;
+    private final GameMap map;
+    private final Entity player;
+    private final Engine engine;
     private final DataRepository dataRepository;
 
-    private boolean controlPoints = true;
-    private boolean questPoints = true; //
-    private boolean anomalies = true;
+    private final boolean controlPoints = true;
+    private final boolean questPoints = true; //
+    private final boolean anomalies = true;
 
     @Inject
     public EngineManager(MapComponent mapComponent, MissionsSystem missionsSystem,
