@@ -79,6 +79,8 @@ public class PostProcessing implements Disposable {
     private Texture processedTexture() {
         Texture texture = fbo.getColorBufferTexture();
         for (ShaderGroup group : shaderGroups.values()) {
+            if (!group.enabled)
+                continue;
             for (ShaderContainer container : group.getShaders()) {
                 batch.setShader(container.shader);
                 FrameBuffer frameBuffer = container.buffer;

@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import net.artux.pda.map.content.assets.AssetsFinder;
+import net.artux.pda.map.utils.MapInfo;
 import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
@@ -49,8 +50,11 @@ public class GameStageModule {
 
     @Provides
     @PerGameMap
-    public UserInterface userInterface(Skin skin, AssetsFinder finder, MapOrientationSystem mapOrientationSystem, @Named("uiStage") Stage uiStage, @Named("gameStage") Stage stage) {
-        UserInterface userInterface = new UserInterface(skin, finder, mapOrientationSystem.getMapBorder(), uiStage.getCamera(), stage.getCamera());
+    public UserInterface userInterface(Skin skin, AssetsFinder finder,
+                                       MapOrientationSystem mapOrientationSystem,
+                                       @Named("uiStage") Stage uiStage,
+                                       @Named("gameStage") Stage stage, MapInfo mapInfo) {
+        UserInterface userInterface = new UserInterface(skin, finder, mapOrientationSystem.getNavigator(), uiStage.getCamera(), stage.getCamera(), mapInfo);
         uiStage.addActor(userInterface);
         return userInterface;
     }
@@ -68,7 +72,7 @@ public class GameStageModule {
         logger.put("Native Heap", Gdx.app, "getNativeHeap");
         logger.put("Java Heap", Gdx.app, "getJavaHeap");
         logger.put("Player position", playerSystem, "getPosition");
-        logger.put("Здоровье", playerSystem, "getHealth");
+        logger.put("Здоровье", playerSystem, "getHealthComponent");
         logger.put("Опыт", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getXp");
         logger.put("Params", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getParameters");
         logger.put("Temp", playerSystem.getDataRepository().getCurrentStoryDataModel().getCurrentState(), "toString");

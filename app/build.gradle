@@ -70,6 +70,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
@@ -81,6 +82,8 @@ android {
         }
         debug {
             debuggable true
+            minifyEnabled false
+            shrinkResources false
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
@@ -190,7 +193,7 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
     //gdx - assets
-    localDeps 'com.github.artux-net:pda-maps:0.8'
+    localDeps 'com.github.artux-net:pda-maps:0.9'
 
     //appodeal
     implementation('com.appodeal.ads:sdk:3.0.2.+') {

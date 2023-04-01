@@ -88,4 +88,12 @@ public class HealthComponent implements Component {
         stamina += model.getStamina();
         radiation(model.getRadiation());
     }
+
+    @Override
+    public String toString() {
+        return "immortal=" + immortal +
+                ", health=" + health +
+                ", stamina=" + stamina +
+                ", radiation=" + radiation;
+    }
 }

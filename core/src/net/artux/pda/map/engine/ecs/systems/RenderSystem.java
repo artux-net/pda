@@ -53,6 +53,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
     private ImmutableArray<Entity> relationalEntities;
     private final HashMap<RelationType, Sprite> relationalSprites;
     private final PostProcessing.ShaderGroup blurGroup;
+    private final PostProcessing.ShaderGroup redGroup;
 
     public static boolean showAll = false;
 
@@ -84,15 +85,24 @@ public class RenderSystem extends BaseSystem implements Drawable {
         blurGroup = postProcessing.loadShaderGroup("blur",
                 List.of(Pair.of(shaderProgram, shaderProgram1 -> {
                             shaderProgram1.setUniformf("dir", 1f, 0);
-                            shaderProgram1.setUniformf("radius", effect);
+                            shaderProgram1.setUniformf("radius", blurEffect);
                             shaderProgram1.setUniformf("resolution", Gdx.graphics.getWidth());
                         }),
                         Pair.of(shaderProgram, shaderProgram12 -> {
                             shaderProgram12.setUniformf("dir", 0, 1f);
-                            shaderProgram12.setUniformf("radius", effect);
+                            shaderProgram12.setUniformf("radius", blurEffect);
                             shaderProgram12.setUniformf("resolution", Gdx.graphics.getHeight());
                         })));
+
+        shaderProgram = assetManager.get("shaders/red.frag");
+        redGroup = postProcessing.loadShaderGroup("red",
+                List.of(Pair.of(shaderProgram, shaderProgram1 -> {
+                    shaderProgram1.setUniformf("red_value",
+                            (float) Math.sin(redEffectAccumulator+=0.005f));
+                })));
     }
+
+    float redEffectAccumulator = 0;
 
     @Override
     public void addedToEngine(Engine engine) {
@@ -134,8 +144,11 @@ public class RenderSystem extends BaseSystem implements Drawable {
     @Override
     public void update(float deltaTime) {
         super.update(deltaTime);
-        if (effect > 0) {
-            effect -= deltaTime;
+        if (blurEffect > 0) {
+            blurEffect -= deltaTime;
+        }
+        if (redEffect > 0) {
+            redEffect -= deltaTime;
         }
     }
 
@@ -173,16 +186,20 @@ public class RenderSystem extends BaseSystem implements Drawable {
                     sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), 0);
             batch.setColor(Color.WHITE);
         }
-        blurGroup.setEnabled(effect > 0);
+        blurGroup.setEnabled(blurEffect > 0);
+        redGroup.setEnabled(redEffect > 0);
 
     }
 
-    float set = 0;
-    float effect = 0;
+    float redEffect = 0;
+    float blurEffect = 0;
 
-    public void setEffect(int seconds) {
-        effect += seconds;
-        set = seconds;
+    public void setBlurEffect(int seconds) {
+        blurEffect += seconds;
+    }
+
+    public void setRedEffect(float redEffect) {
+        this.redEffect = redEffect;
     }
 
     @Override

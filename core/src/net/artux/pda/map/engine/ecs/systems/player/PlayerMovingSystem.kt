@@ -9,11 +9,10 @@ import com.badlogic.gdx.math.Vector2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.artux.engine.pathfinding.TiledNavigator
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.engine.ecs.components.BodyComponent
 import net.artux.pda.map.engine.ecs.components.HealthComponent
-import net.artux.pda.map.engine.ecs.components.PassivityComponent
-import net.artux.pda.map.engine.ecs.components.VelocityComponent
 import net.artux.pda.map.engine.ecs.entities.ai.TileType
 import net.artux.pda.map.engine.ecs.systems.BaseSystem
 import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem
@@ -25,16 +24,11 @@ import javax.inject.Inject
 @PerGameMap
 class PlayerMovingSystem @Inject constructor(
     val assetManager: AssetManager,
-    val mapOrientationSystem: MapOrientationSystem,
+    private val tiledNavigator: TiledNavigator,
     val dataRepository: DataRepository
-) : BaseSystem(
-    Family
-        .all(VelocityComponent::class.java, BodyComponent::class.java)
-        .exclude(PassivityComponent::class.java).get()
-) {
+) : BaseSystem(Family.one().get()) {
 
     private val pm = ComponentMapper.getFor(BodyComponent::class.java)
-    private val vm = ComponentMapper.getFor(VelocityComponent::class.java)
     private val hm = ComponentMapper.getFor(HealthComponent::class.java)
 
     private val MOVEMENT_FORCE = 30f // H per step
@@ -50,27 +44,35 @@ class PlayerMovingSystem @Inject constructor(
     private var random: Random
     private var lastPosition = Vector2()
 
+    val velocity = Vector2()
+    var isRunning: Boolean = false
+
+    private val operationalVelocity: Vector2 = Vector2()
+
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
 
         val entity = player
         val position = pm[entity]
-        val velocityComponent = vm[entity]
-        velocityComponent.velocity = velocityComponent.cpy()
+        operationalVelocity.set(velocity)
+        if (alwaysRun)
+            isRunning = true
 
-        if (alwaysRun) velocityComponent.isRunning = true
         val stepVector: Vector2
-        val currentVelocity = velocityComponent.cpy()
 
-        if (speedup) currentVelocity.scl(PLAYER_MULTIPLICATION)
+        if (speedup)
+            operationalVelocity.scl(PLAYER_MULTIPLICATION)
+
         val healthComponent = hm[entity]
         var staminaDifference = 0f
-        if (velocityComponent.isRunning && healthComponent.stamina > 0) {
-            stepVector = currentVelocity.scl(deltaTime).scl(RUN_MOVEMENT)
-            if (!alwaysRun && entity === player) staminaDifference = -0.1f
+        if (isRunning && healthComponent.stamina > 0) {
+            stepVector = operationalVelocity.scl(deltaTime).scl(RUN_MOVEMENT)
+            if (!alwaysRun && entity === player)
+                staminaDifference = -0.1f
         } else {
-            if (healthComponent.stamina < 100) staminaDifference = 0.06f
-            stepVector = currentVelocity.scl(deltaTime).scl(MOVEMENT_FORCE)
+            if (healthComponent.stamina < 100)
+                staminaDifference = 0.06f
+            stepVector = operationalVelocity.scl(deltaTime).scl(MOVEMENT_FORCE)
         }
         healthComponent.stamina(staminaDifference)
         if (!stepVector.isZero) {
@@ -86,14 +88,14 @@ class PlayerMovingSystem @Inject constructor(
         stepsDistance += lastPosition.dst2(position.position)
         lastPosition.set(position.position)
 
-        val limit = if(velocityComponent.isRunning)
+        val limit = if (isRunning)
             oneRunStepDistance
         else
             oneStepDistance
 
         if (stepsDistance >= limit) {
             stepsDistance = 0f
-            var type = mapOrientationSystem.mapBorder.getTileType(position.x, position.y)
+            var type = tiledNavigator.getTileType(position.x, position.y)
             if (!stepSounds.containsKey(type) || random.nextInt(4) == 0)
                 type = TileType.EMPTY
 
@@ -103,9 +105,13 @@ class PlayerMovingSystem @Inject constructor(
                 stepSounds[type]!!.right
             left = !left
 
-            sound.play(stepVolume * currentVelocity.len())
+            sound.play(stepVolume * velocity.len())
         }
 
+    }
+
+    fun setVelocity(x: Float, y: Float) {
+        velocity.set(x, y)
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {}

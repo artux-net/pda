@@ -17,6 +17,7 @@ import net.artux.pda.map.content.AnomalyHelper;
 import net.artux.pda.map.content.ControlPointsHelper;
 import net.artux.pda.map.content.EntityBuilder;
 import net.artux.pda.map.content.QuestPointsHelper;
+import net.artux.pda.map.content.SecretHelper;
 import net.artux.pda.map.engine.ecs.systems.Drawable;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
@@ -63,19 +64,12 @@ public class EngineManager extends InputListener implements Drawable, Disposable
             QuestPointsHelper.createQuestPointsEntities(mapComponent);
         if (anomalies)
             AnomalyHelper.createAnomalies(mapComponent);
-
+        SecretHelper.createAnomalies(mapComponent);
         conditionEntityManager.update();
 //        RandomSpawnerHelper.init(coreComponent);
 
         missionsSystem.setActiveMission(missionsSystem.getActiveMission()); // finds points
 
-        /*dataRepository.getStoryDataModelFlow().collect(new FlowCollector<StoryDataModel>() {
-            @Nullable
-            @Override
-            public Object emit(StoryDataModel storyDataModel, @NotNull Continuation<? super Unit> continuation) {
-                return null;
-            }
-        });*/
         stage.addListener(this);
         syncCameraPosition(stage);
         Gdx.app.log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");

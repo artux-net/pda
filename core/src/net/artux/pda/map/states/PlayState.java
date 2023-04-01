@@ -1,12 +1,12 @@
 package net.artux.pda.map.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.artux.engine.graphics.postprocessing.PostProcessing;
@@ -73,14 +73,7 @@ public class PlayState extends State {
     protected void handleInput() {
         gsm.addInputProcessor(uistage);
         gsm.addInputProcessor(stage);
-        GestureDetector.GestureListener gestureListener = engineManager.getGestureListener();
-        stage.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return gestureListener.touchDown(x, y, pointer, button);
-            }
-        });
-        gsm.addInputProcessor(new GestureDetector(gestureListener));
+        gsm.addInputProcessor(new GestureDetector(engineManager.getGestureListener()));
     }
 
     @Override
@@ -93,14 +86,16 @@ public class PlayState extends State {
     public void update(float dt) {
         uistage.act(dt);
         stage.act(dt);
-        world.step(1 / 90f, 3, 2);
-        renderer.setView((OrthographicCamera) stage.getCamera());
+        world.step(1 / 90f, 1, 1);
         engineManager.update(dt);
     }
 
     @Override
     public void render() {
+        Camera camera = stage.getCamera();
+        Vector3 leftBottom = camera.frustum.planePoints[0];
         postProcessing.begin();
+        renderer.setView(camera.combined, leftBottom.x, leftBottom.y, camera.viewportWidth, camera.viewportHeight);
         renderer.render();
         stage.draw();
 

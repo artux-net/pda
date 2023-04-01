@@ -12,17 +12,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.engine.ecs.components.*
-import net.artux.pda.map.engine.ecs.components.player.PlayerComponent
 import net.artux.pda.map.engine.ecs.systems.BaseSystem
 import net.artux.pda.map.utils.di.scope.PerGameMap
 import net.artux.pda.map.view.UserInterface
 import net.artux.pda.model.quest.story.StoryDataModel
 import javax.inject.Inject
+import kotlin.math.abs
+import kotlin.math.atan2
 
 @PerGameMap
 class PlayerSystem @Inject constructor(
     val dataRepository: DataRepository,
-    val userInterface: UserInterface
+    val userInterface: UserInterface,
+    val playerMovingSystem: PlayerMovingSystem
 ) :
     BaseSystem(Family.one().get()), Disposable {
     private val pm = ComponentMapper.getFor(
@@ -37,19 +39,13 @@ class PlayerSystem @Inject constructor(
     private val hm = ComponentMapper.getFor(
         HealthComponent::class.java
     )
-    private val pmm = ComponentMapper.getFor(
-        PlayerComponent::class.java
-    )
-    private val vcm = ComponentMapper.getFor(
-        VelocityComponent::class.java
-    )
     lateinit var lastDataModel: StoryDataModel
 
     init {
         CoroutineScope(Dispatchers.Main).launch {
-          dataRepository.storyDataModelFlow.collect{
-              lastDataModel = it
-          }
+            dataRepository.storyDataModelFlow.collect {
+                lastDataModel = it
+            }
         }
     }
 
@@ -67,6 +63,8 @@ class PlayerSystem @Inject constructor(
         return super.getPlayer()
     }
 
+    val direction: Vector2 = Vector2()
+
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
         if (isPlayerActive) {
@@ -74,24 +72,27 @@ class PlayerSystem @Inject constructor(
             val playerPosition = pm[player]
             val spriteComponent = sm[player]
             val enemy = moodComponent.enemy
-            val direction: Vector2
-            direction = if (enemy == null) {
-                vcm[player].velocity
+            if (enemy == null) {
+                direction.set(playerMovingSystem.velocity)
             } else {
                 val enemyPosition = pm[enemy]
-                enemyPosition.position.cpy().sub(playerPosition.position)
+                direction.set(
+                    enemyPosition.position.x - playerPosition.position.x,
+                    enemyPosition.position.y - playerPosition.position.y
+                )
             }
-            val degrees = (Math.atan2(
+
+            val degrees = (atan2(
                 -direction.x.toDouble(),
                 direction.y
                     .toDouble()
             ) * 180.0 / Math.PI).toFloat()
+
             val currentRotation = spriteComponent.rotation - 90
-            val alternativeRotation: Float
-            alternativeRotation =
+            val alternativeRotation =
                 if (currentRotation > 0) currentRotation - 360 else currentRotation + 360
             var difference = currentRotation - degrees
-            if (Math.abs(alternativeRotation - degrees) < Math.abs(difference)) difference =
+            if (abs(alternativeRotation - degrees) < abs(difference)) difference =
                 alternativeRotation - degrees
             if (direction.x != 0f && direction.y != 0f) {
                 val step = difference * deltaTime * 20
@@ -101,8 +102,7 @@ class PlayerSystem @Inject constructor(
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {}
-    val healthComponent: HealthComponent
-        get() = hm[player]
+    val healthComponent: HealthComponent get() = hm[player]
     val position: Vector2
         get() = pm[player].position
 

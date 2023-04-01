@@ -5,20 +5,24 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
+import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
+import net.artux.pda.map.view.view.bars.Bar;
+import net.artux.pda.map.view.view.bars.Utils;
 
 import javax.inject.Inject;
 
@@ -29,14 +33,16 @@ public class VisionSystem extends BaseSystem implements Drawable {
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<VisionComponent> vcm = ComponentMapper.getFor(VisionComponent.class);
+    private final ComponentMapper<HealthComponent> hcm = ComponentMapper.getFor(HealthComponent.class);
     private final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
     private final MapOrientationSystem mapOrientationSystem;
     private final Sprite enemyTarget;
     private final World world;
+    private final Bar progressBar;
 
     @Inject
-    public VisionSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem, World world) {
+    public VisionSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem, World world, Skin skin) {
         super(Family.all(VisionComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
         this.world = world;
@@ -44,6 +50,10 @@ public class VisionSystem extends BaseSystem implements Drawable {
         enemyTarget = new Sprite(assetManager.get("transfer.png", Texture.class));
         enemyTarget.setSize(16, 16);
         enemyTarget.setOriginCenter();
+
+        progressBar = new Bar(Color.GREEN);
+        progressBar.setWidth(26);
+        progressBar.setHeight(5);
     }
 
     @Override
@@ -79,10 +89,16 @@ public class VisionSystem extends BaseSystem implements Drawable {
         Sprite sprite = enemyTarget;
         VisionComponent visionComponent = vcm.get(getPlayer());
         MoodComponent moodComponent = mm.get(getPlayer());
-        Entity playerEnemyTarget = moodComponent.getEnemy();
-        if (playerEnemyTarget != null) {
-            if (visionComponent.getVisibleEntities().contains(playerEnemyTarget)) {
-                Vector2 enemyPosition = pm.get(playerEnemyTarget).getPosition();
+        Entity playerEnemy = moodComponent.getEnemy();
+        if (playerEnemy != null) {
+            if (visionComponent.getVisibleEntities().contains(playerEnemy)) {
+                Vector2 enemyPosition = pm.get(playerEnemy).getPosition();
+                if (hcm.has(playerEnemy)) {
+                    progressBar.setValue(hcm.get(playerEnemy).getHealth());
+                    progressBar.setPosition(enemyPosition.x - 13, enemyPosition.y + 8);
+                    progressBar.draw(batch, 1f);
+                }
+
                 batch.draw(sprite, enemyPosition.x - sprite.getOriginX(), enemyPosition.y - sprite.getOriginY(), sprite.getOriginX(),
                         sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), enemyTarget.getRotation());
 

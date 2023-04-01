@@ -3,12 +3,14 @@ package net.artux.pda.map.utils.di.modules;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import net.artux.pda.map.utils.MapInfo;
 import net.artux.pda.map.engine.ecs.entities.MapBodyBuilder;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.map.GameMap;
@@ -44,6 +46,16 @@ public class EngineModule {
         TiledMap tiledMap = new TmxMapLoader().load("maps/" + gameMap.getTmx());
         MapBodyBuilder.buildShapes(tiledMap, 1, world);
         return tiledMap;
+    }
+
+    @Provides
+    @PerGameMap
+    public MapInfo getMapInfo(TiledMap map) {
+        TiledMapTileLayer tileLayer = (TiledMapTileLayer) map.getLayers().get("tiles");
+
+        int mapWidth = tileLayer.getWidth() * tileLayer.getTileWidth();
+        int mapHeight = tileLayer.getHeight() * tileLayer.getTileHeight();
+        return new MapInfo(mapWidth, mapHeight);
     }
 
     @Provides

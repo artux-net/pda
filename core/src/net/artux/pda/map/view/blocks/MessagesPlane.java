@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Timer;
@@ -30,7 +31,7 @@ public class MessagesPlane extends ScrollPane {
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
             .withZone(ZoneId.systemDefault());
     private final AssetManager assetManager;
-    private final Table table;
+    private final VerticalGroup table;
     private final Label.LabelStyle titleStyle;
     private final Label.LabelStyle subtitleStyle;
 
@@ -38,19 +39,15 @@ public class MessagesPlane extends ScrollPane {
 
     @Inject
     public MessagesPlane(AssetsFinder finder) {
-        super(new Table().left().bottom());
+        super(new VerticalGroup().left().bottom());
         this.assetManager = finder.getManager();
 
-        table = (Table) getActor();
+        table = (VerticalGroup) getActor();
         setScrollingDisabled(true, false);
         setSize(w / 3f, 300);
 
         titleStyle = new Label.LabelStyle(finder.getFontManager().getFont(24), Color.WHITE);
         subtitleStyle = new Label.LabelStyle(finder.getFontManager().getFont(FontManager.LIBERAL_FONT, 20), Color.WHITE);
-    }
-
-    public Table getTable() {
-        return table;
     }
 
     public void addMessage(String icon, String title, String content, Length length) {
@@ -69,10 +66,7 @@ public class MessagesPlane extends ScrollPane {
                 .top();
         mainGroup.add(contentGroup)
                 .growX();
-        table.row();
-        table.add(mainGroup)
-                .pad(20)
-                .growX();
+        table.addActor(mainGroup);
 
         title = timeFormatter.format(Instant.now()) + " " + title;
         Label titleLabel = new Label(title, titleStyle);
@@ -93,21 +87,9 @@ public class MessagesPlane extends ScrollPane {
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
-                removeCellWithActor(mainGroup);
+                table.removeActor(mainGroup);
             }
         }, length.secs);
-    }
-
-    private void removeCellWithActor(Actor remove) {
-        for (Actor actor : table.getChildren()) {
-            if (actor == remove) {
-                Cell<Actor> cell = table.getCell(actor);
-                actor.remove();
-                // remove cell from table
-                table.getCells().removeValue(cell, true);
-                table.invalidate();
-            }
-        }
     }
 
     public enum Length {

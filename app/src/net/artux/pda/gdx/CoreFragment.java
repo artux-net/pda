@@ -1,5 +1,6 @@
 package net.artux.pda.gdx;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
@@ -14,7 +15,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.RewardedVideoCallbacks;
+import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.badlogic.gdx.backends.android.AndroidAudio;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
+import com.badlogic.gdx.backends.android.AsynchronousAndroidAudio;
 
 import net.artux.pda.app.PDAApplication;
 import net.artux.pda.map.DataRepository;
@@ -37,6 +41,11 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     private GdxAdapter gdxAdapter;
     private QuestViewModel questViewModel;
+
+    @Override
+    public AndroidAudio createAudio(Context context, AndroidApplicationConfiguration config) {
+        return new AsynchronousAndroidAudio(context, config);
+    }
 
     @Nullable
     @Override

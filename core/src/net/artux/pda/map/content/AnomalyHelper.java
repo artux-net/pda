@@ -27,15 +27,8 @@ import java.util.Set;
 
 public class AnomalyHelper {
 
-    private static final String[] names = {"Жарка", "Электра", "Трамплин", "Туман", "Огниво"};
-
-    private static final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private static final ComponentMapper<HealthComponent> hcm = ComponentMapper.getFor(HealthComponent.class);
-    private static final ComponentMapper<Effects> ecm = ComponentMapper.getFor(Effects.class);
-
     public static void createAnomalies(MapComponent coreComponent) {
         Engine engine = coreComponent.getEngine();
-        AssetManager assetManager = coreComponent.getAssetsManager();
         TiledMap tiledMap = coreComponent.getTiledMap();
 
         TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("tiles");
@@ -74,14 +67,10 @@ public class AnomalyHelper {
 
             int size = random(20, 30);
             final AnomalyComponent anomalyComponent = new AnomalyComponent(Anomaly.values()[random(0, Anomaly.values().length - 1)], size);
-            size *= 2;
 
             final Vector2 finalPosition = position;
             anomaly.add(new BodyComponent(finalPosition, coreComponent.getWorld()))
-
-                    .add(anomalyComponent)
-                    .add(new ClickComponent(size / 2, () -> engine.getSystem(RenderSystem.class)
-                            .showText(anomalyComponent.desc(), finalPosition)));
+                    .add(anomalyComponent);
             engine.addEntity(anomaly);
         }
 

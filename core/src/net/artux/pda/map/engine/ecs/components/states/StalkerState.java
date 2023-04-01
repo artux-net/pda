@@ -111,8 +111,10 @@ public enum StalkerState implements State<Entity> {
                     } else if (dst > 20 && dst < distanceToAttack(weaponModel.getPrecision())) {
                         gmm.get(entity).setMovementTarget(null);
                     } else {
-                        Vector2 tempTarget = enemyBodyComponent.cpy().sub(entityBodyComponent);
-                        gmm.get(entity).setMovementTarget(entityBodyComponent.cpy().sub(tempTarget));
+                        //движение в обратном направлении, слишком близко подошли
+                        Vector2 diff = enemyBodyComponent.cpy().sub(entityBodyComponent);
+                        diff.scl(-1);
+                        gmm.get(entity).setMovementTarget(diff.add(entityBodyComponent));
                     }
                 }
             } else {

@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.Timer;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.engine.ecs.components.AnomalyComponent;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
+import net.artux.pda.map.engine.ecs.components.ClickComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
@@ -32,6 +33,7 @@ import javax.inject.Inject;
 @PerGameMap
 public class AnomalySystem extends EntitySystem {
 
+    private final RenderSystem renderSystem;
     private ImmutableArray<Entity> anomalies;
     private ImmutableArray<Entity> entities;
     private final Random random = new Random();
@@ -56,11 +58,12 @@ public class AnomalySystem extends EntitySystem {
     @Inject
     public AnomalySystem(AssetManager assetManager, CameraSystem cameraSystem,
                          SoundsSystem soundsSystem, NotificationController notificationController,
-                         World world, LocaleBundle localeBundle) {
+                         RenderSystem renderSystem, LocaleBundle localeBundle) {
         this.assetManager = assetManager;
         this.localeBundle = localeBundle;
         this.cameraSystem = cameraSystem;
         this.soundsSystem = soundsSystem;
+        this.renderSystem = renderSystem;
         this.notificationController = notificationController;
 
         anomaly = assetManager.get("audio/sounds/pda/d-beep.ogg", Sound.class);
@@ -71,7 +74,6 @@ public class AnomalySystem extends EntitySystem {
         super.addedToEngine(engine);
         anomalies = engine.getEntitiesFor(Family.all(AnomalyComponent.class, BodyComponent.class).get());
         entities = engine.getEntitiesFor(Family.all(HealthComponent.class, BodyComponent.class).get());
-        //generateGroup();
     }
 
     @Override
@@ -96,16 +98,18 @@ public class AnomalySystem extends EntitySystem {
                 //if (radiation)
                 //  healthComponent.damage(healthComponent.radiation * deltaTime * 0.01f);
                 float dst = anomalyBody.getPosition().dst(bodyComponent.getPosition());
-                if (dst < anomaly.getSize() + 30f
-                        && player) {
+                if (dst < anomaly.getSize() + 30f && player) {
                     playerNearAnomaly = true;
 
                     if (!scm.has(anomalyEntity)) {
                         float size = anomaly.getSize();
-                        anomalyEntity.add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size * 2, size * 2));
+                        anomalyEntity
+                                .add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size * 2, size * 2))
+                                .add(new ClickComponent((int) size,
+                                        () -> renderSystem.showText(anomaly.desc(), anomalyBody.getPosition())));
                         notificationController.notify(NotificationType.ATTENTION,
                                 localeBundle.get("main.anomaly.found"),
-                                anomaly.getAnomaly().getName());
+                                localeBundle.get("main.anomaly.found.desc", anomaly.getAnomaly().getName()));
                     }
 
                 }

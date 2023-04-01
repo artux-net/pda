@@ -2,6 +2,8 @@ package net.artux.pda.map.utils.di.modules.ui;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
@@ -29,8 +32,8 @@ import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.WeaponComponent;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerBattleSystem;
+import net.artux.pda.map.engine.ecs.systems.player.PlayerMovingSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
-import net.artux.pda.map.managers.notification.NotificationController;
 import net.artux.pda.map.view.BackpackMenu;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.MessagesPlane;
@@ -55,7 +58,9 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initJoyTable(NotificationController notificationController, MessagesPlane messagesPlane, @Named("joyTable") Table joyTable, @Named("gameZone") Group gameZone, AssetsFinder assetsFinder, PlayerSystem playerSystem) {
+    public Actor initJoyTable(MessagesPlane messagesPlane, @Named("joyTable") Table joyTable,
+                              @Named("gameZone") Group gameZone, AssetsFinder assetsFinder,
+                              PlayerMovingSystem playerMovingSystem) {
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
         AssetManager assetManager = assetsFinder.getManager();
         style.knob = new TextureRegionDrawable(assetManager.get("textures/ui/touchpad/knob.png", Texture.class));
@@ -73,7 +78,10 @@ public class UserInterfaceModule {
                 Color color = touchpad.getColor();
                 float joyDeltaX = ((Touchpad) actor).getKnobPercentX();
                 float joyDeltaY = ((Touchpad) actor).getKnobPercentY();
-                vm.get(playerSystem.getPlayer()).set(joyDeltaX, joyDeltaY);
+                if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT))
+                    playerMovingSystem.setRunning(true);
+                playerMovingSystem.setVelocity(joyDeltaX, joyDeltaY);
+
                 if (joyDeltaY == 0 && joyDeltaX == 0)
                     touchpad.setColor(color.r, color.g, color.b, 0.2f);
                 else
@@ -96,20 +104,15 @@ public class UserInterfaceModule {
     @Provides
     public Actor initAssistant(@Named("assistantTable") Table assistantBlock,
                                InteractionSystem interactionSystem, AssetManager assetManager) {
-        Table actionsTable = new Table();
-        actionsTable.defaults().pad(10).space(20);
-        assistantBlock.add(actionsTable);
-        actionsTable.add();
-        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-        style.up = new TextureRegionDrawable(assetManager.get("textures/ui/slots/slot.png", Texture.class));
+        HorizontalGroup horizontalGroup = new HorizontalGroup();
+        assistantBlock.add(horizontalGroup);
         assistantBlock.addAction(new Action() {
-
             @Override
             public boolean act(float delta) {
                 Collection<InteractiveComponent> components = interactionSystem.getInteractiveComponents();
-                removeActors(actionsTable, components.stream().map(InteractiveComponent::getTitle).collect(Collectors.toList()));
+                removeActors(horizontalGroup, components.stream().map(InteractiveComponent::getTitle).collect(Collectors.toList()));
                 for (InteractiveComponent component : components) {
-                    if (actionsTable.findActor(component.title) == null) {
+                    if (horizontalGroup.findActor(component.title) == null) {
                         String icon;
                         switch (component.type) {
                             case FINDING:
@@ -141,17 +144,22 @@ public class UserInterfaceModule {
                             }
                         });
 
-                        actionsTable
-                                .add(button)
-                                .pad(10);
+                        horizontalGroup
+                                .addActor(button);
                     }
                 }
                 return false;
             }
 
-            private void removeActors(Table container, Collection<String> activeActions) {
-                if (activeActions.size() != container.getChildren().size)
-                    container.clear();
+            private void removeActors(HorizontalGroup container, Collection<String> activeActions) {
+                if (activeActions.size() != container.getChildren().size) {
+                    for (int i = 0; i < container.getChildren().size; i++) {
+                        Actor actor1 = container.getChild(i);
+                        if (!activeActions.contains(actor1.getName()))
+                            actor1.remove();
+                    }
+                }
+
             }
 
         });
@@ -193,7 +201,7 @@ public class UserInterfaceModule {
                         weaponSlot.setLabelText(entityWeapon.getMagazine() + "/" + resource.getQuantity());
                     }
                 } else {
-                    weaponSlot.setText("Оружие отсутствует");
+                    weaponSlot.setText("Оружие отсутствует");//todo locale
                     weaponSlot.setLabelText("");
                 }
                 return false;
@@ -224,7 +232,7 @@ public class UserInterfaceModule {
     @IntoSet
     @Provides
     public Actor initControlTable(@Named("controlTable") Table controlTable, @Named("gameZone") Group gameZone, PlayerSystem playerSystem,
-                                  PlayerBattleSystem battleSystem, AssetManager assetManager) {
+                                  PlayerBattleSystem battleSystem, AssetManager assetManager, PlayerMovingSystem playerMovingSystem) {
         float offset = 50;
         float step = 60;
         controlTable.add(addInteractButton(assetManager, "textures/ui/icons/icon_shoot.png", new ClickListener() {
@@ -272,12 +280,11 @@ public class UserInterfaceModule {
         controlTable.row();
 
         controlTable.add(addInteractButton(assetManager, "textures/ui/icons/icon_run.png", new ClickListener() {
-                    private final ComponentMapper<VelocityComponent> vcm = ComponentMapper.getFor(VelocityComponent.class);
                     private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
                     @Override
                     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        vcm.get(playerSystem.getPlayer()).running = false;
+                        playerMovingSystem.setRunning(false);
                         super.touchUp(event, x, y, pointer, button);
                     }
 
@@ -285,7 +292,7 @@ public class UserInterfaceModule {
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                         HealthComponent healthComponent = hm.get(playerSystem.getPlayer());
                         if (healthComponent.getStamina() > 10f)
-                            vcm.get(playerSystem.getPlayer()).running = true;
+                            playerMovingSystem.setRunning(true);
                         return super.touchDown(event, x, y, pointer, button);
                     }
                 }))

@@ -7,11 +7,13 @@ import net.artux.pda.map.engine.ecs.systems.ArtifactSystem;
 import net.artux.pda.map.engine.ecs.systems.BattleSystem;
 import net.artux.pda.map.engine.ecs.systems.DeadCheckerSystem;
 import net.artux.pda.map.engine.ecs.systems.EffectsSystem;
+import net.artux.pda.map.engine.ecs.systems.EjectionSystem;
 import net.artux.pda.map.engine.ecs.systems.EntityProcessorSystem;
 import net.artux.pda.map.engine.ecs.systems.MapLoggerSystem;
 import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.ecs.systems.MovementTargetingSystem;
 import net.artux.pda.map.engine.ecs.systems.RenderSystem;
+import net.artux.pda.map.engine.ecs.systems.SecretSystem;
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
 import net.artux.pda.map.engine.ecs.systems.SpawnSystem;
 import net.artux.pda.map.engine.ecs.systems.TimerSystem;
@@ -48,6 +50,14 @@ public abstract class EngineSystemsModule {
     @IntoSet
     @Binds
     public abstract EntitySystem playerMovingSystem(PlayerMovingSystem playerMovingSystem);
+
+    @IntoSet
+    @Binds
+    public abstract EntitySystem ejectionSystem(EjectionSystem ejectionSystem);
+
+    @IntoSet
+    @Binds
+    public abstract EntitySystem secretSystem(SecretSystem secretSystem);
 
     @IntoSet
     @Binds

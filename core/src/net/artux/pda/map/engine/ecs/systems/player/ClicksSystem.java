@@ -4,6 +4,9 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.ClickComponent;
@@ -13,7 +16,7 @@ import net.artux.pda.map.utils.di.scope.PerGameMap;
 import javax.inject.Inject;
 
 @PerGameMap
-public class ClicksSystem extends IteratingSystem {
+public class ClicksSystem extends IteratingSystem implements GestureDetector.GestureListener{
 
     private final ComponentMapper<ClickComponent> cm = ComponentMapper.getFor(ClickComponent.class);
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
@@ -46,5 +49,50 @@ public class ClicksSystem extends IteratingSystem {
 
 
         return false;
+    }
+
+    @Override
+    public boolean touchDown(float x, float y, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean tap(float x, float y, int count, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean longPress(float x, float y) {
+        return false;
+    }
+
+    @Override
+    public boolean fling(float velocityX, float velocityY, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean pan(float x, float y, float deltaX, float deltaY) {
+        return false;
+    }
+
+    @Override
+    public boolean panStop(float x, float y, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean zoom(float initialDistance, float distance) {
+        return false;
+    }
+
+    @Override
+    public boolean pinch(Vector2 initialPointer1, Vector2 initialPointer2, Vector2 pointer1, Vector2 pointer2) {
+        return false;
+    }
+
+    @Override
+    public void pinchStop() {
+
     }
 }

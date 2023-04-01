@@ -140,7 +140,7 @@ public class StoryDataModel implements Serializable {
         for (ItemModel item : getAllItems()) {
             if (item instanceof WearableModel)
                 if (item.getType() == type)
-                    if (((WearableModel) item).isEquipped()) {
+                    if (((WearableModel) item).isEquipped() && item.getQuantity() > 0) {
                         return (WearableModel) item;
                     }
         }

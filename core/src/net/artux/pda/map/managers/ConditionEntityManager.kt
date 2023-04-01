@@ -50,7 +50,7 @@ class ConditionEntityManager @Inject constructor(
     init {
         CoroutineScope(Dispatchers.Main).launch {
             dataRepository.storyDataModelFlow.collect {
-                update(it)
+                Gdx.app.postRunnable { update(it) }
             }
         }
     }

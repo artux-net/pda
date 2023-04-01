@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
 import net.artux.engine.pathfinding.TiledNavigator;
-import net.artux.pda.map.engine.data.GlobalData;
+import net.artux.pda.map.utils.MapInfo;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
@@ -34,14 +34,16 @@ public class UIFrame extends WidgetGroup {
 
     private final Table leftGroup;
     private final Table rightGroup;
+    private final MapInfo mapInfo;
 
     @Inject
-    public UIFrame(AssetManager assetManager, Camera usualCamera, Camera uiCamera, TiledNavigator tiledNavigator, BitmapFont font) {
+    public UIFrame(AssetManager assetManager, Camera usualCamera, Camera uiCamera, TiledNavigator tiledNavigator, BitmapFont font, MapInfo mapInfo) {
         super();
         this.camera = usualCamera;
 
         w = (int) uiCamera.viewportWidth;
         h = (int) uiCamera.viewportHeight;
+        this.mapInfo = mapInfo;
 
         standardFrameSize = 30f;
         topFrameHeight = standardFrameSize * 2.5f;
@@ -156,19 +158,19 @@ public class UIFrame extends WidgetGroup {
     public void act(float delta) {
         super.act(delta);
         counter.setText(String.valueOf(PlayerData.visibleEntities));
-        horizontalSlider.setValue(GlobalData.cameraPosX);
+        horizontalSlider.setValue(camera.position.x);
         Vector3[] visibleCameraCorners = camera.frustum.planePoints;
 
-        float widthK = (visibleCameraCorners[1].x - visibleCameraCorners[0].x) / GlobalData.mapWidth;
+        float widthK = (visibleCameraCorners[1].x - visibleCameraCorners[0].x) / mapInfo.getMapWidth();
         float knobWidth = horizontalSlider.getWidth();
         if (widthK < 1)
             knobWidth *= widthK;
 
         horizontalSlider.getStyle().knob.setMinWidth(knobWidth);
 
-        verticalSlider.setValue(GlobalData.cameraPosY);
+        verticalSlider.setValue(camera.position.y);
 
-        float heightK = (visibleCameraCorners[2].y - visibleCameraCorners[1].y) / GlobalData.mapHeight;
+        float heightK = (visibleCameraCorners[2].y - visibleCameraCorners[1].y) / mapInfo.getMapHeight();
         float knobHeight = verticalSlider.getHeight();
         if (heightK < 1)
             knobHeight *= heightK;

@@ -19,6 +19,8 @@ import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
 
+import dagger.Provides;
+
 @PerGameMap
 public class MapOrientationSystem extends EntitySystem {
 
@@ -55,10 +57,6 @@ public class MapOrientationSystem extends EntitySystem {
         return pathFinder;
     }
 
-    public TiledRaycastCollisionDetector<FlatTiledNode> getCollisionDetector() {
-        return collisionDetector;
-    }
-
     public PathSmoother<FlatTiledNode, Vector2> getPathSmoother() {
         return pathSmoother;
     }
@@ -85,7 +83,7 @@ public class MapOrientationSystem extends EntitySystem {
                 y * tileSize + random.nextInt(tileSize));
     }
 
-    public TiledNavigator getMapBorder() {
+    public TiledNavigator getNavigator() {
         return tiledNavigator;
     }
 

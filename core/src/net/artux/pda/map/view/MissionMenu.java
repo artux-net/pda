@@ -139,7 +139,7 @@ public class MissionMenu extends Table {
                     Image pointIcon = new Image(texture);
                     pointIcon.setScaling(Scaling.fit);
 
-                    ImageTextButton textButton = new ImageTextButton(pointIcon, point.getTitle() + condition.toString(), labelStyle);
+                    ImageTextButton textButton = new ImageTextButton(pointIcon, point.getTitle(), labelStyle);
                     textButton.addListener(new ActorGestureListener() {
                         @Override
                         public void tap(InputEvent event, float x, float y, int count, int button) {
