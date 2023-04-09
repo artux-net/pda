@@ -41,14 +41,14 @@ public class GdxAdapter extends ApplicationAdapter {
         assetManager = coreComponent.getAssetsManager();
 
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
-        Gdx.app.log("GDX", "GDX load stared, version " + Gdx.app.getVersion());
+        Gdx.app.getApplicationLogger().log("GDX", "GDX load stared, version " + Gdx.app.getVersion());
         long loadMills = TimeUtils.millis();
         startHeap = Gdx.app.getNativeHeap();
         Gdx.app.debug("GDX", "Before load, heap " + startHeap);
         State firstState = coreComponent.getPreloadState();
         gsc.push(firstState);
         Gdx.app.debug("GDX", "Loaded, heap " + Gdx.app.getNativeHeap());
-        Gdx.app.log("GDX", "GDX loading took " + (TimeUtils.millis() - loadMills) + " ms.");
+        Gdx.app.getApplicationLogger().log("GDX", "GDX loading took " + (TimeUtils.millis() - loadMills) + " ms.");
         resume();
     }
 

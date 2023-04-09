@@ -69,7 +69,7 @@ class DataRepository(
     }
 
     fun setUserData(storyDataModel: StoryDataModel) {
-        Gdx.app.log(TAG, "Story data updated.")
+        Gdx.app.applicationLogger.log(TAG, "Story data updated.")
         this.storyDataModel = SerializationUtils.clone(storyDataModel)
         currentStoryDataModel = storyDataModel
         dataModelFlow.tryEmit(storyDataModel)
@@ -88,7 +88,7 @@ class DataRepository(
         val summaryMap = HashMap(QuestUtil.difference(storyDataModel, currentStoryDataModel))
         if (actions != null) {
             summaryMap.putAll(actions)
-            Gdx.app.log("ACTIONS", "$summaryMap")
+            Gdx.app.applicationLogger.log("ACTIONS", "$summaryMap")
             platformInterface.applyActions(summaryMap)
         }
     }

@@ -72,7 +72,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
         stage.addListener(this);
         syncCameraPosition(stage);
-        Gdx.app.log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");
+        Gdx.app.getApplicationLogger().log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");
     }
 
     private void syncCameraPosition(Stage stage) {

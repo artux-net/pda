@@ -59,11 +59,11 @@ public class PlayState extends State {
     public void resume() {
         Gdx.input.getInputProcessor()
                 .touchUp(0, 0, 0, 0); //resets all inputs after pause
-        Gdx.app.log(TAG, "OnResume");
+        Gdx.app.getApplicationLogger().log(TAG, "OnResume");
         GameMap map = dataRepository.getGameMap();
 
         if (gameMap.getId() != map.getId()) {
-            Gdx.app.log(TAG, "Update map, old: " + gameMap.getId() + " new map: " + map.getId());
+            Gdx.app.getApplicationLogger().log(TAG, "Update map, old: " + gameMap.getId() + " new map: " + map.getId());
             gsm.set(coreComponent.getPreloadState());
         }
         engineManager.updateOnlyPlayer();

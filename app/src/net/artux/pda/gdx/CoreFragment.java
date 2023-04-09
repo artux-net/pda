@@ -30,6 +30,7 @@ import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
+import net.artux.pda.utils.GDXTimberLogger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     private GdxAdapter gdxAdapter;
     private QuestViewModel questViewModel;
+    private GDXTimberLogger gdxTimberLogger;
 
     @Override
     public AndroidAudio createAudio(Context context, AndroidApplicationConfiguration config) {
@@ -52,6 +54,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Bundle args = getArguments();
         if (args != null) {
+            gdxTimberLogger = new GDXTimberLogger();
             StoryModel storyModel = (StoryModel) args.getSerializable("story");
             StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
             GameMap map = (GameMap) args.getSerializable("map");
@@ -90,6 +93,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             dataRepository.setUserData(dataModel);
             dataRepository.setGameMap(map);
         }
+        setApplicationLogger(gdxTimberLogger);
         super.onResume();
     }
 
@@ -121,7 +125,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     @Override
     public void applyActions(Map<String, List<String>> actions) {
-        questViewModel.sync(actions);
+        questViewModel.syncNow(actions);
     }
 
     @Override
@@ -175,7 +179,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
             @Override
             public void onRewardedVideoFinished(double v, String s) {
-                questViewModel.sync(Map.of("money", List.of(String.valueOf((int) v))));
+                questViewModel.syncNow(Map.of("money", List.of(String.valueOf((int) v))));
             }
 
             @Override

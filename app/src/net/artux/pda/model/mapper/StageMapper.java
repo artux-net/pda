@@ -81,7 +81,7 @@ public interface StageMapper {
         for (Transfer transfer : stage.getTransfers())
             if (QuestUtil.check(transfer.getCondition(), dataCompanion)) {
                 transfer.setText(formatText(transfer.getText(), dataCompanion).trim());
-                transfers.add(new TransferModel(transfer.getStageId(), transfer.getText()));
+                transfers.add(new TransferModel(transfer.getStage(), transfer.getText()));
             }
         if (transfers.size() == 0)
             return Collections.singletonList(new TransferModel(-1, "Недостижимые условия переходов."));

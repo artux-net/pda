@@ -202,7 +202,7 @@ public class StoryDataModel implements Serializable {
         NEW(1, 1000),
         STALKER(2, 3000),
         EXPERIENCE(3, 6000),
-        OLD(4, 1000),
+        OLD(4, 10000),
         MASTER(5, 16000),
         FINAL(6, Integer.MAX_VALUE, true);
 

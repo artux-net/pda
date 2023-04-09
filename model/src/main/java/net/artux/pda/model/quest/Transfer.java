@@ -9,9 +9,9 @@ import lombok.Data;
 @Data
 public class Transfer implements Serializable {
 
-    private int stageId;
-    private HashMap<String, List<String>> condition;
+    private int stage;
     private String text;
+    private HashMap<String, List<String>> condition;
     private HashMap<String, List<String>> actions;
 
 }

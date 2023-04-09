@@ -11,7 +11,7 @@ public class Stage implements Serializable {
 
     private Integer id;
     private Integer typeStage;
-    private String backgroundUrl;
+    private String background;
     private int[] music;
     private String title;
     private String message;

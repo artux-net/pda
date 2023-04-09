@@ -36,7 +36,7 @@ class ConditionEntityManager @Inject constructor(
     fun update(dataModel: StoryDataModel?) {
         val currentEntities =
             engine.getEntitiesFor(Family.one(ConditionComponent::class.java).get())
-        Gdx.app.log("Points", "Update conditional-points.")
+        Gdx.app.applicationLogger.log("Points", "Update conditional-points.")
         for (i in 0 until currentEntities.size()) {
             val e = currentEntities.get(i)
             if (QuestUtil.check(cm[e], dataModel))

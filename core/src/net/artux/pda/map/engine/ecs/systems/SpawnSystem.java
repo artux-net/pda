@@ -60,7 +60,7 @@ public class SpawnSystem extends IteratingSystem {
             entities.removeIf(e -> getEntities().indexOf(e, true) < 0);
             if (spawnComponent.isEmpty()) {
                 if (!spawnComponent.isActionsDone()) {
-                    Gdx.app.log("Spawn actions", "Actions sent");
+                    Gdx.app.getApplicationLogger().log("Spawn actions", "Actions sent");
                     dataRepository.applyActions(spawnComponent.getSpawnModel().getActions());
                     spawnComponent.setActionsDone(true);
                 }

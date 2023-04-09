@@ -43,7 +43,7 @@ public class PlayerBattleSystem extends BaseSystem {
     }
 
     public void setPlayerShoot(boolean playerShoot) {
-        Gdx.app.log("Player Battle", "player shoot: " + playerShoot);
+        Gdx.app.getApplicationLogger().log("Player Battle", "player shoot: " + playerShoot);
         this.playerShoot = playerShoot;
     }
 

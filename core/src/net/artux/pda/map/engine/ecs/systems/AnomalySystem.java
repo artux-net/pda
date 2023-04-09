@@ -198,7 +198,7 @@ public class AnomalySystem extends EntitySystem {
                 };
 
                 entityBuilder.randomStalker(targeting.getTarget(), targeting);
-                Gdx.app.log("WorldSystem", "New entity created.");
+                Gdx.app.getApplicationLogger().log("WorldSystem", "New entity created.");
                 generateGroup();*//*
                 //todo
             }

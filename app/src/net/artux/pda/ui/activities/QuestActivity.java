@@ -1,10 +1,7 @@
 package net.artux.pda.ui.activities;
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -17,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -28,14 +24,12 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentNotificationBinding;
 import net.artux.pda.gdx.CoreFragment;
 import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.StageType;
-import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.ui.fragments.quest.SellerFragment;
 import net.artux.pda.ui.fragments.quest.StageFragment;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
@@ -44,10 +38,6 @@ import net.artux.pda.ui.viewmodels.UserViewModel;
 import net.artux.pda.utils.MultiExoPlayer;
 import net.artux.pda.utils.URLHelper;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -55,24 +45,15 @@ import timber.log.Timber;
 
 
 @AndroidEntryPoint
-public class QuestActivity extends FragmentActivity implements View.OnClickListener, AndroidFragmentApplication.Callbacks {
+public class QuestActivity extends FragmentActivity implements AndroidFragmentApplication.Callbacks {
 
-    private TextView tvTime;
     private ImageSwitcher switcher;
-    private ImageView musicImage;
+
     @Inject
     protected Gson gson;
-
     private String currentBackground = "";
-
-    private BroadcastReceiver timeChangeReceiver;
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-            .withZone(ZoneId.systemDefault());
     private MultiExoPlayer multiExoPlayer;
-
-
     private CoreFragment coreFragment;
-
     private QuestViewModel questViewModel;
 
     @Override
@@ -88,8 +69,8 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
                 multiExoPlayer = new MultiExoPlayer(QuestActivity.this, chapter.getMusic());
                 //preload images
                 for (Stage stage : chapter.getStages()) {
-                    if (stage.getBackgroundUrl() != null && !stage.getBackgroundUrl().isEmpty()) {
-                        String background_url = URLHelper.getResourceURL(stage.getBackgroundUrl());
+                    if (stage.getBackground() != null && !stage.getBackground().isEmpty()) {
+                        String background_url = URLHelper.getResourceURL(stage.getBackground());
 
                         Glide.with(QuestActivity.this)
                                 .downloadOnly()
@@ -123,11 +104,9 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
                 setTitle(stageModel.getTitle());
             else
                 setTitle("");
-            //findViewById(R.id.navbar).setVisibility(View.VISIBLE);
         });
 
         questViewModel.getMap().observe(this, map -> {
-            //findViewById(R.id.navbar).setVisibility(View.GONE);
             FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
             if (coreFragment == null)
                 coreFragment = new CoreFragment();
@@ -222,12 +201,6 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
 
         questViewModel.getBackground().observe(this, this::setBackground);
 
-        /*tvTime = findViewById(R.id.sceneTime);
-        musicImage = findViewById(R.id.musicSetup);
-        musicImage.setOnClickListener(this);
-        findViewById(R.id.closeButton).setOnClickListener(this);
-        findViewById(R.id.exitButton).setOnClickListener(this);
-        findViewById(R.id.log).setOnClickListener(this);*/
         switcher = findViewById(R.id.switcher);
         switcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
         switcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
@@ -280,67 +253,6 @@ public class QuestActivity extends FragmentActivity implements View.OnClickListe
                     .into((ImageView) switcher.getNextView());
             switcher.showNext();
         }
-    }
-
-    @Override
-    public void onClick(View v) {
-        int id = v.getId();
-        if (id == R.id.musicSetup) {
-            if (isMuted()) {
-                musicImage.setImageDrawable(ResourcesCompat
-                        .getDrawable(getResources(), R.drawable.ic_vol_on, getApplicationContext().getTheme()));
-                unmute();
-            } else {
-                musicImage.setImageDrawable(ResourcesCompat
-                        .getDrawable(getResources(), R.drawable.ic_vol_off, getApplicationContext().getTheme()));
-                mute();
-            }
-        } else if (id == R.id.closeButton) {
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-        } else if (id == R.id.exitButton)
-            questViewModel.exitStory();
-        else if (id == R.id.log) {
-            Stage stage = questViewModel.getCurrentStage();
-            StoryDataModel dataModel = questViewModel.getStoryData().getValue();
-
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder.setPrettyPrinting();
-
-            assert dataModel != null;
-            String logStage = "Story: " + questViewModel.getCurrentStoryId() + "\n" +
-                    "Chapter: " + questViewModel.getCurrentChapterId() + "\n \n" +
-                    "Parameters: " + gsonBuilder.create().toJson(dataModel.getParameters()) + "\n \n" +
-                    "Stage: " + gsonBuilder.create().toJson(stage);
-
-
-            Intent intent = new Intent(this, LogActivity.class);
-            intent.putExtra("text", logStage);
-            startActivity(intent);
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-//        tvTime.setText(timeFormatter.format(Instant.now()));
-/*        timeChangeReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context ctx, Intent intent) {
-                if (intent.getAction() != null && intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0)
-                    tvTime.setText(timeFormatter.format(Instant.now()));
-            }
-        };
-
-        registerReceiver(timeChangeReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));*/
-    }
-
-    @Override
-    public void onStop() {
-        release();
-        super.onStop();
-        if (timeChangeReceiver != null)
-            unregisterReceiver(timeChangeReceiver);
     }
 
     @Override

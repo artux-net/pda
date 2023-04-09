@@ -166,7 +166,7 @@ public class EntityBuilder {
                 .add(new GroupTargetMovingComponent(targeting));
 */
 
-        Gdx.app.log("WorldSystem", "New entity created.");
+        Gdx.app.getApplicationLogger().log("WorldSystem", "New entity created.");
         return entity;
     }
 

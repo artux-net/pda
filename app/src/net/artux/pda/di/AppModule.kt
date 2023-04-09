@@ -13,6 +13,7 @@ import dagger.hilt.components.SingletonComponent
 import fr.bipi.tressence.file.FileLoggerTree
 import net.artux.pda.BuildConfig
 import net.artux.pda.common.PropertyFields
+import net.artux.pda.utils.FileLogTree
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.io.IOException
@@ -44,19 +45,10 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun logForest(@ApplicationContext context: Context): List<Timber.Tree> {
+    fun logForest(): List<Timber.Tree> {
         val list = LinkedList<Timber.Tree>()
         list.add(if (BuildConfig.DEBUG) DebugTree() else CrashReportingTree())
-        val filePath = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)?.absolutePath
-        list.add(
-            FileLoggerTree.Builder()
-                .withFileName("pda.log")
-                .withDirName(filePath!!)
-                .withSizeLimit(20000)
-                .withFileLimit(3)
-                .appendToFile(true)
-                .build()
-        )
+        list.add(FileLogTree())
         return list
     }
 

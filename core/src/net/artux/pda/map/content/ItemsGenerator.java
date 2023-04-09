@@ -71,12 +71,14 @@ public class ItemsGenerator {
         if (itemModels.size() == 0)
             return null;
 
-        int rangsLen = StoryDataModel.Rang.values().length - 1;
-        StoryDataModel.Rang rang = dataModel.getRang();
+        int maxXp = StoryDataModel.Rang.EXPERIENCE.getXp();
+        int xp = dataModel.getXp();
         int lastIndex = itemModels.size() - 1;
-        if (rangsLen <= itemModels.size()) {
-            lastIndex = (rang.getId() / rangsLen) * lastIndex;
+        if (xp < maxXp) {
+            lastIndex = (xp / maxXp) * lastIndex;
         }
+        if (lastIndex < 0)
+            lastIndex = 0;
 
         ItemModel item = itemModels.get(random(lastIndex));
         item.setQuantity(1);

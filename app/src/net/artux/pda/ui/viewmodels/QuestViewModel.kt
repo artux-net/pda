@@ -94,13 +94,13 @@ class QuestViewModel @javax.inject.Inject constructor(
                 .map { mapper.chapter(it) }
                 .onSuccess {
                     chapter.postValue(it)
-                    background.postValue(it.stages[0].backgroundUrl)
+                    background.postValue(it.stages[0].background)
                     val chapterStage = it.getStage(stageId)
 
                     if (chapterStage != null) {
                         if (sync) {
                             prepareSync(chapterStage)
-                            sync()
+                            syncNow()
                         }
                         setStage(chapterStage)
                     } else
@@ -114,18 +114,23 @@ class QuestViewModel @javax.inject.Inject constructor(
     }
 
     private fun prepareSync(chapterStage: Stage) {
+        if (chapterStage.actions != null)
+            processLocalActions(chapterStage.actions)
+
         var states = actionsMap["state"]
         if (states == null)
             states = LinkedList()
         states.add("$currentStoryId:$currentChapterId:${chapterStage.id}")
         actionsMap["state"] = states
 
-        if (chapterStage.typeStage == 7 && chapterStage.texts[0].text != null)
+        if (chapterStage.texts != null
+            && chapterStage.texts.size > 0
+            && chapterStage.texts[0].text.isNotBlank())
             summaryMessages.add(
                 UserMessage(
                     chapterStage.title,
                     chapterStage.texts[0].text,
-                    chapterStage.backgroundUrl
+                    chapterStage.background
                 )
             )
     }
@@ -136,7 +141,7 @@ class QuestViewModel @javax.inject.Inject constructor(
             when (chapterStage.typeStage) {
                 4 -> {
                     //переход на карту
-                    sync()
+                    syncNow()
                     title.postValue("Loading map...")
                     val mapId: String? = chapterStage.data["map"]
                     if (mapId != null) {
@@ -152,46 +157,43 @@ class QuestViewModel @javax.inject.Inject constructor(
                                 .onFailure { status.postValue(StatusModel(it)) }
                         }
                     } else
-                        status.postValue(StatusModel("Указан тип стадии - карта, но не id не задан"))
+                        status.postValue(StatusModel("Указан тип стадии - карта, но id не задан"))
                 }
-                5,6 -> {
+                5, 6 -> {
                     processData(chapterStage.data)
                 }
                 else -> {
-                    background.postValue(chapterStage.backgroundUrl)
-                    if (storyData.value != null) {
-                        notification.postValue(
-                            stageMapper.notification(
-                                chapterStage,
-                                storyData.value
-                            )
-                        )
-                        if (chapterStage.actions != null && chapterStage.actions.containsKey("force"))
-                            sync()
-                        stage.postValue(stageMapper.model(chapterStage, storyData.value))
-                    } else status.postValue(StatusModel(Exception("Story Data null")))
+                    background.postValue(chapterStage.background)
+                    if (storyData.value == null) {
+                        status.postValue(StatusModel(Exception("Story Data null")))
+                        return@launch
+                    }
+                    notification.postValue(
+                        stageMapper.notification(chapterStage, storyData.value)
+                    )
+
+                    val stageModel = stageMapper.model(chapterStage, storyData.value)
+                    stage.postValue(stageModel)
                 }
             }
         }
-
-
     }
 
     fun chooseTransfer(transfer: TransferModel) {
         viewModelScope.launch {
-            if (stage.value!!.type == StageType.DIALOG) {
-                summaryMessages.add(
-                    UserMessage(
-                        storyData.value,
-                        transfer.text
-                    )
+            summaryMessages.add(
+                UserMessage(
+                    storyData.value,
+                    transfer.text
                 )
-            }
+            )
 
             val chapterStage = chapter.value!!.getStage(transfer.stageId)
             if (chapterStage != null) {
                 prepareSync(chapterStage)
                 setStage(chapterStage)
+                if (chapterStage.actions != null && chapterStage.actions.containsKey("syncNow"))
+                    syncNow()
             } else
                 status.postValue(StatusModel(Exception("Can not find stage with id: ${transfer.stageId} in chapter: $currentChapterId")))
         }
@@ -201,7 +203,7 @@ class QuestViewModel @javax.inject.Inject constructor(
         return chapter.value!!.getStage(stage.value!!.id)
     }
 
-    private suspend fun sync() {
+    private suspend fun syncNow() {
         Timber.d("Start syncing story")
         title.postValue("Синхронизация")
         loadingState.postValue(true)
@@ -223,17 +225,21 @@ class QuestViewModel @javax.inject.Inject constructor(
             .getOrNull()
     }
 
-    fun sync(map: Map<String, MutableList<String>>) {
+    fun syncNow(map: Map<String, MutableList<String>>) {
         actionsMap.putAll(map)
         viewModelScope.launch {
-            sync()
+            syncNow()
         }
+    }
+
+    fun openMap(mapId: Int) {
+
     }
 
     fun exitStory() {
         viewModelScope.launch {
-            sync()
-            val actions = mapOf(Pair("reset_current", listOf("")))
+            syncNow()
+            val actions = mapOf(Pair("exitStory", listOf("")))
             repository.syncMember(CommandBlock().actions(actions))
                 .onSuccess { data.postValue(mapOf(Pair("exit", ""))) }
                 .onFailure { status.postValue(StatusModel(it)) }
@@ -257,6 +263,32 @@ class QuestViewModel @javax.inject.Inject constructor(
 
     fun clear() {
         repository.clearCache()
+    }
+
+    private fun processLocalActions(actions: Map<String, MutableList<String>>) {
+        if (actions.containsKey("finishStory")) {
+            actionsMap["finishStory"] = mutableListOf("")
+            exitStory()
+        } else if (actions.containsKey("openStage")) {
+            val list: MutableList<String> = actions["openStage"] ?: return
+            var chapterId = currentChapterId
+            val stageId: Int
+            if (list.size > 2)
+                return
+            else if (list.size == 1)
+                stageId = list[0].toInt()
+            else {
+                chapterId = list[0].toInt()
+                stageId = list[1].toInt()
+            }
+            beginWithStage(chapterId, stageId)
+
+        } else if (actions.containsKey("openSeller")) {
+            val sellerId: Int? = actions["openSeller"]?.get(0)?.toInt()
+            if (sellerId != null) {
+                this.data.postValue(mapOf(Pair("seller", "$sellerId")))
+            }
+        }
     }
 
     fun processData(data: Map<String, String>?) {

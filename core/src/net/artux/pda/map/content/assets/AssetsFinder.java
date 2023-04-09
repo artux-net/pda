@@ -39,7 +39,7 @@ public class AssetsFinder implements Disposable {
 
     public AssetManager getManager() {
         if (assetManager == null) {
-            Gdx.app.log("Assets", "Setup assets for loading.");
+            Gdx.app.getApplicationLogger().log("Assets", "Setup assets for loading.");
             assetManager = new AssetManager();
 
             for (int i = 0; i < 31; i++) {
@@ -82,7 +82,7 @@ public class AssetsFinder implements Disposable {
             assetManager.setLoader(LocaleBundle.class, new LocaleBundleLoader(assetManager.getFileHandleResolver()));
             assetManager.load("locale/ui.properties", LocaleBundle.class);
         } else {
-            Gdx.app.log("Assets", "Assets are already set. Return cache.");
+            Gdx.app.getApplicationLogger().log("Assets", "Assets are already set. Return cache.");
         }
         return assetManager;
     }
@@ -116,6 +116,6 @@ public class AssetsFinder implements Disposable {
         fontManager.dispose();
         assetManager.dispose();
         assetManager = null;
-        Gdx.app.log("Assets", "Disposed.");
+        Gdx.app.getApplicationLogger().log("Assets", "Disposed.");
     }
 }
