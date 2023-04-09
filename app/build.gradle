@@ -38,7 +38,6 @@ swaggerSources {
 
 gradle.projectsEvaluated {
     preBuild.dependsOn downloadAPI
-    preBuild.dependsOn copyMaps
     preBuild.dependsOn swaggerSources.pdanetwork.code
 }
 
@@ -52,7 +51,7 @@ android {
             aidl.srcDirs = ['src']
             renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
+            assets.srcDirs = ['../assets']
             jniLibs.srcDirs = ['libs']
         }
 
@@ -116,10 +115,6 @@ ext {
     dagger_version = "2.43.2"
     retrofit_version = "2.9.0"
     androidx_version = "2.5.1"
-}
-
-configurations {
-    localDeps
 }
 
 dependencies {
@@ -192,20 +187,10 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$dagger_version"
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
-    //gdx - assets
-    localDeps 'com.github.artux-net:pda-maps:0.9'
-
     //appodeal
     implementation('com.appodeal.ads:sdk:3.0.2.+') {
         exclude group: 'com.appodeal.ads.sdk.services', module: 'facebook_analytics'
     }
-}
-
-task copyMaps(type: Copy) {
-    from zipTree(configurations.localDeps.copy().files[0])
-    into "assets/maps"
-    exclude '**/META-INF/**'
-    println 'Done'
 }
 
 task copyAndroidNatives {

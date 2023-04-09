@@ -19,7 +19,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
@@ -47,7 +46,7 @@ public class NetworkModule {
             Request original = chain.request();
             Request.Builder requestBuilder = original
                     .newBuilder()
-                    .addHeader("locale", Locale.getDefault().getLanguage());
+                    .addHeader("assets/locale", Locale.getDefault().getLanguage());
 
             if (dataManager.isAuthenticated()) {
                 requestBuilder.addHeader("Authorization", dataManager.getAuthToken());

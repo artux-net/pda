@@ -1,7 +1,6 @@
 package net.artux.pda.di
 
 import android.content.Context
-import android.os.Environment
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -10,7 +9,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import fr.bipi.tressence.file.FileLoggerTree
 import net.artux.pda.BuildConfig
 import net.artux.pda.common.PropertyFields
 import net.artux.pda.utils.FileLogTree
@@ -33,7 +31,7 @@ class AppModule {
     ): Properties {
         val properties = Properties()
         try {
-            properties.load(context.assets.open("config/app.properties"))
+            properties.load(context.assets.open("assets/config/app.properties"))
         } catch (e: IOException) {
             Timber.i("Props not found.")
         }
