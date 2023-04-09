@@ -38,12 +38,13 @@ public class GdxAdapter extends ApplicationAdapter {
 
     @Override
     public void create() {
+        startHeap = Gdx.app.getNativeHeap();
         assetManager = coreComponent.getAssetsManager();
 
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         Gdx.app.getApplicationLogger().log("GDX", "GDX load stared, version " + Gdx.app.getVersion());
         long loadMills = TimeUtils.millis();
-        startHeap = Gdx.app.getNativeHeap();
+
         Gdx.app.debug("GDX", "Before load, heap " + startHeap);
         State firstState = coreComponent.getPreloadState();
         gsc.push(firstState);
@@ -75,6 +76,10 @@ public class GdxAdapter extends ApplicationAdapter {
     }
 
     private boolean disposed;
+
+    public boolean isDisposed() {
+        return disposed;
+    }
 
     @Override
     public void dispose() {

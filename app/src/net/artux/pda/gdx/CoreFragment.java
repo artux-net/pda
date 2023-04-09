@@ -77,8 +77,11 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
         super.onViewCreated(view, savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         questViewModel = provider.get(QuestViewModel.class);
-        questViewModel.getStoryData().observe(getViewLifecycleOwner(), storyDataModel ->
-                gdxAdapter.getDataRepository().setUserData(storyDataModel));
+        questViewModel.getStoryData().observe(getViewLifecycleOwner(), storyDataModel -> {
+                    if (gdxAdapter != null && !gdxAdapter.isDisposed())
+                        gdxAdapter.getDataRepository().setUserData(storyDataModel);
+                }
+        );
     }
 
     @Override
@@ -110,6 +113,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
                 }
 
                 if (intent != null) {
+                    requireActivity().finish();
                     startActivity(intent);
                 }
             }
@@ -214,6 +218,10 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     @Override
     public void onDestroy() {
         Timber.d("Destroyed CoreStarter");
+        if (gdxAdapter != null) {
+            gdxAdapter.dispose();
+            gdxAdapter = null;
+        }
         super.onDestroy();
     }
 

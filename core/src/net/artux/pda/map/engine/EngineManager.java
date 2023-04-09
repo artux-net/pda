@@ -22,7 +22,7 @@ import net.artux.pda.map.engine.ecs.systems.Drawable;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.ecs.systems.player.MissionsSystem;
-import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
+import net.artux.pda.map.engine.ecs.systems.player.PlayerMovingSystem;
 import net.artux.pda.map.managers.ConditionEntityManager;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.map.utils.di.components.MapComponent;
@@ -109,9 +109,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     }
 
     public void updateOnlyPlayer() {
-        engine.getSystem(PlayerSystem.class)
-                .getPosition()
-                .set(Mappers.vector2(dataRepository.getGameMap().getDefPos()));
+        engine.getSystem(PlayerMovingSystem.class).setPosition(Mappers.vector2(dataRepository.getGameMap().getDefPos()));
         engine.getSystem(InteractionSystem.class).setProcessing(true);
 
     }

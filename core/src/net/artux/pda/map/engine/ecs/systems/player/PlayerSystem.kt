@@ -1,9 +1,6 @@
 package net.artux.pda.map.engine.ecs.systems.player
 
-import com.badlogic.ashley.core.ComponentMapper
-import com.badlogic.ashley.core.Engine
-import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.core.Family
+import com.badlogic.ashley.core.*
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Disposable
@@ -11,7 +8,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.pda.map.DataRepository
-import net.artux.pda.map.engine.ecs.components.*
+import net.artux.pda.map.engine.ecs.components.BodyComponent
+import net.artux.pda.map.engine.ecs.components.HealthComponent
+import net.artux.pda.map.engine.ecs.components.MoodComponent
+import net.artux.pda.map.engine.ecs.components.SpriteComponent
+import net.artux.pda.map.engine.ecs.components.player.PlayerComponent
 import net.artux.pda.map.engine.ecs.systems.BaseSystem
 import net.artux.pda.map.utils.di.scope.PerGameMap
 import net.artux.pda.map.view.UserInterface
@@ -56,7 +57,19 @@ class PlayerSystem @Inject constructor(
 
     override fun addedToEngine(engine: Engine) {
         super.addedToEngine(engine)
-        loadPreferences()
+
+        engine.addEntityListener(
+            Family.one(PlayerComponent::class.java).get(),
+            object : EntityListener {
+                override fun entityAdded(entity: Entity?) {
+                    loadPreferences()
+                }
+
+                override fun entityRemoved(entity: Entity?) {
+
+                }
+
+            })
     }
 
     public override fun getPlayer(): Entity? {

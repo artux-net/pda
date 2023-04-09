@@ -15,7 +15,6 @@ import net.artux.pda.map.engine.ecs.components.BodyComponent
 import net.artux.pda.map.engine.ecs.components.HealthComponent
 import net.artux.pda.map.engine.ecs.entities.ai.TileType
 import net.artux.pda.map.engine.ecs.systems.BaseSystem
-import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem
 import net.artux.pda.map.utils.di.scope.PerGameMap
 import org.apache.commons.lang3.tuple.ImmutablePair
 import java.util.*
@@ -31,7 +30,7 @@ class PlayerMovingSystem @Inject constructor(
     private val pm = ComponentMapper.getFor(BodyComponent::class.java)
     private val hm = ComponentMapper.getFor(HealthComponent::class.java)
 
-    private val MOVEMENT_FORCE = 30f // H per step
+    private val MOVEMENT_FORCE = 33f // H per step
     private val RUN_MOVEMENT = MOVEMENT_FORCE * 2
     private val PLAYER_MULTIPLICATION = 6f
 
@@ -39,7 +38,7 @@ class PlayerMovingSystem @Inject constructor(
     private var left = false
     private val stepVolume = 0.15f
     private val oneStepDistance = 0.36f
-    private val oneRunStepDistance = 0.7f
+    private val oneRunStepDistance = 0.75f
     private var stepsDistance = 0f
     private var random: Random
     private var lastPosition = Vector2()
@@ -112,6 +111,10 @@ class PlayerMovingSystem @Inject constructor(
 
     fun setVelocity(x: Float, y: Float) {
         velocity.set(x, y)
+    }
+
+    fun setPosition(vector2: Vector2) {
+        pm[player].body.setTransform(vector2, 0f)
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {}
