@@ -13,6 +13,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          submodules: recursive
         
       - name: Bump version
         uses: chkfung/android-version-actions@v1.2.1
@@ -48,6 +50,6 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Сборка ${{github.run_number}}: ${{ github.event.commits[0].message }} 
+            Сборка ${{github.run_number}}
             
             Ссылка для скачивания: ${{steps.upload.outputs.internalSharingDownloadUrl}}
