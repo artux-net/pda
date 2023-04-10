@@ -22,9 +22,13 @@ jobs:
           gradlePath: app/build.gradle
           versionCode: ${{github.run_number}}
           
+          
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+    
       - name: Build APK
         id: build
-        run: bash ./gradlew assembleRelease
+        run: ./gradlew assembleRelease  
         
       - uses: r0adkll/sign-android-release@v1
         name: Sign APK
