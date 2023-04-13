@@ -45,8 +45,11 @@ class AppModule {
     @Singleton
     fun logForest(): List<Timber.Tree> {
         val list = LinkedList<Timber.Tree>()
-        list.add(if (BuildConfig.DEBUG) DebugTree() else CrashReportingTree())
-        list.add(FileLogTree())
+        if (BuildConfig.DEBUG) {
+            list.add(DebugTree())
+            list.add(FileLogTree())
+        }else
+            list.add(CrashReportingTree())
         return list
     }
 
