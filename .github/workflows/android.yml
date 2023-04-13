@@ -43,12 +43,18 @@ jobs:
           keyPassword: ${{ secrets.KEY_PASSWORD }}   
           
       - uses: r0adkll/upload-google-play@v1
+        name: Upload to Google Play Console
         id: upload
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
           releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
           track: internalsharing
+          
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pda
+          path: ${{steps.sign_apk.outputs.signedReleaseFile}}
           
       - name: Send message to Artux channel
         uses: appleboy/telegram-action@master
