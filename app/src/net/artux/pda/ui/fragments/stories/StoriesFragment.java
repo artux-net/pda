@@ -122,8 +122,11 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             if (dataModel != null) {
                 boolean sequenceWalkthrough = Boolean.parseBoolean(properties
                         .getProperty(PropertyFields.STORIES_SEQUENCE, "true"));
-                if (properties.getProperty(PropertyFields.TESTER_MODE).equals("true"))
+
+                String testMode = properties.getProperty(PropertyFields.TESTER_MODE);
+                if (testMode != null && testMode.equals("true"))
                     sequenceWalkthrough = false;
+
                 Optional<StoryItem> firstStory = storiesViewModel.getStories().getValue().stream().findFirst();
 
                 if (firstStory.isPresent() && firstStory.get() != storyItem && sequenceWalkthrough) {

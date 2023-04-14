@@ -114,7 +114,8 @@ public class AssetsFinder implements Disposable {
     @Override
     public void dispose() {
         fontManager.dispose();
-        assetManager.dispose();
+        if (assetManager != null)
+            assetManager.dispose();
         assetManager = null;
         Gdx.app.getApplicationLogger().log("Assets", "Disposed.");
     }

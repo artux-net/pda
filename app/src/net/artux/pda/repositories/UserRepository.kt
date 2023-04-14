@@ -105,9 +105,10 @@ class UserRepository @Inject constructor(
                     val data = response.body()
                     Timber.i("Got response")
                     if (data != null) {
-                        memberCache.put("user", data)
                         if (data.role.name != UserDto.RoleEnum.USER.name)
                             properties.setProperty(PropertyFields.TESTER_MODE, true.toString())
+                        else
+                            properties.setProperty(PropertyFields.TESTER_MODE, false.toString())
                         it.resume(Result.success(data))
                     } else {
                         val error = response.toString()

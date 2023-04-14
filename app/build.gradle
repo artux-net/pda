@@ -44,6 +44,7 @@ gradle.projectsEvaluated {
 android {
     buildToolsVersion "32.0.0"
     compileSdkVersion 33
+    namespace 'net.artux.pda'
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
@@ -63,8 +64,8 @@ android {
         applicationId "net.artux.pda"
         minSdkVersion 26
         targetSdkVersion 33
-        versionCode 14
-        versionName "0.2.6"
+        versionCode 38
+        versionName "0.3.0"
     }
     buildTypes {
         release {
