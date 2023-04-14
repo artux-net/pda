@@ -51,6 +51,15 @@ jobs:
           releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
           track: internalsharing
           
+      
+      - uses: r0adkll/upload-google-play@v1
+        id: uploadPlay
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: net.artux.pda
+          releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          track: internal          
+          
       - uses: actions/upload-artifact@v3
         with:
           name: pda
