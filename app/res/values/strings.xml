@@ -212,4 +212,5 @@
     <string name="group_relation">Отношение группировок</string>
     <string name="progress">Прогресс</string>
     <string name="rp_chat_channel">RP</string>
+    <string name="chatLimit">Чтобы получить доступ к чату, нужно пройти один из сюжетов.</string>
 </resources>

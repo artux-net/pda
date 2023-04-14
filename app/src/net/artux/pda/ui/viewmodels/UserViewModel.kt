@@ -44,7 +44,7 @@ class UserViewModel @Inject constructor(
     fun getFromCache(): UserModel? {
         return userRepository.getCachedMember()
             .map { userMapper.model(it) }
-            .getOrThrow()
+            .getOrNull()
     }
 
     fun updateMember() {
@@ -73,9 +73,9 @@ class UserViewModel @Inject constructor(
 
     fun isChatAllowed(): Boolean {
         val userModel: UserModel? = getFromCache()
-        val atLeastOneOver = storyData.value?.storyStates?.any { it.isOver }
+        val atLeastOneOver = storyData.value?.storyStates?.any { it.isOver } ?: false
         val xpChatLimit = firebaseRemoteConfig.getLong(PropertyFields.XP_CHAT_LIMIT)
-        return (userModel != null && xpChatLimit < userModel.xp) || atLeastOneOver ?: false
+        return (userModel != null && xpChatLimit <= userModel.xp) || atLeastOneOver
     }
 
 }

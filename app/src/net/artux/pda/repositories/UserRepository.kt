@@ -1,6 +1,7 @@
 package net.artux.pda.repositories
 
 import net.artux.pda.common.PropertyFields
+import net.artux.pda.model.mapper.UserMapper
 import net.artux.pda.model.user.UserRelation
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.*
@@ -91,7 +92,6 @@ class UserRepository @Inject constructor(
         return if (cache != null)
             Result.success(cache)
         else Result.failure(java.lang.Exception("Cache isn't found"))
-
     }
 
     suspend fun getMember(): Result<UserDto> {
@@ -105,6 +105,7 @@ class UserRepository @Inject constructor(
                     val data = response.body()
                     Timber.i("Got response")
                     if (data != null) {
+                        memberCache.put("user", data)
                         if (data.role.name != UserDto.RoleEnum.USER.name)
                             properties.setProperty(PropertyFields.TESTER_MODE, true.toString())
                         else

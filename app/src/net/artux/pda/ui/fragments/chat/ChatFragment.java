@@ -56,7 +56,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     private ChatAdapter mChatAdapter;
     private TextInputEditText mInputEditText;
     private WebSocket ws;
-    private FragmentChatBinding binding;
     private ObjectWebSocketListener<ChatUpdate> userMessageObjectWebSocketListener;
     private final Timer timer = new Timer();
 
@@ -100,7 +99,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        binding = FragmentChatBinding.inflate(inflater);
+        net.artux.pda.databinding.FragmentChatBinding binding = FragmentChatBinding.inflate(inflater);
         return binding.getRoot();
     }
 
@@ -110,7 +109,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
 
         if (!viewModel.isChatAllowed()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
-            builder.setMessage("Чтобы получить доступ к чату, нужно пройти один из сюжетов.");
+            builder.setMessage(R.string.chatLimit);
             builder.setNegativeButton(R.string.okay, (dialogInterface, i) -> navigationPresenter.addFragment(new StoriesFragment(), true));
             builder.setOnCancelListener(dialogInterface ->
                     navigationPresenter.addFragment(new StoriesFragment(), true));

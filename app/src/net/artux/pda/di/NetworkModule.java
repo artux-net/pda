@@ -81,6 +81,7 @@ public class NetworkModule {
         Map<String, Object> defaults = new HashMap<>();
         defaults.put(PropertyFields.API_URL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);
         defaults.put(PropertyFields.RESOURCE_URL, BuildConfig.PROTOCOL + "://" + BuildConfig.URL);
+        defaults.put(PropertyFields.XP_CHAT_LIMIT, 26L);
         return defaults;
     }
 
