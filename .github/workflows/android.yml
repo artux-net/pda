@@ -9,7 +9,6 @@ jobs:
   assemble_job:
     name: Assemble
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
 
       - name: Checkout
