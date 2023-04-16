@@ -22,7 +22,6 @@ public class Logger extends VerticalGroup {
     private final Label.LabelStyle labelStyle;
     long lastTimeCounted;
     private float sinceChange;
-    private float frameRate;
 
     private final List<Triple<Method, Object, String>> dataCollection = new ArrayList<>();
     public static boolean visible = true;
@@ -32,7 +31,6 @@ public class Logger extends VerticalGroup {
 
         lastTimeCounted = TimeUtils.millis();
         sinceChange = 0;
-        frameRate = Gdx.graphics.getFramesPerSecond();
         BitmapFont font = skin.getFont("font");
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
         columnAlign(Align.left);
@@ -72,7 +70,8 @@ public class Logger extends VerticalGroup {
         sinceChange += delta;
         if (sinceChange >= 1000) {
             sinceChange = 0;
-            frameRate = Gdx.graphics.getFramesPerSecond();
+            //frameRate = Gdx.graphics.getFramesPerSecond();
+            //TODO FPS in logger
         }
     }
 
@@ -104,7 +103,4 @@ public class Logger extends VerticalGroup {
         }
     }
 
-    public float getFrameRate() {
-        return frameRate;
-    }
 }

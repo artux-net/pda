@@ -42,6 +42,14 @@ gradle.projectsEvaluated {
 }
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\maksi\\StudioProjects\\pda\\keystore\\pda.jks')
+            storePassword 'pass'
+            keyAlias 'pda'
+            keyPassword 'pass'
+        }
+    }
     buildToolsVersion "32.0.0"
     compileSdkVersion 33
     namespace 'net.artux.pda'
@@ -69,12 +77,12 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
-            buildConfigField("String", "URL", "\"files.artux.net/static/\"")
+            buildConfigField("String", "URL", "\"cdn.artux.net/static/\"")
             buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-4707001480680280/1079779549\"")
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-4707001480680280/2723145658\"")
@@ -84,10 +92,11 @@ android {
             debuggable true
             minifyEnabled false
             shrinkResources false
+
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
-            buildConfigField("String", "URL", "\"files.artux.net/static/\"")
+            buildConfigField("String", "URL", "\"cdn.artux.net/static/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-3940256099942544/1033173712\"")
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-3940256099942544/2247696110\"")
         }

@@ -1,3 +1,8 @@
+-keep class net.artux.pda.model.mapper.*
+-keep class * extends com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
 
 -verbose
 
@@ -14,6 +19,28 @@
    <init>(com.badlogic.gdx.Application, android.content.Context, java.lang.Object, com.badlogic.gdx.backends.android.AndroidApplicationConfiguration);
 }
 
+-keepclassmembers class com.badlogic.gdx.physics.box2d.World {
+   boolean contactFilter(long, long);
+   void    beginContact(long);
+   void    endContact(long);
+   void    preSolve(long, long);
+   void    postSolve(long, long);
+   boolean reportFixture(long);
+   float   reportRayFixture(long, float, float, float, float, float);
+}
+
+-verbose
+
+-dontwarn com.badlogic.gdx.backends.android.AndroidFragmentApplication
+
+# Required if using Gdx-Controllers extension
+-keep class com.badlogic.gdx.controllers.android.AndroidControllers
+
+-keep public class com.badlogic.** {
+   *;
+}
+
+# Required if using Box2D extension
 -keepclassmembers class com.badlogic.gdx.physics.box2d.World {
    boolean contactFilter(long, long);
    void    beginContact(long);

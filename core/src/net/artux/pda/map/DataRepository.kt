@@ -84,8 +84,11 @@ class DataRepository(
         dataModelFlow.tryEmit(currentStoryDataModel)
     }
 
-    fun applyActions(actions: Map<String, List<String>>?) {
-        val summaryMap = HashMap(QuestUtil.difference(storyDataModel, currentStoryDataModel))
+    fun applyActions(actions: Map<String, List<String>>?, calculateDiff: Boolean = true) {
+        val summaryMap = if (calculateDiff)
+            HashMap(QuestUtil.difference(storyDataModel, currentStoryDataModel))
+        else
+            HashMap()
         if (actions != null) {
             summaryMap.putAll(actions)
             Gdx.app.applicationLogger.log("ACTIONS", "$summaryMap")

@@ -120,7 +120,13 @@ class PlayerSystem @Inject constructor(
         get() = pm[player].position
 
     override fun dispose() {
-        savePreferences()
+        if(isPlayerActive)
+            savePreferences()
+        else{
+            val preferences = Gdx.app.getPreferences("player")
+            preferences.clear()
+            preferences.flush()
+        }
     }
 
     private fun savePreferences() {

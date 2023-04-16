@@ -41,6 +41,7 @@ public class GdxAdapter extends ApplicationAdapter {
         startHeap = Gdx.app.getNativeHeap();
         assetManager = coreComponent.getAssetsManager();
 
+        gsc.clear();
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         Gdx.app.getApplicationLogger().log("GDX", "GDX load stared, version " + Gdx.app.getVersion());
         long loadMills = TimeUtils.millis();
@@ -86,7 +87,7 @@ public class GdxAdapter extends ApplicationAdapter {
         Gdx.app.debug("GDX", "Disposing, heap " + Gdx.app.getNativeHeap());
         super.dispose();
         if (!disposed) {
-            gsc.dispose();
+            gsc.clear();
             coreComponent.getAssetsFinder().dispose();
             disposed = true;
             System.gc();

@@ -1,5 +1,6 @@
 package net.artux.pda.map.states;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -67,7 +68,7 @@ public class ErrorState extends State {
                 .fill()
                 .pad(50f);
 
-        restartLabel.addListener(new ActorGestureListener(){
+        restartLabel.addListener(new ActorGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
                 super.tap(event, x, y, count, button);
@@ -82,6 +83,7 @@ public class ErrorState extends State {
         for (StackTraceElement stackTraceElement : throwable.getStackTrace()) {
             label.setText(label.getText() + "\n" + stackTraceElement);
         }
+        Gdx.app.getApplicationLogger().error("Core", "Map Core error", throwable);
     }
 
     public void resume() {

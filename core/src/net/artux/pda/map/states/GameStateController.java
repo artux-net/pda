@@ -49,10 +49,11 @@ public class GameStateController {
         states.peek().resume();
     }
 
-    public void dispose() {
+    public void clear() {
         for (State state : states) {
             state.dispose();
         }
+        states.removeAllElements();
     }
 
     public void update(float dt) {
