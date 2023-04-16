@@ -10,6 +10,8 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.artux.engine.graphics.postprocessing.PostProcessing;
+import net.artux.engine.scenes.Scene;
+import net.artux.engine.scenes.SceneController;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.utils.di.components.CoreComponent;
@@ -18,8 +20,9 @@ import net.artux.pda.map.utils.di.components.MapComponent;
 import net.artux.pda.model.map.GameMap;
 
 import javax.inject.Inject;
+import javax.xml.crypto.Data;
 
-public class PlayState extends State {
+public class PlayScene extends Scene {
 
     private final static String TAG = "PlayState";
     private final GameMap gameMap;
@@ -27,17 +30,20 @@ public class PlayState extends State {
     public Stage uistage;
 
     private final EngineManager engineManager;
-    private final CoreComponent coreComponent;
+    private final CoreComponent coreComponent
+;
 
     private final World world;
     private final OrthogonalTiledMapRenderer renderer;
     private final PostProcessing postProcessing;
+    private final DataRepository dataRepository;
 
     @Inject
-    public PlayState(final GameStateController gsm, DataRepository dataRepository, GameMap gameMap, CoreComponent coreComponent) {
-        super(gsm, dataRepository);
+    public PlayScene(final SceneController sceneController, DataRepository dataRepository, GameMap gameMap, CoreComponent coreComponent) {
+        super(sceneController);
         this.gameMap = gameMap;
         this.coreComponent = coreComponent;
+        this.dataRepository = dataRepository;
 
         MapComponent mapComponent = DaggerMapComponent.builder()
                 .coreComponent(coreComponent)
@@ -53,6 +59,8 @@ public class PlayState extends State {
 
         mapComponent.getUserInterface();
         mapComponent.initInterface();
+        addStage(stage);
+        addStage(uistage);
     }
 
     @Override
@@ -64,28 +72,20 @@ public class PlayState extends State {
 
         if (gameMap.getId() != map.getId()) {
             Gdx.app.getApplicationLogger().log(TAG, "Update map, old: " + gameMap.getId() + " new map: " + map.getId());
-            gsm.set(coreComponent.getPreloadState());
+            sceneController.set(coreComponent.getPreloadState());
         }
         engineManager.updateOnlyPlayer();
     }
 
     @Override
     protected void handleInput() {
-        gsm.addInputProcessor(uistage);
-        gsm.addInputProcessor(stage);
-        gsm.addInputProcessor(new GestureDetector(engineManager.getGestureListener()));
-    }
-
-    @Override
-    protected void stop() {
-        gsm.removeInputProcessor(stage);
-        gsm.removeInputProcessor(uistage);
+        super.handleInput();
+        sceneController.addInputProcessor(new GestureDetector(engineManager.getGestureListener()));
     }
 
     @Override
     public void update(float dt) {
-        uistage.act(dt);
-        stage.act(dt);
+        super.update(dt);
         world.step(1 / 90f, 1, 1);
         engineManager.update(dt);
     }
@@ -117,10 +117,9 @@ public class PlayState extends State {
 
     @Override
     public void dispose() {
+        super.dispose();
         postProcessing.dispose();
-        stage.dispose();
         renderer.dispose();
-        uistage.dispose();
         engineManager.dispose();
     }
 

@@ -44,7 +44,7 @@ gradle.projectsEvaluated {
 android {
     signingConfigs {
         release {
-            storeFile file('C:\\Users\\maksi\\StudioProjects\\pda\\keystore\\pda.jks')
+            storeFile file("$projectDir/keystore/pda.jks")
             storePassword 'pass'
             keyAlias 'pda'
             keyPassword 'pass'

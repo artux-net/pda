@@ -7,8 +7,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.states.GameStateController;
-import net.artux.pda.map.states.State;
+import net.artux.engine.scenes.SceneController;
+import net.artux.engine.scenes.Scene;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.utils.di.components.CoreComponent;
 import net.artux.pda.map.utils.di.components.DaggerCoreComponent;
@@ -22,7 +22,7 @@ import java.util.Properties;
 
 public class GdxAdapter extends ApplicationAdapter {
 
-    private final GameStateController gsc;
+    private final SceneController gsc;
     private final CoreComponent coreComponent;
     private AssetManager assetManager;
     private long startHeap;
@@ -47,8 +47,8 @@ public class GdxAdapter extends ApplicationAdapter {
         long loadMills = TimeUtils.millis();
 
         Gdx.app.debug("GDX", "Before load, heap " + startHeap);
-        State firstState = coreComponent.getPreloadState();
-        gsc.push(firstState);
+        Scene firstScene = coreComponent.getPreloadState();
+        gsc.push(firstScene);
         Gdx.app.debug("GDX", "Loaded, heap " + Gdx.app.getNativeHeap());
         Gdx.app.getApplicationLogger().log("GDX", "GDX loading took " + (TimeUtils.millis() - loadMills) + " ms.");
         resume();

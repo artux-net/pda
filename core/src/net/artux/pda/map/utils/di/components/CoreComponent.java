@@ -2,13 +2,13 @@ package net.artux.pda.map.utils.di.components;
 
 import com.badlogic.gdx.assets.AssetManager;
 
+import net.artux.engine.scenes.SceneController;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.content.assets.AssetsFinder;
-import net.artux.pda.map.states.ErrorState;
-import net.artux.pda.map.states.GameStateController;
-import net.artux.pda.map.states.PlayState;
-import net.artux.pda.map.states.PreloadState;
+import net.artux.pda.map.states.ErrorScene;
+import net.artux.pda.map.states.PlayScene;
+import net.artux.pda.map.states.PreloadScene;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.utils.di.modules.AppModule;
 import net.artux.pda.model.map.GameMap;
@@ -24,13 +24,13 @@ import dagger.Component;
 @Component(modules = {AppModule.class})
 public interface CoreComponent {
 
-    PreloadState getPreloadState();
+    PreloadScene getPreloadState();
 
-    PlayState getPlayState();
+    PlayScene getPlayState();
 
-    ErrorState getErrorState();
+    ErrorScene getErrorState();
 
-    GameStateController getGSC();
+    SceneController getGSC();
 
     AssetsFinder getAssetsFinder();
 

@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Align;
 
+import net.artux.engine.scenes.Scene;
+import net.artux.engine.scenes.SceneController;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.utils.di.components.CoreComponent;
@@ -20,15 +22,15 @@ import java.time.Instant;
 import javax.inject.Inject;
 
 
-public class ErrorState extends State {
+public class ErrorScene extends Scene {
 
     private final Stage stage;
     private final Label label;
 
     @Inject
-    public ErrorState(final GameStateController gsm, DataRepository dataRepository,
+    public ErrorScene(final SceneController gsm, DataRepository dataRepository,
                       CoreComponent coreComponent, LocaleBundle localeBundle) {
-        super(gsm, dataRepository);
+        super(gsm);
         BitmapFont font = coreComponent.getAssetsFinder().getFontManager().getFont(22);
         GameMap gameMap = dataRepository.getGameMap();
 
@@ -91,12 +93,12 @@ public class ErrorState extends State {
 
     @Override
     protected void handleInput() {
-        gsm.addInputProcessor(stage);
+        sceneController.addInputProcessor(stage);
     }
 
     @Override
     protected void stop() {
-        gsm.removeInputProcessor(stage);
+        sceneController.removeInputProcessor(stage);
     }
 
     @Override

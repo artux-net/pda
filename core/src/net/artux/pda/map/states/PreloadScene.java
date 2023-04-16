@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 
+import net.artux.engine.scenes.SceneController;
+import net.artux.engine.scenes.Scene;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.utils.di.components.CoreComponent;
 import net.artux.pda.model.map.GameMap;
@@ -17,7 +19,7 @@ import java.text.DecimalFormat;
 import javax.inject.Inject;
 
 
-public class PreloadState extends State {
+public class PreloadScene extends Scene {
 
     private final CoreComponent coreComponent;
     private final AssetManager assetManager;
@@ -26,9 +28,9 @@ public class PreloadState extends State {
     private final Label progressLabel;
 
     @Inject
-    public PreloadState(final GameStateController gsm, DataRepository dataRepository,
+    public PreloadScene(final SceneController gsm, DataRepository dataRepository,
                         CoreComponent coreComponent) {
-        super(gsm, dataRepository);
+        super(gsm);
         this.coreComponent = coreComponent;
         BitmapFont font = coreComponent.getAssetsFinder().getFontManager().getFont(22);
         assetManager = coreComponent.getAssetsManager();
@@ -61,12 +63,12 @@ public class PreloadState extends State {
 
     @Override
     protected void handleInput() {
-        gsm.addInputProcessor(stage);
+        sceneController.addInputProcessor(stage);
     }
 
     @Override
     protected void stop() {
-        gsm.removeInputProcessor(stage);
+        sceneController.removeInputProcessor(stage);
     }
 
     @Override
@@ -79,7 +81,7 @@ public class PreloadState extends State {
     public void render() {
         try {
             if (assetManager.isFinished()) {
-                gsm.set(coreComponent.getPlayState());
+                sceneController.set(coreComponent.getPlayState());
             } else {
                 stage.draw();
                 float progress = assetManager.getProgress();
@@ -87,9 +89,9 @@ public class PreloadState extends State {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            ErrorState errorState = coreComponent.getErrorState();
+            ErrorScene errorState = coreComponent.getErrorState();
             errorState.setThrowable(e);
-            gsm.set(errorState);
+            sceneController.set(errorState);
         }
     }
 
