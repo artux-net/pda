@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -56,6 +57,7 @@ public class HeaderInterfaceModule {
     public Actor initHeader(MissionMenu missionMenu, GameMap map,
                             @Named("gameZone") Group gameZone,
                             Label.LabelStyle labelStyle, UIFrame uiFrame,
+                            UserInterface userInterface,
                             AssetManager assetManager, DataRepository dataRepository) {
 
         TextureRegionDrawable pauseDrawable = new TextureRegionDrawable(assetManager.get("textures/ui/exit.png", Texture.class));
@@ -66,7 +68,16 @@ public class HeaderInterfaceModule {
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 super.clicked(event, x, y);
                 Gdx.app.debug("UserInterface", "touched pause - user interface");
-                dataRepository.sendData(Collections.singletonMap("openPda", ""));
+                userInterface.getStack().getChildren().peek().remove();
+                //dataRepository.sendData(Collections.singletonMap("openPda", ""));
+            }
+        });
+
+        pauseButton.addAction(new Action() {
+            @Override
+            public boolean act(float delta) {
+                pauseButton.setVisible(userInterface.getStack().getChildren().size > 1);
+                return false;
             }
         });
 

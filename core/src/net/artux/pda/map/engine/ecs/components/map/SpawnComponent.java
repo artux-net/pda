@@ -10,6 +10,8 @@ import net.artux.pda.map.engine.ecs.components.GroupTargetMovingComponent;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.map.SpawnModel;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class SpawnComponent implements Component, GroupTargetMovingComponent.Targeting {
 
     private final SpawnModel spawnModel;
@@ -64,7 +66,10 @@ public class SpawnComponent implements Component, GroupTargetMovingComponent.Tar
 
     public String desc() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Объект: ").append(spawnModel.getTitle());
+        if (!StringUtils.isBlank(spawnModel.getTitle()))
+            stringBuilder.append("Объект: ").append(spawnModel.getTitle());
+        else
+            stringBuilder.append("Контрольная точка.");
         stringBuilder.append('\n');
         if (isEmpty())
             stringBuilder.append("Не занята");

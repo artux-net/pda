@@ -94,26 +94,9 @@ class BackpackMenu @Inject constructor(
 
         val leftTable = Table()
         leftTable.top().left()
-        textButton.setText(localeBundle["main.close"])
-        textButton.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent, x: Float, y: Float) {
-                super.clicked(event, x, y)
-                remove()
-            }
-        })
-        adButton.setText(localeBundle["main.ad.rewarded"])
-        adButton.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent, x: Float, y: Float) {
-                platformInterface.rewardedAd()
-            }
-        })
+
+
         infoLabel = Label("", subtitleStyle)
-
-        //buttonsTable.defaults().center().space(20f)
-        leftTable.add(textButton).uniformX()
-        leftTable.add(adButton).uniformX()
-        leftTable.row()
-
         leftTable.add(hud)
         leftTable.add(infoLabel)
         leftTable.row()
@@ -260,6 +243,34 @@ class BackpackMenu @Inject constructor(
             }
 
         }
+
+        textButton.setText(localeBundle["main.close"])
+        textButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent, x: Float, y: Float) {
+                super.clicked(event, x, y)
+                dataRepository.platformInterface.openPDA()
+            }
+        })
+        adButton.setText(localeBundle["main.ad.rewarded"])
+        adButton.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent, x: Float, y: Float) {
+                platformInterface.rewardedAd()
+            }
+        })
+
+        hud.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent, x: Float, y: Float) {
+                super.clicked(event, x, y)
+                remove()
+            }
+        })
+
+        //buttonsTable.defaults().center().space(20f)
+        leftTable.row().space(10f)
+        leftTable.add(textButton).uniformX()
+        leftTable.add(adButton).uniformX()
+
+
         mainItemsView.setOnClickListener(onItemClickListener)
         background = Utils.getColoredDrawable(1, 1, Colors.backgroundColor)
         touchable = Touchable.enabled

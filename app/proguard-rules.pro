@@ -40,6 +40,20 @@
    *;
 }
 
+-keep public class net.artux.pda.model.** {
+   *;
+}
+
+-keep public class net.artux.pda.map.engine.ecs.entities.** {
+   *;
+}
+
+
+
+-keep public class net.artux.pdanetwork.** {
+   *;
+}
+
 # Required if using Box2D extension
 -keepclassmembers class com.badlogic.gdx.physics.box2d.World {
    boolean contactFilter(long, long);

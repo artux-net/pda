@@ -44,7 +44,7 @@ gradle.projectsEvaluated {
 android {
     signingConfigs {
         release {
-            storeFile file("$projectDir/keystore/pda.jks")
+            storeFile file('C:\\Users\\maksi\\StudioProjects\\pda\\keystore\\pda.jks')
             storePassword 'pass'
             keyAlias 'pda'
             keyPassword 'pass'
@@ -73,13 +73,15 @@ android {
         minSdkVersion 26
         targetSdkVersion 33
         versionCode 38
-        versionName "0.3.0"
+        versionName "0.3.1"
+        proguardFiles 'proguard-rules.pro'
     }
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
             buildConfigField("String", "URL", "\"cdn.artux.net/static/\"")

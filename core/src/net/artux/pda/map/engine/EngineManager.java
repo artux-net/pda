@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
@@ -108,9 +109,14 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         return engine;
     }
 
-    public void updateOnlyPlayer() {
-        engine.getSystem(PlayerMovingSystem.class).setPosition(Mappers.vector2(dataRepository.getGameMap().getDefPos()));
-        engine.getSystem(InteractionSystem.class).setProcessing(true);
+    Vector2 lastDefaultPosition = null;
 
+    public void updateOnlyPlayer() {
+        Vector2 pos = Mappers.vector2(dataRepository.getGameMap().getDefPos());
+        if (lastDefaultPosition == null || !lastDefaultPosition.epsilonEquals(pos, 1)) {
+            lastDefaultPosition = pos;
+            engine.getSystem(PlayerMovingSystem.class).setPosition(lastDefaultPosition);
+            engine.getSystem(InteractionSystem.class).setProcessing(true);
+        }
     }
 }
