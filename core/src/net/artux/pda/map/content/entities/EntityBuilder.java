@@ -1,4 +1,4 @@
-package net.artux.pda.map.content;
+package net.artux.pda.map.content.entities;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.content.ContentGenerator;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.BulletComponent;
 import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
@@ -32,8 +33,12 @@ import net.artux.pda.map.engine.ecs.components.states.StalkerState;
 import net.artux.pda.map.engine.ecs.entities.Bodies;
 import net.artux.pda.map.engine.ecs.systems.statemachine.MessagingCodes;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
+import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.inject.Inject;
 
@@ -106,6 +111,10 @@ public class EntityBuilder {
         return new Vector2(basePosition.x + x, basePosition.y + y);
     }
 
+    public Entity createStalerGroup(Vector2 position){
+        return null;
+    }
+
 
     public Entity spawnStalker(Vector2 position, GroupComponent group) {
         Entity entity = new Entity();
@@ -141,9 +150,8 @@ public class EntityBuilder {
         return entity;
     }
 
-    public Entity randomStalker(GroupTargetMovingComponent.Targeting targeting) {
+    public Entity randomMutant(GroupTargetMovingComponent.Targeting targeting) {
         Entity entity = new Entity();
-/*
 
         WeaponModel w = new WeaponModel();
         w.setSpeed(random(5, 10));
@@ -153,18 +161,17 @@ public class EntityBuilder {
 
         StatesComponent statesComponent = new StatesComponent(entity, null, StalkerState.INITIAL, StalkerState.GUARDING);
 
-        entity.add(new PositionComponent(targeting.getTarget()))
+    /*    entity.add(new BodyComponent(Bodies.stalker(targeting.getTarget(), world)))
                 .add(new VisionComponent())
-                .add(new RelationalSpriteComponent(8, 8))
+                .add(new SpriteComponent(assetManager.get("textures/icons/entity/mutant.png"), 8, 8))
                 .add(new VelocityComponent())
                 .add(new HealthComponent())
                 .add(new GraphMotionComponent(null))
-                .add(new WeaponComponent(w, this))
-                .add(new StalkerComponent("Мутант", new ArrayList<ItemModel>()))
+                .add(new WeaponComponent(w, assetManager))
+                .add(new StalkerComponent("Мутант","textures/icons/entity/mutant.png", new ArrayList<ItemModel>()))
                 .add(statesComponent)
                 .add(new MoodComponent(-1, null, Collections.singleton("angry")))
-                .add(new GroupTargetMovingComponent(targeting));
-*/
+                .add(new GroupTargetMovingComponent(targeting));*/
 
         Gdx.app.getApplicationLogger().log("WorldSystem", "New entity created.");
         return entity;

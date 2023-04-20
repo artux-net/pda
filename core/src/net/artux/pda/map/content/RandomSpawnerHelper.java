@@ -8,6 +8,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.common.PropertyFields;
+import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent;
 import net.artux.pda.map.engine.ecs.components.map.TransferComponent;
@@ -63,7 +64,7 @@ public class RandomSpawnerHelper {
 
         float singleFreq = Float.parseFloat((String) properties.get(PropertyFields.SINGLE_BOT_FREQ));
         timerSystem.addTimerAction(singleFreq, () -> entityProcessorSystem
-                .addEntity(entityBuilder.randomStalker(mapOrientationSystem::getRandomFreePoint)));
+                .addEntity(entityBuilder.randomMutant(mapOrientationSystem::getRandomFreePoint)));
     }
 
 }

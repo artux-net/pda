@@ -244,7 +244,7 @@ class BackpackMenu @Inject constructor(
 
         }
 
-        textButton.setText(localeBundle["main.close"])
+        textButton.setText(localeBundle["main.openPda"])
         textButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent, x: Float, y: Float) {
                 super.clicked(event, x, y)

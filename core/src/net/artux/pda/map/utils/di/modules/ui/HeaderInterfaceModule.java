@@ -65,11 +65,11 @@ public class HeaderInterfaceModule {
         Button pauseButton = new Button(pauseButtonStyle);
         pauseButton.addListener(new ClickListener() {
             @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+            public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 Gdx.app.debug("UserInterface", "touched pause - user interface");
-                userInterface.getStack().getChildren().peek().remove();
-                //dataRepository.sendData(Collections.singletonMap("openPda", ""));
+                int lastIndex = userInterface.getStack().getChildren().size - 1;
+                userInterface.getStack().removeActorAt(lastIndex, true);
             }
         });
 

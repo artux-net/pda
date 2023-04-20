@@ -16,7 +16,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
-import net.artux.pda.map.content.EntityBuilder;
+import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.ClickComponent;
 import net.artux.pda.map.engine.ecs.components.GroupComponent;

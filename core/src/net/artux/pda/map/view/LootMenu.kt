@@ -86,20 +86,6 @@ class LootMenu @Inject constructor(
 
         val leftTable = Table()
         leftTable.top().left()
-        textButton.setText(localeBundle["main.close"])
-        textButton.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent, x: Float, y: Float) {
-                super.clicked(event, x, y)
-                dataRepository.applyActions(emptyMap())
-                remove()
-            }
-        })
-
-        add(textButton)
-            .left()
-        add(Label("", titleLabelStyle)).growX()
-
-        row()
 
         botInfo = MediaItem("", "", "", titleLabelStyle, subtitleStyle, assetManager)
         mainInfo = MediaItem(

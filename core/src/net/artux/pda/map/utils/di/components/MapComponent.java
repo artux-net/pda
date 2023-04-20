@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.engine.scenes.SceneController;
 import net.artux.pda.map.DataRepository;
-import net.artux.pda.map.content.EntityBuilder;
+import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.ecs.systems.EntityProcessorSystem;
 import net.artux.pda.map.managers.ConditionEntityManager;

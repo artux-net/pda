@@ -1,5 +1,7 @@
 package net.artux.pda.map.utils.di.modules;
 
+import com.badlogic.gdx.ApplicationLogger;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 
 import net.artux.engine.utils.LocaleBundle;
@@ -43,6 +45,11 @@ public class AppModule {
     @Singleton
     public DataRepository getDataRepository() {
         return dataRepository;
+    }
+
+    @Provides
+    public ApplicationLogger getAppLogger() {
+        return Gdx.app.getApplicationLogger();
     }
 
     @Provides

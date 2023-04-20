@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
@@ -30,10 +32,10 @@ public class PlayScene extends Scene {
     public Stage uistage;
 
     private final EngineManager engineManager;
-    private final CoreComponent coreComponent
-;
+    private final CoreComponent coreComponent;
 
     private final World world;
+    private final TiledMap tiledMap;
     private final OrthogonalTiledMapRenderer renderer;
     private final PostProcessing postProcessing;
     private final DataRepository dataRepository;
@@ -56,6 +58,7 @@ public class PlayScene extends Scene {
         renderer = mapComponent.getRenderer();
         renderer.setView((OrthographicCamera) stage.getCamera());
         postProcessing = mapComponent.getPostProcessing();
+        tiledMap = mapComponent.getTiledMap();
 
         mapComponent.getUserInterface();
         mapComponent.initInterface();
@@ -120,6 +123,7 @@ public class PlayScene extends Scene {
         super.dispose();
         postProcessing.dispose();
         renderer.dispose();
+        tiledMap.dispose();
         engineManager.dispose();
     }
 

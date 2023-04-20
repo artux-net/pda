@@ -16,7 +16,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.content.AnomalyHelper;
 import net.artux.pda.map.content.ControlPointsHelper;
-import net.artux.pda.map.content.EntityBuilder;
+import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.content.QuestPointsHelper;
 import net.artux.pda.map.content.SecretHelper;
 import net.artux.pda.map.engine.ecs.systems.Drawable;

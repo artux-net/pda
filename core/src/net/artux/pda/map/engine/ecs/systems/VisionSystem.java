@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
@@ -22,7 +21,8 @@ import net.artux.pda.map.engine.ecs.components.PassivityComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.map.view.view.bars.Bar;
-import net.artux.pda.map.view.view.bars.Utils;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 
@@ -56,6 +56,8 @@ public class VisionSystem extends BaseSystem implements Drawable {
         progressBar.setHeight(5);
     }
 
+    AtomicBoolean wall = new AtomicBoolean(false);
+
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         BodyComponent bodyComponentComponent1 = pm.get(entity);
@@ -70,16 +72,17 @@ public class VisionSystem extends BaseSystem implements Drawable {
 
             BodyComponent bodyComponentComponent2 = pm.get(entity2);
             float dst = bodyComponentComponent1.getPosition().dst(bodyComponentComponent2.getPosition());
-
             if (dst < VISION_DISTANCE
-                    && !mapOrientationSystem.collides(bodyComponentComponent1.getPosition(), bodyComponentComponent2.getPosition()))
+                    && !mapOrientationSystem.collides(bodyComponentComponent1.getPosition(), bodyComponentComponent2.getPosition())) {
+                wall.set(false);
                 world.rayCast((fixture, point, normal, fraction) -> {
-                    if (fixture.getBody().getType() == BodyDef.BodyType.DynamicBody)
-                        visionComponent1.addVisibleEntity(entity2);
-                    return 0;
-                }, bodyComponentComponent1.getPosition(), bodyComponentComponent2.getPosition());
-
-
+                    if (fixture.getBody().getType() == BodyDef.BodyType.StaticBody)
+                        wall.set(true);
+                    return 1;
+                }, bodyComponentComponent2.getPosition(), bodyComponentComponent1.getPosition());
+                if (!wall.get())
+                    visionComponent1.addVisibleEntity(entity2);
+            }
         }
     }
 
