@@ -61,6 +61,7 @@ public class ItemsTableView extends Table {
                 .fill()
                 .expand()
                 .fill()
+                .rowLeft()
                 .align(Align.left | Align.top)
                 .left()
                 .pad(5)

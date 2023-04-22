@@ -116,6 +116,7 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
             args.putSerializable("user", provider.get(UserViewModel.class).getFromCache());
             args.putSerializable("story", provider.get(QuestViewModel.class).getCurrentStory());
             args.putSerializable("items", provider.get(SellerViewModel.class).getItems());
+            args.putBoolean("updated", true);
 
             coreFragment.setArguments(args);
             if (coreFragment.isAdded()) {

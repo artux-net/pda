@@ -18,7 +18,6 @@ import com.google.gson.stream.JsonReader;
 
 import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
-import net.artux.pda.map.engine.ecs.components.ClickComponent;
 import net.artux.pda.map.engine.ecs.components.GroupComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.map.ConditionComponent;
@@ -82,34 +81,25 @@ public class EntityProcessorSystem extends EntitySystem {
 
     public Entity generateSpawn(SpawnModel spawnModel) {
         Gang gang = spawnModel.getGroup();
+        SpawnComponent spawnComponent = new SpawnComponent(spawnModel);
+        Entity controlPoint = new Entity();
+
         if (gang != null) {
-            SpawnComponent spawnComponent = new SpawnComponent(spawnModel);
             spawnComponent.setGroup(generateGroup(spawnComponent.getPosition(), gang, gangRelations.get(gang), spawnModel.getN(), spawnModel.getParams()));
 
-            Entity controlPoint = new Entity();
             float size = spawnModel.getR() * 2 * 0.9f;
-            if (!spawnModel.getParams().contains("hide")) {
+            if (!spawnModel.getParams().contains("hide"))
                 controlPoint.add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size));
-            }
             if (spawnModel.getCondition() != null)
                 controlPoint.add(new ConditionComponent(spawnModel.getCondition()));
             else
                 controlPoint.add(new ConditionComponent(Collections.emptyMap()));
 
-            controlPoint
-                    .add(new BodyComponent(Mappers.vector2(spawnModel.getPos()), world))
-                    .add(spawnComponent)
-                    .add(new ClickComponent(spawnModel.getR(),
-                            () -> renderSystem.showText(spawnComponent.desc(), Mappers.vector2(spawnModel.getPos()))));
-
-            if (spawnModel.getCondition() != null)
-                controlPoint.add(new ConditionComponent(spawnModel.getCondition()));
-            else
-                controlPoint.add(new ConditionComponent(Collections.emptyMap()));
-
-            addEntity(controlPoint);
+            controlPoint.add(new BodyComponent(Mappers.vector2(spawnModel.getPos()), world))
+                    .add(spawnComponent);
         }
-        return null;
+        addEntity(controlPoint);
+        return controlPoint;
     }
 
 

@@ -159,16 +159,7 @@ class BackpackMenu @Inject constructor(
                 val btnNo = TextButton("Отменить", textButtonStyle)
 
                 val skinDialog: Skin = userInterface.skin
-                val dialog: Dialog = object : Dialog("", skinDialog) {
-                    override fun getPrefHeight(): Float {
-                        return 300f
-                    }
-
-                    override fun getPrefWidth(): Float {
-                        return 400f
-                    }
-                }
-                dialog.debug()
+                val dialog: Dialog = object : Dialog("", skinDialog) {}
                 dialog.isModal = true
                 dialog.isMovable = false
                 dialog.isResizable = false
@@ -178,12 +169,22 @@ class BackpackMenu @Inject constructor(
                 slider.style.knob.minHeight = 50f
                 val weightLabel =
                     Label(localeBundle.get("item.weight", itemModel.weight), titleLabelStyle)
+
+                val quantityLabel =
+                    Label(localeBundle.get("item.quantity", 1), titleLabelStyle)
+
                 slider.addListener(object : ChangeListener() {
                     override fun changed(event: ChangeEvent?, actor: Actor?) {
                         weightLabel.setText(
                             localeBundle.get(
                                 "item.weight",
                                 itemModel.weight * slider.value.toInt()
+                            )
+                        )
+                        quantityLabel.setText(
+                            localeBundle.get(
+                                "item.quantity",
+                                slider.value.toInt()
                             )
                         )
                     }
@@ -224,8 +225,10 @@ class BackpackMenu @Inject constructor(
 
                 dialog.text(localeBundle.get("item.throw", itemModel.title), titleLabelStyle)
                 dialog.contentTable.row()
-                dialog.contentTable.add(slider).growX()
-                dialog.contentTable.row()
+                dialog.contentTable.add(quantityLabel).center().growX()
+                    .row()
+                if (itemModel.type.isCountable)
+                    dialog.contentTable.add(slider).growX().row()
                 dialog.contentTable.add(weightLabel).center().growX()
 
 
@@ -234,12 +237,6 @@ class BackpackMenu @Inject constructor(
 
                 dialog.buttonTable.add(t).grow()
                 dialog.show(stage)
-                /*.setPosition(
-                    parent.width / 2 - 720 / 2,
-                    parent.height / 2 - (parent.height - 40)
-                )*/
-
-                userInterface.stack.add(dialog)
             }
 
         }

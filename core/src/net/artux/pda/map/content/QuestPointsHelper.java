@@ -48,7 +48,7 @@ public class QuestPointsHelper {
                 .add(new InteractiveComponent(point.getName(), point.getType(), () ->
                         platformInterface.send(point.getData())))
                 .add(new ClickComponent(23, () -> engine.getSystem(RenderSystem.class)
-                        .showText("Метка: " + point.getName(), Mappers.vector2(point.getPos()))));
+                        .showText(point.getName(), Mappers.vector2(point.getPos()))));
         bcm.get(entity).body.setTransform(Mappers.vector2(point.getPos()), 0);
 
         if (point.getCondition() != null)

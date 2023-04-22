@@ -5,11 +5,11 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Timer;
 
 import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.engine.scenes.Scene;
@@ -22,7 +22,6 @@ import net.artux.pda.map.utils.di.components.MapComponent;
 import net.artux.pda.model.map.GameMap;
 
 import javax.inject.Inject;
-import javax.xml.crypto.Data;
 
 public class PlayScene extends Scene {
 
@@ -121,6 +120,7 @@ public class PlayScene extends Scene {
     @Override
     public void dispose() {
         super.dispose();
+        Timer.instance().clear();
         postProcessing.dispose();
         renderer.dispose();
         tiledMap.dispose();

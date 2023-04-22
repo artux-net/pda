@@ -16,9 +16,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.content.AnomalyHelper;
 import net.artux.pda.map.content.ControlPointsHelper;
-import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.content.QuestPointsHelper;
 import net.artux.pda.map.content.SecretHelper;
+import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.ecs.systems.Drawable;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
@@ -36,7 +36,6 @@ import javax.inject.Inject;
 public class EngineManager extends InputListener implements Drawable, Disposable {
 
     private final GameMap map;
-    private final Entity player;
     private final Engine engine;
     private final DataRepository dataRepository;
 
@@ -56,7 +55,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         long loadTime = TimeUtils.millis();
 
         EntityBuilder entityBuilder = mapComponent.getEntityBuilder();
-        player = entityBuilder.player(Mappers.vector2(map.getDefPos()), dataRepository);
+        Entity player = entityBuilder.player(Mappers.vector2(map.getDefPos()), dataRepository);
         engine.addEntity(player);
 
         if (controlPoints)
@@ -102,21 +101,18 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         for (EntitySystem s : engine.getSystems()) {
             if (s instanceof Disposable) ((Disposable) s).dispose();
         }
-        //dataRepository.removePropertyChangeListener(storyDataListener);
     }
 
     public Engine getEngine() {
         return engine;
     }
 
-    Vector2 lastDefaultPosition = null;
-
     public void updateOnlyPlayer() {
-        Vector2 pos = Mappers.vector2(dataRepository.getGameMap().getDefPos());
-        if (lastDefaultPosition == null || !lastDefaultPosition.epsilonEquals(pos, 1)) {
-            lastDefaultPosition = pos;
-            engine.getSystem(PlayerMovingSystem.class).setPosition(lastDefaultPosition);
-            engine.getSystem(InteractionSystem.class).setProcessing(true);
+        engine.getSystem(InteractionSystem.class).setProcessing(true);
+        if (dataRepository.getUpdated()) {
+            Vector2 pos = Mappers.vector2(dataRepository.getGameMap().getDefPos());
+            engine.getSystem(PlayerMovingSystem.class).setPosition(pos);
+            dataRepository.setUpdated(false);
         }
     }
 }

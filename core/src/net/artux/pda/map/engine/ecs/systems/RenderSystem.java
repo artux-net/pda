@@ -14,10 +14,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.engine.graphics.postprocessing.PostProcessing;
@@ -44,6 +42,8 @@ public class RenderSystem extends BaseSystem implements Drawable {
     private final Stage stage;
 
     private final Label.LabelStyle labelStyle;
+    private final Label label;
+    private Timer.Task task;
 
     private final ComponentMapper<FogOfWarComponent> fog = ComponentMapper.getFor(FogOfWarComponent.class);
     private final ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
@@ -64,7 +64,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
         BitmapFont font = assetsFinder.getFontManager().getFont(16);
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
-
+        label = new Label("", labelStyle);
         AssetManager assetManager = assetsFinder.getManager();
         relationalSprites = new HashMap<>();
         Sprite redSprite = new Sprite(assetManager.get("red.png", Texture.class));
@@ -98,7 +98,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
         redGroup = postProcessing.loadShaderGroup("red",
                 List.of(Pair.of(shaderProgram, shaderProgram1 -> {
                     shaderProgram1.setUniformf("red_value",
-                            (float) Math.sin(redEffectAccumulator+=0.005f));
+                            (float) Math.sin(redEffectAccumulator += 0.005f));
                 })));
     }
 
@@ -110,30 +110,26 @@ public class RenderSystem extends BaseSystem implements Drawable {
         relationalEntities = engine.getEntitiesFor(Family.all(MoodComponent.class, BodyComponent.class).exclude(SpriteComponent.class).get());
     }
 
-    public void showText(String text, float x, float y) {
-        if (!hasStageActorWithName(stage, text)) {
-            final Label label = new Label(text, labelStyle);
-            label.setName(text);
-            label.setOrigin(Align.center);
-            label.setPosition(x, y);
-            stage.addActor(label);
-            Timer.schedule(new Timer.Task() {
-                @Override
-                public void run() {
-                    if (stage.getActors().contains(label, true))
-                        label.remove();
-                }
-            }, 5);
-        }
-    }
 
-    private boolean hasStageActorWithName(Stage stage, String name) {
-        for (Actor actor : stage.getActors()) {
-            if (actor.getName() != null && actor.getName().equals(name)) {
-                return true;
-            }
+    public void showText(String text, float x, float y) {
+        label.setText(text);
+        label.invalidate();
+        x -= label.getPrefWidth() / 2;
+        y += 23;
+        label.setPosition(x, y);
+        if (!stage.getActors().contains(label, true))
+            stage.addActor(label);
+        if (task != null && task.isScheduled()) {
+            task.cancel();
         }
-        return false;
+        task = new Timer.Task() {
+            @Override
+            public void run() {
+                if (stage.getActors().contains(label, true))
+                    label.remove();
+            }
+        };
+        Timer.schedule(task, 5);
     }
 
     public void showText(String text, Vector2 position) {

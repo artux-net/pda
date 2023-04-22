@@ -88,6 +88,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     public void onResume() {
         Timber.i("Core resumed");
         Bundle args = getArguments();
+
         if (args != null) {
             StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
             GameMap map = (GameMap) args.getSerializable("map");
@@ -95,6 +96,12 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             DataRepository dataRepository = gdxAdapter.getDataRepository();
             dataRepository.setUserData(dataModel);
             dataRepository.setGameMap(map);
+
+            boolean updated = args.getBoolean("updated", false);
+            if (updated)
+                args.putBoolean("updated", false);
+            dataRepository.setUpdated(updated);
+            setArguments(args);
         }
         setApplicationLogger(gdxTimberLogger);
         super.onResume();

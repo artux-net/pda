@@ -20,7 +20,7 @@ public class GroupComponent implements Component {
     private final MoodComponent mood;
     private final List<Entity> entities;
     private GroupTargetMovingComponent.Targeting targeting;
-    private Set<String> params;
+    private final Set<String> params;
 
     public GroupComponent(Gang gang, Integer[] relations, List<Entity> entities, Set<String> params) {
         this.gang = gang;
@@ -48,6 +48,10 @@ public class GroupComponent implements Component {
         }
         centerPoint.scl(1f / entities.size());
         return centerPoint;
+    }
+
+    public Gang getGang() {
+        return gang;
     }
 
     public MoodComponent getMood() {

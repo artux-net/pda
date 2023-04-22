@@ -63,6 +63,7 @@ class DataRepository(
     val storyDataModelFlow: SharedFlow<StoryDataModel> = dataModelFlow
 
     val gson = Gson()
+    var updated: Boolean = true
 
     init {
         dataModelFlow.tryEmit(storyDataModel)
