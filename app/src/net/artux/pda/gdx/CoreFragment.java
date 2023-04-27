@@ -13,8 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.appodeal.ads.Appodeal;
-import com.appodeal.ads.RewardedVideoCallbacks;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidAudio;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
@@ -111,7 +109,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     public void send(final Map<String, String> data) {
         runOnUiThread(() -> {
             if (data != null) {
-                Timber.d("Got command: %s", data.toString());
+                Timber.tag("Core Fragment").d("Got data - command: %s", data.toString());
                 Intent intent = null;
                 questViewModel.processData(data);
                 if (data.containsKey("openPda")) {
@@ -166,7 +164,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     @Override
     public void rewardedAd() {
-        Appodeal.show(requireActivity(), Appodeal.REWARDED_VIDEO, "default");
+        /*Appodeal.show(requireActivity(), Appodeal.REWARDED_VIDEO, "default");
         Appodeal.setRewardedVideoCallbacks(new RewardedVideoCallbacks() {
             @Override
             public void onRewardedVideoLoaded(boolean b) {
@@ -207,7 +205,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             public void onRewardedVideoClicked() {
 
             }
-        });
+        });*/
     }
 
     @Override

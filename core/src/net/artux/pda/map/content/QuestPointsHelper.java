@@ -8,6 +8,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.World;
 
+import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.ClickComponent;
 import net.artux.pda.map.engine.ecs.components.InteractiveComponent;
@@ -41,12 +42,12 @@ public class QuestPointsHelper {
     private static Entity pointEntity(MapComponent coreComponent, final Point point, World world) {
         Engine engine = coreComponent.getEngine();
         AssetManager assetManager = coreComponent.getAssetsManager();
-        PlatformInterface platformInterface = coreComponent.getDataRepository().getPlatformInterface();
+        DataRepository dataRepository = coreComponent.getDataRepository();
 
         Entity entity = new Entity()
                 .add(new BodyComponent(Mappers.vector2(point.getPos()), world))
                 .add(new InteractiveComponent(point.getName(), point.getType(), () ->
-                        platformInterface.send(point.getData())))
+                        dataRepository.sendData(point.getData())))
                 .add(new ClickComponent(23, () -> engine.getSystem(RenderSystem.class)
                         .showText(point.getName(), Mappers.vector2(point.getPos()))));
         bcm.get(entity).body.setTransform(Mappers.vector2(point.getPos()), 0);

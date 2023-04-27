@@ -66,7 +66,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
 
         void bind(UserInfo userInfo, int pos) {
             this.pos.setText("#" + pos);
-            if (ownerId.equals(userInfo.pdaId))
+            if (ownerId.equals(userInfo.id))
                 itemView.setBackgroundColor(Color.rgb(30, 40, 50));
             ProfileHelper.setAvatar(avatar, userInfo.avatar);
             title.setText(title.getContext().getString(R.string.rating_title, userInfo.login,
@@ -76,12 +76,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
                     ProfileHelper.getGroup(desc.getContext(), userInfo.gang.getId()),
                     ProfileHelper.getDays(userInfo.registration)));
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    clickListener.onClick(userInfo);
-                }
-            });
+            itemView.setOnClickListener(view -> clickListener.onClick(userInfo));
         }
     }
 

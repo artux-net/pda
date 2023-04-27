@@ -68,7 +68,7 @@ public class GameStageModule {
     @PerGameMap
     public Logger getLogger(Skin skin, PlayerSystem playerSystem) {
         Logger logger = new Logger(skin);
-        //logger.put("FPS", Gdx.app.getGraphics(), "getFramesPerSecond"); too heavy
+        logger.put("FPS", Gdx.app.getGraphics(), "getFramesPerSecond");
         logger.put("Native Heap", Gdx.app, "getNativeHeap");
         logger.put("Java Heap", Gdx.app, "getJavaHeap");
         logger.put("Player position", playerSystem, "getPosition");
@@ -76,7 +76,6 @@ public class GameStageModule {
         logger.put("Опыт", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getXp");
         logger.put("Params", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getParameters");
         logger.put("Temp", playerSystem.getDataRepository().getCurrentStoryDataModel().getCurrentState(), "toString");
-        //logger.put("Stories stat", Arrays.toString(playerSystem.getPlayerMember().getData().getStories().toArray()), "toString");
 
         logger.put("Screen width", Gdx.app.getGraphics(), "getWidth");
         logger.put("Height", Gdx.app.getGraphics(), "getHeight");

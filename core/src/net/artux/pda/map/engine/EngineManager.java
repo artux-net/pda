@@ -17,6 +17,7 @@ import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.content.AnomalyHelper;
 import net.artux.pda.map.content.ControlPointsHelper;
 import net.artux.pda.map.content.QuestPointsHelper;
+import net.artux.pda.map.content.RandomSpawnerHelper;
 import net.artux.pda.map.content.SecretHelper;
 import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.ecs.systems.Drawable;
@@ -66,7 +67,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
             AnomalyHelper.createAnomalies(mapComponent);
         SecretHelper.createAnomalies(mapComponent);
         conditionEntityManager.update();
-//        RandomSpawnerHelper.init(coreComponent);
+        RandomSpawnerHelper.init(mapComponent);
 
         missionsSystem.setActiveMission(missionsSystem.getActiveMission()); // finds points
 

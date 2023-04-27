@@ -1,20 +1,26 @@
 package net.artux.pda.model.user;
 
 public enum Gang {
-    LONERS(0),
-    BANDITS(1),
-    MILITARY(2),
-    LIBERTY(3),
-    DUTY(4),
-    MONOLITH(5),
-    MERCENARIES(6),
-    SCIENTISTS(7),
-    CLEAR_SKY(8);
+    LONERS(0, "gang.loners"),
+    BANDITS(1, "gang.bandits"),
+    MILITARY(2, "gang.military"),
+    LIBERTY(3, "gang.liberty"),
+    DUTY(4, "gang.duty"),
+    MONOLITH(5, "gang.monolith"),
+    MERCENARIES(6, "gang.mercenaries"),
+    SCIENTISTS(7, "gang.scientists"),
+    CLEAR_SKY(8, "gang.clear_sky");
 
     private final int id;
+    private final String titleId;
 
-    Gang(int id) {
+    Gang(int id, String titleId) {
         this.id = id;
+        this.titleId = titleId;
+    }
+
+    public String getTitleId() {
+        return titleId;
     }
 
     public int getId() {

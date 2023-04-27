@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
@@ -111,6 +112,7 @@ public class UIFrame extends WidgetGroup {
         horizontalSlider = new Slider(0, tiledNavigator.getMapWidth(), 1, false, style);
         horizontalSlider.setSize(w - standardFrameSize - getHeaderLeftX(), standardFrameSize - additionalSizes * 2);
         horizontalSlider.setPosition(getHeaderLeftX(), additionalSizes);
+        horizontalSlider.setTouchable(Touchable.disabled);
         addActor(horizontalSlider);
 
         style = new Slider.SliderStyle();
@@ -120,6 +122,7 @@ public class UIFrame extends WidgetGroup {
 
         verticalSlider.setSize(standardFrameSize - frameOffset, h - topFrameHeight - standardFrameSize);
         verticalSlider.setPosition(w - standardFrameSize + frameOffset / 2, standardFrameSize);
+        verticalSlider.setTouchable(Touchable.disabled);
         addActor(verticalSlider);
 
         counter = new Label("0", new Label.LabelStyle(font, Color.ORANGE));

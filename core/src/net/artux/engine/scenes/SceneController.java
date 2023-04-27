@@ -33,6 +33,7 @@ public class SceneController {
     }
 
     public void resume() {
+
         scenes.peek().resume();
     }
 
@@ -98,5 +99,13 @@ public class SceneController {
 
     public void clearInputProcessors() {
         multiplexer.clear();
+    }
+
+    public void pause() {
+        for (int i = 0; i < multiplexer.getProcessors().size; i++) {
+            for (int j = 0; j < Gdx.input.getMaxPointers(); j++) {
+                multiplexer.getProcessors().get(i).touchUp(0, 0, j, 0); //resets all inputs after pause;
+            }
+        }
     }
 }

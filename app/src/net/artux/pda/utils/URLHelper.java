@@ -28,15 +28,14 @@ public class URLHelper {
     public static String getApiUrl(String part) {
         if (part == null)
             return null;
-        String background_url;
-        if (!part.contains("http")) {
-            if (part.startsWith("/"))
-                background_url = apiUrl + part;
-            else
-                background_url = apiUrl + "/" + part;
+        String result;
+        if (!part.startsWith("http")) {
+            while (part.startsWith("/"))
+                part = part.replaceFirst("/", "");
+            result = apiUrl + part;
         } else
-            background_url = part;
-        return background_url;
+            result = part;
+        return result;
     }
 
 }

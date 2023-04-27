@@ -13,40 +13,31 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.InteractiveComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
-import net.artux.pda.map.engine.ecs.components.VelocityComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.WeaponComponent;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerBattleSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerMovingSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem;
-import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.BackpackMenu;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.MessagesPlane;
 import net.artux.pda.map.view.view.DetailedHUD;
 import net.artux.pda.map.view.view.bars.Slot;
-import net.artux.pda.map.view.view.bars.Utils;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.Collection;
@@ -79,8 +70,6 @@ public class UserInterfaceModule {
         Touchpad touchpad = new Touchpad(10, style);
         touchpad.setBounds(50, 50, 200, 200);
         touchpad.addListener(new ChangeListener() {
-            private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
-
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Color color = touchpad.getColor();
@@ -114,6 +103,7 @@ public class UserInterfaceModule {
                                InteractionSystem interactionSystem, AssetManager assetManager) {
         HorizontalGroup horizontalGroup = new HorizontalGroup();
         horizontalGroup.pad(20f);
+        horizontalGroup.space(10f);
         assistantBlock.add(horizontalGroup);
         assistantBlock.addAction(new Action() {
             @Override
@@ -288,23 +278,24 @@ public class UserInterfaceModule {
         })).padRight(offset += step);
         controlTable.row();
 
-        controlTable.add(addInteractButton(assetManager, "textures/ui/icons/icon_run.png", new ClickListener() {
-                    private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
+        ClickListener clickListener = new ClickListener();
+        ImageButton runButton = addInteractButton(assetManager, "textures/ui/icons/icon_run.png", clickListener);
+        runButton.addAction(new Action() {
+            final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
-                    @Override
-                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                        playerMovingSystem.setRunning(false);
-                        super.touchUp(event, x, y, pointer, button);
-                    }
+            @Override
+            public boolean act(float delta) {
+                if (playerSystem.getPlayer() != null) {
+                    HealthComponent healthComponent = hm.get(playerSystem.getPlayer());
 
-                    @Override
-                    public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        HealthComponent healthComponent = hm.get(playerSystem.getPlayer());
-                        if (healthComponent.getStamina() > 10f)
-                            playerMovingSystem.setRunning(true);
-                        return super.touchDown(event, x, y, pointer, button);
-                    }
-                }))
+                    playerMovingSystem.setRunning(runButton.isPressed() && healthComponent.getStamina() > 10f);
+                }
+
+                return false;
+            }
+        });
+
+        controlTable.add(runButton)
                 .padRight(offset + step)
                 .padBottom(step);
         float size = gameZone.getHeight() / 3f;

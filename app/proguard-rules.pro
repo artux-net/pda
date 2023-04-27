@@ -40,6 +40,8 @@
    *;
 }
 
+-keep enum * { *; }
+
 -keep public class net.artux.pda.model.** {
    *;
 }

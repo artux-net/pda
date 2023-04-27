@@ -3,6 +3,7 @@ package net.artux.pda.map.engine.ecs.systems
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.ashley.utils.ImmutableArray
@@ -41,9 +42,19 @@ class SpawnSystem @Inject constructor(private val dataRepository: DataRepository
                 .exclude(PassivityComponent::class.java, VelocityComponent::class.java)
                 .get()
         )
-        groupEntities = engine.getEntitiesFor(
-            Family.all(GroupComponent::class.java, BodyComponent::class.java).get()
-        )
+        val groupFamily = Family.all(GroupComponent::class.java, BodyComponent::class.java).get()
+
+        groupEntities = engine.getEntitiesFor(groupFamily)
+
+        engine.addEntityListener(groupFamily, object : EntityListener{
+            override fun entityAdded(entity: Entity?) {
+            }
+
+            override fun entityRemoved(entity: Entity?) {
+                gm[entity].removeEntity(entity)
+            }
+
+        })
     }
 
     override fun update(deltaTime: Float) {
@@ -51,8 +62,7 @@ class SpawnSystem @Inject constructor(private val dataRepository: DataRepository
         for (i in 0 until spawns!!.size()) {
             val spawnComponent = sm[spawns!![i]]
             val spawnBodyComponent = pm[spawns!![i]]
-            val entities = spawnComponent.groupComponent.entities
-            entities.removeIf { e: Entity? -> getEntities().indexOf(e, true) < 0 }
+
             if (spawnComponent.isEmpty) {
                 if (!spawnComponent.isActionsDone) {
                     Gdx.app.applicationLogger.log("Spawn actions", "Actions sent")

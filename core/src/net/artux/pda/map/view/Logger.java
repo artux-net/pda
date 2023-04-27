@@ -19,18 +19,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Logger extends VerticalGroup {
-    private final Label.LabelStyle labelStyle;
-    long lastTimeCounted;
-    private float sinceChange;
 
-    private final List<Triple<Method, Object, String>> dataCollection = new ArrayList<>();
+    private final Label.LabelStyle labelStyle;
+    private final List<Triple<Method, Object, String>> dataCollection;
+
     public static boolean visible = true;
 
     public Logger(Skin skin) {
         super();
 
-        lastTimeCounted = TimeUtils.millis();
-        sinceChange = 0;
+        dataCollection = new ArrayList<>();
         BitmapFont font = skin.getFont("font");
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
         columnAlign(Align.left);
@@ -39,7 +37,6 @@ public class Logger extends VerticalGroup {
     @Override
     public void act(float delta) {
         super.act(delta);
-        update();
         for (Actor l : getChildren()) {
             for (Triple<Method, Object, String> tr :
                     dataCollection) {
@@ -61,18 +58,6 @@ public class Logger extends VerticalGroup {
     public void draw(Batch batch, float parentAlpha) {
         if (visible)
             super.draw(batch, parentAlpha);
-    }
-
-    public void update() {
-        long delta = TimeUtils.timeSinceMillis(lastTimeCounted);
-        lastTimeCounted = TimeUtils.millis();
-
-        sinceChange += delta;
-        if (sinceChange >= 1000) {
-            sinceChange = 0;
-            //frameRate = Gdx.graphics.getFramesPerSecond();
-            //TODO FPS in logger
-        }
     }
 
     public void put(String title, Object o, String nameOfMethod) {

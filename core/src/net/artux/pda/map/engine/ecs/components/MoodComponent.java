@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class MoodComponent implements Component {
 
-    public int group = -1;
+    public int gandId = -1;
     public final Integer[] relations;
 
     public boolean player;
@@ -28,15 +28,15 @@ public class MoodComponent implements Component {
     public MoodComponent(StoryDataModel storyDataModel) {
         player = true;
         angry = false;
-        group = storyDataModel.getGang().getId();
+        gandId = storyDataModel.getGang().getId();
         relations = new Integer[9];
         for (Gang gang : Gang.values()) {
             relations[gang.getId()] = storyDataModel.getRelations().getFor(gang);
         }
     }
 
-    public MoodComponent(int group, Integer[] relations, Set<String> params) {
-        this.group = group;
+    public MoodComponent(Gang gang, Integer[] relations, Set<String> params) {
+        this.gandId = gang.getId();
         if (relations.length != Gang.values().length)
             throw new RuntimeException("Wrong length");
         this.relations = relations;
@@ -46,6 +46,10 @@ public class MoodComponent implements Component {
         untarget = params.contains("untarget");
         this.angryOnPlayer = params.contains("angryOnPlayer");
         this.ignorePlayer = params.contains("ignorePlayer");
+    }
+
+    public MoodComponent(GroupComponent groupComponent) {
+        this(groupComponent.getGang(), groupComponent.getRelations(), groupComponent.getParams());
     }
 
     public boolean isEnemy(MoodComponent moodComponent) {
@@ -59,11 +63,11 @@ public class MoodComponent implements Component {
         if (angry)
             return true;
         if (moodComponent.player)
-            return moodComponent.relations[group] < -2;
+            return moodComponent.relations[gandId] < -2;
         else
             //usual compare
-            response = moodComponent.group < 0 // is animal
-                    || moodComponent.group < relations.length && relations[moodComponent.group] < -2 && group != moodComponent.group; // is person
+            response = moodComponent.gandId < 0 // is animal
+                    || moodComponent.gandId < relations.length && relations[moodComponent.gandId] < -2 && gandId != moodComponent.gandId; // is person
 
         return response;
     }
@@ -81,14 +85,14 @@ public class MoodComponent implements Component {
     }
 
     public int getRelation(MoodComponent moodComponent) {
-        if (moodComponent.group < relations.length)
-            return relations[moodComponent.group];
+        if (moodComponent.gandId < relations.length)
+            return relations[moodComponent.gandId];
         else return -10;
     }
 
     public void setRelation(MoodComponent moodComponent, int relation) {
-        if (moodComponent.group < relations.length)
-            relations[moodComponent.group] = relation;
+        if (moodComponent.gandId < relations.length)
+            relations[moodComponent.gandId] = relation;
     }
 
 }

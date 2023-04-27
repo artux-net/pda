@@ -32,7 +32,7 @@ public class TimerSystem extends IteratingSystem {
                 if (frequencyPerMinute >= random.nextFloat())
                     listener.action();
             }
-        }, random.nextInt(60), 1000 * 60);
+        }, random.nextInt(60), 60);
     }
 
     public void delayAction(int seconds, TimerListener listener) {

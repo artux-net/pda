@@ -60,7 +60,10 @@ public class NetworkModule {
                     .connectTimeout(10, TimeUnit.SECONDS)
                     .writeTimeout(10, TimeUnit.SECONDS)
                     .readTimeout(600, TimeUnit.SECONDS);
-        }
+        } else
+            httpClient.connectTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS)
+                    .writeTimeout(10, TimeUnit.SECONDS);
 
         return httpClient.build();
     }

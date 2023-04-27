@@ -105,13 +105,22 @@ class BackpackMenu @Inject constructor(
         leftTable.add(armorView)
             .grow()
 
+        armorView.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                super.clicked(event, x, y)
+
+
+
+            }
+        })
+
         val verticalGroup = Table()
         rifleView = DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
-        pistolView =
-            DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
+        pistolView = DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
         pistolView.disableDesc()
         rifleView.disableDesc()
         armorView.disableDesc()
+
         verticalGroup.add(rifleView).fill().uniform()
         verticalGroup.row()
         verticalGroup.add(pistolView).fill().uniform()
@@ -132,6 +141,7 @@ class BackpackMenu @Inject constructor(
             .left()
             .colspan(2)
             .growX()
+
         val onItemClickListener = object : OnItemClickListener {
             override fun onTap(itemModel: ItemModel) {
                 if (itemModel is MedicineModel) {
@@ -155,6 +165,7 @@ class BackpackMenu @Inject constructor(
                 textButtonStyle.font = titleLabelStyle.font
                 textButtonStyle.fontColor = Color.WHITE
 
+                //TODO locale
                 val btnYes = TextButton("Выбросить", textButtonStyle)
                 val btnNo = TextButton("Отменить", textButtonStyle)
 
@@ -230,7 +241,6 @@ class BackpackMenu @Inject constructor(
                 if (itemModel.type.isCountable)
                     dialog.contentTable.add(slider).growX().row()
                 dialog.contentTable.add(weightLabel).center().growX()
-
 
                 t.add(btnYes).grow().uniform()
                 t.add(btnNo).grow().uniform()

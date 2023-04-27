@@ -23,16 +23,13 @@ import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.map.ConditionComponent;
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent;
 import net.artux.pda.map.engine.ecs.entities.model.GangRelations;
-import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.map.SpawnModel;
+import net.artux.pda.model.map.Strength;
 import net.artux.pda.model.user.Gang;
 
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -82,10 +79,13 @@ public class EntityProcessorSystem extends EntitySystem {
     public Entity generateSpawn(SpawnModel spawnModel) {
         Gang gang = spawnModel.getGroup();
         SpawnComponent spawnComponent = new SpawnComponent(spawnModel);
+        Vector2 position = spawnComponent.getPosition();
         Entity controlPoint = new Entity();
 
         if (gang != null) {
-            spawnComponent.setGroup(generateGroup(spawnComponent.getPosition(), gang, gangRelations.get(gang), spawnModel.getN(), spawnModel.getParams()));
+            GroupComponent group = generateGroup(position, gang, gangRelations.get(gang),
+                    spawnModel.getN(), spawnModel.getParams(), spawnModel.getStrength());
+            spawnComponent.setGroup(group);
 
             float size = spawnModel.getR() * 2 * 0.9f;
             if (!spawnModel.getParams().contains("hide"))
@@ -95,7 +95,7 @@ public class EntityProcessorSystem extends EntitySystem {
             else
                 controlPoint.add(new ConditionComponent(Collections.emptyMap()));
 
-            controlPoint.add(new BodyComponent(Mappers.vector2(spawnModel.getPos()), world))
+            controlPoint.add(new BodyComponent(position, world))
                     .add(spawnComponent);
         }
         addEntity(controlPoint);
@@ -103,13 +103,17 @@ public class EntityProcessorSystem extends EntitySystem {
     }
 
 
-    public GroupComponent generateGroup(Vector2 pos, Gang gang, Integer[] relations, int n, Set<String> params) {
-        List<Entity> pointEntities = new LinkedList<>();
-        GroupComponent groupComponent = new GroupComponent(gang, relations, pointEntities, params);
+    public GroupComponent generateGroup(Vector2 pos, Gang gang, Integer[] relations, int n, Set<String> params, Strength strength) {
+        GroupComponent groupComponent = new GroupComponent(gang, relations, strength, params);
+
+        Entity leader = builder.createLeader(pos, groupComponent);
+        groupComponent.addEntity(leader);
+        getEngine().addEntity(leader);
+
         for (int i = 0; i < n; i++) {
-            Entity entity = builder.spawnStalker(getRandomAround(pos, 15), groupComponent);
+            Entity entity = builder.createGroupStalker(getRandomAround(pos, 15), groupComponent);
             getEngine().addEntity(entity);
-            pointEntities.add(entity);
+            groupComponent.addEntity(entity);
         }
         return groupComponent;
     }
@@ -121,7 +125,8 @@ public class EntityProcessorSystem extends EntitySystem {
 
     public void generateTakeSpawnGroup(Vector2 randomTransferPosition, Vector2 attackTarget) {
         Gang gang = gangRelations.random();
-        GroupComponent group = generateGroup(randomTransferPosition, gang, gangRelations.get(gang), random(4, 7), Collections.emptySet());
+        GroupComponent group = generateGroup(randomTransferPosition, gang,
+                gangRelations.get(gang), random(4, 7), Collections.emptySet(), Strength.WEAK);
         group.setTargeting(() -> attackTarget);
     }
 
@@ -129,20 +134,16 @@ public class EntityProcessorSystem extends EntitySystem {
         Gang currentGang = spawnComponent.getSpawnModel().getGroup();
         Gang enemyGang = gangRelations.findEnemyByGang(currentGang);
         if (enemyGang != null) {
-            GroupComponent group = generateGroup(randomTransferPosition, enemyGang, gangRelations.get(enemyGang), random(4, 7), Collections.emptySet());
+            GroupComponent group = generateGroup(randomTransferPosition, enemyGang,
+                    gangRelations.get(enemyGang), random(4, 7), Collections.emptySet(), Strength.WEAK);
             group.setTargeting(spawnComponent::getPosition);
         }
     }
 
-
-    static Random random = new Random();
-
-    public static Vector2 getRandomAround(Vector2 point, int r) {
-        int min = -r;
-        float offsetX = random.nextInt(r - min) + min;
-        float offsetY = random.nextInt(r - min) + min;
+    public Vector2 getRandomAround(Vector2 point, int r) {
+        float offsetX = random(-r, r);
+        float offsetY = random(-r, r);
         return point.cpy().add(offsetX, offsetY);
     }
-
 
 }

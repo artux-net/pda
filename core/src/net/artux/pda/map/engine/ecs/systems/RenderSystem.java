@@ -22,6 +22,7 @@ import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
+import net.artux.pda.map.engine.ecs.components.LeaderComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.PassivityComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
@@ -30,8 +31,9 @@ import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -45,13 +47,15 @@ public class RenderSystem extends BaseSystem implements Drawable {
     private final Label label;
     private Timer.Task task;
 
+    private final ComponentMapper<LeaderComponent> lc = ComponentMapper.getFor(LeaderComponent.class);
     private final ComponentMapper<FogOfWarComponent> fog = ComponentMapper.getFor(FogOfWarComponent.class);
     private final ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
 
     private ImmutableArray<Entity> relationalEntities;
-    private final HashMap<RelationType, Sprite> relationalSprites;
+    private final EnumMap<RelationType, Sprite> relationalSprites;
+    private final EnumMap<RelationType, Sprite> relationalLeaderSprites;
     private final PostProcessing.ShaderGroup blurGroup;
     private final PostProcessing.ShaderGroup redGroup;
 
@@ -65,21 +69,33 @@ public class RenderSystem extends BaseSystem implements Drawable {
         BitmapFont font = assetsFinder.getFontManager().getFont(16);
         labelStyle = new Label.LabelStyle(font, Color.WHITE);
         label = new Label("", labelStyle);
+        relationalSprites = new EnumMap<>(RelationType.class);
+        relationalLeaderSprites = new EnumMap<>(RelationType.class);
+
         AssetManager assetManager = assetsFinder.getManager();
-        relationalSprites = new HashMap<>();
-        Sprite redSprite = new Sprite(assetManager.get("red.png", Texture.class));
-        Sprite yellowSprite = new Sprite(assetManager.get("yellow.png", Texture.class));
-        Sprite greenSprite = new Sprite(assetManager.get("green.png", Texture.class));
-        redSprite.setSize(8, 8);
-        yellowSprite.setSize(8, 8);
-        greenSprite.setSize(8, 8);
-        redSprite.setOriginCenter();
-        yellowSprite.setOriginCenter();
-        greenSprite.setOriginCenter();
+        Sprite redSprite = new Sprite(assetManager.get("textures/icons/entity/red.png", Texture.class));
+        Sprite yellowSprite = new Sprite(assetManager.get("textures/icons/entity/yellow.png", Texture.class));
+        Sprite greenSprite = new Sprite(assetManager.get("textures/icons/entity/green.png", Texture.class));
+
+        Sprite redStarSprite = new Sprite(assetManager.get("textures/icons/entity/mutant.png", Texture.class));
+        Sprite yellowStarSprite = new Sprite(assetManager.get("textures/icons/entity/mutant.png", Texture.class));
+        Sprite greenStarSprite = new Sprite(assetManager.get("textures/icons/entity/mutant.png", Texture.class));
+
+        Consumer<Sprite> spriteConsumer = sprite -> {
+            sprite.setSize(8,8);
+            sprite.setOriginCenter();
+        };
 
         relationalSprites.put(RelationType.ENEMY, redSprite);
         relationalSprites.put(RelationType.NEUTRAL, yellowSprite);
         relationalSprites.put(RelationType.FRIEND, greenSprite);
+
+        relationalLeaderSprites.put(RelationType.ENEMY, redStarSprite);
+        relationalLeaderSprites.put(RelationType.NEUTRAL, yellowStarSprite);
+        relationalLeaderSprites.put(RelationType.FRIEND, greenStarSprite);
+
+        relationalLeaderSprites.values().forEach(spriteConsumer);
+        relationalSprites.values().forEach(spriteConsumer);
 
         ShaderProgram shaderProgram = assetManager.get("shaders/blur.frag");
         blurGroup = postProcessing.loadShaderGroup("blur",
@@ -172,8 +188,13 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
             MoodComponent moodComponent = mm.get(getPlayer());
             MoodComponent entityMoodComponent = mm.get(entity);
+            Sprite sprite;
 
-            Sprite sprite = relationalSprites.get(RelationType.by(moodComponent.getRelation(entityMoodComponent)));
+            if (lc.has(entity) && !relationalLeaderSprites.isEmpty()) {
+                sprite = relationalLeaderSprites.get(RelationType.by(moodComponent.getRelation(entityMoodComponent)));
+            } else
+                sprite = relationalSprites.get(RelationType.by(moodComponent.getRelation(entityMoodComponent)));
+
             if (!showAll && fog.has(entity)) {
                 sprite.setAlpha(fog.get(entity).visionCoefficient);
                 batch.setColor(sprite.getColor());

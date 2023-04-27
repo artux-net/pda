@@ -107,8 +107,6 @@ public class VisionSystem extends BaseSystem implements Drawable {
 
                 enemyTarget.rotate(-1.5f);
                 enemyTarget.draw(batch);
-            } else {
-                moodComponent.setEnemy(null);
             }
         }
     }

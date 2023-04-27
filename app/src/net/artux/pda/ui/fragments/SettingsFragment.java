@@ -16,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.appodeal.ads.Appodeal;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -95,7 +94,7 @@ public class SettingsFragment extends BaseFragment implements View.OnClickListen
 
         binding.mapCache.setText("Сохраненные карты: " + ((float) (dirSize(cacheDirectory) / (1024 * 1024))) + " мб");
 
-        binding.testAds.setOnClickListener(v -> Appodeal.startTestActivity(requireActivity()));
+        //binding.testAds.setOnClickListener(v -> Appodeal.startTestActivity(requireActivity()));
     }
 
     private static long dirSize(File dir) {

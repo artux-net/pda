@@ -23,7 +23,7 @@ public class GangRelations {
     }
 
     public MoodComponent getMoodBy(Gang gang, Set<String> params) {
-        return new MoodComponent(gang.getId(), get(gang), params);
+        return new MoodComponent(gang, get(gang), params);
     }
 
     public HashMap<Gang, Integer[]> getRelations() {

@@ -12,7 +12,6 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 
 import net.artux.pda.R;
 
@@ -43,9 +42,9 @@ public class AvatarsAdapter extends RecyclerView.Adapter<AvatarsAdapter.ViewHold
         return 30;
     }
 
-    public void uncheck(Integer pos){
+    public void uncheck(Integer pos) {
         ViewHolder holder = holders.get(pos);
-        if (holder!=null)
+        if (holder != null)
             holder.uncheck();
     }
 
@@ -65,31 +64,31 @@ public class AvatarsAdapter extends RecyclerView.Adapter<AvatarsAdapter.ViewHold
             itemView.setOnClickListener(this);
         }
 
-        void bind(int id){
+        void bind(int id) {
             id++;
             Glide.with(avatar)
-                    .load(Uri.parse("file:///android_asset/textures/avatars/a"+id+".png"))
+                    .load(Uri.parse("file:///android_asset/textures/avatars/a" + id + ".png"))
                     .centerInside()
                     .into(avatar);
 
-            if(selected==id)
+            if (selected == id)
                 check();
             else
                 uncheck();
         }
 
-        void check(){
+        void check() {
             checked.setImageDrawable(ResourcesCompat.getDrawable(avatar.getResources(), R.drawable.ic_check, null));
         }
 
-        public void uncheck(){
+        public void uncheck() {
             checked.setImageDrawable(null);
         }
 
         @Override
         public void onClick(View view) {
-            int position = getAbsoluteAdapterPosition();
-            if(position != RecyclerView.NO_POSITION) {
+            int position = getAdapterPosition();
+            if (position != RecyclerView.NO_POSITION) {
                 AvatarsAdapter.this.uncheck(selected);
                 selected = position;
                 check();

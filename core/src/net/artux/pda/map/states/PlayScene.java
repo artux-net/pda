@@ -67,8 +67,6 @@ public class PlayScene extends Scene {
 
     @Override
     public void resume() {
-        Gdx.input.getInputProcessor()
-                .touchUp(0, 0, 0, 0); //resets all inputs after pause
         Gdx.app.getApplicationLogger().log(TAG, "OnResume");
         GameMap map = dataRepository.getGameMap();
 

@@ -207,7 +207,7 @@ class QuestViewModel @javax.inject.Inject constructor(
         Timber.d("Start syncing story")
         title.postValue("Синхронизация")
         loadingState.postValue(true)
-        Timber.d("Actions map: $actionsMap")
+
         repository.syncMember(CommandBlock().actions(actionsMap))
             .map { mapper.dataModel(it) }
             .onSuccess {

@@ -12,13 +12,16 @@ public interface TimeMapper {
 
     TimeMapper INSTANCE = Mappers.getMapper(TimeMapper.class);
 
-    default OffsetDateTime to(Instant instant){
+    default OffsetDateTime to(Instant instant) {
         return OffsetDateTime
                 .ofInstant(org.threeten.bp.Instant
                         .ofEpochSecond(instant.getEpochSecond()), ZoneId.systemDefault());
     }
 
-    default Instant to(OffsetDateTime instant){
+    default Instant to(OffsetDateTime instant) {
+        if (instant == null) {
+            return Instant.now();
+        }
         return Instant.ofEpochSecond(instant.toEpochSecond());
     }
 }

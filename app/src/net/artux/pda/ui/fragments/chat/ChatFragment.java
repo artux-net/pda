@@ -130,11 +130,12 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
 
             @Override
             public void onMessage(ChatUpdate update) {
-                requireActivity().runOnUiThread(() -> {
-                    mChatAdapter.update(update);
-                    if (mChatAdapter.getItemCount() > 0)
-                        mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount() - 1);
-                });
+                if (!isDetached())
+                    requireActivity().runOnUiThread(() -> {
+                        mChatAdapter.update(update);
+                        if (mChatAdapter.getItemCount() > 0)
+                            mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount() - 1);
+                    });
 
             }
 

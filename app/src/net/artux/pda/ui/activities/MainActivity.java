@@ -1,5 +1,7 @@
 package net.artux.pda.ui.activities;
 
+import static net.artux.pda.ui.util.AndroidHelper.hideNavBar;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,9 +18,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.appodeal.ads.Appodeal;
-import com.appodeal.ads.initializing.ApdInitializationCallback;
-import com.appodeal.ads.initializing.ApdInitializationError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -72,7 +71,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Appodeal.initialize(this, getString(R.string.appodeal_key), Appodeal.INTERSTITIAL | Appodeal.REWARDED_VIDEO, new ApdInitializationCallback() {
+        /*Appodeal.initialize(this, getString(R.string.appodeal_key), Appodeal.INTERSTITIAL | Appodeal.REWARDED_VIDEO, new ApdInitializationCallback() {
             @Override
             public void onInitializationFinished(List<ApdInitializationError> list) {
                 if (list != null && list.size() > 0)
@@ -80,7 +79,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
                         Timber.tag("Add Error").e(err);
             }
         });
-
+*/
         presenter = new MainPresenter();
         presenter.attachView(this);
 
@@ -117,7 +116,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
         setListeners();
         Timber.i("Main activity created.");
-        //startService(new Intent(this, NotificationService.class));
+        hideNavBar(getWindow());
     }
 
     @Override

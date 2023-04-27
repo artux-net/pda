@@ -26,6 +26,11 @@ import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.view.bars.Utils;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.SpawnModel;
+import net.artux.pda.model.user.Gang;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 public class ControlPointsHelper {
 
@@ -36,7 +41,6 @@ public class ControlPointsHelper {
         UserInterface userInterface = mapComponent.getUserInterface();
         FontManager fontManager = mapComponent.getAssetsFinder().getFontManager();
 
-
         Label.LabelStyle titleLabelStyle = fontManager.getLabelStyle(38, Color.WHITE);
 
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
@@ -45,7 +49,6 @@ public class ControlPointsHelper {
         textButtonStyle.fontColor = Color.WHITE;
 
         TextButton btnYes = new TextButton(localeBundle.get("main.close"), textButtonStyle);
-
         Skin skinDialog = userInterface.getSkin();
         Dialog dialog = new Dialog("", skinDialog) {
             @Override
@@ -70,9 +73,7 @@ public class ControlPointsHelper {
         Label quantityLabel = new Label("", titleLabelStyle);
         Label strengthLabel = new Label("", titleLabelStyle);
 
-
         btnYes.addListener(new InputListener() {
-
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 dialog.hide();
@@ -107,28 +108,32 @@ public class ControlPointsHelper {
 
         dialog.getButtonTable().add(btnYes).grow();
 
-
-        if (map.getSpawns() != null)
-            for (int i = 0; i < map.getSpawns().size(); i++) {
-                SpawnModel spawnModel = map.getSpawns().get(i);
+        //add spawns on map
+        List<SpawnModel> spawns = map.getSpawns();
+        if (spawns != null)
+            for (int i = 0; i < spawns.size(); i++) {
+                SpawnModel spawnModel = spawns.get(i);
                 Entity entity = processor.generateSpawn(spawnModel);
+
+                //add click component
                 entity.add(new ClickComponent(spawnModel.getR(),
                         () -> {
                             pointTitleLabel.setText(localeBundle.get("point", spawnModel.getTitle()));
                             pointDescLabel.setText(spawnModel.getDescription());
 
-                            SpawnComponent spawnComponent = (SpawnComponent) entity.getComponent(SpawnComponent.class);
+                            SpawnComponent spawnComponent = entity.getComponent(SpawnComponent.class);
                             GroupComponent groupComponent = spawnComponent.getGroupComponent();
+
                             if (groupComponent != null) {
-                                takenLabel.setText(localeBundle.get("point.taken", groupComponent.getGang()));
-                                quantityLabel.setText(localeBundle.get("point.quantity", groupComponent.getEntities().size()));
+                                Gang gang = groupComponent.getGang();
+                                takenLabel.setText(localeBundle.get("point.taken", localeBundle.get(gang.getTitleId())));
+                                quantityLabel.setText(localeBundle.get("point.quantity", groupComponent.getEntities().size));
                                 strengthLabel.setText(localeBundle.get("point.strength", "WEAK"));
                             } else {
                                 takenLabel.setText(localeBundle.get("point.taken", localeBundle.get("point.not.taken")));
                                 quantityLabel.setText("");
                                 strengthLabel.setText("");
                             }
-
 
                             dialog.show(userInterface.getStage());
                         }));

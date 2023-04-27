@@ -5,10 +5,11 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
+import net.artux.pda.model.map.Strength;
 import net.artux.pda.model.user.Gang;
 
-import java.util.List;
 import java.util.Set;
 
 public class GroupComponent implements Component {
@@ -16,19 +17,21 @@ public class GroupComponent implements Component {
     ComponentMapper<BodyComponent> positionComponentComponentMapper = ComponentMapper.getFor(BodyComponent.class);
 
     private final Gang gang;
+    private final Integer[] relations;
     private final MessageDispatcher dispatcher;
-    private final MoodComponent mood;
-    private final List<Entity> entities;
+    private final Array<Entity> entities;
+    private final Strength strength;
     private GroupTargetMovingComponent.Targeting targeting;
     private final Set<String> params;
 
-    public GroupComponent(Gang gang, Integer[] relations, List<Entity> entities, Set<String> params) {
+    public GroupComponent(Gang gang, Integer[] relations, Strength strength, Set<String> params) {
         this.gang = gang;
-        this.entities = entities;
+        this.relations = relations;
+        this.strength = strength;
         this.params = params;
-        this.mood = new MoodComponent(gang.getId(), relations, params);
         this.dispatcher = new MessageDispatcher();
-        dispatcher.setDebugEnabled(true);
+        entities = new Array<>(40);
+        dispatcher.setDebugEnabled(false);
     }
 
     public Set<String> getParams() {
@@ -46,7 +49,7 @@ public class GroupComponent implements Component {
             BodyComponent pos = positionComponentComponentMapper.get(e);
             centerPoint.add(pos.getPosition());
         }
-        centerPoint.scl(1f / entities.size());
+        centerPoint.scl(1f / entities.size);
         return centerPoint;
     }
 
@@ -54,11 +57,23 @@ public class GroupComponent implements Component {
         return gang;
     }
 
-    public MoodComponent getMood() {
-        return mood;
+    public void addEntity(Entity e) {
+        entities.add(e);
     }
 
-    public List<Entity> getEntities() {
+    public void removeEntity(Entity e) {
+        entities.removeValue(e, false);
+    }
+
+    public Integer[] getRelations() {
+        return relations;
+    }
+
+    public Strength getStrength() {
+        return strength;
+    }
+
+    public Array<Entity> getEntities() {
         return entities;
     }
 
@@ -70,8 +85,4 @@ public class GroupComponent implements Component {
         return targeting;
     }
 
-    @Override
-    public String toString() {
-        return gang.toString() + '\n' + "Количество: " + entities.size();
-    }
 }

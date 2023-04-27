@@ -9,6 +9,8 @@ import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 
+import org.apache.commons.lang3.SerializationUtils;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -30,19 +32,19 @@ public class ItemsGenerator {
     public List<ItemModel> getRandomItems() {
         List<ItemModel> items = new LinkedList<>();
         if (random() > 0.3f) {
-            if (random() > 0.3f) {
-                items.add(generateByRang(allItems.getWeapons()));
+            if (random() < 0.3f) {
+                items.add(generateByRang(allItems.getWeapons(), 0.15f));
             }
 
-            if (random() > 0.1f) {
+            if (random() < 0.1f) {
                 items.add(generateByRang(allItems.getArmors()));
             }
 
-            if (random() > 0.05f) {
+            if (random() < 0.05f) {
                 items.add(generateByRang(allItems.getArtifacts()));
             }
 
-            if (random() > 0.01f) {
+            if (random() < 0.01f) {
                 items.add(generateByRang(allItems.getDetectors()));
             }
 
@@ -55,8 +57,8 @@ public class ItemsGenerator {
             }
 
             for (int i = 0; i < random(2); i++) {
-                if (random() > 0.6f) {
-                    ItemModel medicine = generateByRang(allItems.getMedicines());
+                if (random() < 0.6f) {
+                    ItemModel medicine = generateByRang(allItems.getMedicines(), 0.4f);
                     if (medicine != null) medicine.setQuantity(random(1, 3));
                     items.add(medicine);
                 }
@@ -64,10 +66,15 @@ public class ItemsGenerator {
 
         }
         items.removeIf(Objects::isNull);
+        items.forEach(item -> item = SerializationUtils.clone(item));
         return items;
     }
 
     public ItemModel generateByRang(List<? extends ItemModel> itemModels) {
+        return generateByRang(itemModels, 0);
+    }
+
+    public ItemModel generateByRang(List<? extends ItemModel> itemModels, float plusK) {
         if (itemModels.size() == 0)
             return null;
 
@@ -75,11 +82,12 @@ public class ItemsGenerator {
         int xp = dataModel.getXp();
         int lastIndex = itemModels.size() - 1;
         if (xp < maxXp) {
-            lastIndex = (xp / maxXp) * lastIndex;
+            lastIndex = (int) (((xp / maxXp) + plusK) * lastIndex);
         }
         if (lastIndex < 0)
             lastIndex = 0;
-
+        if (lastIndex > itemModels.size() - 1)
+            lastIndex = itemModels.size() - 1;
         ItemModel item = itemModels.get(random(lastIndex));
         item.setQuantity(1);
         return itemModels.get(random(lastIndex));

@@ -81,8 +81,8 @@ public enum Effect {
         }
     };
 
-    private static ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
-    private static ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private static final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
+    private static final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
 
     private final String name;
     private final String icon;
@@ -105,4 +105,5 @@ public enum Effect {
     public abstract void affect(float dt, Entity entity);
 
     public abstract void end(Entity entity);
+
 }

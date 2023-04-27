@@ -48,7 +48,7 @@ public class ObjectWebSocketListener<T> extends okhttp3.WebSocketListener {
 
     @Override
     public void onFailure(@NonNull WebSocket webSocket, @NonNull Throwable t, okhttp3.Response response) {
-        Timber.e(t, "WS - closing because throwable: %s", t.getMessage());
+        Timber.d(t, "WS - closing because throwable: %s", t.getMessage());
         onUpdateListener.onClose();
     }
 

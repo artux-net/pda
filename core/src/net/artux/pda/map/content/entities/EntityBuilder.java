@@ -20,6 +20,7 @@ import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
 import net.artux.pda.map.engine.ecs.components.GroupComponent;
 import net.artux.pda.map.engine.ecs.components.GroupTargetMovingComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
+import net.artux.pda.map.engine.ecs.components.LeaderComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.StalkerComponent;
@@ -33,12 +34,8 @@ import net.artux.pda.map.engine.ecs.components.states.StalkerState;
 import net.artux.pda.map.engine.ecs.entities.Bodies;
 import net.artux.pda.map.engine.ecs.systems.statemachine.MessagingCodes;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
-import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 import javax.inject.Inject;
 
@@ -102,7 +99,7 @@ public class EntityBuilder {
     }
 
     public Vector2 getPointNear(Vector2 basePosition, float precision) {
-        double r = 10 / precision;
+        double r = 40 / precision;
 
         double angle = random.nextInt(360);
 
@@ -111,20 +108,36 @@ public class EntityBuilder {
         return new Vector2(basePosition.x + x, basePosition.y + y);
     }
 
-    public Entity createStalerGroup(Vector2 position){
+    public Entity createStalerGroup(Vector2 position) {
         return null;
     }
 
 
-    public Entity spawnStalker(Vector2 position, GroupComponent group) {
+    public Entity createGroupStalker(Vector2 position, GroupComponent group) {
         Entity entity = new Entity();
 
         WeaponModel w = new WeaponModel();
         w.setType(ItemType.RIFLE);
-        w.setSpeed(random(5, 10));
-        w.setDamage(random(3, 5));
-        w.setPrecision(random(15, 25));
-        w.setBulletQuantity(30);
+        switch (group.getStrength()) {
+            case STRONG:
+                w.setSpeed(random(13, 15));
+                w.setDamage(random(9, 10));
+                w.setPrecision(random(35, 45));
+                w.setBulletQuantity(45);
+                break;
+            case MIDDLE:
+                w.setSpeed(random(9, 15));
+                w.setDamage(random(5, 10));
+                w.setPrecision(random(25, 45));
+                w.setBulletQuantity(45);
+                break;
+            default:
+                w.setSpeed(random(5, 10));
+                w.setDamage(random(3, 5));
+                w.setPrecision(random(15, 25));
+                w.setBulletQuantity(30);
+                break;
+        }
 
         HealthComponent healthComponent = new HealthComponent();
         healthComponent.setImmortal(group.getParams().contains("immortal"));
@@ -140,7 +153,7 @@ public class EntityBuilder {
                 .add(new Effects())
                 .add(healthComponent)
                 .add(group)
-                .add(group.getMood())
+                .add(new MoodComponent(group))
                 .add(new StalkerComponent(contentGenerator.generateName(), contentGenerator.generateAvatar(), contentGenerator.getRandomItems()))
                 .add(new WeaponComponent(w, assetManager))
                 .add(statesComponent)
@@ -178,4 +191,9 @@ public class EntityBuilder {
     }
 
 
+    public Entity createLeader(Vector2 pos, GroupComponent groupComponent) {
+        Entity entity = createGroupStalker(pos, groupComponent);
+        entity.add(new LeaderComponent());
+        return entity;
+    }
 }

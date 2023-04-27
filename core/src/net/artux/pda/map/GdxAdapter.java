@@ -61,6 +61,12 @@ public class GdxAdapter extends ApplicationAdapter {
     }
 
     @Override
+    public void pause() {
+        super.pause();
+        gsc.pause();
+    }
+
+    @Override
     public void resize(int width, int height) {
         //super.resize(width, height);
         //gsc.resize(width, height);

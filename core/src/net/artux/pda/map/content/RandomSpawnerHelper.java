@@ -32,34 +32,28 @@ public class RandomSpawnerHelper {
         EntityBuilder entityBuilder = coreComponent.getEntityBuilder();
 
         TimerSystem timerSystem = engine.getSystem(TimerSystem.class);
-        CameraSystem cameraSystem = engine.getSystem(CameraSystem.class);
         SpawnSystem spawnSystem = engine.getSystem(SpawnSystem.class);
         MapOrientationSystem mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
         Properties properties = coreComponent.getDataRepository().getProperties();
         ImmutableArray<Entity> transfers = engine.getEntitiesFor(Family.all(BodyComponent.class, TransferComponent.class).get());
-        ImmutableArray<Entity> spawns = engine.getEntitiesFor(Family.all(BodyComponent.class, SpawnComponent.class).get());
 
         float groupFreq = Float.parseFloat((String) properties.get(PropertyFields.GROUP_BOT_FREQ));
-        timerSystem.addTimerAction(groupFreq, new TimerSystem.TimerListener() {
-            @Override
-            public void action() {
-                Entity randomTransfer = transfers.random();
-                Vector2 randomTransferPosition;
-                if (randomTransfer == null)
-                    randomTransferPosition = mapOrientationSystem.getRandomFreePoint();
-                else
-                    randomTransferPosition = pm.get(randomTransfer).getPosition();
+        timerSystem.addTimerAction(groupFreq, () -> {
+            Entity randomTransfer = transfers.random();
+            Vector2 randomTransferPosition;
+            if (randomTransfer == null)
+                randomTransferPosition = mapOrientationSystem.getRandomFreePoint();
+            else
+                randomTransferPosition = pm.get(randomTransfer).getPosition();
 
-                Entity targetSpawn = spawnSystem.getEmptySpawn();
-                if (targetSpawn != null) {
-                    Vector2 spawnPosition = pm.get(targetSpawn).getPosition();
-                    entityProcessorSystem.generateTakeSpawnGroup(randomTransferPosition, spawnPosition);
-                    return;
-                }
-                targetSpawn = spawnSystem.getRandomSpawn();
-                if (targetSpawn != null)
-                    entityProcessorSystem.generateAttackSpawnGroup(randomTransferPosition, sm.get(targetSpawn));
+            Entity targetSpawn = spawnSystem.getEmptySpawn();
+            if (targetSpawn != null) {
+                Vector2 spawnPosition = pm.get(targetSpawn).getPosition();
+                entityProcessorSystem.generateTakeSpawnGroup(randomTransferPosition, spawnPosition);
+                return;
             }
+            targetSpawn = spawnSystem.getRandomSpawn();
+            entityProcessorSystem.generateAttackSpawnGroup(randomTransferPosition, sm.get(targetSpawn));
         });
 
         float singleFreq = Float.parseFloat((String) properties.get(PropertyFields.SINGLE_BOT_FREQ));

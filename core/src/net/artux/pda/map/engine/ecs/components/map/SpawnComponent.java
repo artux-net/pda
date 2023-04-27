@@ -32,7 +32,7 @@ public class SpawnComponent implements Component, GroupTargetMovingComponent.Tar
     }
 
     public boolean isEmpty() {
-        return groupComponent == null || groupComponent.getEntities().size() < 1;
+        return groupComponent == null || groupComponent.getEntities().size < 1;
     }
 
     public Vector2 getPosition() {

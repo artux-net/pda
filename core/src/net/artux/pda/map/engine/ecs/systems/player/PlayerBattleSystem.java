@@ -50,7 +50,7 @@ public class PlayerBattleSystem extends BaseSystem {
     @Override
     protected void processEntity(Entity player, float deltaTime) {
         WeaponComponent playerWeapon = wm.get(player);
-        MoodComponent moodComponent = mm.get(player);
+        MoodComponent playerMood = mm.get(player);
         VisionComponent playerVision = vm.get(player);
 
         if (playerWeapon.getReloading() && !soundStarted) {
@@ -60,13 +60,13 @@ public class PlayerBattleSystem extends BaseSystem {
 
         playerWeapon.update(deltaTime);
 
-        if (moodComponent.hasEnemy()) {
-            if (!mm.get(moodComponent.enemy).untarget)
-                if (playerVision.isSeeing(moodComponent.getEnemy()))
+        if (playerMood.hasEnemy()) {
+            if (!mm.get(playerMood.enemy).untarget)
+                if (playerVision.isSeeing(playerMood.getEnemy()))
                     if (playerShoot && playerWeapon.shoot()) {
                         soundStarted = false;
-                        entityProcessorSystem.addBulletToEngine(player, moodComponent.getEnemy(), playerWeapon.getSelected());
-                        soundsSystem.playSoundAtDistance(playerWeapon.getShotSound(), pm.get(moodComponent.getEnemy()).getPosition());
+                        entityProcessorSystem.addBulletToEngine(player, playerMood.getEnemy(), playerWeapon.getSelected());
+                        soundsSystem.playSoundAtDistance(playerWeapon.getShotSound(), pm.get(playerMood.getEnemy()).getPosition());
                     }
         }/*else{
             if (playerShoot && playerWeapon.shoot()) {
@@ -76,9 +76,23 @@ public class PlayerBattleSystem extends BaseSystem {
             }
         }*/
 
+
         LinkedList<Entity> playerEnemies = playerVision.getVisibleEntities();
-        if (moodComponent.hasEnemy() && !playerEnemies.contains(moodComponent.getEnemy()))
-            moodComponent.setEnemy(null);
+        if (playerMood.hasEnemy() && !playerEnemies.contains(playerMood.getEnemy())) {
+            boolean nextEnemyFound = false;
+            for (int i = 0; i < playerEnemies.size(); i++) {
+                Entity enemy = playerEnemies.get(i);
+                MoodComponent enemyMood = mm.get(enemy);
+                if (playerMood.isEnemy(enemyMood) || enemyMood.isEnemy(playerMood)) {
+                    playerMood.setEnemy(enemy);
+                    nextEnemyFound = true;
+                    break;
+                }
+            }
+            if (!nextEnemyFound)
+                playerMood.setEnemy(null);
+        }
+
     }
 
     boolean soundStarted = false;

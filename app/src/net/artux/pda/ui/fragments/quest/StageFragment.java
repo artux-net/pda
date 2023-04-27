@@ -126,7 +126,7 @@ public class StageFragment extends Fragment implements View.OnClickListener {
     private void setSceneResponses(List<TransferModel> transferModels) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         for (TransferModel transfer : transferModels) {
-            Button button = new Button(getContext());
+            Button button = new Button(requireContext());
             button.setLayoutParams(layoutParams);
             button.setPadding(10, 10, 10, 10);
             button.setGravity(Gravity.CENTER_VERTICAL);

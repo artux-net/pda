@@ -1,5 +1,7 @@
 package net.artux.pda.ui.activities;
 
+import static net.artux.pda.ui.util.AndroidHelper.hideNavBar;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -35,7 +37,6 @@ import net.artux.pda.ui.fragments.quest.StageFragment;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.ui.viewmodels.SellerViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
-import net.artux.pda.utils.MultiExoPlayer;
 import net.artux.pda.utils.URLHelper;
 
 import javax.inject.Inject;
@@ -52,7 +53,6 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
     @Inject
     protected Gson gson;
     private String currentBackground = "";
-    private MultiExoPlayer multiExoPlayer;
     private CoreFragment coreFragment;
     private QuestViewModel questViewModel;
 
@@ -66,7 +66,6 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
 
         questViewModel.getChapter().observe(this, chapter -> {
             if (chapter != null) {
-                multiExoPlayer = new MultiExoPlayer(QuestActivity.this, chapter.getMusic());
                 //preload images
                 for (Stage stage : chapter.getStages()) {
                     if (stage.getBackground() != null && !stage.getBackground().isEmpty()) {
@@ -206,27 +205,9 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
         switcher.setInAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_in));
         switcher.setOutAnimation(AnimationUtils.loadAnimation(this, android.R.anim.fade_out));
 
-        hideNavBar();
+        hideNavBar(getWindow());
 
         startLoading();
-    }
-
-    void hideNavBar() {
-        final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-
-        getWindow().getDecorView().setSystemUiVisibility(flags);
-
-        final View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
-                    if((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                        decorView.setSystemUiVisibility(flags);
-                    }
-                });
     }
 
     private void startLoading() {
@@ -286,25 +267,6 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
 
-    }
-
-    public void unmute() {
-        if (multiExoPlayer != null)
-            multiExoPlayer.unmute();
-    }
-
-    public void mute() {
-        if (multiExoPlayer != null)
-            multiExoPlayer.mute();
-    }
-
-    public boolean isMuted() {
-        return multiExoPlayer.isMuted();
-    }
-
-    public void release() {
-        if (multiExoPlayer != null)
-            multiExoPlayer.release();
     }
 
     @Override

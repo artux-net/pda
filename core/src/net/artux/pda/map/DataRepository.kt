@@ -92,7 +92,6 @@ class DataRepository(
             HashMap()
         if (actions != null) {
             summaryMap.putAll(actions)
-            Gdx.app.applicationLogger.log("ACTIONS", "$summaryMap")
             platformInterface.applyActions(summaryMap)
         }
     }

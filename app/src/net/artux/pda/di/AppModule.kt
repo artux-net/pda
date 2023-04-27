@@ -31,7 +31,7 @@ class AppModule {
     ): Properties {
         val properties = Properties()
         try {
-            properties.load(context.assets.open("assets/config/app.properties"))
+            properties.load(context.assets.open("config/app.properties"))
         } catch (e: IOException) {
             Timber.i("Props not found.")
         }
