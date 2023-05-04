@@ -36,7 +36,7 @@ jobs:
           gradle-version: 7.6
           
       - name: Checking lint
-        run: ./gradlew lintRelease --debug
+        run: ./gradlew lintRelease --stacktrace
     
       - name: Build APK
         id: build
