@@ -3,12 +3,9 @@ package net.artux.pda.map.view
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +15,6 @@ import net.artux.pda.map.content.assets.AssetsFinder
 import net.artux.pda.map.utils.Colors
 import net.artux.pda.map.utils.di.scope.PerGameMap
 import net.artux.pda.map.view.blocks.MediaItem
-import net.artux.pda.map.view.blocks.SlotTextButton
 import net.artux.pda.map.view.view.ItemsTableView
 import net.artux.pda.map.view.view.OnItemClickListener
 import net.artux.pda.map.view.view.bars.Utils
@@ -31,7 +27,6 @@ import javax.inject.Inject
 
 @PerGameMap
 class LootMenu @Inject constructor(
-    textButton: SlotTextButton,
     assetsFinder: AssetsFinder,
     private val localeBundle: LocaleBundle,
     private val dataRepository: DataRepository,

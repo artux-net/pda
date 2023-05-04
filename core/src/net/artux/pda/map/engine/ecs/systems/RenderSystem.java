@@ -77,9 +77,9 @@ public class RenderSystem extends BaseSystem implements Drawable {
         Sprite yellowSprite = new Sprite(assetManager.get("textures/icons/entity/yellow.png", Texture.class));
         Sprite greenSprite = new Sprite(assetManager.get("textures/icons/entity/green.png", Texture.class));
 
-        Sprite redStarSprite = new Sprite(assetManager.get("textures/icons/entity/mutant.png", Texture.class));
-        Sprite yellowStarSprite = new Sprite(assetManager.get("textures/icons/entity/mutant.png", Texture.class));
-        Sprite greenStarSprite = new Sprite(assetManager.get("textures/icons/entity/mutant.png", Texture.class));
+        Sprite redStarSprite = new Sprite(assetManager.get("textures/icons/entity/star-red.png", Texture.class));
+        Sprite yellowStarSprite = new Sprite(assetManager.get("textures/icons/entity/star-yellow.png", Texture.class));
+        Sprite greenStarSprite = new Sprite(assetManager.get("textures/icons/entity/star-green.png", Texture.class));
 
         Consumer<Sprite> spriteConsumer = sprite -> {
             sprite.setSize(8,8);

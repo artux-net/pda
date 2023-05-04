@@ -1,14 +1,16 @@
 package net.artux.pda.ui.activities.hierarhy;
 
-import android.os.Bundle;
+import androidx.fragment.app.Fragment;
 
 public interface MainContract {
 
     interface View {
-        void setFragment(BaseFragment fragment, boolean addToBackStack);
+        void setFragment(Fragment fragment, boolean addToBackStack);
+
         void setAdditionalFragment(AdditionalBaseFragment fragment);
 
         void setTitle(String title);
+
         void setAdditionalTitle(String title);
 
         void setLoadingState(boolean loadingState);
@@ -24,6 +26,7 @@ public interface MainContract {
 
     interface Presenter {
         void attachView(View view);
+
         void backPressed(BaseFragment baseFragment);
     }
 

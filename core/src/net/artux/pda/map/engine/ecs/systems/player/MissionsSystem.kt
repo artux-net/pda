@@ -29,7 +29,7 @@ import net.artux.pda.model.map.Point
 import net.artux.pda.model.quest.MissionModel
 import net.artux.pda.model.quest.story.ParameterModel
 import net.artux.pda.model.quest.story.StoryDataModel
-import java.util.*
+import java.util.LinkedList
 import java.util.stream.Collectors
 import javax.inject.Inject
 
@@ -93,7 +93,7 @@ class MissionsSystem @Inject constructor(
             val checkpointModel = m.getCurrentCheckpoint(*paramArr)
             messagesPlane.addMessage(
                 "textures/avatars/a0.png", "Задание обновлено: " + m.title,
-                "Новая цель: " + checkpointModel.title, MessagesPlane.Length.SHORT
+                "Новая цель: " + checkpointModel!!.title, MessagesPlane.Length.SHORT
             )
             soundsSystem.playSound(missionUpdatedSound)
         }
@@ -156,20 +156,20 @@ class MissionsSystem @Inject constructor(
         this.activeMission = activeMission
         if (activeMission == null) return
         val currentCheckpoint = activeMission.getCurrentCheckpoint(*params)
-        val chapter = currentCheckpoint.chapter
-        val stage = currentCheckpoint.stage
+        val chapter = currentCheckpoint?.chapter
+        val stage = currentCheckpoint?.stage
         var found = false
         for (questEntity in entities) {
             val questComponent = qcm[questEntity]
             val position = pm[questEntity]
-            if (questComponent.contains(chapter, stage)) {
+            if (questComponent.contains(chapter!!, stage!!)) {
                 found = true
                 setTargetPosition(position.position)
             }
         }
         if (!found) {
             val currentMap = dataRepository.gameMap
-            val requiredMap = getRequiredMap(chapter, stage)
+            val requiredMap = getRequiredMap(chapter!!, stage!!)
             if (requiredMap === currentMap || requiredMap == null) return
             val path = pathFinder.find(
                 mapDigraph,
@@ -213,16 +213,16 @@ class MissionsSystem @Inject constructor(
             val node = mapDigraph.offer(map)
             for (point in map.points) {
                 if (point.type == 7) {
-                    val currentData: Map<String, String> = point.data
-                    val chapterString = currentData["chapter"]
-                    val stageString = currentData["stage"]
-                    var targetMap = currentData["map"] //with map
+                    val currentData: HashMap<String, String>? = point.data
+                    val chapterString = currentData?.get("chapter")
+                    val stageString = currentData?.get("stage")
+                    var targetMap = currentData?.get("map") //with map
                     if (chapterString != null && stageString != null) {
                         //with chapter
                         val stage = stageString.toInt()
                         val data: Map<String, String>? = storyModel
                             .getChapter(chapterString)
-                            .getStage(stage).data
+                            ?.getStage(stage)?.data
                         if (data != null && data.containsKey("map")) targetMap = data["map"]
                     }
                     if (targetMap != null) {

@@ -29,8 +29,8 @@ class SummaryRepository @Inject constructor(
         summaryCache.put(id, summary)
     }
 
-    fun updateSummary(messages: List<UserMessage>) {
-        getCachedSummary(Summary.getCurrentId())
+    fun updateSummary(messages: MutableList<UserMessage>) {
+        getCachedSummary(Summary.currentId)
             .onSuccess {
                 it.messages.addAll(messages)
                 putSummary(it.title, it)

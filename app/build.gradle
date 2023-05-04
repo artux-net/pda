@@ -66,17 +66,28 @@ android {
 
     }
     packagingOptions {
-        exclude 'META-INF/robovm/ios/robovm.xml'
+        resources {
+            excludes += ['META-INF/robovm/ios/robovm.xml']
+        }
     }
     defaultConfig {
         applicationId "net.artux.pda"
         minSdkVersion 26
-        targetSdkVersion 33
+        targetSdkVersion 32
         versionCode 51
         versionName "0.3.2"
         proguardFiles 'proguard-rules.pro'
         testProguardFiles 'proguard-rules.pro'
     }
+
+    applicationVariants.all { variant ->
+        {
+            variant.resValue "string", "versionName", variant.versionName
+
+            variant.resValue "string", "versionCode", variant.versionCode.toString()
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -103,11 +114,23 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = "1.9"
-        targetCompatibility = "1.9"
+        sourceCompatibility = 17
+        targetCompatibility = 17
     }
+
+
+    kotlin {
+        jvmToolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+        jvmToolchain(17)
+    }
+
+
     buildFeatures {
         viewBinding true
+        renderScript true
+        aidl true
     }
     lint {
         abortOnError false
@@ -123,7 +146,7 @@ ext {
     json_fire_version = "1.8.0"
     mapstruct_version = "1.5.2.Final"
     glide_version = "4.12.0"
-    dagger_version = "2.43.2"
+    dagger_version = "2.46"
     retrofit_version = "2.9.0"
     androidx_version = "2.5.1"
 }
@@ -152,6 +175,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_version"
     implementation "androidx.core:core-ktx:1.9.0"
     implementation "androidx.fragment:fragment-ktx:1.5.2"
+    implementation "androidx.preference:preference-ktx:1.2.0"
 
     //retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"

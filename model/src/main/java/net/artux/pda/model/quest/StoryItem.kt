@@ -1,14 +1,9 @@
-package net.artux.pda.model.quest;
+package net.artux.pda.model.quest
 
-import lombok.Data;
-
-@Data
-public class StoryItem {
-
-    private int id;
-    private String title;
-    private String icon;
-    private String desc;
-    private boolean complete;
-
+class StoryItem {
+    var id = 0
+    var title: String? = null
+    var icon: String? = null
+    var desc: String? = null
+    var complete = false
 }

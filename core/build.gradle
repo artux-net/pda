@@ -1,6 +1,9 @@
-apply plugin: "java"
-apply plugin: 'kotlin'
-apply plugin: "kotlin-kapt"
+plugins{
+    id "java"
+    id 'kotlin'
+    id "kotlin-kapt"
+}
+
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3

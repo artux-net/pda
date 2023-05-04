@@ -73,7 +73,7 @@ class UserViewModel @Inject constructor(
 
     fun isChatAllowed(): Boolean {
         val userModel: UserModel? = getFromCache()
-        val atLeastOneOver = storyData.value?.storyStates?.any { it.isOver } ?: false
+        val atLeastOneOver = storyData.value?.storyStates?.any { it.over } ?: false
         val xpChatLimit = firebaseRemoteConfig.getLong(PropertyFields.XP_CHAT_LIMIT)
         return (userModel != null && xpChatLimit <= userModel.xp) || atLeastOneOver
     }

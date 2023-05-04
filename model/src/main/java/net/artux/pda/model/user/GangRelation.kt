@@ -1,43 +1,29 @@
-package net.artux.pda.model.user;
+package net.artux.pda.model.user
 
-import java.io.Serializable;
+import java.io.Serializable
 
-import lombok.Data;
+class GangRelation : Serializable {
+    var bandits = 0
+    var clearSky = 0
+    var duty = 0
+    var liberty = 0
+    var loners = 0
+    var mercenaries = 0
+    var military = 0
+    var monolith = 0
+    var scientists = 0
 
-@Data
-public class GangRelation implements Serializable {
-
-    private int bandits;
-    private int clearSky;
-    private int duty;
-    private int liberty;
-    private int loners;
-    private int mercenaries;
-    private int military;
-    private int monolith;
-    private int scientists;
-
-    public int getFor(Gang gang) {
-        switch (gang) {
-            case DUTY:
-                return duty;
-            case LONERS:
-                return loners;
-            case BANDITS:
-                return bandits;
-            case CLEAR_SKY:
-                return clearSky;
-            case LIBERTY:
-                return liberty;
-            case MERCENARIES:
-                return mercenaries;
-            case MILITARY:
-                return military;
-            case MONOLITH:
-                return monolith;
-            default:
-                return scientists;
+    fun getFor(gang: Gang?): Int {
+        return when (gang) {
+            Gang.DUTY -> duty
+            Gang.LONERS -> loners
+            Gang.BANDITS -> bandits
+            Gang.CLEAR_SKY -> clearSky
+            Gang.LIBERTY -> liberty
+            Gang.MERCENARIES -> mercenaries
+            Gang.MILITARY -> military
+            Gang.MONOLITH -> monolith
+            else -> scientists
         }
     }
-
 }

@@ -6,7 +6,12 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Slider
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
@@ -29,7 +34,12 @@ import net.artux.pda.map.view.view.HUD
 import net.artux.pda.map.view.view.ItemsTableView
 import net.artux.pda.map.view.view.OnItemClickListener
 import net.artux.pda.map.view.view.bars.Utils
-import net.artux.pda.model.items.*
+import net.artux.pda.model.items.ArmorModel
+import net.artux.pda.model.items.ItemModel
+import net.artux.pda.model.items.ItemType
+import net.artux.pda.model.items.MedicineModel
+import net.artux.pda.model.items.WeaponModel
+import net.artux.pda.model.items.WearableModel
 import net.artux.pda.model.quest.story.StoryDataModel
 import javax.inject.Inject
 
@@ -110,13 +120,13 @@ class BackpackMenu @Inject constructor(
                 super.clicked(event, x, y)
 
 
-
             }
         })
 
         val verticalGroup = Table()
         rifleView = DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
-        pistolView = DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
+        pistolView =
+            DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
         pistolView.disableDesc()
         rifleView.disableDesc()
         armorView.disableDesc()

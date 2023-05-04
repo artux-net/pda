@@ -1,17 +1,10 @@
-package net.artux.pda.model.quest;
+package net.artux.pda.model.quest
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
+import java.io.Serializable
 
-import lombok.Data;
-
-@Data
-public class Transfer implements Serializable {
-
-    private int stage;
-    private String text;
-    private HashMap<String, List<String>> condition;
-    private HashMap<String, List<String>> actions;
-
+class Transfer : Serializable {
+    var stage = 0
+    var text: String? = null
+    var condition: HashMap<String, List<String>>? = null
+    var actions: HashMap<String, List<String>>? = null
 }

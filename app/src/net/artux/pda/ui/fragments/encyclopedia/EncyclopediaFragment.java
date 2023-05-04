@@ -35,7 +35,7 @@ public class EncyclopediaFragment extends BaseFragment {
     public static EncyclopediaFragment of(ItemModel model) {
         EncyclopediaFragment encyclopediaFragment = new EncyclopediaFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt(BASE_ID, model.getBaseId());
+        bundle.putInt(BASE_ID, model.baseId);
         encyclopediaFragment.setArguments(bundle);
         return encyclopediaFragment;
     }

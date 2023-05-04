@@ -1,16 +1,9 @@
-package net.artux.pda.model.quest;
+package net.artux.pda.model.quest
 
-import java.util.List;
-
-import lombok.Data;
-
-@Data
-public class StageModel {
-
-    private int id;
-    private String title;
-    private String content;
-    private StageType type;
-    private List<TransferModel> transfers;
-
+class StageModel {
+    var id = 0
+    var title: String? = null
+    var content: String? = null
+    var type: StageType? = null
+    var transfers: List<TransferModel>? = null
 }

@@ -72,18 +72,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensorLandscape" />
 
-        <service
-            android:name=".utils.MyDownloadService"
-            android:exported="false"
-            tools:ignore="Instantiatable">
-
-            <intent-filter>
-                <action android:name="com.google.android.exoplayer.downloadService.action.RESTART" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </service>
-
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-4707001480680280~1357953477" />

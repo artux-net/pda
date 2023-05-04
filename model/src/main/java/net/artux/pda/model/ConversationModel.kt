@@ -1,16 +1,11 @@
-package net.artux.pda.model;
+package net.artux.pda.model
 
-import java.io.Serializable;
+import java.io.Serializable
 
-import lombok.Data;
-
-@Data
-public class ConversationModel implements Serializable {
-
-    private int id;
-    private int type;
-    private String title;
-    private String lastMessage;
-    private String avatar;
-
+class ConversationModel : Serializable {
+    var id = 0
+    var type = 0
+    var title: String? = null
+    var lastMessage: String? = null
+    var avatar: String? = null
 }

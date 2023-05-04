@@ -1,15 +1,8 @@
-package net.artux.pda.model.quest;
+package net.artux.pda.model.quest
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
+import java.io.Serializable
 
-import lombok.Data;
-
-@Data
-public class Text implements Serializable {
-
-    private String text;
-    private HashMap<String, List<String>> condition;
-
+class Text : Serializable {
+    var text: String = ""
+    var condition: HashMap<String, List<String>> = HashMap()
 }

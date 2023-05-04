@@ -141,7 +141,7 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
         });
 
         questViewModel.getStatus().observe(this, statusModel -> {
-            if (!statusModel.isSuccess()) {
+            if (!statusModel.getSuccess()) {
                 Timber.e(statusModel.getDescription());
                 Intent intent = new Intent(QuestActivity.this, MainActivity.class);
                 intent.putExtra("status", statusModel);

@@ -1,16 +1,20 @@
 package net.artux.pda.ui.activities.hierarhy;
 
+import androidx.fragment.app.Fragment;
+
 public class MainPresenter implements MainContract.Presenter, FragmentNavigation.Presenter {
 
     private MainContract.View view;
-    public BaseFragment mainFragment;
+    public Fragment mainFragment;
     public AdditionalBaseFragment additionalFragment;
 
     @Override
-    public void addFragment(BaseFragment fragment, boolean addToBackStack) {
+    public void addFragment(Fragment fragment, boolean addToBackStack) {
         if (mainFragment == null || !mainFragment.getClass().isInstance(fragment)){
             mainFragment = fragment;
-            updateAdditionalFragment(fragment);
+            if (mainFragment instanceof BaseFragment) {
+                updateAdditionalFragment((BaseFragment) fragment);
+            }
             view.setFragment(fragment, addToBackStack);
         }
     }
@@ -18,18 +22,16 @@ public class MainPresenter implements MainContract.Presenter, FragmentNavigation
     void updateAdditionalFragment(BaseFragment baseFragment){
         if(!baseFragment.defaultAdditionalFragment.isInstance(additionalFragment)){
             try {
-                additionalFragment = baseFragment.defaultAdditionalFragment.newInstance();
+                additionalFragment = baseFragment.getDefaultAdditionalFragment().newInstance();
                 addAdditionalFragment(additionalFragment);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
+            } catch (IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }
         }
     }
 
     @Override
-    public BaseFragment getCurrentFragment() {
+    public Fragment getCurrentFragment() {
         return mainFragment;
     }
 

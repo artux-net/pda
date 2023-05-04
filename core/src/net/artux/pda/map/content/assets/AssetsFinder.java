@@ -56,7 +56,7 @@ public class AssetsFinder implements Disposable {
             assetManager.load("cache.png", Texture.class);
             assetManager.load("transfer.png", Texture.class);
             assetManager.load("gg.png", Texture.class);
-            assetManager.load("gray.png", Texture.class);
+            //assetManager.load("gray.png", Texture.class);
             assetManager.load("controlPoint.png", Texture.class);
 
             ObjectMap<String, Object> fontsMap = new ObjectMap<>();

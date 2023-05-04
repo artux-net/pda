@@ -72,7 +72,7 @@ public class LoadingActivity extends AppCompatActivity {
             start();
         });
         viewModel.getStatus().observe(this, statusModel -> {
-            if (!statusModel.isSuccess()) {
+            if (!statusModel.getSuccess()) {
                 Toast.makeText(getApplicationContext(), statusModel.getDescription(), Toast.LENGTH_LONG).show();
                 viewModel.signOut();
                 startActivity(new Intent(this, LoginActivity.class));

@@ -102,7 +102,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         authViewModel.getStatus().observe(this, status -> {
             showProgress(false);
-            if (status.isSuccess()) {
+            if (status.getSuccess()) {
                 Intent intent = new Intent(RegisterActivity.this, FinishRegistrationActivity.class);
                 intent.putExtra("email", registerUserModel.getEmail());
                 startActivity(intent);

@@ -39,7 +39,7 @@ class ConditionEntityManager @Inject constructor(
         Gdx.app.applicationLogger.log("Points", "Update conditional-points.")
         for (i in 0 until currentEntities.size()) {
             val e = currentEntities.get(i)
-            if (QuestUtil.check(cm[e], dataModel))
+            if (QuestUtil.check(cm[e], dataModel!!))
                 e.remove(PassivityComponent::class.java)
             else
                 if (!pcm.has(e))

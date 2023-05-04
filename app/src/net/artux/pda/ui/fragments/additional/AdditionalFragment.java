@@ -6,18 +6,18 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
-import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.fragments.SettingsFragment;
 import net.artux.pda.ui.fragments.encyclopedia.EncyclopediaFragment;
 import net.artux.pda.ui.fragments.profile.BackpackFragment;
 import net.artux.pda.ui.fragments.profile.EquipmentFragment;
 import net.artux.pda.ui.fragments.profile.SummaryFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.rating.RatingFragment;
+import net.artux.pda.ui.fragments.settings.PrefsFragment;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +29,7 @@ public class AdditionalFragment extends AdditionalBaseFragment implements String
 
     private FragmentListBinding binding;
     private StringAdapter adapter;
-    private List<Class<? extends BaseFragment>> fragmentClasses = new ArrayList<>();
+    private List<Class<? extends Fragment>> fragmentClasses = new ArrayList<>();
 
     {
         fragmentClasses.add(EquipmentFragment.class);
@@ -39,7 +39,7 @@ public class AdditionalFragment extends AdditionalBaseFragment implements String
         fragmentClasses.add(RatingFragment.class);
         fragmentClasses.add(null);
         fragmentClasses.add(SummaryFragment.class);
-        fragmentClasses.add(SettingsFragment.class);
+        fragmentClasses.add(PrefsFragment.class);
     }
 
     @Nullable

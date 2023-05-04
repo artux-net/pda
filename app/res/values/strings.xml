@@ -41,8 +41,6 @@
     <string name="action_clear_saved_images">Clear cache of images</string>
 
     <!-- Strings related to messenger -->
-    <string name="version">PDA version: %1$s</string>
-    <string name="build">Build: %1$s</string>
     <string name="action_input_login_or_email">Input your Login or Email..</string>
     <string name="action_cancel">Cancel</string>
     <string name="unable_connect">Unable to connect server</string>
@@ -206,11 +204,39 @@
     <string name="take_off">Take off</string>
     <string name="help_tab4_title">How shall we proceed then?</string>
     <string name="info">Information</string>
-    <string name="cost">Ориентировочная стоимость: %s RU</string>
+    <string name="cost">Cost: %s RU</string>
     <string name="sell_question">Вы хотите продать %s?</string>
     <string name="buy_question">Вы хотите купить %s?</string>
-    <string name="group_relation">Отношение группировок</string>
-    <string name="progress">Прогресс</string>
-    <string name="rp_chat_channel">RP</string>
+    <string name="group_relation">Group relations</string>
+    <string name="progress">Progress</string>
+    <string name="rp_chat_channel" translatable="false">RP</string>
     <string name="chatLimit">Чтобы получить доступ к чату, нужно пройти один из сюжетов.</string>
+
+
+    <string name="link_artux" translatable="false">https://artux.net/</string>
+    <string name="link_youtube" translatable="false">https://www.youtube.com/@Artux</string>
+    <string name="link_vk" translatable="false">https://vk.com/stalker_pda</string>
+    <string name="link_discord" translatable="false">https://discord.gg/qwVGfQDwWt</string>
+    <string name="discord_server">Сервер Discord</string>
+    <string name="vk_group">VK Group</string>
+    <string name="interesting">Интересное</string>
+    <string name="walk_through">Прохождение</string>
+    <string name="disable_ads">Отключить рекламу</string>
+    <string name="update_stories">Обновлять истории</string>
+    <string name="update_stories_summary">Новые версии сюжетов сразу появлятются в ПДА</string>
+    <string name="pda">PDA</string>
+    <string name="clear_all_cache">Clear all cache</string>
+    <string name="clear_all_cache_summary">Очищает весь кэш приложения</string>
+    <string name="clear_images_cache">Сбросить кэш изображений</string>
+    <string name="clear_images_cache_summary">Очищает загруженные арты из историй</string>
+    <string name="cache">Кэш</string>
+    <string name="reset_walk_through_summary">Сбрасывает прохождения, отношения и инвентарь, не изменяет опыт</string>
+    <string name="exit_story_summary">Оставляет все неизменным, появляется выбор другой истории</string>
+    <string name="youtube_channel">YouTube channel</string>
+    <string name="developers_site">Developer\'s site</string>
+    <string name="account">Account</string>
+    <string name="reset_walk_through">Reset walkthrough</string>
+    <string name="exit_story">Exit current story</string>
+    <string name="version">Version</string>
+    <string name="build">Build</string>
 </resources>

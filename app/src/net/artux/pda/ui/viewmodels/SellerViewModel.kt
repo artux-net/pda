@@ -43,7 +43,7 @@ class SellerViewModel @Inject constructor(
         quantity: Int
     ): Result<StatusModel> {
         val sellerId = seller.value!!.id
-        return repository.actionWithItem(type, uuid, sellerId, quantity)
+        return repository.actionWithItem(type, uuid, sellerId!!, quantity)
             .map { statusMapper.model(it) }
     }
 

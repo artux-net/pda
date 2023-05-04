@@ -66,9 +66,8 @@
     <string name="nickname">Прозвище</string>
     <string name="repeat_password">Повторите пароль</string>
     <string name="agreement">Нажимая кнопку \"РЕГИСТРАЦИЯ\", \nвы принимаете <font color="#f2cd34">условия пользования и соглашаетесь с получением информационно-рекламных писем.</font>.</string>
-    <string name="member_debug">Member информация</string>
-    <string name="build">Сборка: %1$s</string>
-    <string name="version">Версия ПДА: %1$s</string>
+    <string name="build">Сборка</string>
+    <string name="version">Версия</string>
     <string name="resetData">Сбросить раздел data</string>
     <string name="weight">%1$s кг</string>
     <string name="wr_message">Написать сообщение</string>
@@ -121,4 +120,27 @@
     <string name="help_tab4_title">Как тогда поступим?</string>
     <string name="friends_of">Друзья %s</string>
     <string name="chatLimit">Чтобы получить доступ к чату, нужно пройти один из сюжетов.</string>
+    <string name="discord_server">Сервер Discord</string>
+    <string name="interesting">Интересное</string>
+    <string name="walk_through">Прохождение</string>
+    <string name="disable_ads">Отключить рекламу</string>
+    <string name="update_stories">Обновлять истории</string>
+    <string name="clear_all_cache_summary">Очищает весь кэш приложения</string>
+    <string name="clear_images_cache">Сбросить кеш изображений</string>
+    <string name="clear_images_cache_summary">Очищает загруженные арты из историй</string>
+    <string name="cache">Кеш</string>
+    <string name="info">Информация</string>
+    <string name="cost">Ориентировочная стоимость: %s RU</string>
+    <string name="sell_question">Вы хотите продать %s?</string>
+    <string name="buy_question">Вы хотите купить %s?</string>
+    <string name="group_relation">Отношение группировок</string>
+    <string name="progress">Прогресс</string>
+    <string name="vk_group">Группа ПДА ВК</string>
+    <string name="youtube_channel">Канал YouTube</string>
+    <string name="developers_site">Сайт разработчиков</string>
+    <string name="account">Аккаунт</string>
+    <string name="pda">ПДА</string>
+    <string name="clear_all_cache">Сбросить весь кеш</string>
+    <string name="reset_walk_through">Сбросить прохождение</string>
+    <string name="exit_story">Выйти из текущей истории</string>
 </resources>

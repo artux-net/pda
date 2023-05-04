@@ -26,7 +26,7 @@ class ItemsViewModel @Inject constructor(
 
     fun setWearable(wearable: WearableModel) {
         viewModelScope.launch {
-            repository.setWearableItem(wearable.id)
+            repository.setWearableItem(wearable.id!!)
                 .onSuccess { status.postValue(statusMapper.model(it)) }
                 .onFailure { status.postValue(StatusModel(it)) }
             updateData()

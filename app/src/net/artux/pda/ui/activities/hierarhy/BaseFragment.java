@@ -37,4 +37,7 @@ public abstract class BaseFragment extends Fragment {
         Timber.d("Fragment %s stopped.", getClass().getName());
     }
 
+    public Class<? extends AdditionalBaseFragment> getDefaultAdditionalFragment() {
+        return defaultAdditionalFragment;
+    }
 }

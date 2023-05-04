@@ -131,7 +131,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
 
                 if (firstStory.isPresent() && firstStory.get() != storyItem && sequenceWalkthrough) {
                     StoryStateModel stateModel = dataModel.getStateByStoryId(id - 1);
-                    if (stateModel == null || !stateModel.isOver()) {
+                    if (stateModel == null || !stateModel.getOver()) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
                         builder.setTitle("Нет доступа");
                         builder.setMessage("Прохождение этой истории недоступно пока не пройдены предыдущие");
@@ -142,7 +142,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 }
 
                 StoryStateModel storyStateModel = dataModel.getStateByStoryId(id);
-                if (storyStateModel != null && storyStateModel.isOver()) {
+                if (storyStateModel != null && storyStateModel.getOver()) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
                     builder.setTitle("Нет доступа");
                     builder.setMessage("История уже пройдена, приступайте к прохождению других. " +

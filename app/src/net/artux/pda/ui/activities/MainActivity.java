@@ -105,7 +105,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
                         .setAction("Ok", view -> {
                         })
                         .show();
-                if (!statusModel.isSuccess())
+                if (!statusModel.getSuccess())
                     Timber.e(statusModel.getDescription());
             }
         }
@@ -138,7 +138,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
     }
 
     @Override
-    public void setFragment(BaseFragment fragment, boolean addToBackStack) {
+    public void setFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager()
                 .beginTransaction();
         if (addToBackStack)

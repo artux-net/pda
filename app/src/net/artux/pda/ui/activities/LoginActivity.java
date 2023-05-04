@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
         authViewModel.getStatus().observe(this, statusModel -> {
             showProgress(false);
-            if (!statusModel.isSuccess()) {
+            if (!statusModel.getSuccess()) {
                 Toast.makeText(LoginActivity.this, getString(R.string.error_login), Toast.LENGTH_LONG).show();
             }
         });
