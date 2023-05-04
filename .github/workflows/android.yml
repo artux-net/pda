@@ -2,7 +2,7 @@ name: Android Build
 
 on:
   pull_request:
-        branches: [ main ]
+    branches: [ master ]
 
 jobs:
   assemble_job:
