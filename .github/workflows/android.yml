@@ -33,7 +33,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
     
       - name: Checking lint
-        run: ./gradlew lintRelease
+        run: ./gradlew lintRelease --debug
     
       - name: Build APK
         id: build
