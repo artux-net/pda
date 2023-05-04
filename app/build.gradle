@@ -114,15 +114,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = 17
-        targetCompatibility = 17
+        sourceCompatibility = 11
+        targetCompatibility = 11
     }
 
     kotlin {
         jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
+            languageVersion.set(JavaLanguageVersion.of(11))
         }
-        jvmToolchain(17)
+        jvmToolchain(11)
     }
 
     buildFeatures {

@@ -91,7 +91,7 @@ object QuestUtil {
             val difference = oldItems.stream()
                 .filter { itemModel: ItemModel -> itemModel.id != null && itemModel.id == newItem.id && itemModel.quantity != newItem.quantity }
                 .findFirst()
-            difference.ifPresent { itemModel: ItemModel? -> itemDifferences.add(newItem.id.toString() + ":" + newItem.quantity) }
+            difference.ifPresent { itemDifferences.add(newItem.id.toString() + ":" + newItem.quantity) }
         }
         response["item"] = itemDifferences
         return response
