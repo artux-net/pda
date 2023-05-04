@@ -41,6 +41,7 @@ public interface StoryMapper {
 
     ParameterModel paramModel(ParameterDto dto);
 
+    @Mapping(target = "complete", ignore = true)
     StoryItem story(StoryDto value);
 
     List<StoryItem> stories(List<StoryDto> dtos);

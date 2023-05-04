@@ -1,7 +1,6 @@
 package net.artux.pda.model.items
 
 data class ArtifactModel(
-    var anomalyId: Int = 0,
     var health: Int = 0,
     var radio: Int = 0,
     var damage: Int = 0,

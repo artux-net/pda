@@ -17,9 +17,9 @@ data class SpawnModel(
     var condition: HashMap<String, List<String>>? = null,
 ) : Serializable {
 
-    val params: Set<String>
-        get() {
-            if (data == null) data = HashMap()
-            return data!!.keys
-        }
+    fun getParams(): Set<String> {
+        if (data == null)
+            data = HashMap()
+        return data!!.keys
+    }
 }

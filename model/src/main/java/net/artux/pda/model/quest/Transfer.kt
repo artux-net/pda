@@ -6,5 +6,4 @@ class Transfer : Serializable {
     var stage = 0
     var text: String? = null
     var condition: HashMap<String, List<String>>? = null
-    var actions: HashMap<String, List<String>>? = null
 }
