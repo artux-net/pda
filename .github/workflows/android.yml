@@ -1,9 +1,8 @@
 name: Android Build
 
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+        branches: [ main ]
 
 jobs:
   assemble_job:
@@ -22,14 +21,23 @@ jobs:
         with:
           gradlePath: app/build.gradle
           versionCode: ${{github.run_number}}
-          
-          
+        
+      - name: set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: gradle
+
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
     
+      - name: Checking lint
+        run: ./gradlew lintRelease
+    
       - name: Build APK
         id: build
-        run: ./gradlew assembleRelease  
+        run: ./gradlew clean assembleRelease  
         
       - uses: r0adkll/sign-android-release@v1
         name: Sign APK
