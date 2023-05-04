@@ -5,7 +5,7 @@ import java.io.Serializable
 class Stage : Serializable {
     var id: Int? = null
     var typeStage: Int? = null
-    var background: String? = null
+    var background: String = ""
     var title: String? = null
     var message: String? = null
     var typeMessage: Int? = null

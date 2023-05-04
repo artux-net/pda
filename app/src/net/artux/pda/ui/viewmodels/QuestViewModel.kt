@@ -242,10 +242,6 @@ class QuestViewModel @javax.inject.Inject constructor(
         }
     }
 
-    fun openMap(mapId: Int) {
-
-    }
-
     fun exitStory() {
         viewModelScope.launch {
             syncNow()
