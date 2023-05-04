@@ -214,7 +214,7 @@ dependencies {
     implementation "com.google.dagger:dagger:$dagger_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     kapt "com.google.dagger:dagger-android-processor:$dagger_version"
-    kapt "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.6.0"
+    kapt "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.4.2"
 
     implementation "com.google.dagger:hilt-android:$dagger_version"
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
