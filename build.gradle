@@ -17,8 +17,6 @@ buildscript {
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$dagger_version"
-
-        classpath 'org.ajoberstar.grgit:grgit-core:5.0.0'
     }
 
 }
@@ -54,7 +52,6 @@ project(":app") {
     dependencies {
         implementation project(":core")
         implementation project(":model")
-        //implementation project(':app:build:swagger-code-pdanetwork')
 
         api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
