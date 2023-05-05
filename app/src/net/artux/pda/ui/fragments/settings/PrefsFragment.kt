@@ -51,6 +51,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
         val clearAllCachePreference = findPreference<Preference>("clear_all_cache")
         clearAllCachePreference?.setOnPreferenceClickListener {
             questViewModel.clear()
+            Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show()
             true
         }
 
@@ -76,6 +77,10 @@ class PrefsFragment : PreferenceFragmentCompat() {
             clearSharedPreferences(requireContext().applicationContext)
             questViewModel.resetData()
             true
+        }
+
+        questViewModel.storyData.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show()
         }
 
     }

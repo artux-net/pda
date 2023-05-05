@@ -97,7 +97,6 @@
     <string name="artifact_desc">"Health: %1$s  Radio: %2$s  Damage: %3$s  Bleeding: %4$s  Thermal: %5$s  Chemical: %6$s  Endurance: %7$s  Electric: %8$s  "</string>
     <string name="detector_desc">"Type: %1$s"</string>
 
-    <string name="member_debug">Show userModel debug info</string>
     <string name="resetData">Reset data</string>
     <string name="wr_message">Write a message</string>
     <string name="okay">Okay</string>
@@ -219,19 +218,17 @@
     <string name="link_discord" translatable="false">https://discord.gg/qwVGfQDwWt</string>
     <string name="discord_server">Сервер Discord</string>
     <string name="vk_group">VK Group</string>
-    <string name="interesting">Интересное</string>
-    <string name="walk_through">Прохождение</string>
-    <string name="disable_ads">Отключить рекламу</string>
-    <string name="update_stories">Обновлять истории</string>
-    <string name="update_stories_summary">Новые версии сюжетов сразу появлятются в ПДА</string>
+    <string name="interesting">Interesting</string>
+    <string name="walk_through">Walkthrough</string>
+    <string name="disable_ads">Disable ads</string>
+    <string name="update_stories">Update stories</string>
     <string name="pda">PDA</string>
     <string name="clear_all_cache">Clear all cache</string>
     <string name="clear_all_cache_summary">Очищает весь кэш приложения</string>
     <string name="clear_images_cache">Сбросить кэш изображений</string>
     <string name="clear_images_cache_summary">Очищает загруженные арты из историй</string>
-    <string name="cache">Кэш</string>
-    <string name="reset_walk_through_summary">Сбрасывает прохождения, отношения и инвентарь, не изменяет опыт</string>
-    <string name="exit_story_summary">Оставляет все неизменным, появляется выбор другой истории</string>
+    <string name="cache">Cache</string>
+    <string name="reset_walk_through_summary">Reset all data, no changes in xp</string>
     <string name="youtube_channel">YouTube channel</string>
     <string name="developers_site">Developer\'s site</string>
     <string name="account">Account</string>
@@ -239,4 +236,8 @@
     <string name="exit_story">Exit current story</string>
     <string name="version">Version</string>
     <string name="build">Build</string>
+    <string name="support">Support</string>
+    <string name="write_to_developer">Write a suggestion to developer.</string>
+    <string name="write_to_developer_summary" >Found a bug? Let us know</string>
+    <string name="exit_story_summary">Exit only current story, let you choose another</string>
 </resources>

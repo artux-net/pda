@@ -72,7 +72,6 @@
             app:summary="@string/clear_all_cache_summary"
             app:title="@string/clear_all_cache" />
 
-
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -81,9 +80,25 @@
         app:title="@string/account">
 
         <Preference
-            app:key="sign_out"
             app:iconSpaceReserved="false"
+            app:key="sign_out"
             app:title="@string/action_sign_out" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="support_category"
+        app:title="@string/support">
+
+        <PreferenceScreen
+            app:iconSpaceReserved="false"
+            app:summary="@string/write_to_developer_summary"
+            app:title="@string/write_to_developer">
+            <intent
+                android:action="android.intent.action.SENDTO"
+                android:data="mailto:maxim@artux.net" />
+        </PreferenceScreen>
 
     </PreferenceCategory>
 
@@ -92,7 +107,7 @@
         app:title="@string/interesting">
 
         <PreferenceScreen
-            app:iconSpaceReserved="false"
+            app:icon="@drawable/logo_artux"
             app:summary="artux.net"
             app:title="@string/developers_site">
             <intent
@@ -122,9 +137,11 @@
             app:iconSpaceReserved="false"
             app:summary="discord.gg/qwVGfQDwWt"
             app:title="@string/discord_server">
+
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="@string/link_discord" />
+
         </PreferenceScreen>
 
     </PreferenceCategory>

@@ -126,9 +126,9 @@
     <string name="disable_ads">Отключить рекламу</string>
     <string name="update_stories">Обновлять истории</string>
     <string name="clear_all_cache_summary">Очищает весь кэш приложения</string>
-    <string name="clear_images_cache">Сбросить кеш изображений</string>
+    <string name="clear_images_cache">Сбросить кэш изображений</string>
     <string name="clear_images_cache_summary">Очищает загруженные арты из историй</string>
-    <string name="cache">Кеш</string>
+    <string name="cache">Кэш</string>
     <string name="info">Информация</string>
     <string name="cost">Ориентировочная стоимость: %s RU</string>
     <string name="sell_question">Вы хотите продать %s?</string>
@@ -136,11 +136,17 @@
     <string name="group_relation">Отношение группировок</string>
     <string name="progress">Прогресс</string>
     <string name="vk_group">Группа ПДА ВК</string>
+    <string name="reset_walk_through_summary">Сбрасывает прохождения, отношения и инвентарь, не изменяет опыт</string>
+    <string name="exit_story_summary">Оставляет все неизменным, появляется выбор другой истории</string>
     <string name="youtube_channel">Канал YouTube</string>
     <string name="developers_site">Сайт разработчиков</string>
     <string name="account">Аккаунт</string>
+    <string name="update_stories_summary">Новые версии сюжетов сразу появлятются в ПДА</string>
     <string name="pda">ПДА</string>
-    <string name="clear_all_cache">Сбросить весь кеш</string>
+    <string name="clear_all_cache">Сбросить весь кэш</string>
     <string name="reset_walk_through">Сбросить прохождение</string>
     <string name="exit_story">Выйти из текущей истории</string>
+    <string name="support">Поддержка</string>
+    <string name="write_to_developer">Написать разработчику</string>
+    <string name="write_to_developer_summary" >Сообщить о проблеме или предложить улучшение</string>
 </resources>
