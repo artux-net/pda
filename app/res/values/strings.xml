@@ -240,4 +240,5 @@
     <string name="write_to_developer">Write a suggestion to developer.</string>
     <string name="write_to_developer_summary" >Found a bug? Let us know</string>
     <string name="exit_story_summary">Exit only current story, let you choose another</string>
+    <string name="update_stories_summary">" "</string>
 </resources>

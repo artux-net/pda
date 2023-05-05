@@ -56,9 +56,10 @@ public class EffectsSystem extends BaseSystem {
         } else if (type == TileType.STRONG_RADIATION) {
             radiation = Radiation.STRONG;
         }
-        healthComponent.radiation(radiation.damage);
 
-        if (radiation.damage > 0)
+
+        if (radiation.damage > 0) {
+            healthComponent.radiation(radiation.damage);
             if (entity == getPlayer()) {
                 geigerTime -= deltaTime;
                 if (geigerTime < 0) {
@@ -66,6 +67,7 @@ public class EffectsSystem extends BaseSystem {
                     geigerTime += radiation.geigerTime;
                 }
             }
+        }
     }
 
     public void addEffect(Entity entity, Effect effect, int seconds) {

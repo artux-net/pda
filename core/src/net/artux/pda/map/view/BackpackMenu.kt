@@ -112,21 +112,16 @@ class BackpackMenu @Inject constructor(
         leftTable.row()
 
         armorView = DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
+        armorView.skin = userInterface.skin
         leftTable.add(armorView)
             .grow()
 
-        armorView.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                super.clicked(event, x, y)
-
-
-            }
-        })
-
         val verticalGroup = Table()
         rifleView = DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
+        rifleView.skin = userInterface.skin
         pistolView =
             DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
+        pistolView.skin = userInterface.skin
         pistolView.disableDesc()
         rifleView.disableDesc()
         armorView.disableDesc()
@@ -155,10 +150,9 @@ class BackpackMenu @Inject constructor(
         val onItemClickListener = object : OnItemClickListener {
             override fun onTap(itemModel: ItemModel) {
                 if (itemModel is MedicineModel) {
-                    val model = itemModel
-                    if (model.quantity > 0) {
-                        model.quantity = model.quantity - 1
-                        playerSystem.healthComponent.treat(itemModel as MedicineModel?)
+                    if (itemModel.quantity > 0) {
+                        itemModel.quantity = itemModel.quantity - 1
+                        playerSystem.healthComponent.treat(itemModel)
                         soundsSystem.playSound(assetManager.get("audio/sounds/person/medicine.ogg"))
                     }
                     dataRepository.update()
@@ -175,9 +169,8 @@ class BackpackMenu @Inject constructor(
                 textButtonStyle.font = titleLabelStyle.font
                 textButtonStyle.fontColor = Color.WHITE
 
-                //TODO locale
-                val btnYes = TextButton("Выбросить", textButtonStyle)
-                val btnNo = TextButton("Отменить", textButtonStyle)
+                val btnYes = TextButton(localeBundle.get("main.throw"), textButtonStyle)
+                val btnNo = TextButton(localeBundle.get("main.cancel"), textButtonStyle)
 
                 val skinDialog: Skin = userInterface.skin
                 val dialog: Dialog = object : Dialog("", skinDialog) {}

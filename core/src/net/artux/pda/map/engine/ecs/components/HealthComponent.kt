@@ -1,99 +1,122 @@
-package net.artux.pda.map.engine.ecs.components;
+package net.artux.pda.map.engine.ecs.components
 
-import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Component
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import net.artux.pda.map.DataRepository
+import net.artux.pda.model.items.ArmorModel
+import net.artux.pda.model.items.ItemType
+import net.artux.pda.model.items.MedicineModel
+import net.artux.pda.model.quest.story.StoryDataModel
 
-import net.artux.pda.model.items.MedicineModel;
+class HealthComponent : Component {
+    private var immortal = false
+    private lateinit var armorModel: ArmorModel
+    var health = 100f
+    var stamina = 100f
+        private set
+    var radiation = 0f
 
-public class HealthComponent implements Component {
-
-    private boolean immortal = false;
-
-    private Float health;
-    private Float stamina;
-    private Float radiation;
-
-    public HealthComponent() {
-        health = 100f;
-        stamina = 100f;
-        radiation = 0f;
+    constructor(dataRepository: DataRepository) {
+        CoroutineScope(Dispatchers.Unconfined).launch {
+            dataRepository.storyDataModelFlow.collect {
+                updateData(it)
+            }
+        }
     }
 
-    public void setImmortal(boolean immortal) {
-        this.immortal = immortal;
+    constructor(armorModel: ArmorModel) {
+        setArmorModel(armorModel)
     }
 
-    public float getHealth() {
-        return health;
+    private fun updateData(dataModel: StoryDataModel) {
+        val armorModel = dataModel.getEquippedWearable(ItemType.ARMOR) as ArmorModel?
+        if (armorModel != null)
+            setArmorModel(dataModel.getEquippedWearable(ItemType.ARMOR) as ArmorModel)
+        else
+            setArmorModel(ArmorModel())
     }
 
-    public float getStamina() {
-        return stamina;
+    private fun setArmorModel(armorModel: ArmorModel) {
+        this.armorModel = armorModel
     }
 
-    public float getRadiation() {
-        return radiation;
+    fun setImmortal(immortal: Boolean) {
+        this.immortal = immortal
     }
 
-    public boolean isDead() {
-        return health < 1;
+    fun isDead(): Boolean {
+        return health < 1
     }
 
-    public void setHealth(Float health) {
-        this.health = health;
+    fun psy(damage: Float) {
+        health(calculateDamage(-damage, armorModel.psyProtection))
     }
 
-    public void setRadiation(Float radiation) {
-        this.radiation = radiation;
+    fun thermal(damage: Float) {
+        health(calculateDamage(-damage, armorModel.thermalProtection))
     }
 
-    public void damage(float damage) {
-        health(-damage);
+    fun electric(damage: Float) {
+        health(calculateDamage(-damage, armorModel.electricProtection))
     }
 
-    public void health(float value) {
-        if (immortal)
-            return;
-
-        float result = health + value;
-        if (result > 0)
-            if (result > 100)
-                health = 100f;
-            else
-                health = result;
-        else health = 0f;
+    fun chemical(damage: Float) {
+        health(calculateDamage(-damage, armorModel.chemicalProtection))
     }
 
-    public void stamina(float value) {
-        float result = stamina + value;
-        if (result > 0)
-            if (result > 100)
-                stamina = 100f;
-            else
-                stamina = result;
-        else stamina = 0f;
+    private fun calculateDamage(damage: Float, protection: Float): Float {
+        var protection = protection
+        protection *= armorModel.condition / 100
+
+        val armorDamage = if (damage < 0)
+            -damage
+        else
+            damage
+
+        armorModel.condition = armorModel.condition - 0.01f * armorDamage
+
+        if (armorModel.condition > 100)
+            armorModel.condition = 100f
+        else if (armorModel.condition < 0)
+            armorModel.condition = 0f
+
+        return damage * ((100 - protection) / 100)
     }
 
-    public void radiation(float value) {
-        float result = radiation + value;
-        if (result > 0)
-            if (result > 100)
-                radiation = 100f;
-            else
-                radiation = result;
-        else radiation = 0f;
+    fun damage(damage: Float) {
+        health(calculateDamage(-damage, armorModel.damageProtection))
     }
 
-    public void treat(MedicineModel model) {
-        health(model.getHealth());
-        stamina += model.getStamina();
-        radiation(model.getRadiation());
+    fun health(value: Float) {
+        if (immortal) return
+        val result = health + value
+        health = if (result > 0) if (result > 100) 100f else result else 0f
     }
 
-    @Override
-    public String toString() {
+    fun stamina(value: Float) {
+        val result = stamina + value
+        stamina = if (result > 0) if (result > 100) 100f else result else 0f
+    }
+
+    fun radiation(damage: Float) {
+        var damage = damage
+        damage = calculateDamage(damage, armorModel.radioProtection)
+        val result = radiation + damage
+        radiation = if (result > 0) if (result > 100) 100f else result else 0f
+    }
+
+    fun treat(model: MedicineModel) {
+        health(model.health)
+        stamina += model.stamina
+        radiation(model.radiation)
+    }
+
+    override fun toString(): String {
         return "immortal=" + immortal +
                 ", health=" + health +
                 ", stamina=" + stamina +
-                ", radiation=" + radiation;
+                ", radiation=" + radiation
     }
 }

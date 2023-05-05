@@ -34,6 +34,7 @@ import net.artux.pda.map.engine.ecs.components.states.StalkerState;
 import net.artux.pda.map.engine.ecs.entities.Bodies;
 import net.artux.pda.map.engine.ecs.systems.statemachine.MessagingCodes;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
+import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
 
@@ -67,8 +68,8 @@ public class EntityBuilder {
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
                 .add(new WeaponComponent(dataRepository, assetManager))
                 .add(new MoodComponent(dataRepository.getStoryDataModel()))
-                .add(new HealthComponent())
-                .add(new PlayerComponent(dataRepository.getStoryDataModel()));
+                .add(new HealthComponent(dataRepository))
+                .add(new PlayerComponent());
     }
 
     public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {
@@ -139,7 +140,7 @@ public class EntityBuilder {
                 break;
         }
 
-        HealthComponent healthComponent = new HealthComponent();
+        HealthComponent healthComponent = new HealthComponent(new ArmorModel());
         healthComponent.setImmortal(group.getParams().contains("immortal"));
 
         StatesComponent statesComponent = new StatesComponent(entity, group.getDispatcher(), StalkerState.INITIAL, StalkerState.GUARDING);

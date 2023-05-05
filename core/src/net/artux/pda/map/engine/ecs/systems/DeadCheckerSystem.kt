@@ -68,7 +68,7 @@ class DeadCheckerSystem @Inject constructor(
             val entity = entities[i]
             val healthComponent = hm[entity]
             val bodyComponent = pm[entity]
-            if (healthComponent.isDead) {
+            if (healthComponent.isDead()) {
                 val deadEntity = Entity()
                 deadEntity.add(BodyComponent(bodyComponent.position, world))
                     .add(SpriteComponent(assetManager.get("textures/icons/entity/gray.png", Texture::class.java), 4f, 4f))
