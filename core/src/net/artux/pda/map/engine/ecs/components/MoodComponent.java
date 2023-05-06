@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class MoodComponent implements Component {
 
-    public int gandId = -1;
+    public final int gandId;
     public final Integer[] relations;
 
     public boolean player;
@@ -46,6 +46,12 @@ public class MoodComponent implements Component {
         untarget = params.contains("untarget");
         this.angryOnPlayer = params.contains("angryOnPlayer");
         this.ignorePlayer = params.contains("ignorePlayer");
+    }
+
+    public MoodComponent() {
+        gandId = -1;
+        this.relations = new Integer[]{-5, -5, -5, -5, -5, -5, -5, -5, -5};
+        this.angry = true;
     }
 
     public MoodComponent(GroupComponent groupComponent) {

@@ -59,7 +59,7 @@ public class EffectsSystem extends BaseSystem {
 
 
         if (radiation.damage > 0) {
-            healthComponent.radiation(radiation.damage);
+            healthComponent.radiationValue(radiation.damage);
             if (entity == getPlayer()) {
                 geigerTime -= deltaTime;
                 if (geigerTime < 0) {

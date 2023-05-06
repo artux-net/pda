@@ -5,12 +5,14 @@ import static com.badlogic.gdx.math.MathUtils.random;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.content.ContentGenerator;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
@@ -18,18 +20,19 @@ import net.artux.pda.map.engine.ecs.components.BulletComponent;
 import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
 import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
 import net.artux.pda.map.engine.ecs.components.GroupComponent;
-import net.artux.pda.map.engine.ecs.components.GroupTargetMovingComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
+import net.artux.pda.map.engine.ecs.components.InfightingComponent;
 import net.artux.pda.map.engine.ecs.components.LeaderComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.StalkerComponent;
 import net.artux.pda.map.engine.ecs.components.StatesComponent;
-import net.artux.pda.map.engine.ecs.components.VelocityComponent;
+import net.artux.pda.map.engine.ecs.components.TargetMovingComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
 import net.artux.pda.map.engine.ecs.components.WeaponComponent;
 import net.artux.pda.map.engine.ecs.components.effects.Effects;
 import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
+import net.artux.pda.map.engine.ecs.components.states.MutantState;
 import net.artux.pda.map.engine.ecs.components.states.StalkerState;
 import net.artux.pda.map.engine.ecs.entities.Bodies;
 import net.artux.pda.map.engine.ecs.systems.statemachine.MessagingCodes;
@@ -37,6 +40,8 @@ import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.WeaponModel;
+
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -47,13 +52,15 @@ public class EntityBuilder {
 
     private final AssetManager assetManager;
     private final ContentGenerator contentGenerator;
+    private final LocaleBundle localeBundle;
     private final Texture bulletTexture;
     private final World world;
 
     @Inject
-    public EntityBuilder(AssetManager assetManager, ContentGenerator contentGenerator, World world) {
+    public EntityBuilder(AssetManager assetManager, ContentGenerator contentGenerator, LocaleBundle localeBundle, World world) {
         this.assetManager = assetManager;
         this.contentGenerator = contentGenerator;
+        this.localeBundle = localeBundle;
         this.world = world;
 
         bulletTexture = assetManager.get("textures/icons/entity/bullet.png", Texture.class);
@@ -62,7 +69,6 @@ public class EntityBuilder {
     public Entity player(Vector2 position, DataRepository dataRepository) {
         return new Entity()
                 .add(new BodyComponent(Bodies.stalker(position, world)))
-                .add(new VelocityComponent())
                 .add(new VisionComponent())
                 .add(new Effects())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))
@@ -109,11 +115,6 @@ public class EntityBuilder {
         return new Vector2(basePosition.x + x, basePosition.y + y);
     }
 
-    public Entity createStalerGroup(Vector2 position) {
-        return null;
-    }
-
-
     public Entity createGroupStalker(Vector2 position, GroupComponent group) {
         Entity entity = new Entity();
 
@@ -149,7 +150,6 @@ public class EntityBuilder {
         entity
                 .add(new BodyComponent(Bodies.stalker(position, world)))
                 .add(new GraphMotionComponent(null))
-                .add(new VelocityComponent())
                 .add(new VisionComponent())
                 .add(new Effects())
                 .add(healthComponent)
@@ -158,39 +158,35 @@ public class EntityBuilder {
                 .add(new StalkerComponent(contentGenerator.generateName(), contentGenerator.generateAvatar(), contentGenerator.getRandomItems()))
                 .add(new WeaponComponent(w, assetManager))
                 .add(statesComponent)
-                .add(new GroupTargetMovingComponent(group))
+                .add(new TargetMovingComponent(group))
                 .add(new FogOfWarComponent());
 
         return entity;
     }
 
-    public Entity randomMutant(GroupTargetMovingComponent.Targeting targeting) {
+    public Entity randomMutant(TargetMovingComponent.Targeting targeting) {
         Entity entity = new Entity();
+        StatesComponent statesComponent = new StatesComponent(entity, new MessageDispatcher(), MutantState.INITIAL, MutantState.GUARDING);
 
-        WeaponModel w = new WeaponModel();
-        w.setSpeed(random(5, 10));
-        w.setDamage(random(3, 5));
-        w.setPrecision(random(15, 25));
-        w.setBulletQuantity(30);
+        BodyComponent bodyComponent = new BodyComponent(Bodies.mutant(targeting.getTarget(), world));
+        bodyComponent.setMovementForce(2000);
 
-        StatesComponent statesComponent = new StatesComponent(entity, null, StalkerState.INITIAL, StalkerState.GUARDING);
-
-    /*    entity.add(new BodyComponent(Bodies.stalker(targeting.getTarget(), world)))
+        MutantType randomType = MutantType.values()[random.nextInt(MutantType.values().length)];
+        entity.add(bodyComponent)
                 .add(new VisionComponent())
-                .add(new SpriteComponent(assetManager.get("textures/icons/entity/mutant.png"), 8, 8))
-                .add(new VelocityComponent())
-                .add(new HealthComponent())
+                .add(new FogOfWarComponent())
+                .add(new HealthComponent(new ArmorModel()))
                 .add(new GraphMotionComponent(null))
-                .add(new WeaponComponent(w, assetManager))
-                .add(new StalkerComponent("Мутант","textures/icons/entity/mutant.png", new ArrayList<ItemModel>()))
+                .add(randomType.getInfightingComponent())
                 .add(statesComponent)
-                .add(new MoodComponent(-1, null, Collections.singleton("angry")))
-                .add(new GroupTargetMovingComponent(targeting));*/
+                .add(new MoodComponent())
+                .add(new TargetMovingComponent(targeting))
+                .add(new StalkerComponent(localeBundle.get(randomType.getTitleId()), randomType.getAvatarId(), new ArrayList<>()))
+                .add(new SpriteComponent(assetManager.get(randomType.getIconId()), 8, 8));
 
         Gdx.app.getApplicationLogger().log("WorldSystem", "New entity created.");
         return entity;
     }
-
 
     public Entity createLeader(Vector2 pos, GroupComponent groupComponent) {
         Entity entity = createGroupStalker(pos, groupComponent);

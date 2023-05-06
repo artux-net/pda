@@ -6,13 +6,13 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.engine.ecs.components.GroupComponent;
-import net.artux.pda.map.engine.ecs.components.GroupTargetMovingComponent;
+import net.artux.pda.map.engine.ecs.components.TargetMovingComponent;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.map.SpawnModel;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class SpawnComponent implements Component, GroupTargetMovingComponent.Targeting {
+public class SpawnComponent implements Component, TargetMovingComponent.Targeting {
 
     private final SpawnModel spawnModel;
     private GroupComponent groupComponent;

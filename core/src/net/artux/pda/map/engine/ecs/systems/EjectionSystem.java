@@ -97,7 +97,7 @@ public class EjectionSystem extends EntitySystem {
                     continue;
 
                 healthComponent.health(-0.02f);
-                healthComponent.radiation(0.007f);
+                healthComponent.radiationValue(0.007f);
             }
 
     }

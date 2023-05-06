@@ -34,4 +34,25 @@ public abstract class Bodies {
         return stalker.init(position, world);
     }
 
+    public static Body mutant(Vector2 target, World world) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(target);
+
+        Body body = world.createBody(bodyDef);
+        body.setLinearDamping(2);
+        body.getMassData().mass = 100f;
+        CircleShape circle = new CircleShape();
+        circle.setRadius(3f);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = circle;
+        fixtureDef.density = 40;
+        fixtureDef.friction = 0;
+
+        body.createFixture(fixtureDef);
+
+        circle.dispose();
+        return body;
+    }
 }

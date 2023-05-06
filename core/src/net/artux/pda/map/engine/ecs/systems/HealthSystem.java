@@ -1,14 +1,12 @@
 package net.artux.pda.map.engine.ecs.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 
-import net.artux.pda.map.engine.ecs.components.ArtifactComponent;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
-import net.artux.pda.map.engine.ecs.components.player.PlayerComponent;
+import net.artux.pda.map.engine.ecs.components.PassivityComponent;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
@@ -18,29 +16,31 @@ public class HealthSystem extends BaseSystem {
 
     private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
-    @Inject
-    public HealthSystem() {
-        super(Family.all(HealthComponent.class, BodyComponent.class).get());
-    }
+    private final RenderSystem renderSystem;
 
-    @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
+    @Inject
+    public HealthSystem(RenderSystem renderSystem) {
+        super(Family.all(HealthComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
+        this.renderSystem = renderSystem;
     }
 
     @Override
     public void update(float deltaTime) {
-        super.update(deltaTime);
-        for (int i = 0; i < getEntities().size(); i++) {
-            HealthComponent healthComponent = hm.get(getEntities().get(i));
-            if (healthComponent.getRadiation() > 0){
-                healthComponent.damage(0.001f * healthComponent.getRadiation());
+        if (isPlayerActive()) {
+            HealthComponent healthComponent = hm.get(getPlayer());
+            if (healthComponent.getDamaged() > 0.1f) {
+                renderSystem.damageAccumulator += healthComponent.getDamaged();
             }
         }
+        super.update(deltaTime);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-
+        HealthComponent healthComponent = hm.get(entity);
+        healthComponent.setDamaged(0);
+        if (healthComponent.getRadiation() > 0) {
+            healthComponent.damage(0.001f * healthComponent.getRadiation());
+        }
     }
 }

@@ -17,6 +17,7 @@ class HealthComponent : Component {
     var stamina = 100f
         private set
     var radiation = 0f
+    var damaged = 0f
 
     constructor(dataRepository: DataRepository) {
         CoroutineScope(Dispatchers.Unconfined).launch {
@@ -76,6 +77,8 @@ class HealthComponent : Component {
             damage
 
         armorModel.condition = armorModel.condition - 0.01f * armorDamage
+        if (armorDamage > 0)
+            damaged += armorDamage
 
         if (armorModel.condition > 100)
             armorModel.condition = 100f
@@ -100,7 +103,7 @@ class HealthComponent : Component {
         stamina = if (result > 0) if (result > 100) 100f else result else 0f
     }
 
-    fun radiation(damage: Float) {
+    fun radiationValue(damage: Float) {
         var damage = damage
         damage = calculateDamage(damage, armorModel.radioProtection)
         val result = radiation + damage
@@ -110,7 +113,7 @@ class HealthComponent : Component {
     fun treat(model: MedicineModel) {
         health(model.health)
         stamina += model.stamina
-        radiation(model.radiation)
+        radiationValue(model.radiation)
     }
 
     override fun toString(): String {

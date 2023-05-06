@@ -7,6 +7,6 @@ data class GameMap(
     var title: String,
     var tmx: String,
     var defPos: String = "500:500",
-    var points: List<Point> = mutableListOf(),
-    var spawns: List<SpawnModel> = mutableListOf()
+    var points: List<Point>? = mutableListOf(),
+    var spawns: List<SpawnModel>? = mutableListOf()
 ) : Serializable

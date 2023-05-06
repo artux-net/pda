@@ -12,7 +12,6 @@ import net.artux.engine.pathfinding.FlatTiledNode;
 import net.artux.engine.pathfinding.TiledManhattanDistance;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
-import net.artux.pda.map.engine.ecs.components.VelocityComponent;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import javax.inject.Inject;
@@ -21,25 +20,18 @@ import javax.inject.Inject;
 public class MovementTargetingSystem extends BaseSystem {
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private final ComponentMapper<VelocityComponent> vm = ComponentMapper.getFor(VelocityComponent.class);
     private final ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
 
-    private TiledManhattanDistance<FlatTiledNode> heuristic;
-    private IndexedAStarPathFinder<FlatTiledNode> pathFinder;
-    private PathSmoother<FlatTiledNode, Vector2> pathSmoother;
-    MapOrientationSystem mapOrientationSystem;
-
-    private final float MOVEMENT_FORCE = 30f; // H per step
+    private final TiledManhattanDistance<FlatTiledNode> heuristic;
+    private final IndexedAStarPathFinder<FlatTiledNode> pathFinder;
+    private final PathSmoother<FlatTiledNode, Vector2> pathSmoother;
+    private final MapOrientationSystem mapOrientationSystem;
+    private final Vector2 tempUnit = new Vector2();
 
     @Inject
     public MovementTargetingSystem(MapOrientationSystem mapOrientationSystem) {
-        super(Family.all(VelocityComponent.class, BodyComponent.class, GraphMotionComponent.class).get());
+        super(Family.all(BodyComponent.class, GraphMotionComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
-    }
-
-    @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
 
         heuristic = mapOrientationSystem.getHeuristic();
         pathFinder = mapOrientationSystem.getPathFinder();
@@ -49,7 +41,6 @@ public class MovementTargetingSystem extends BaseSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         BodyComponent bodyComponent = pm.get(entity);
-        VelocityComponent velocityComponent = vm.get(entity);
         GraphMotionComponent targetMovingComponent = gmm.get(entity);
 
         if (targetMovingComponent.isActive()) {
@@ -89,16 +80,13 @@ public class MovementTargetingSystem extends BaseSystem {
                 }
             }
 
-            Vector2 unit = new Vector2(target.x - bodyComponent.getX(),
-                    target.y - bodyComponent.getY());
+            tempUnit.set(target.x - bodyComponent.getX(),
+                    target.y - bodyComponent.getY()).nor();
 
-            unit.scl(1 / unit.len());
-            velocityComponent.setVelocity(unit);
-
-            if (!unit.isZero()) {
+            if (!tempUnit.isZero()) {
                 bodyComponent.getBody().applyLinearImpulse(
-                        unit.x * MOVEMENT_FORCE,
-                        unit.y * MOVEMENT_FORCE,
+                        tempUnit.x * bodyComponent.getMovementForce(),
+                        tempUnit.y * bodyComponent.getMovementForce(),
                         bodyComponent.getPosition().x,
                         bodyComponent.getPosition().y,
                         true

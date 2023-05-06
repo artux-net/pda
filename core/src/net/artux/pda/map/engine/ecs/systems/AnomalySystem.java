@@ -11,7 +11,6 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.engine.utils.LocaleBundle;
@@ -120,7 +119,7 @@ public class AnomalySystem extends EntitySystem {
 
                 somebodyIsInAnomaly = true;
                 if (radiation)
-                    healthComponent.radiation(0.006f);
+                    healthComponent.radiationValue(0.006f);
 
 
                 if (!player)

@@ -16,8 +16,10 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
+import net.artux.pda.map.engine.ecs.components.ClickComponent;
 import net.artux.pda.map.engine.ecs.components.GroupComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.map.ConditionComponent;
@@ -44,14 +46,16 @@ public class EntityProcessorSystem extends EntitySystem {
     private final RenderSystem renderSystem;
     private final GangRelations gangRelations;
     private final World world;
+    private final LocaleBundle localeBundle;
 
     @Inject
-    public EntityProcessorSystem(EntityBuilder entityBuilder, AssetManager assetManager, RenderSystem renderSystem, World world) {
+    public EntityProcessorSystem(EntityBuilder entityBuilder, AssetManager assetManager, RenderSystem renderSystem, World world, LocaleBundle localeBundle) {
         super();
         this.world = world;
         builder = entityBuilder;
         this.renderSystem = renderSystem;
         this.assetManager = assetManager;
+        this.localeBundle = localeBundle;
         JsonReader reader = new JsonReader(Gdx.files.internal("config/mobs.json").reader());
         gangRelations = new Gson().fromJson(reader, GangRelations.class);
     }
@@ -108,6 +112,8 @@ public class EntityProcessorSystem extends EntitySystem {
 
         Entity leader = builder.createLeader(pos, groupComponent);
         groupComponent.addEntity(leader);
+        leader.add(new ClickComponent(10, () ->
+                renderSystem.showText(localeBundle.get(groupComponent.getGang().getTitleId()), pm.get(leader).getPosition())));
         getEngine().addEntity(leader);
 
         for (int i = 0; i < n; i++) {

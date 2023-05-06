@@ -10,6 +10,7 @@ import net.artux.pda.map.engine.ecs.systems.EffectsSystem;
 import net.artux.pda.map.engine.ecs.systems.EjectionSystem;
 import net.artux.pda.map.engine.ecs.systems.EntityProcessorSystem;
 import net.artux.pda.map.engine.ecs.systems.HealthSystem;
+import net.artux.pda.map.engine.ecs.systems.InfightingSystem;
 import net.artux.pda.map.engine.ecs.systems.MapLoggerSystem;
 import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.ecs.systems.MovementTargetingSystem;
@@ -39,6 +40,10 @@ public abstract class EngineSystemsModule {
     @IntoSet
     @Binds
     public abstract EntitySystem clicksSystem(ClicksSystem clicksSystem);
+
+    @IntoSet
+    @Binds
+    public abstract EntitySystem infightingSystem(InfightingSystem infightingSystem);
 
     @IntoSet
     @Binds

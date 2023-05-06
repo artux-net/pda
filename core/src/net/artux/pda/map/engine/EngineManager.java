@@ -20,6 +20,7 @@ import net.artux.pda.map.content.QuestPointsHelper;
 import net.artux.pda.map.content.RandomSpawnerHelper;
 import net.artux.pda.map.content.SecretHelper;
 import net.artux.pda.map.content.entities.EntityBuilder;
+import net.artux.pda.map.engine.ecs.components.TargetMovingComponent;
 import net.artux.pda.map.engine.ecs.systems.Drawable;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
@@ -57,8 +58,14 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
         EntityBuilder entityBuilder = mapComponent.getEntityBuilder();
         Entity player = entityBuilder.player(Mappers.vector2(map.getDefPos()), dataRepository);
-        engine.addEntity(player);
 
+        engine.addEntity(player);
+        engine.addEntity(entityBuilder.randomMutant(new TargetMovingComponent.Targeting() {
+            @Override
+            public Vector2 getTarget() {
+                return new Vector2(500, 1000);
+            }
+        }));
         if (controlPoints)
             ControlPointsHelper.createControlPointsEntities(mapComponent);
         if (questPoints)

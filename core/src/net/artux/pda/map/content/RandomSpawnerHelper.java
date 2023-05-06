@@ -1,5 +1,7 @@
 package net.artux.pda.map.content;
 
+import static com.badlogic.gdx.math.MathUtils.random;
+
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -16,7 +18,6 @@ import net.artux.pda.map.engine.ecs.systems.EntityProcessorSystem;
 import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem;
 import net.artux.pda.map.engine.ecs.systems.SpawnSystem;
 import net.artux.pda.map.engine.ecs.systems.TimerSystem;
-import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.utils.di.components.MapComponent;
 
 import java.util.Properties;
@@ -57,8 +58,12 @@ public class RandomSpawnerHelper {
         });
 
         float singleFreq = Float.parseFloat((String) properties.get(PropertyFields.SINGLE_BOT_FREQ));
-        timerSystem.addTimerAction(singleFreq, () -> entityProcessorSystem
-                .addEntity(entityBuilder.randomMutant(mapOrientationSystem::getRandomFreePoint)));
+        timerSystem.addTimerAction(singleFreq, () -> {
+            for (int i = 0; i < random(4, 5); i++) {
+                entityProcessorSystem
+                        .addEntity(entityBuilder.randomMutant(mapOrientationSystem::getRandomFreePoint));
+            }
+        });
     }
 
 }

@@ -12,15 +12,13 @@ import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
-import net.artux.pda.map.engine.ecs.components.TargetMovingComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.StatesComponent;
+import net.artux.pda.map.engine.ecs.components.TargetMovingComponent;
 import net.artux.pda.map.engine.ecs.components.VisionComponent;
-import net.artux.pda.map.engine.ecs.components.WeaponComponent;
-import net.artux.pda.model.items.WeaponModel;
 
-public enum StalkerState implements State<Entity> {
+public enum MutantState implements State<Entity> {
 
     INITIAL() {
         @Override
@@ -82,7 +80,6 @@ public enum StalkerState implements State<Entity> {
         public void update(Entity entity) {
             MoodComponent moodComponent = mm.get(entity);
             StatesComponent statesComponent = sm.get(entity);
-            VisionComponent visionComponent = visionMapper.get(entity);
 
             if (moodComponent.hasEnemy()) {
                 Entity enemy = moodComponent.getEnemy();
@@ -92,31 +89,14 @@ public enum StalkerState implements State<Entity> {
                     return;
                 }
 
-                WeaponComponent weaponComponent = wm.get(entity);
+                Vector2 enemyBodyComponent = pm.get(enemy).getPosition();
+                Vector2 entityBodyComponent = pm.get(entity).getPosition();
 
-                if (weaponComponent.getSelected() != null) {
-                    WeaponModel weaponModel = weaponComponent.getSelected();
-                    Vector2 enemyBodyComponent = pm.get(enemy).getPosition();
-                    Vector2 entityBodyComponent = pm.get(entity).getPosition();
-
-                    float dst = entityBodyComponent.dst(enemyBodyComponent);
-                    if (dst > 200) {
-                        moodComponent.setEnemy(null);
-                        return;
-                    }
-
-                    if (!visionComponent.isSeeing(enemy)
-                            || dst > distanceToAttack(weaponModel.getPrecision())) {
-                        gmm.get(entity).setMovementTarget(enemyBodyComponent);
-                    } else if (dst > 20 && dst < distanceToAttack(weaponModel.getPrecision())) {
-                        gmm.get(entity).setMovementTarget(null);
-                    } else {
-                        //движение в обратном направлении, слишком близко подошли
-                        Vector2 diff = enemyBodyComponent.cpy().sub(entityBodyComponent);
-                        diff.scl(-1);
-                        gmm.get(entity).setMovementTarget(diff.add(entityBodyComponent));
-                    }
-                }
+                float dst = entityBodyComponent.dst(enemyBodyComponent);
+                if (dst > 200) {
+                    moodComponent.setEnemy(null);
+                } else
+                    gmm.get(entity).setMovementTarget(enemyBodyComponent);
             } else {
                 moodComponent.setEnemy(null);
                 statesComponent.setGlobalState(GUARDING);
@@ -158,10 +138,6 @@ public enum StalkerState implements State<Entity> {
         }
     };
 
-    public float distanceToAttack(float precision) {
-        return precision * 3;
-    }
-
     protected final ComponentMapper<StatesComponent> sm = ComponentMapper.getFor(StatesComponent.class);
     protected final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
     protected final ComponentMapper<VisionComponent> visionMapper = ComponentMapper.getFor(VisionComponent.class);
@@ -169,7 +145,6 @@ public enum StalkerState implements State<Entity> {
     protected final ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
     protected final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     protected final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
-    protected final ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
 
     @Override
     public void enter(Entity entity) {

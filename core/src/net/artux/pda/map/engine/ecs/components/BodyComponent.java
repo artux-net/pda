@@ -12,6 +12,8 @@ public class BodyComponent implements Component {
 
     public final Body body;
 
+    private float MOVEMENT_FORCE = 30f; // H per step
+
     public BodyComponent(BodyBuilder bodyBuilder, Vector2 position, World world) {
         this.body = bodyBuilder.init(position, world);
     }
@@ -60,5 +62,14 @@ public class BodyComponent implements Component {
     public BodyComponent impulse(float x, float y) {
         body.applyForceToCenter(x, y, true);
         return this;
+    }
+
+
+    public float getMovementForce() {
+        return MOVEMENT_FORCE;
+    }
+
+    public void setMovementForce(float value) {
+        MOVEMENT_FORCE = value;
     }
 }

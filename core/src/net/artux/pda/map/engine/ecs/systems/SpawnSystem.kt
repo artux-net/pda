@@ -17,7 +17,7 @@ import javax.inject.Inject
 @PerGameMap
 class SpawnSystem @Inject constructor(private val dataRepository: DataRepository) : IteratingSystem(
     Family.all(
-        VisionComponent::class.java, BodyComponent::class.java, VelocityComponent::class.java
+        VisionComponent::class.java, BodyComponent::class.java
     ).exclude(
         PassivityComponent::class.java
     ).get()
@@ -39,7 +39,7 @@ class SpawnSystem @Inject constructor(private val dataRepository: DataRepository
         spawns = engine.getEntitiesFor(
             Family
                 .all(SpawnComponent::class.java, BodyComponent::class.java)
-                .exclude(PassivityComponent::class.java, VelocityComponent::class.java)
+                .exclude(PassivityComponent::class.java)
                 .get()
         )
         val groupFamily = Family.all(GroupComponent::class.java, BodyComponent::class.java).get()

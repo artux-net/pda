@@ -192,16 +192,17 @@ class MissionsSystem @Inject constructor(
     private fun getRequiredMap(chapter: Int, stage: Int): GameMap? {
         val storyModel = dataRepository.storyModel
         for (map in storyModel.maps.values) {
-            for (point in map.points) {
-                val currentData: Map<String, String> = point.data
-                val chapterString = currentData["chapter"]
-                val stageString = currentData["stage"]
-                if (chapterString != null && stageString != null) {
-                    val stageId = stageString.toInt()
-                    val chapterId = chapterString.toInt()
-                    if (chapterId == chapter && stageId == stage) return map
+            if (map.points != null)
+                for (point in map.points!!) {
+                    val currentData: Map<String, String> = point.data
+                    val chapterString = currentData["chapter"]
+                    val stageString = currentData["stage"]
+                    if (chapterString != null && stageString != null) {
+                        val stageId = stageString.toInt()
+                        val chapterId = chapterString.toInt()
+                        if (chapterId == chapter && stageId == stage) return map
+                    }
                 }
-            }
         }
         return null
     }
@@ -211,7 +212,7 @@ class MissionsSystem @Inject constructor(
         val mapDigraph = Digraph<GameMap>()
         for (map in storyModel.maps.values) {
             val node = mapDigraph.offer(map)
-            for (point in map.points) {
+            for (point in map.points!!) {
                 if (point.type == 7) {
                     val currentData: HashMap<String, String>? = point.data
                     val chapterString = currentData?.get("chapter")

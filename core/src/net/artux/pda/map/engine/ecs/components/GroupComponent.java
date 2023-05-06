@@ -21,7 +21,7 @@ public class GroupComponent implements Component {
     private final MessageDispatcher dispatcher;
     private final Array<Entity> entities;
     private final Strength strength;
-    private GroupTargetMovingComponent.Targeting targeting;
+    private TargetMovingComponent.Targeting targeting;
     private final Set<String> params;
 
     public GroupComponent(Gang gang, Integer[] relations, Strength strength, Set<String> params) {
@@ -38,7 +38,7 @@ public class GroupComponent implements Component {
         return params;
     }
 
-    public void setTargeting(GroupTargetMovingComponent.Targeting targeting) {
+    public void setTargeting(TargetMovingComponent.Targeting targeting) {
         this.targeting = targeting;
     }
 
@@ -81,7 +81,7 @@ public class GroupComponent implements Component {
         return dispatcher;
     }
 
-    public GroupTargetMovingComponent.Targeting getTargeting() {
+    public TargetMovingComponent.Targeting getTargeting() {
         return targeting;
     }
 

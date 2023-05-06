@@ -57,7 +57,8 @@ public class RenderSystem extends BaseSystem implements Drawable {
     private final EnumMap<RelationType, Sprite> relationalSprites;
     private final EnumMap<RelationType, Sprite> relationalLeaderSprites;
     private final PostProcessing.ShaderGroup blurGroup;
-    private final PostProcessing.ShaderGroup redGroup;
+    private final PostProcessing.ShaderGroup redEjectGroup;
+    private final PostProcessing.ShaderGroup redDamageGroup;
 
     public static boolean showAll = false;
 
@@ -82,7 +83,7 @@ public class RenderSystem extends BaseSystem implements Drawable {
         Sprite greenStarSprite = new Sprite(assetManager.get("textures/icons/entity/star-green.png", Texture.class));
 
         Consumer<Sprite> spriteConsumer = sprite -> {
-            sprite.setSize(8,8);
+            sprite.setSize(8, 8);
             sprite.setOriginCenter();
         };
 
@@ -111,14 +112,26 @@ public class RenderSystem extends BaseSystem implements Drawable {
                         })));
 
         shaderProgram = assetManager.get("shaders/red.frag");
-        redGroup = postProcessing.loadShaderGroup("red",
+        redEjectGroup = postProcessing.loadShaderGroup("red",
                 List.of(Pair.of(shaderProgram, shaderProgram1 -> {
                     shaderProgram1.setUniformf("red_value",
                             (float) Math.sin(redEffectAccumulator += 0.005f));
                 })));
+
+        redDamageGroup = postProcessing.loadShaderGroup("redDamage",
+                List.of(Pair.of(shaderProgram, shaderProgram1 -> {
+                    if (damageAccumulator > 3) {
+                        shaderProgram1.setUniformf("red_value", 1);
+                        damageAccumulator = 3;
+                    }
+                    else if (damageAccumulator < 0)
+                        shaderProgram1.setUniformf("red_value", 0);
+                    else shaderProgram1.setUniformf("red_value", damageAccumulator / 3f);
+                })));
     }
 
     float redEffectAccumulator = 0;
+    float damageAccumulator = 0;
 
     @Override
     public void addedToEngine(Engine engine) {
@@ -162,6 +175,9 @@ public class RenderSystem extends BaseSystem implements Drawable {
         if (redEffect > 0) {
             redEffect -= deltaTime;
         }
+        if (damageAccumulator > 0) {
+            damageAccumulator -= deltaTime;
+        }
     }
 
     @Override
@@ -204,8 +220,8 @@ public class RenderSystem extends BaseSystem implements Drawable {
             batch.setColor(Color.WHITE);
         }
         blurGroup.setEnabled(blurEffect > 0);
-        redGroup.setEnabled(redEffect > 0);
-
+        redEjectGroup.setEnabled(redEffect > 0);
+        redDamageGroup.setEnabled(damageAccumulator > 0);
     }
 
     float redEffect = 0;
