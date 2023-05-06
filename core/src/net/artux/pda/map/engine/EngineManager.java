@@ -60,12 +60,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         Entity player = entityBuilder.player(Mappers.vector2(map.getDefPos()), dataRepository);
 
         engine.addEntity(player);
-        engine.addEntity(entityBuilder.randomMutant(new TargetMovingComponent.Targeting() {
-            @Override
-            public Vector2 getTarget() {
-                return new Vector2(500, 1000);
-            }
-        }));
+
         if (controlPoints)
             ControlPointsHelper.createControlPointsEntities(mapComponent);
         if (questPoints)

@@ -21,7 +21,6 @@ import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
 import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
 import net.artux.pda.map.engine.ecs.components.GroupComponent;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
-import net.artux.pda.map.engine.ecs.components.InfightingComponent;
 import net.artux.pda.map.engine.ecs.components.LeaderComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
