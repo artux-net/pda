@@ -164,13 +164,6 @@ public class HeaderInterfaceModule {
                 }
             }, PlayerMovingSystem.Companion.getSpeedup());
 
-            debugMenu.addCheckBox("Вертикальная синхронизация", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    Gdx.graphics.setVSync(((CheckBox) actor).isChecked());
-                }
-            }, true);
-
             debugMenu.addCheckBox("Вечный бег", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -178,14 +171,7 @@ public class HeaderInterfaceModule {
                 }
             }, PlayerMovingSystem.Companion.getAlwaysRun());
 
-            debugMenu.addCheckBox("Учитывать столкновения", new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    PlayerMovingSystem.Companion.setPlayerWalls(((CheckBox) actor).isChecked());
-                }
-            }, PlayerMovingSystem.Companion.getPlayerWalls());
-
-            debugMenu.addCheckBox("Отобразить стены игрока", new ChangeListener() {
+            debugMenu.addCheckBox("Отобразить стены", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
                     MapLoggerSystem.showPlayerWalls = ((CheckBox) actor).isChecked();

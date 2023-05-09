@@ -11,8 +11,7 @@ import net.artux.pda.map.engine.ecs.systems.BaseSystem;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
 
 import javax.inject.Inject;
 
@@ -26,7 +25,7 @@ public class InteractionSystem extends BaseSystem {
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<InteractiveComponent> im = ComponentMapper.getFor(InteractiveComponent.class);
-    private final Set<InteractiveComponent> interactiveComponents = new HashSet<>();
+    private final HashMap<InteractiveComponent.Type, InteractiveComponent> interactiveComponents = new HashMap<>();
 
     @Override
     public void update(float deltaTime) {
@@ -41,7 +40,7 @@ public class InteractionSystem extends BaseSystem {
 
             if (playerBodyComponent.getPosition().dst(bodyComponent.getPosition()) < 35f) {
                 if (interactiveComponent.type != InteractiveComponent.Type.ACTION) {
-                    interactiveComponents.add(interactiveComponent);
+                    interactiveComponents.put(interactiveComponent.type, interactiveComponent);
                 } else {
                     setProcessing(false);
                     interactiveComponent.interact();
@@ -55,7 +54,7 @@ public class InteractionSystem extends BaseSystem {
     }
 
     public Collection<InteractiveComponent> getInteractiveComponents() {
-        return interactiveComponents;
+        return interactiveComponents.values();
     }
 
 }

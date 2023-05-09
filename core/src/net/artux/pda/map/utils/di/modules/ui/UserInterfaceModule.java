@@ -111,41 +111,42 @@ public class UserInterfaceModule {
                 Collection<InteractiveComponent> components = interactionSystem.getInteractiveComponents();
                 removeActors(horizontalGroup, components.stream().map(InteractiveComponent::getTitle).collect(Collectors.toList()));
                 for (InteractiveComponent component : components) {
-                    if (horizontalGroup.findActor(component.title) == null) {
-                        String icon;
-                        switch (component.type) {
-                            case FINDING:
-                                icon = "textures/ui/icons/icon_search.png";
-                                break;
-                            case TRANSFER:
-                                icon = "textures/ui/icons/ic_transfer.png";
-                                break;
-                            default:
-                                icon = "textures/ui/icons/icon_dialog.png";
-                                break;
-                        }
-
-                        TextureRegion textureRegion = new TextureRegion(assetManager.get(icon, Texture.class));
-                        float pad = textureRegion.getRegionHeight() * 0.15f;
-
-                        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-                        style.up = new TextureRegionDrawable(assetManager.get("textures/ui/buttonBack.png", Texture.class));
-                        style.imageUp = new TextureRegionDrawable(textureRegion);
-
-                        ImageButton button = new ImageButton(style);
-                        button.pad(pad);
-                        button.setName(component.title);
-                        button.addListener(new ClickListener() {
-                            @Override
-                            public void clicked(InputEvent event, float x, float y) {
-                                super.clicked(event, x, y);
-                                component.listener.interact();
-                            }
-                        });
-
-                        horizontalGroup
-                                .addActor(button);
+                    if (horizontalGroup.findActor(component.title) != null)
+                        continue;
+                    String icon;
+                    switch (component.type) {
+                        case FINDING:
+                            icon = "textures/ui/icons/icon_search.png";
+                            break;
+                        case TRANSFER:
+                            icon = "textures/ui/icons/ic_transfer.png";
+                            break;
+                        default:
+                            icon = "textures/ui/icons/icon_dialog.png";
+                            break;
                     }
+
+                    TextureRegion textureRegion = new TextureRegion(assetManager.get(icon, Texture.class));
+                    float pad = textureRegion.getRegionHeight() * 0.15f;
+
+                    ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+                    style.up = new TextureRegionDrawable(assetManager.get("textures/ui/buttonBack.png", Texture.class));
+                    style.imageUp = new TextureRegionDrawable(textureRegion);
+
+                    ImageButton button = new ImageButton(style);
+                    button.pad(pad);
+                    button.setName(component.title);
+                    button.addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            super.clicked(event, x, y);
+                            component.listener.interact();
+                        }
+                    });
+
+                    horizontalGroup
+                            .addActor(button);
+
                 }
                 return false;
             }

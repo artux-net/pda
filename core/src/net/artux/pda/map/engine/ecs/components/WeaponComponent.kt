@@ -68,8 +68,11 @@ class WeaponComponent : Component {
             val sounds = weaponModel.sounds
             if (sounds != null) {
                 val type = weaponModel.type.name.lowercase()
-                reloadSoundName = prefix + type + "/" + sounds.reload
-                shotSoundName = prefix + type + "/" + sounds.shot
+                if (!sounds.reload.isNullOrBlank())
+                    reloadSoundName = prefix + type + "/" + sounds.reload
+
+                if (!sounds.shot.isNullOrBlank())
+                    shotSoundName = prefix + type + "/" + sounds.shot
             }
             shotSound = assetManager.get(shotSoundName)
             reloadSound = assetManager.get(reloadSoundName)
@@ -90,9 +93,9 @@ class WeaponComponent : Component {
 
     var type = ItemType.RIFLE
 
-    fun updateWeapon(){
+    fun updateWeapon() {
         setWeaponModel(dataModel.getEquippedWearable(type) as WeaponModel?)
-        if(selected == null) {
+        if (selected == null) {
             type = if (type === ItemType.RIFLE) ItemType.PISTOL else ItemType.RIFLE
             setWeaponModel(dataModel.getEquippedWearable(type) as WeaponModel?)
         }
