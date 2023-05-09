@@ -1,5 +1,6 @@
 package net.artux.pda.ui.fragments.profile
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -79,9 +80,10 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             val currentRang = StoryDataModel.getRang(model.xp)
             val nextRang = currentRang.nextRang
 
-            binding.currentRangTextView.text = ProfileHelper.getRangTitleById(currentRang.id, view.context)
+            binding.currentRangTextView.text =
+                ProfileHelper.getRangTitleById(currentRang.id, view.context)
             binding.xpProgressBar.min = currentRang.xp
-            if(nextRang != null) {
+            if (nextRang != null) {
                 binding.nextRangTextView.text =
                     ProfileHelper.getRangTitleById(nextRang.id, view.context)
                 binding.xpProgressBar.max = nextRang.xp
@@ -146,7 +148,15 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             }*/
         }
         if (arguments != null)
-            profileViewModel.updateProfile(requireArguments().getSerializable("pdaId") as UUID)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                profileViewModel.updateProfile(
+                    requireArguments().getSerializable(
+                        "pdaId",
+                        UUID::class.java
+                    )
+                )
+            } else
+                profileViewModel.updateProfile(requireArguments().getSerializable("pdaId") as UUID)
         else
             profileViewModel.updateProfile(viewModel.getId())
     }

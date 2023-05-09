@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
-import net.artux.engine.resource.types.NetFile;
+import net.artux.engine.resource.types.NetTexture;
 
 public class LazyImage extends Image {
 
@@ -33,7 +33,7 @@ public class LazyImage extends Image {
         } else {
             if (filename.contains("http")) {
                 netFile = true;
-                assetManager.load(filename, NetFile.class);
+                assetManager.load(filename, NetTexture.class);
             }else {
                 FileHandle fileHandle = assetManager.getFileHandleResolver().resolve(filename);
                 if (fileHandle.exists()) {
@@ -52,7 +52,7 @@ public class LazyImage extends Image {
             if (!netFile)
                 setDrawable(new TextureRegionDrawable(assetManager.get(filename, Texture.class)));
             else
-                setDrawable(new TextureRegionDrawable((Texture) assetManager.get(filename, NetFile.class).file));
+                setDrawable(new TextureRegionDrawable((Texture) assetManager.get(filename, NetTexture.class).file));
         }
     }
 }

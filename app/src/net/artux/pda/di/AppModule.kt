@@ -55,12 +55,15 @@ class AppModule {
 
     private class CrashReportingTree : Timber.Tree() {
         override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-            var message = message
             if (priority == Log.VERBOSE || priority == Log.DEBUG) {
                 return
             }
-            if (tag != null) message = "$tag : $message"
-            FirebaseCrashlytics.getInstance().log(message)
+            val finalMessage = if (tag != null && tag.isNotBlank())
+                "$tag : $message"
+            else
+                message
+
+            FirebaseCrashlytics.getInstance().log(finalMessage)
             if (t != null && !BuildConfig.DEBUG) {
                 FirebaseCrashlytics.getInstance().recordException(t)
                 t.printStackTrace()

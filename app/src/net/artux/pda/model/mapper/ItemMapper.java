@@ -1,5 +1,8 @@
 package net.artux.pda.model.mapper;
 
+import static org.mapstruct.NullValueMappingStrategy.RETURN_DEFAULT;
+
+import net.artux.pda.model.items.DetectorModel;
 import net.artux.pda.model.items.ItemType;
 import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pdanetwork.model.ArmorDto;
@@ -11,12 +14,16 @@ import net.artux.pdanetwork.model.MedicineDto;
 import net.artux.pdanetwork.model.WeaponDto;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(nullValueMappingStrategy = RETURN_DEFAULT)
 public interface ItemMapper {
 
     ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
+
+    @Mapping(target = "copy", ignore = true)
+    DetectorModel model(DetectorDto dto);
 
     ItemsContainerModel model(ItemsContainer itemsContainer);
 

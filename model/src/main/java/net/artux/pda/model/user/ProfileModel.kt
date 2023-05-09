@@ -16,8 +16,6 @@ class ProfileModel {
     var gang: Gang? = null
     var relations: GangRelation? = null
     var achievements = 0
-    var friendStatus = 0
-
     /*
     0 - is not friend
     1 - friend
@@ -27,7 +25,7 @@ class ProfileModel {
     var friends = 0
     var subs = 0
 
-    constructor() {}
+    constructor()
     constructor(userModel: UserModel) {
         login = userModel.login
         name = userModel.name

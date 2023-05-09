@@ -7,7 +7,6 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
@@ -15,7 +14,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 
 import net.artux.engine.resource.loaders.LocaleBundleLoader;
 import net.artux.engine.resource.loaders.NetTextureAssetLoader;
-import net.artux.engine.resource.types.NetFile;
+import net.artux.engine.resource.types.NetTexture;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.view.FontManager;
 
@@ -75,7 +74,7 @@ public class AssetsFinder implements Disposable {
             sounds = assetManager.getFileHandleResolver().resolve("audio/music");
             loadRecursively(assetManager, sounds, true, Music.class);
 
-            assetManager.setLoader(NetFile.class, new NetTextureAssetLoader(properties));
+            assetManager.setLoader(NetTexture.class, new NetTextureAssetLoader(properties));
             assetManager.setLoader(LocaleBundle.class, new LocaleBundleLoader(assetManager.getFileHandleResolver()));
             assetManager.load("locale/ui.properties", LocaleBundle.class);
         } else {

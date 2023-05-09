@@ -67,10 +67,6 @@ class UserViewModel @Inject constructor(
         userRepository.clearMemberCache()
     }
 
-    fun requestFriend(uid: UUID) {
-        //todo
-    }
-
     fun isChatAllowed(): Boolean {
         val userModel: UserModel? = getFromCache()
         val atLeastOneOver = storyData.value?.storyStates?.any { it.over } ?: false

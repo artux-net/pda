@@ -64,6 +64,10 @@ public class ItemsGenerator {
                 }
             }
 
+        } else {
+            ItemModel bullet = generateByRang(allItems.getBullets());
+            if (bullet != null) bullet.setQuantity(random(1, 15));
+            items.add(bullet);
         }
         items.removeIf(Objects::isNull);
         items.forEach(item -> item = SerializationUtils.clone(item));
@@ -83,6 +87,9 @@ public class ItemsGenerator {
         int lastIndex = itemModels.size() - 1;
         if (xp < maxXp) {
             lastIndex = (int) (((xp / maxXp) + plusK) * lastIndex);
+        }
+        if (random() > 0.2f) {
+            lastIndex += random(1, 2);
         }
         if (lastIndex < 0)
             lastIndex = 0;

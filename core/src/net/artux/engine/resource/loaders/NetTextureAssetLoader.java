@@ -13,12 +13,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.utils.Array;
 
-import net.artux.engine.resource.types.NetFile;
+import net.artux.engine.resource.types.NetTexture;
 import net.artux.pda.common.PropertyFields;
 
 import java.util.Properties;
 
-public class NetTextureAssetLoader extends AsynchronousAssetLoader<NetFile, NetTextureAssetLoader.TextureParameter> {
+public class NetTextureAssetLoader extends AsynchronousAssetLoader<NetTexture, NetTextureAssetLoader.TextureParameter> {
 
     private final static String TAG = "NETLoader";
 
@@ -106,7 +106,7 @@ public class NetTextureAssetLoader extends AsynchronousAssetLoader<NetFile, NetT
     }
 
     @Override
-    public NetFile loadSync(AssetManager manager, String fileName, FileHandle file, TextureParameter parameter) {
+    public NetTexture loadSync(AssetManager manager, String fileName, FileHandle file, TextureParameter parameter) {
 
         if (info == null) return null;
         Texture texture = info.texture;
@@ -119,7 +119,7 @@ public class NetTextureAssetLoader extends AsynchronousAssetLoader<NetFile, NetT
             texture.setFilter(parameter.minFilter, parameter.magFilter);
             texture.setWrap(parameter.wrapU, parameter.wrapV);
         }
-        return new NetFile(texture);
+        return new NetTexture(texture);
 
     }
 
@@ -136,7 +136,7 @@ public class NetTextureAssetLoader extends AsynchronousAssetLoader<NetFile, NetT
 
     TextureLoaderInfo info = new TextureLoaderInfo();
 
-    static public class TextureParameter extends AssetLoaderParameters<NetFile> {
+    static public class TextureParameter extends AssetLoaderParameters<NetTexture> {
         /**
          * the format of the final Texture. Uses the source images format if null
          **/

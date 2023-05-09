@@ -28,16 +28,17 @@ class ProfileViewModel @Inject constructor(
         return response.map { userMapper.model(it) }
     }
 
-    fun updateProfile(pdaId: UUID) {
-        viewModelScope.launch {
-            userRepository.getProfile(pdaId)
-                .map { userMapper.model(it) }
-                .onSuccess {
-                    it.id = pdaId
-                    profile.postValue(it)
-                }
-                .onFailure { status.postValue(StatusModel(it)) }
-        }
+    fun updateProfile(uuid: UUID?) {
+        if (uuid != null)
+            viewModelScope.launch {
+                userRepository.getProfile(uuid)
+                    .map { userMapper.model(it) }
+                    .onSuccess {
+                        it.id = uuid
+                        profile.postValue(it)
+                    }
+                    .onFailure { status.postValue(StatusModel(it)) }
+            }
     }
 
     fun getId(): UUID {

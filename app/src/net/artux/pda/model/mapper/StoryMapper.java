@@ -1,5 +1,7 @@
 package net.artux.pda.model.mapper;
 
+import static org.mapstruct.NullValueMappingStrategy.RETURN_DEFAULT;
+
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.Point;
 import net.artux.pda.model.map.SpawnModel;
@@ -28,7 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-@Mapper(uses = {ItemMapper.class, UserMapper.class})
+@Mapper(uses = {ItemMapper.class, UserMapper.class}, nullValueMappingStrategy = RETURN_DEFAULT)
 public interface StoryMapper {
 
     StoryMapper INSTANCE = Mappers.getMapper(StoryMapper.class);
@@ -37,6 +39,7 @@ public interface StoryMapper {
 
     @Mapping(target = "parametersMap", ignore = true)
     @Mapping(target = "allItems", ignore = true)
+    @Mapping(target = "currentWearable", ignore = true)
     StoryDataModel dataModel(StoryData storyData);
 
     ParameterModel paramModel(ParameterDto dto);
@@ -51,6 +54,7 @@ public interface StoryMapper {
     Point point(net.artux.pdanetwork.model.Point point);
     List<Point> points(List<net.artux.pdanetwork.model.Point> point);
 
+    @Mapping(target = "params", ignore = true)
     SpawnModel spawn(Spawn spawn);
     List<SpawnModel> spawns(List<Spawn> spawn);
 

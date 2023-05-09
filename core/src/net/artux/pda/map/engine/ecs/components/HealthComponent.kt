@@ -67,9 +67,8 @@ class HealthComponent : Component {
         health(calculateDamage(-damage, armorModel.chemicalProtection))
     }
 
-    private fun calculateDamage(damage: Float, protection: Float): Float {
-        var protection = protection
-        protection *= armorModel.condition / 100
+    private fun calculateDamage(damage: Float, inputProtection: Float): Float {
+        val protection = inputProtection * armorModel.condition / 100
 
         val armorDamage = if (damage < 0)
             -damage
@@ -103,9 +102,8 @@ class HealthComponent : Component {
         stamina = if (result > 0) if (result > 100) 100f else result else 0f
     }
 
-    fun radiationValue(damage: Float) {
-        var damage = damage
-        damage = calculateDamage(damage, armorModel.radioProtection)
+    fun radiationValue(inputDamage: Float) {
+        val damage = calculateDamage(inputDamage, armorModel.radioProtection)
         val result = radiation + damage
         radiation = if (result > 0) if (result > 100) 100f else result else 0f
     }
