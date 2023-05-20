@@ -1,8 +1,11 @@
 package net.artux.pda.app;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.google.firebase.FirebaseApp;
+import com.yandex.mobile.ads.common.InitializationListener;
+import com.yandex.mobile.ads.common.MobileAds;
 
 import net.artux.pda.R;
 import net.artux.pda.common.PropertyFields;
@@ -46,6 +49,7 @@ public class PDAApplication extends Application {
             Timber.i("%s planted", tree.getClass().getSimpleName());
         }
         Timber.i("App started.");
+        MobileAds.initialize(this, () -> Timber.i("Mobile ADS SDK initialized"));
         URLHelper.init(properties);
     }
 

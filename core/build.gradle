@@ -1,18 +1,20 @@
 plugins{
     id "java"
-    id 'kotlin'
+    id "kotlin"
     id "kotlin-kapt"
+    //id "gdx"
 }
 
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation "org.apache.commons:commons-lang3:3.12.0"
+    implementation 'org.int4.dirk:dirk-di:1.0.0-beta1'
 }
 
 sourceCompatibility = 1.8
 java.targetCompatibility = JavaVersion.VERSION_1_8
 
 sourceSets.main.java.srcDirs = [ "src/" ]
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+[compileJava, compileTestJava]*.options*.encoding = "UTF-8"
 

@@ -10,10 +10,16 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import net.artux.engine.di.System;
 import net.artux.pda.map.utils.MapInfo;
 import net.artux.pda.map.engine.ecs.entities.MapBodyBuilder;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.map.GameMap;
+
+import org.int4.dirk.di.Injectors;
+import org.int4.dirk.library.SingletonScopeResolver;
+import org.int4.dirk.spi.config.ScopeStrategy;
+import org.int4.dirk.spi.scope.ScopeResolver;
 
 import java.util.Set;
 
@@ -21,6 +27,7 @@ import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.inject.Singleton;
 
 @Module(includes = EngineSystemsModule.class)
 public class EngineModule {
@@ -29,6 +36,7 @@ public class EngineModule {
     @Provides
     public Engine getEngine(Set<EntitySystem> systems) {
         Engine engine = new Engine();
+
         for (EntitySystem system : systems)
             engine.addSystem(system);
         return engine;

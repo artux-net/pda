@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.8.20'
+    ext.kotlin_version = "1.8.20"
     ext.dagger_version = "2.45"
 
     repositories {
@@ -12,24 +12,26 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.0'
-        classpath 'com.google.gms:google-services:4.3.13'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.5'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.google.dagger:hilt-android-gradle-plugin:$dagger_version"
+        classpath("io.github.prygunov:gdx-engine:0.1")
+        classpath("com.android.tools.build:gradle:7.4.0")
+        classpath("com.google.gms:google-services:4.3.13")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.5")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:$dagger_version")
     }
 
 }
 
+
 allprojects {
-    version = '1.0'
+    version = "1.0"
     ext {
-        kotlin_version = '1.8.20'
+        kotlin_version = "1.8.20"
         appName = "PDA"
-        gdxVersion = '1.11.0'
-        ashleyVersion = '1.7.4'
-        aiVersion = '1.8.2'
-        gdxControllersVersion = '2.2.1'
+        gdxVersion = "1.11.0"
+        ashleyVersion = "1.7.4"
+        aiVersion = "1.8.2"
+        gdxControllersVersion = "2.2.1"
     }
 
     repositories {
@@ -44,8 +46,9 @@ allprojects {
 }
 
 
+
 project(":app") {
-    apply plugin: 'com.android.application'
+    apply plugin: "com.android.application"
 
     configurations { natives }
 
@@ -53,55 +56,62 @@ project(":app") {
         implementation project(":core")
         implementation project(":model")
 
-        api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
-        api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
-        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
-        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
-        natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
-        api "com.badlogicgames.ashley:ashley:$ashleyVersion"
-        api "com.badlogicgames.gdx-controllers:gdx-controllers-android:$gdxControllersVersion"
-        api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
+        api("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
+        natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
+        natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")
+        natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86")
+        natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64")
+        api("com.badlogicgames.gdx:gdx-freetype:$gdxVersion")
+        natives("com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a")
+        natives("com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a")
+        natives("com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86")
+        natives("com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64")
+        api("com.badlogicgames.ashley:ashley:$ashleyVersion")
+        api("com.badlogicgames.gdx-controllers:gdx-controllers-android:$gdxControllersVersion")
+        api("com.badlogicgames.gdx:gdx-ai:$aiVersion")
 
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
-        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
-        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
-        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
+        api("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
+        natives("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a")
+        natives("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a")
+        natives("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86")
+        natives("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64")
     }
 }
 
 project(":core") {
     apply plugin: "java-library"
-    apply plugin: 'kotlin'
+    apply plugin: "kotlin"
     apply plugin: "kotlin-kapt"
+
+    apply plugin: "gdx"
+
+    assets{
+        assetsDirectory.set(files("${rootDir}/assets"))
+        namespace.set("net.artux.pda")
+    }
 
     dependencies {
         implementation project(":model")
 
-        implementation 'com.google.code.gson:gson:2.8.9'
-        implementation 'org.apache.commons:commons-lang3:3.0'
+        implementation("com.google.code.gson:gson:2.8.9")
+        implementation("org.apache.commons:commons-lang3:3.0")
 
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.ashley:ashley:$ashleyVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
+        api("com.badlogicgames.gdx:gdx:$gdxVersion")
+        api("com.badlogicgames.ashley:ashley:$ashleyVersion")
+        api("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
+        api("com.badlogicgames.gdx:gdx-ai:$aiVersion")
+        api("com.badlogicgames.gdx:gdx-freetype:$gdxVersion")
+        api("com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion")
 
         //dagger
-        implementation "com.google.dagger:dagger:$dagger_version"
-        annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
-        kapt "com.google.dagger:dagger-compiler:$dagger_version"
+        implementation("com.google.dagger:dagger:$dagger_version")
+        annotationProcessor("com.google.dagger:dagger-compiler:$dagger_version")
+        kapt("com.google.dagger:dagger-compiler:$dagger_version")
 
         //kotlin
-        implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
-        implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-        implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+        implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
+        implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
     }
 }
 

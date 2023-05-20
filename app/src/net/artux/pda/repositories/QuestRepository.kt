@@ -161,7 +161,7 @@ class QuestRepository @Inject constructor(
     suspend fun syncMember(map: CommandBlock): Result<StoryData> {
         return suspendCoroutine {
             Timber.tag("Quest Repository").d("Syncing, actions: ${map.actions}")
-            defaultApi.doActions(map).enqueue(object : Callback<StoryData> {
+            defaultApi.applyCommands(map).enqueue(object : Callback<StoryData> {
                 override fun onResponse(
                     call: Call<StoryData>,
                     response: Response<StoryData>
@@ -185,7 +185,7 @@ class QuestRepository @Inject constructor(
 
     suspend fun getStoryData(): Result<StoryData> {
         return suspendCoroutine {
-            defaultApi.actualData.enqueue(object : Callback<StoryData> {
+            defaultApi.currentStoryData.enqueue(object : Callback<StoryData> {
                 override fun onResponse(call: Call<StoryData>, response: Response<StoryData>) {
                     val data = response.body()
                     if (data != null) {

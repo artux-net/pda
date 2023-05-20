@@ -41,10 +41,10 @@ class NewsRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         clearCache()
-                        for (article in data.data) {
+                        for (article in data.content) {
                             cache.put(article.id.toString(), article)
                         }
-                        it.resume(Result.success(data.data))
+                        it.resume(Result.success(data.content))
                     } else
                         it.resume(Result.failure(Exception("Feed null")))
                 }

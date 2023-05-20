@@ -156,8 +156,8 @@ class UserRepository @Inject constructor(
                     ) {
                         val data = response.body()
 
-                        if (data?.data != null) {
-                            it.resume(Result.success(data.data))
+                        if (data?.content != null) {
+                            it.resume(Result.success(data.content))
                         } else
                             it.resume(Result.failure(Exception("Не удалось загрузить больше")))
                     }

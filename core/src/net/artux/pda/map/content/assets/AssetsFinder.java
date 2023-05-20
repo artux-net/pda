@@ -38,6 +38,7 @@ public class AssetsFinder implements Disposable {
 
     public AssetManager getManager() {
         if (assetManager == null) {
+            //assetManager.setLogger();
             Gdx.app.getApplicationLogger().log("Assets", "Setup assets for loading.");
             assetManager = new AssetManager();
 

@@ -17,6 +17,12 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidAudio;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.badlogic.gdx.backends.android.AsynchronousAndroidAudio;
+import com.yandex.mobile.ads.common.AdRequest;
+import com.yandex.mobile.ads.common.AdRequestError;
+import com.yandex.mobile.ads.common.ImpressionData;
+import com.yandex.mobile.ads.rewarded.Reward;
+import com.yandex.mobile.ads.rewarded.RewardedAd;
+import com.yandex.mobile.ads.rewarded.RewardedAdEventListener;
 
 import net.artux.pda.app.PDAApplication;
 import net.artux.pda.map.DataRepository;
@@ -164,6 +170,64 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     @Override
     public void rewardedAd() {
+        RewardedAd mRewardedAd = new RewardedAd(requireContext());
+        mRewardedAd.setAdUnitId("R-M-2151056-2");
+
+        // Создание объекта таргетирования рекламы.
+        final AdRequest adRequest = new AdRequest.Builder().build();
+
+        // Регистрация слушателя для отслеживания событий, происходящих в рекламе.
+        mRewardedAd.setRewardedAdEventListener(new RewardedAdEventListener() {
+
+            @Override
+            public void onRewarded(final Reward reward) {
+                questViewModel.syncNow(Map.of("money", List.of(String.valueOf(reward.getAmount()))));
+            }
+
+            @Override
+            public void onAdClicked() {
+
+            }
+
+            @Override
+            public void onAdLoaded() {
+                mRewardedAd.show();
+            }
+
+            @Override
+            public void onAdFailedToLoad(final AdRequestError adRequestError) {
+                //...
+            }
+
+            @Override
+            public void onAdShown() {
+                //...
+            }
+
+            @Override
+            public void onAdDismissed() {
+                //...
+            }
+
+            @Override
+            public void onLeftApplication() {
+                //...
+            }
+
+            @Override
+            public void onReturnedToApplication() {
+                //...
+            }
+
+            @Override
+            public void onImpression(@Nullable ImpressionData impressionData) {
+
+            }
+        });
+
+        // Загрузка объявления.
+        mRewardedAd.loadAd(adRequest);
+
         /*Appodeal.show(requireActivity(), Appodeal.REWARDED_VIDEO, "default");
         Appodeal.setRewardedVideoCallbacks(new RewardedVideoCallbacks() {
             @Override
@@ -188,7 +252,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
             @Override
             public void onRewardedVideoFinished(double v, String s) {
-                questViewModel.syncNow(Map.of("money", List.of(String.valueOf((int) v))));
+
             }
 
             @Override

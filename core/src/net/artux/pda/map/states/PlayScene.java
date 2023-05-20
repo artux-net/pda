@@ -21,6 +21,10 @@ import net.artux.pda.map.utils.di.components.DaggerMapComponent;
 import net.artux.pda.map.utils.di.components.MapComponent;
 import net.artux.pda.model.map.GameMap;
 
+import org.int4.dirk.api.Injector;
+import org.int4.dirk.di.Injectors;
+import org.int4.dirk.library.SingletonScopeResolver;
+
 import javax.inject.Inject;
 
 public class PlayScene extends Scene {
