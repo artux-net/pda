@@ -74,10 +74,10 @@ public class SceneController {
             scenes.peek().resize(width, height);
     }
 
-    public void render() {
+    public void render(float dt) {
         try {
             if (scenes.size() > 0)
-                scenes.peek().render();
+                scenes.peek().render(dt);
         } catch (Exception e) {
             ErrorScene errorState = coreComponent.getErrorState();
             errorState.setThrowable(e);

@@ -38,15 +38,15 @@ public class SceneQuestController implements Serializable, QuestController {
         loadStage(transfer.getStageId());
     }
 
-    private void synchronize(Stage stage, int id) {
+    private void synchronize(Stage stage, long id) {
         listener.sync(stage, id);
     }
 
-    void loadStage(int id) {
+    void loadStage(long id) {
         loadStage(id, true);
     }
 
-    void loadStage(int id, boolean sync) {
+    void loadStage(long id, boolean sync) {
         actualStage = chapter.getStage(id);
         if (sync)
             synchronize(actualStage, id);

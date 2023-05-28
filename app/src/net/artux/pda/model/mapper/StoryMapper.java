@@ -6,18 +6,17 @@ import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.Point;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.quest.ChapterModel;
-import net.artux.pda.model.quest.Sound;
 import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.StoryItem;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.ParameterModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pdanetwork.model.Chapter;
+import net.artux.pdanetwork.model.ChapterDto;
 import net.artux.pdanetwork.model.ParameterDto;
 import net.artux.pdanetwork.model.Spawn;
-import net.artux.pdanetwork.model.Story;
 import net.artux.pdanetwork.model.StoryData;
 import net.artux.pdanetwork.model.StoryDto;
+import net.artux.pdanetwork.model.StoryInfo;
 import net.artux.pdanetwork.model.Text;
 import net.artux.pdanetwork.model.Transfer;
 
@@ -35,7 +34,7 @@ public interface StoryMapper {
 
     StoryMapper INSTANCE = Mappers.getMapper(StoryMapper.class);
 
-    StoryModel story(Story story);
+    StoryModel story(StoryDto story);
 
     @Mapping(target = "parametersMap", ignore = true)
     @Mapping(target = "allItems", ignore = true)
@@ -45,20 +44,30 @@ public interface StoryMapper {
     ParameterModel paramModel(ParameterDto dto);
 
     @Mapping(target = "complete", ignore = true)
-    StoryItem story(StoryDto value);
+    StoryItem storyItem(StoryInfo value);
 
-    List<StoryItem> stories(List<StoryDto> dtos);
+    List<StoryItem> storyItem(List<StoryInfo> dtos);
 
     GameMap map(net.artux.pdanetwork.model.GameMap map);
 
     Point point(net.artux.pdanetwork.model.Point point);
+
     List<Point> points(List<net.artux.pdanetwork.model.Point> point);
 
     @Mapping(target = "params", ignore = true)
     SpawnModel spawn(Spawn spawn);
+
     List<SpawnModel> spawns(List<Spawn> spawn);
 
-    ChapterModel chapter(Chapter chapter);
+    ChapterModel chapter(ChapterDto chapter);
+
+    default Map<Long, Stage> stagesMap(Map<String, net.artux.pdanetwork.model.Stage> stageMap){
+        Map<Long, Stage> result = new HashMap<>();
+        for (Map.Entry<String, net.artux.pdanetwork.model.Stage> entry : stageMap.entrySet()) {
+            result.put(entry.getValue().getId(), stage(entry.getValue()));
+        }
+        return result;
+    }
 
     Stage stage(net.artux.pdanetwork.model.Stage stage);
 
@@ -66,13 +75,11 @@ public interface StoryMapper {
 
     net.artux.pda.model.quest.Transfer map(Transfer value);
 
-    Sound sound(net.artux.pdanetwork.model.Sound sound);
-
     default List<GameMap> maps(HashMap<Long, net.artux.pdanetwork.model.GameMap> maps) {
         List<GameMap> result = new LinkedList<>();
         for (Map.Entry<Long, net.artux.pdanetwork.model.GameMap> map : maps.entrySet()) {
             net.artux.pdanetwork.model.GameMap oldMap = map.getValue();
-            GameMap m = new GameMap(oldMap.getId(), oldMap.getTitle(), oldMap.getTmx(), oldMap.getDefPos(),  points(oldMap.getPoints()), spawns(oldMap.getSpawns()));
+            GameMap m = new GameMap(oldMap.getId(), oldMap.getTitle(), oldMap.getTmx(), oldMap.getDefPos(), points(oldMap.getPoints()), spawns(oldMap.getSpawns()));
             m.setId(m.getId());
             result.add(m);
         }

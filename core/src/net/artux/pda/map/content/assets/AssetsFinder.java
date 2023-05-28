@@ -16,6 +16,7 @@ import net.artux.engine.resource.loaders.LocaleBundleLoader;
 import net.artux.engine.resource.loaders.NetTextureAssetLoader;
 import net.artux.engine.resource.types.NetTexture;
 import net.artux.engine.utils.LocaleBundle;
+import net.artux.pda.R;
 import net.artux.pda.map.view.FontManager;
 
 import java.util.Properties;

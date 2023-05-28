@@ -92,6 +92,11 @@ public class ErrorScene extends Scene {
     }
 
     @Override
+    public void hide() {
+
+    }
+
+    @Override
     protected void handleInput() {
         sceneController.addInputProcessor(stage);
     }
@@ -107,12 +112,17 @@ public class ErrorScene extends Scene {
     }
 
     @Override
-    public void render() {
+    public void render(float dt) {
         stage.draw();
     }
 
     @Override
     public void resize(int w, int h) {
+    }
+
+    @Override
+    public void pause() {
+
     }
 
     @Override

@@ -1,12 +1,13 @@
 package net.artux.engine.scenes;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import java.util.Stack;
 
 
-public abstract class Scene {
+public abstract class Scene implements Screen {
 
     protected final SceneController sceneController;
     private final Stack<Stage> stages;
@@ -43,10 +44,15 @@ public abstract class Scene {
         }
     }
 
-    public void render(){
+    public void render(float dt){
         for (Stage stage : stages) {
             stage.draw();
         }
+    }
+
+    @Override
+    public void show() {
+
     }
 
     public abstract void resize(int width, int height);

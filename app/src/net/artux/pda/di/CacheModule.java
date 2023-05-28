@@ -12,7 +12,6 @@ import net.artux.pdanetwork.model.ItemsContainer;
 import net.artux.pdanetwork.model.NoteDto;
 import net.artux.pdanetwork.model.Profile;
 import net.artux.pdanetwork.model.SellerDto;
-import net.artux.pdanetwork.model.Story;
 import net.artux.pdanetwork.model.StoryData;
 import net.artux.pdanetwork.model.StoryDto;
 import net.artux.pdanetwork.model.UserDto;
@@ -47,10 +46,10 @@ public class CacheModule {
         return new Cache<>(UserDto.class, context, gson);
     }
 
-    @Provides
-    public Cache<Story> getStoryCache(@ApplicationContext Context context, Gson gson) {
-        return new Cache<>(Story.class, context, gson);
-    }
+   /* @Provides
+    public Cache<StoryDto> getStoryCache(@ApplicationContext Context context, Gson gson) {
+        return new Cache<>(StoryDto.class, context, gson);
+    }*/
 
     @Provides
     public Cache<Summary> getSummaryCache(@ApplicationContext Context context, Gson gson) {

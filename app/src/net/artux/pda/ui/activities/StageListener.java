@@ -11,6 +11,6 @@ public interface StageListener {
     void processTransfer(TransferModel transfer);
     void setStage(Stage stage, boolean summary);
     void playSound();
-    void sync(Stage stage, int id);
+    void sync(Stage stage, long id);
     void prepareStage(Stage actualStage);
 }

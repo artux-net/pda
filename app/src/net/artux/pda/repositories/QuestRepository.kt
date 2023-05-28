@@ -19,7 +19,7 @@ class QuestRepository @Inject constructor(
     private val storyDataCache: Cache<StoryData>,
     private val storyCache: Cache<StoryDto>,
     private val summaryCache: Cache<Summary>,
-    private val questCache: Cache<Story>
+    private val questCache: Cache<StoryDto>
 ) {
 
     fun clearCache() {
@@ -36,38 +36,38 @@ class QuestRepository @Inject constructor(
         else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
-    fun getCachedStory(storyId: Int): Result<Story> {
+    fun getCachedStory(storyId: Int): Result<StoryDto> {
         val cache = questCache.get("$storyId")
         return if (cache != null)
             Result.success(cache)
         else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
-    suspend fun updateStories(): Result<List<StoryDto>> {
+    suspend fun updateStories(): Result<List<StoryInfo>> {
         return suspendCoroutine {
-            defaultApi.stories.enqueue(object : Callback<List<StoryDto>> {
+            defaultApi.stories.enqueue(object : Callback<List<StoryInfo>> {
                 override fun onResponse(
-                    call: Call<List<StoryDto>>,
-                    response: Response<List<StoryDto>>
+                    call: Call<List<StoryInfo>>,
+                    response: Response<List<StoryInfo>>
                 ) {
                     val data = response.body()
                     if (data != null) {
                         for (story in data) {
-                            storyCache.put(story.id.toString(), story)
+                            //storyCache.put(story.id.toString(), story)//TODO
                         }
                         it.resume(Result.success(data))
                     } else
                         it.resume(Result.failure(Exception("Chapter null: $response")))
                 }
 
-                override fun onFailure(call: Call<List<StoryDto>>, t: Throwable) {
+                override fun onFailure(call: Call<List<StoryInfo>>, t: Throwable) {
                     it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })
         }
     }
 
-    suspend fun getChapter(storyId: Int, chapterId: Int): Result<Chapter> {
+    suspend fun getChapter(storyId: Int, chapterId: Int): Result<ChapterDto> {
         val story = getStory(storyId)
         story.onSuccess {
             val chapter = it.chapters[chapterId.toString()]
@@ -77,15 +77,15 @@ class QuestRepository @Inject constructor(
         return Result.failure(Exception("Chapter not found in cached story"))
     }
 
-    private suspend fun getStory(storyId: Int): Result<Story> {
+    private suspend fun getStory(storyId: Int): Result<StoryDto> {
         return suspendCoroutine {
             val story = questCache.get(storyId.toString())
             if (story != null)
                 it.resume(Result.success(story))
             else {
                 defaultApi.getStory(storyId.toLong())
-                    .enqueue(object : Callback<Story> {
-                        override fun onResponse(call: Call<Story>, response: Response<Story>) {
+                    .enqueue(object : Callback<StoryDto> {
+                        override fun onResponse(call: Call<StoryDto>, response: Response<StoryDto>) {
                             val data = response.body()
                             if (data != null) {
                                 questCache.put("$storyId", data)
@@ -94,7 +94,7 @@ class QuestRepository @Inject constructor(
                                 it.resume(Result.failure(Exception("Story pull error: $response")))
                         }
 
-                        override fun onFailure(call: Call<Story>, t: Throwable) {
+                        override fun onFailure(call: Call<StoryDto>, t: Throwable) {
                             t.printStackTrace()
                             it.resume(Result.failure(java.lang.Exception(t)))
                         }

@@ -24,6 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:networkSecurityConfig="@xml/network_security_config">
+
         <activity
             android:name=".ui.activities.HelpActivity"
             android:exported="true"
@@ -73,9 +74,6 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-4707001480680280~1357953477" />
-
-
-
     </application>
 
 </manifest>

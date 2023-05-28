@@ -80,13 +80,13 @@ class QuestViewModel @javax.inject.Inject constructor(
         sellerRepository.getItems().getOrThrow()
     }
 
-    fun beginWithStage(chapterId: Int, stageId: Int) {
+    fun beginWithStage(chapterId: Int, stageId: Long) {
         if (currentStoryId == -1)
             throw Exception()
         beginWithStage(currentStoryId, chapterId, stageId, true)
     }
 
-    fun beginWithStage(storyId: Int, chapterId: Int, stageId: Int, sync: Boolean) {
+    fun beginWithStage(storyId: Int, chapterId: Int, stageId: Long, sync: Boolean) {
         viewModelScope.launch {
             currentStoryId = storyId
             currentChapterId = chapterId
@@ -99,7 +99,7 @@ class QuestViewModel @javax.inject.Inject constructor(
                 .map { mapper.chapter(it) }
                 .onSuccess {
                     chapter.postValue(it)
-                    background.postValue(it.stages[0].background)
+                    background.postValue(it.stages[0]?.background)
                     val chapterStage = it.getStage(stageId)
 
                     if (chapterStage != null) {
@@ -278,14 +278,14 @@ class QuestViewModel @javax.inject.Inject constructor(
         } else if (actions.containsKey("openStage")) {
             val list: List<String> = actions["openStage"] ?: return
             var chapterId = currentChapterId
-            val stageId: Int
+            val stageId: Long
             if (list.size > 2)
                 return
             else if (list.size == 1)
-                stageId = list[0].toInt()
+                stageId = list[0].toLong()
             else {
                 chapterId = list[0].toInt()
-                stageId = list[1].toInt()
+                stageId = list[1].toLong()
             }
             beginWithStage(chapterId, stageId)
 
@@ -308,7 +308,7 @@ class QuestViewModel @javax.inject.Inject constructor(
             val chapterId: String? = data["chapter"]
             val stageId: String? = data["stage"]
             if (chapterId != null && stageId != null) {
-                beginWithStage(chapterId.toInt(), stageId.toInt())
+                beginWithStage(chapterId.toInt(), stageId.toLong())
             }
         } else if (data.containsKey("seller")) {
             val sellerId: String? = data["seller"]

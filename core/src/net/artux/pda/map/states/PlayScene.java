@@ -82,6 +82,11 @@ public class PlayScene extends Scene {
     }
 
     @Override
+    public void hide() {
+
+    }
+
+    @Override
     protected void handleInput() {
         super.handleInput();
         sceneController.addInputProcessor(new GestureDetector(engineManager.getGestureListener()));
@@ -95,7 +100,7 @@ public class PlayScene extends Scene {
     }
 
     @Override
-    public void render() {
+    public void render(float dt) {
         Camera camera = stage.getCamera();
         Vector3 leftBottom = camera.frustum.planePoints[0];
         postProcessing.begin();
@@ -117,6 +122,11 @@ public class PlayScene extends Scene {
     public void resize(int w, int h) {
         //stage.getViewport().update(w, h, false);
         //uistage.getViewport().update(w, h, false);
+    }
+
+    @Override
+    public void pause() {
+        
     }
 
     @Override

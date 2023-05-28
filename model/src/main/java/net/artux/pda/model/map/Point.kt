@@ -3,6 +3,7 @@ package net.artux.pda.model.map
 import java.io.Serializable
 
 data class Point(
+    var id: Int = 0,
     var type: Int = 0,
     var name: String? = null,
     var pos: String? = null,

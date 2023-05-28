@@ -3,7 +3,7 @@ package net.artux.pda.model.quest
 import java.io.Serializable
 
 class Stage : Serializable {
-    var id: Int? = null
+    var id: Long? = null
     var typeStage: Int? = null
     var background: String? = ""
     var title: String? = null

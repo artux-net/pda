@@ -79,7 +79,7 @@ public class GdxAdapter extends ApplicationAdapter {
         if (!assetManager.isFinished())
             assetManager.update(17);
         gsc.update(Gdx.graphics.getDeltaTime());
-        gsc.render();
+        gsc.render(Gdx.graphics.getDeltaTime());
     }
 
     private boolean disposed;

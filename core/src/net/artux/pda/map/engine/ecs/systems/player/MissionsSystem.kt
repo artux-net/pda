@@ -220,7 +220,7 @@ class MissionsSystem @Inject constructor(
                     var targetMap = currentData?.get("map") //with map
                     if (chapterString != null && stageString != null) {
                         //with chapter
-                        val stage = stageString.toInt()
+                        val stage = stageString.toLong()
                         val data: Map<String, String>? = storyModel
                             .getChapter(chapterString)
                             ?.getStage(stage)?.data

@@ -38,7 +38,7 @@ class StoriesViewModel @javax.inject.Inject constructor(
     fun updateStories() {
         viewModelScope.launch {
             repository.updateStories()
-                .map { mapper.stories(it) }
+                .map { mapper.storyItem(it) }
                 .onSuccess {
                     if (properties.getProperty(
                             PropertyFields.TESTER_MODE,

@@ -62,6 +62,11 @@ public class PreloadScene extends Scene {
     }
 
     @Override
+    public void hide() {
+
+    }
+
+    @Override
     protected void handleInput() {
         sceneController.addInputProcessor(stage);
     }
@@ -78,7 +83,7 @@ public class PreloadScene extends Scene {
 
 
     @Override
-    public void render() {
+    public void render(float dt) {
         try {
             if (assetManager.isFinished()) {
                 sceneController.set(coreComponent.getPlayState());
@@ -97,6 +102,11 @@ public class PreloadScene extends Scene {
 
     @Override
     public void resize(int w, int h) {
+    }
+
+    @Override
+    public void pause() {
+
     }
 
     @Override

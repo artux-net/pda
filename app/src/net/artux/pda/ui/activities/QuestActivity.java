@@ -67,7 +67,7 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
         questViewModel.getChapter().observe(this, chapter -> {
             if (chapter != null) {
                 //preload images
-                for (Stage stage : chapter.getStages()) {
+                for (Stage stage : chapter.getStages().values()) {
                     if (stage.getBackground() != null && !stage.getBackground().isEmpty()) {
                         String background_url = URLHelper.getResourceURL(stage.getBackground());
 
