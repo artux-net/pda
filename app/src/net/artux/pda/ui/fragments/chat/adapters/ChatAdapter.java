@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import net.artux.pda.R;
 import net.artux.pda.model.chat.ChatUpdate;
 import net.artux.pda.model.chat.UserMessage;
+import net.artux.pda.model.user.Role;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
@@ -130,7 +131,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
                             + " - " + formatter.format(instant));
                 }
 
-                if (userModel.getRole() != null && userModel.getRole() != UserModel.Role.USER)
+                if (userModel.getRole() != null && userModel.getRole() != Role.USER)
                     infoView.setText(infoView.getText() + " " + userModel.getRole());
 
                 ProfileHelper.setAvatar(avatarView, userModel.getAvatar());

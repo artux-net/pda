@@ -1,6 +1,7 @@
 package net.artux.pda.model.chat
 
 import net.artux.pda.model.quest.story.StoryDataModel
+import net.artux.pda.model.user.Role
 import net.artux.pda.model.user.UserModel
 import java.io.Serializable
 import java.time.Instant
@@ -49,7 +50,7 @@ data class UserMessage(
         author.avatar = avatarId
         author.name = senderLogin
         author.nickname = ""
-        author.role = UserModel.Role.ADMIN
+        author.role = Role.ADMIN
         author.pdaId = -1L
     }
 

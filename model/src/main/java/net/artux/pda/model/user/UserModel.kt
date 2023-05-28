@@ -18,7 +18,4 @@ class UserModel : Serializable {
     var registration: Instant? = null
     var lastLoginAt: Instant? = null
 
-    enum class Role {
-        ADMIN, USER, TESTER, MODERATOR
-    }
 }

@@ -149,4 +149,7 @@
     <string name="support">Поддержка</string>
     <string name="write_to_developer">Написать разработчику</string>
     <string name="write_to_developer_summary" >Сообщить о проблеме или предложить улучшение</string>
+    <string name="online">В сети</string>
+    <string name="offline">Не в сети</string>
+    <string name="position_p">Позиция в рейтинге: %1$s</string>
 </resources>

@@ -68,7 +68,15 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             val model = it
 
             ProfileHelper.setAvatar(binding.profileAvatar, model.avatar)
-            binding.profileLogin.text = "${model.name} ${model.nickname}"
+            binding.profileNickname.text = "${model.name} ${model.nickname}"
+            binding.profileLogin.text = "${model.login} #${model.pdaId}"
+            binding.profileRole.text = "${model.role}"
+            val onlineStatus = if(model.isOnline())
+                getString(R.string.online)
+            else
+                getString(R.string.offline)
+
+            binding.profileStatus.text = onlineStatus
             binding.profileGroup.text = GroupHelper.getTitle(model.gang, context)
             binding.profileTime.text =
                 getString(R.string.in_zone_time_p, ProfileHelper.getDays(model))
@@ -76,6 +84,9 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 getString(R.string.rang_p, ProfileHelper.getRangTitleByXp(model.xp, view.context))
             binding.profileRating.text =
                 getString(R.string.xp_p, model.xp.toString())
+
+            binding.profilePosition.text =
+                getString(R.string.position_p, model.ratingPosition.toString())
 
             val currentRang = StoryDataModel.getRang(model.xp)
             val nextRang = currentRang.nextRang
