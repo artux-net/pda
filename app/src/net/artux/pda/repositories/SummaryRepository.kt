@@ -2,6 +2,7 @@ package net.artux.pda.repositories
 
 import net.artux.pda.model.Summary
 import net.artux.pda.model.chat.UserMessage
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,17 +30,23 @@ class SummaryRepository @Inject constructor(
         summaryCache.put(id, summary)
     }
 
-    fun updateSummary(messages: MutableList<UserMessage>) {
+    fun updateSummary() {
         getCachedSummary(Summary.currentId)
             .onSuccess {
-                it.messages.addAll(messages)
+                it.messages.addAll(summaryMessages)
                 putSummary(it.title, it)
             }
             .onFailure {
                 val summary = Summary()
-                summary.messages = messages
+                summary.messages = summaryMessages
                 putSummary(summary.title, summary)
             }
+    }
+
+    var summaryMessages: LinkedList<UserMessage> = LinkedList()
+
+    fun check(message: UserMessage){
+        summaryMessages.add(message)
     }
 
     fun getAll(): List<Summary> {

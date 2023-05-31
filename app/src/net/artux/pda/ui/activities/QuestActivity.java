@@ -11,12 +11,10 @@ import android.view.Window;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
@@ -30,13 +28,16 @@ import com.google.gson.Gson;
 import net.artux.pda.R;
 import net.artux.pda.databinding.FragmentNotificationBinding;
 import net.artux.pda.gdx.CoreFragment;
+import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.Stage;
-import net.artux.pda.model.quest.StageType;
+import net.artux.pda.model.quest.StageModel;
+import net.artux.pda.repositories.QuestSoundManager;
 import net.artux.pda.ui.fragments.quest.SellerFragment;
-import net.artux.pda.ui.fragments.quest.StageFragment;
+import net.artux.pda.ui.fragments.quest.StageRootFragment;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.ui.viewmodels.SellerViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
+import net.artux.pda.ui.viewmodels.event.ScreenDestination;
 import net.artux.pda.utils.URLHelper;
 
 import javax.inject.Inject;
@@ -52,14 +53,21 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
 
     @Inject
     protected Gson gson;
+    @Inject
+    protected QuestSoundManager soundManager;
+
     private String currentBackground = "";
     private CoreFragment coreFragment;
+    private StageRootFragment stageRootFragment;
     private QuestViewModel questViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quest);
+
+        stageRootFragment = new StageRootFragment();
+        coreFragment = new CoreFragment();
 
         ViewModelProvider provider = new ViewModelProvider(this);
         questViewModel = provider.get(QuestViewModel.class);
@@ -80,57 +88,10 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
             }
         });
 
-        questViewModel.getStage().observe(this, stageModel -> {
-            FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
-            if (coreFragment != null && coreFragment.isAdded()) {
-                mFragmentTransaction.hide(coreFragment);
-                mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.STARTED);
-            }
-
-            StageFragment stageFragment = StageFragment.createInstance(stageModel);
-            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-                if (fragment instanceof StageFragment) {
-                    mFragmentTransaction.remove(fragment);
-                }
-            }
-
-            mFragmentTransaction
-                    .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-                    .add(R.id.containerView, stageFragment, "stage")
-                    .commitNow();
-
-            if (stageModel.getType() != StageType.CHAPTER_OVER)
-                setTitle(stageModel.getTitle());
-            else
-                setTitle("");
-        });
+        questViewModel.getStage().observe(this, this::setStage);
 
         questViewModel.getMap().observe(this, map -> {
-            FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
-            if (coreFragment == null)
-                coreFragment = new CoreFragment();
-            Bundle args = new Bundle();
-            args.putSerializable("map", map);
-            args.putSerializable("data", questViewModel.getStoryData().getValue());
-            args.putSerializable("user", provider.get(UserViewModel.class).getFromCache());
-            args.putSerializable("story", provider.get(QuestViewModel.class).getCurrentStory());
-            args.putSerializable("items", provider.get(SellerViewModel.class).getItems());
-            args.putBoolean("updated", true);
-
-            coreFragment.setArguments(args);
-            if (coreFragment.isAdded()) {
-                if (coreFragment.isHidden()) {
-                    mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.RESUMED);
-                    mFragmentTransaction.show(coreFragment);
-                } else {
-                    coreFragment.onResume();
-                }
-            }
-            mFragmentTransaction
-                    .replace(R.id.containerView, coreFragment);
-
-            mFragmentTransaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
-            mFragmentTransaction.commitNow();
+            startMap(provider, map);
         });
 
         questViewModel.getLoadingState().observe(this, flag -> {
@@ -147,31 +108,33 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
                 intent.putExtra("status", statusModel);
                 startActivity(intent);
             } else
-                Toast
-                        .makeText(QuestActivity.this,
+                Toast.makeText(QuestActivity.this,
                                 "Can not load stage, error: " + statusModel.getDescription(),
                                 Toast.LENGTH_LONG)
                         .show();
         });
 
-        questViewModel.getData().observe(this, data -> {
-            if (data.containsKey("seller")) {
-                SellerFragment sellerFragment = SellerFragment.newInstance(Integer.parseInt(data.get("seller")));
+        questViewModel.getSellerEvent().observe(this, data -> {
+            int sellerId = data.getPayload();
+            SellerFragment sellerFragment = SellerFragment.newInstance(sellerId);
 
-                findViewById(R.id.navbar).setVisibility(View.GONE);
-                FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
-                mFragmentTransaction
-                        .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-                        .add(R.id.containerView, sellerFragment, "seller")
-                        .addToBackStack("seller")
-                        .commit();
-                Timber.d("Start seller activity - %s", data.get("seller"));
-            } else if (data.containsKey("exit")) {
-                Intent intent = new Intent(QuestActivity.this, MainActivity.class);
-                intent.putExtra("section", "stories");
-                startActivity(intent);
-                finish();
-            }
+            findViewById(R.id.navbar).setVisibility(View.GONE);
+            FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
+            mFragmentTransaction
+                    .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                    .add(R.id.containerView, sellerFragment, "seller")
+                    .addToBackStack("seller")
+                    .commit();
+            Timber.d("Start seller activity - %s", sellerId);
+        });
+
+        questViewModel.getExitEvent().observe(this, data -> {
+            if (data == ScreenDestination.NONE)
+                return;
+            Intent intent = new Intent(QuestActivity.this, MainActivity.class);
+            intent.putExtra("section", data);
+            startActivity(intent);
+            finish();
         });
 
         questViewModel.getNotification().observe(this, notificationModel -> {
@@ -210,6 +173,51 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
         startLoading();
     }
 
+    private void setStage(StageModel stageModel) {
+        soundManager.resume();
+        FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
+        if (coreFragment.isAdded()) {
+            mFragmentTransaction.hide(coreFragment);
+            mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.STARTED);
+        }
+
+        if (!stageRootFragment.isAdded())
+            mFragmentTransaction.add(R.id.containerView, stageRootFragment, "root");
+
+        mFragmentTransaction
+                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                .show(stageRootFragment)
+                .commitNow();
+        stageRootFragment.setStage(stageModel);
+    }
+
+    private void startMap(ViewModelProvider provider, GameMap map) {
+        soundManager.pause();
+        FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+        Bundle args = new Bundle();
+        args.putSerializable("map", map);
+        args.putSerializable("data", questViewModel.getStoryData().getValue());
+        args.putSerializable("user", provider.get(UserViewModel.class).getFromCache());
+        args.putSerializable("story", provider.get(QuestViewModel.class).getCurrentStory());
+        args.putSerializable("items", provider.get(SellerViewModel.class).getItems());
+        args.putBoolean("updated", true);
+
+        coreFragment.setArguments(args);
+        if (coreFragment.isAdded()) {
+            if (coreFragment.isHidden()) {
+                mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.RESUMED);
+                mFragmentTransaction.show(coreFragment);
+            } else {
+                coreFragment.onResume();
+            }
+        }
+        mFragmentTransaction
+                .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+                .replace(R.id.containerView, coreFragment)
+                .commitNow();
+    }
+
     private void startLoading() {
         int[] keys = getIntent().getIntArrayExtra("keys");
         // keys for loading specific stage
@@ -234,10 +242,6 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
 
     }
 
-    public void setTitle(String title) {
-        ((TextView) findViewById(R.id.sceneTitle)).setText(title);
-    }
-
     @Override
     public void onBackPressed() {
         startActivity(new Intent(this, MainActivity.class));
@@ -258,8 +262,21 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        soundManager.pause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        soundManager.resume();
+    }
+
+    @Override
     protected void onDestroy() {
-        System.out.println("Destroyed QuestActivity");
+        Timber.i("Destroyed QuestActivity");
+        soundManager.stop();
         super.onDestroy();
     }
 

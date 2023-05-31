@@ -79,8 +79,8 @@ class PrefsFragment : PreferenceFragmentCompat() {
             true
         }
 
-        questViewModel.storyData.observe(viewLifecycleOwner) {
-            Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show()
+        questViewModel.status.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it.description, Toast.LENGTH_SHORT).show()
         }
 
     }

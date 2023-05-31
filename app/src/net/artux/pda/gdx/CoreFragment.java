@@ -228,48 +228,6 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
         // Загрузка объявления.
         mRewardedAd.loadAd(adRequest);
 
-        /*Appodeal.show(requireActivity(), Appodeal.REWARDED_VIDEO, "default");
-        Appodeal.setRewardedVideoCallbacks(new RewardedVideoCallbacks() {
-            @Override
-            public void onRewardedVideoLoaded(boolean b) {
-
-            }
-
-            @Override
-            public void onRewardedVideoFailedToLoad() {
-
-            }
-
-            @Override
-            public void onRewardedVideoShown() {
-
-            }
-
-            @Override
-            public void onRewardedVideoShowFailed() {
-
-            }
-
-            @Override
-            public void onRewardedVideoFinished(double v, String s) {
-
-            }
-
-            @Override
-            public void onRewardedVideoClosed(boolean b) {
-
-            }
-
-            @Override
-            public void onRewardedVideoExpired() {
-
-            }
-
-            @Override
-            public void onRewardedVideoClicked() {
-
-            }
-        });*/
     }
 
     @Override

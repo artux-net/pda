@@ -151,6 +151,7 @@ dependencies {
     implementation "androidx.multidex:multidex:2.0.1"
     //mapstruct
     implementation "org.mapstruct:mapstruct:1.5.2.Final"
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     kapt "org.mapstruct:mapstruct-processor:1.5.2.Final"
 
     //for api code gen

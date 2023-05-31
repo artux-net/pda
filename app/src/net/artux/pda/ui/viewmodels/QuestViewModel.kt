@@ -3,29 +3,21 @@ package net.artux.pda.ui.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.datatransport.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.chat.UserMessage
 import net.artux.pda.model.map.GameMap
-import net.artux.pda.model.mapper.ItemMapper
 import net.artux.pda.model.mapper.StageMapper
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
-import net.artux.pda.model.quest.ChapterModel
-import net.artux.pda.model.quest.NotificationModel
-import net.artux.pda.model.quest.Stage
-import net.artux.pda.model.quest.StageModel
-import net.artux.pda.model.quest.StoryModel
-import net.artux.pda.model.quest.TransferModel
+import net.artux.pda.model.quest.*
 import net.artux.pda.model.quest.story.StoryDataModel
-import net.artux.pda.repositories.QuestRepository
-import net.artux.pda.repositories.SellerRepository
-import net.artux.pda.repositories.SummaryRepository
-import net.artux.pda.repositories.UserRepository
-import net.artux.pdanetwork.model.CommandBlock
+import net.artux.pda.repositories.*
+import net.artux.pda.ui.viewmodels.event.ScreenDestination
+import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
 import timber.log.Timber
-import java.util.LinkedList
 
 @HiltViewModel
 class QuestViewModel @javax.inject.Inject constructor(
@@ -35,10 +27,9 @@ class QuestViewModel @javax.inject.Inject constructor(
     var repository: QuestRepository,
     var stageMapper: StageMapper,
     var mapper: StoryMapper,
+    var commandController: CommandController,
     var statusMapper: StatusMapper
 ) : ViewModel() {
-
-    val itemMapper: ItemMapper = ItemMapper.INSTANCE
 
     var title: MutableLiveData<String> = MutableLiveData()
     var loadingState: MutableLiveData<Boolean> = MutableLiveData()
@@ -49,15 +40,29 @@ class QuestViewModel @javax.inject.Inject constructor(
     var chapter: MutableLiveData<ChapterModel> = MutableLiveData()
     var map: MutableLiveData<GameMap> = MutableLiveData()
     var data: MutableLiveData<Map<String, String>> = MutableLiveData()
-    var status: MutableLiveData<StatusModel> = MutableLiveData()
 
-    var summaryMessages: LinkedList<UserMessage> = LinkedList()
-    var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
+    val storyData: MutableLiveData<StoryDataModel> get() = commandController.storyData
+    val status: SingleLiveEvent<StatusModel> get() = commandController.status
+    val sellerEvent: SingleLiveEvent<Event<Int>> get() = commandController.sellerEvent
+    val exitEvent: SingleLiveEvent<ScreenDestination> get() = commandController.exitEvent
 
-    var actionsMap: LinkedHashMap<String, MutableList<String>> = LinkedHashMap()
+    var currentStoryId: Int = repository.getCurrentStoryId()
+    var currentChapterId: Int = repository.getCurrentChapterId()
+    var currentStageId: Long = -1
+    var transferDisabled = true
 
-    var currentStoryId: Int = -1
-    var currentChapterId: Int = -1
+    init {
+        commandController.stageEvent.observeForever {
+            val stageId = it.payload.stageId
+            var toSync = false
+            val chapterId = if (it.payload.chapterId > -1) {
+                toSync = true
+                it.payload.chapterId
+            } else
+                currentChapterId
+            beginWithStage(currentStoryId, chapterId, stageId, toSync)
+        }
+    }
 
     fun updateStoryDataFromCache() {
         repository.getCachedStoryData()
@@ -80,13 +85,14 @@ class QuestViewModel @javax.inject.Inject constructor(
         sellerRepository.getItems().getOrThrow()
     }
 
-    fun beginWithStage(chapterId: Int, stageId: Long) {
-        if (currentStoryId == -1)
-            throw Exception()
-        beginWithStage(currentStoryId, chapterId, stageId, true)
-    }
-
-    fun beginWithStage(storyId: Int, chapterId: Int, stageId: Long, sync: Boolean) {
+    fun beginWithStage(
+        storyId: Int = currentStoryId,
+        chapterId: Int,
+        stageId: Long,
+        sync: Boolean = true
+    ) {
+        if (storyId == -1)
+            throw Exception("Negative storyId")
         viewModelScope.launch {
             currentStoryId = storyId
             currentChapterId = chapterId
@@ -102,14 +108,15 @@ class QuestViewModel @javax.inject.Inject constructor(
                     background.postValue(it.stages[0]?.background)
                     val chapterStage = it.getStage(stageId)
 
-                    if (chapterStage != null) {
-                        if (sync) {
-                            prepareSync(chapterStage)
-                            syncNow()
-                        }
-                        setStage(chapterStage)
-                    } else
+                    if (chapterStage == null) {
                         status.postValue(StatusModel(Exception("Can not find stage with id: $stageId in chapter: $currentChapterId")))
+                        return@launch
+                    }
+                    if (sync) {
+                        prepareSync(chapterStage)
+                        syncNow()
+                    }
+                    setStage(chapterStage)
                 }
                 .onFailure {
                     status.postValue(StatusModel(it))
@@ -119,20 +126,12 @@ class QuestViewModel @javax.inject.Inject constructor(
     }
 
     private fun prepareSync(chapterStage: Stage) {
-        if (chapterStage.actions != null)
-            processLocalActions(chapterStage.actions!!)
+        commandController.checkStage(currentStoryId, currentChapterId, chapterStage.id)
+        commandController.process(chapterStage.actions)
 
-        var states = actionsMap["state"]
-        if (states == null)
-            states = LinkedList()
-        states.add("$currentStoryId:$currentChapterId:${chapterStage.id}")
-        actionsMap["state"] = states
-
-        if (chapterStage.texts != null
-            && chapterStage.texts!!.isNotEmpty()
-            && chapterStage.texts!![0].text.isNotBlank()
-        )
-            summaryMessages.add(
+        val texts = chapterStage.texts
+        if (texts != null && texts.isNotEmpty() && texts[0].text.isNotBlank())
+            summaryRepository.check(
                 UserMessage(
                     chapterStage.title,
                     chapterStage.texts!![0].text,
@@ -142,7 +141,8 @@ class QuestViewModel @javax.inject.Inject constructor(
     }
 
     private fun setStage(chapterStage: Stage) {
-        Timber.i("Opening stage: $chapterStage")
+        currentStageId = chapterStage.id
+        Timber.i("Opening stage: ${chapterStage.id}")
         viewModelScope.launch {
             when (chapterStage.typeStage) {
                 4 -> {
@@ -178,35 +178,26 @@ class QuestViewModel @javax.inject.Inject constructor(
                         status.postValue(StatusModel(Exception("Story Data null")))
                         return@launch
                     }
-                    notification.postValue(
-                        stageMapper.notification(chapterStage, storyData.value)
-                    )
-
-                    val stageModel = stageMapper.model(chapterStage, storyData.value)
-                    stage.postValue(stageModel)
+                    notification.postValue(stageMapper.notification(chapterStage, storyData.value))
+                    stage.postValue(stageMapper.model(chapterStage, storyData.value))
+                    transferDisabled = false
                 }
             }
         }
     }
 
     fun chooseTransfer(transfer: TransferModel) {
-        viewModelScope.launch {
-            summaryMessages.add(
-                UserMessage(
-                    storyData.value!!,
-                    transfer.text
-                )
-            )
+        if (transferDisabled)
+            return
+        transferDisabled = true
+        summaryRepository.check(UserMessage(storyData.value!!, transfer.text))
 
-            val chapterStage = chapter.value!!.getStage(transfer.stageId)
-            if (chapterStage != null) {
-                prepareSync(chapterStage)
-                setStage(chapterStage)
-                if (chapterStage.actions != null && chapterStage.actions!!.containsKey("syncNow"))
-                    syncNow()
-            } else
-                status.postValue(StatusModel(Exception("Can not find stage with id: ${transfer.stageId} in chapter: $currentChapterId")))
-        }
+        val chapterStage = chapter.value!!.getStage(transfer.stageId)
+        if (chapterStage != null) {
+            prepareSync(chapterStage)
+            setStage(chapterStage)
+        } else
+            status.postValue(StatusModel(Exception("Can not find stage with id: ${transfer.stageId} in chapter: $currentChapterId")))
     }
 
     fun getCurrentStage(): Stage? {
@@ -218,38 +209,25 @@ class QuestViewModel @javax.inject.Inject constructor(
         title.postValue("Синхронизация")
         loadingState.postValue(true)
 
-        repository.syncMember(CommandBlock().actions(actionsMap))
-            .map { mapper.dataModel(it) }
+        commandController.syncNow()
             .onSuccess {
-                storyData.postValue(it)
-                summaryRepository.updateSummary(summaryMessages)//save summary
-
-                actionsMap = LinkedHashMap()// reset sync map
-                summaryMessages = LinkedList()//reset summary
-                loadingState.postValue(false)
+                summaryRepository.updateSummary()//save summary
                 Timber.d("Successful sync, data: ${storyData.value}")
             }.onFailure {
-                loadingState.postValue(false)
                 status.postValue(StatusModel(it))
             }
-            .getOrNull()
+        loadingState.postValue(false)
     }
 
     fun syncNow(map: Map<String, MutableList<String>>) {
-        actionsMap.putAll(map)
+        commandController.process(map)
         viewModelScope.launch {
             syncNow()
         }
     }
 
     fun exitStory() {
-        viewModelScope.launch {
-            syncNow()
-            val actions = mapOf(Pair("exitStory", listOf("")))
-            repository.syncMember(CommandBlock().actions(actions))
-                .onSuccess { data.postValue(mapOf(Pair("exit", ""))) }
-                .onFailure { status.postValue(StatusModel(it)) }
-        }
+        commandController.process(mapOf(Pair("exitStory", listOf())))
     }
 
     fun resetData() {
@@ -257,13 +235,7 @@ class QuestViewModel @javax.inject.Inject constructor(
             userRepository.clearMemberCache()
             repository.clearCache()
             userRepository.getMember()
-            repository.resetData()
-                .map { mapper.dataModel(it) }
-                .onSuccess {
-                    storyData.postValue(it)
-                    status.postValue(StatusModel("Ok"))
-                }
-                .onFailure { status.postValue(StatusModel(it)) }
+            commandController.resetData()
         }
     }
 
@@ -271,44 +243,15 @@ class QuestViewModel @javax.inject.Inject constructor(
         repository.clearCache()
     }
 
-    private fun processLocalActions(actions: HashMap<String, List<String>>) {
-        if (actions.containsKey("finishStory")) {
-            actionsMap["finishStory"] = mutableListOf("")
-            exitStory()
-        } else if (actions.containsKey("openStage")) {
-            val list: List<String> = actions["openStage"] ?: return
-            var chapterId = currentChapterId
-            val stageId: Long
-            if (list.size > 2)
-                return
-            else if (list.size == 1)
-                stageId = list[0].toLong()
-            else {
-                chapterId = list[0].toInt()
-                stageId = list[1].toLong()
-            }
-            beginWithStage(chapterId, stageId)
-
-        } else if (actions.containsKey("openSeller")) {
-            val sellerId: Int? = actions["openSeller"]?.get(0)?.toInt()
-            if (sellerId != null) {
-                this.data.postValue(mapOf(Pair("seller", "$sellerId")))
-            }
-        }
-    }
-
     fun processData(data: Map<String, String>?) {
         if (data == null)
             return
         loadingState.postValue(true)
-        if (data.containsKey("over")) {
-            actionsMap["over"] = mutableListOf("")
-            exitStory()
-        } else if (data.containsKey("chapter")) {
+        if (data.containsKey("chapter")) {
             val chapterId: String? = data["chapter"]
             val stageId: String? = data["stage"]
             if (chapterId != null && stageId != null) {
-                beginWithStage(chapterId.toInt(), stageId.toLong())
+                beginWithStage(chapterId = chapterId.toInt(), stageId = stageId.toLong())
             }
         } else if (data.containsKey("seller")) {
             val sellerId: String? = data["seller"]

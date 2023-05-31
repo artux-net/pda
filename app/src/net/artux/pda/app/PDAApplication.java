@@ -1,6 +1,8 @@
 package net.artux.pda.app;
 
 import android.app.Application;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.util.Log;
 
 import com.google.firebase.FirebaseApp;
@@ -26,6 +28,10 @@ public class PDAApplication extends Application {
     protected List<Timber.Tree> forest;
     @Inject
     protected Properties properties;
+    @Inject
+    protected SoundPool soundPool;
+    @Inject
+    protected MediaPlayer mediaPlayer;
 
     public static int[] group_avatars = {
             R.drawable.g0,
@@ -60,5 +66,12 @@ public class PDAApplication extends Application {
     public boolean isTesterMode() {
         return properties.getProperty(PropertyFields.TESTER_MODE, "false")
                 .equals("true");
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        soundPool.release();
+        mediaPlayer.release();
     }
 }

@@ -1,6 +1,8 @@
 package net.artux.pda.repositories
 
 import net.artux.pda.model.Summary
+import net.artux.pda.model.mapper.StoryMapper
+import net.artux.pda.model.quest.story.StoryStateModel
 import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.*
 import retrofit2.Call
@@ -19,7 +21,8 @@ class QuestRepository @Inject constructor(
     private val storyDataCache: Cache<StoryData>,
     private val storyCache: Cache<StoryDto>,
     private val summaryCache: Cache<Summary>,
-    private val questCache: Cache<StoryDto>
+    private val questCache: Cache<StoryDto>,
+    private val storyMapper: StoryMapper
 ) {
 
     fun clearCache() {
@@ -41,6 +44,20 @@ class QuestRepository @Inject constructor(
         return if (cache != null)
             Result.success(cache)
         else Result.failure(java.lang.Exception("Cache isn't found"))
+    }
+
+    fun getCurrentState(): StoryStateModel? {
+        return getCachedStoryData()
+            .map { storyMapper.dataModel(it).currentState }
+            .getOrNull()
+    }
+
+    fun getCurrentStoryId(): Int {
+        return getCurrentState()?.storyId ?: -1
+    }
+
+    fun getCurrentChapterId(): Int {
+        return getCurrentState()?.chapterId ?: -1
     }
 
     suspend fun updateStories(): Result<List<StoryInfo>> {
@@ -74,7 +91,7 @@ class QuestRepository @Inject constructor(
             return if (chapter != null) Result.success(chapter)
             else Result.failure(Exception("Chapter not found!"))
         }
-        return Result.failure(Exception("Chapter not found in cached story"))
+        return Result.failure(Exception("Chapter $chapterId not found in cached story $storyId"))
     }
 
     private suspend fun getStory(storyId: Int): Result<StoryDto> {
@@ -85,7 +102,10 @@ class QuestRepository @Inject constructor(
             else {
                 defaultApi.getStory(storyId.toLong())
                     .enqueue(object : Callback<StoryDto> {
-                        override fun onResponse(call: Call<StoryDto>, response: Response<StoryDto>) {
+                        override fun onResponse(
+                            call: Call<StoryDto>,
+                            response: Response<StoryDto>
+                        ) {
                             val data = response.body()
                             if (data != null) {
                                 questCache.put("$storyId", data)
@@ -201,5 +221,4 @@ class QuestRepository @Inject constructor(
             })
         }
     }
-
 }

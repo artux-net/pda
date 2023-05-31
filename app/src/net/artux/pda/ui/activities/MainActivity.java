@@ -39,6 +39,7 @@ import net.artux.pda.ui.fragments.notes.NoteFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.stories.StoriesFragment;
 import net.artux.pda.ui.viewmodels.UserViewModel;
+import net.artux.pda.ui.viewmodels.event.ScreenDestination;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -85,19 +86,21 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
         Intent intent = getIntent();
         if (intent != null) {
-            if (intent.hasExtra("section"))
-                switch (intent.getStringExtra("section")) {
-                    case "stories":
+            if (intent.hasExtra("section")) {
+                ScreenDestination screenDestination = (ScreenDestination) intent.getSerializableExtra("section");
+                switch (screenDestination) {
+                    case STORIES: {
                         presenter.addFragment(new StoriesFragment(), false);
                         break;
-                    case "profileModel":
+                    }
+                    case PROFILE:
                         presenter.addFragment(new UserProfileFragment(), false);
                         break;
                     default:
                         presenter.addFragment(new NewsFragment(), false);
                         break;
                 }
-            else
+            } else
                 presenter.addFragment(new NewsFragment(), false);
             if (intent.hasExtra("status")) {
                 StatusModel statusModel = (StatusModel) intent.getSerializableExtra("status");
