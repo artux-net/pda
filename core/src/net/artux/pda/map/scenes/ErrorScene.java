@@ -1,4 +1,4 @@
-package net.artux.pda.map.states;
+package net.artux.pda.map.scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -11,13 +11,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 import com.badlogic.gdx.utils.Align;
 
 import net.artux.engine.scenes.Scene;
-import net.artux.engine.scenes.SceneController;
+import net.artux.engine.scenes.SceneManager;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.utils.di.components.CoreComponent;
 import net.artux.pda.model.map.GameMap;
 
 import java.time.Instant;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -28,7 +29,7 @@ public class ErrorScene extends Scene {
     private final Label label;
 
     @Inject
-    public ErrorScene(final SceneController gsm, DataRepository dataRepository,
+    public ErrorScene(final SceneManager gsm, DataRepository dataRepository,
                       CoreComponent coreComponent, LocaleBundle localeBundle) {
         super(gsm);
         BitmapFont font = coreComponent.getAssetsFinder().getFontManager().getFont(22);
@@ -98,12 +99,12 @@ public class ErrorScene extends Scene {
 
     @Override
     protected void handleInput() {
-        sceneController.addInputProcessor(stage);
+        sceneManager.addInputProcessor(stage);
     }
 
     @Override
     protected void stop() {
-        sceneController.removeInputProcessor(stage);
+        sceneManager.removeInputProcessor(stage);
     }
 
     @Override
@@ -129,4 +130,8 @@ public class ErrorScene extends Scene {
     public void dispose() {
     }
 
+    @Override
+    public Map<String, Class> getAssets() {
+        return null;
+    }
 }

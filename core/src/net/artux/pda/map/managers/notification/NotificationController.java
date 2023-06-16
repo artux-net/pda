@@ -11,6 +11,7 @@ import net.artux.pda.map.content.ContentGenerator;
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.map.view.blocks.MessagesPlane;
+import net.artux.pda.model.chat.ChatEvent;
 import net.artux.pda.model.chat.UserMessage;
 
 import java.util.EnumMap;
@@ -58,6 +59,11 @@ public class NotificationController {
                 content, MessagesPlane.Length.SHORT);
         soundsSystem.playSound(soundMap.get(type));
     }
+
+    public void msg(String message) {
+        addMessage(UserMessage.event(ChatEvent.Companion.of(message)));
+    }
+
 
     public UserMessage generateMessage() {
         return new UserMessage(contentGenerator.generateName(),

@@ -7,7 +7,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.engine.scenes.SceneController;
+import net.artux.engine.scenes.SceneManager;
 import net.artux.engine.scenes.Scene;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.utils.di.components.CoreComponent;
@@ -22,7 +22,7 @@ import java.util.Properties;
 
 public class GdxAdapter extends ApplicationAdapter {
 
-    private final SceneController gsc;
+    private final SceneManager gsc;
     private final CoreComponent coreComponent;
     private AssetManager assetManager;
     private long startHeap;

@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.artux.engine.graphics.postprocessing.PostProcessing;
-import net.artux.engine.scenes.SceneController;
+import net.artux.engine.scenes.SceneManager;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.EngineManager;
@@ -44,7 +44,7 @@ public interface MapComponent extends CoreComponent {
 
     UserInterface getUserInterface();
 
-    SceneController getGSC();
+    SceneManager getGSC();
 
     DataRepository getDataRepository();
 

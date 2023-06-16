@@ -35,6 +35,10 @@ public class HealthSystem extends BaseSystem {
         super.update(deltaTime);
     }
 
+    public void setImmortalPlayer(boolean value) {
+        hm.get(getPlayer()).setImmortal(value);
+    }
+
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         HealthComponent healthComponent = hm.get(entity);

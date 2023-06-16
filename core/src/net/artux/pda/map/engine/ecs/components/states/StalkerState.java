@@ -108,13 +108,16 @@ public enum StalkerState implements State<Entity> {
                     if (!visionComponent.isSeeing(enemy)
                             || dst > distanceToAttack(weaponModel.getPrecision())) {
                         gmm.get(entity).setMovementTarget(enemyBodyComponent);
+                        sm.get(entity).changeState(MOVING);
                     } else if (dst > 20 && dst < distanceToAttack(weaponModel.getPrecision())) {
                         gmm.get(entity).setMovementTarget(null);
+                        sm.get(entity).changeState(STANDING);
                     } else {
                         //движение в обратном направлении, слишком близко подошли
                         Vector2 diff = enemyBodyComponent.cpy().sub(entityBodyComponent);
                         diff.scl(-1);
                         gmm.get(entity).setMovementTarget(diff.add(entityBodyComponent));
+                        sm.get(entity).changeState(MOVING);
                     }
                 }
             } else {

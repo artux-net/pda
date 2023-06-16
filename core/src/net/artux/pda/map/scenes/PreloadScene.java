@@ -1,4 +1,4 @@
-package net.artux.pda.map.states;
+package net.artux.pda.map.scenes;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
@@ -8,13 +8,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 
-import net.artux.engine.scenes.SceneController;
+import net.artux.engine.scenes.SceneManager;
 import net.artux.engine.scenes.Scene;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.utils.di.components.CoreComponent;
 import net.artux.pda.model.map.GameMap;
 
 import java.text.DecimalFormat;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -28,7 +29,7 @@ public class PreloadScene extends Scene {
     private final Label progressLabel;
 
     @Inject
-    public PreloadScene(final SceneController gsm, DataRepository dataRepository,
+    public PreloadScene(final SceneManager gsm, DataRepository dataRepository,
                         CoreComponent coreComponent) {
         super(gsm);
         this.coreComponent = coreComponent;
@@ -68,12 +69,12 @@ public class PreloadScene extends Scene {
 
     @Override
     protected void handleInput() {
-        sceneController.addInputProcessor(stage);
+        sceneManager.addInputProcessor(stage);
     }
 
     @Override
     protected void stop() {
-        sceneController.removeInputProcessor(stage);
+        sceneManager.removeInputProcessor(stage);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class PreloadScene extends Scene {
     public void render(float dt) {
         try {
             if (assetManager.isFinished()) {
-                sceneController.set(coreComponent.getPlayState());
+                sceneManager.set(coreComponent.getPlayState());
             } else {
                 stage.draw();
                 float progress = assetManager.getProgress();
@@ -96,7 +97,7 @@ public class PreloadScene extends Scene {
             e.printStackTrace();
             ErrorScene errorState = coreComponent.getErrorState();
             errorState.setThrowable(e);
-            sceneController.set(errorState);
+            sceneManager.set(errorState);
         }
     }
 
@@ -113,4 +114,8 @@ public class PreloadScene extends Scene {
     public void dispose() {
     }
 
+    @Override
+    public Map<String, Class> getAssets() {
+        return null;
+    }
 }

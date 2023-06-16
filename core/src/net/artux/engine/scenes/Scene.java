@@ -4,19 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import net.artux.engine.utils.AssetsUser;
+
 import java.util.Stack;
 
 
-public abstract class Scene implements Screen {
+public abstract class Scene implements Screen, AssetsUser {
 
-    protected final SceneController sceneController;
+    protected final SceneManager sceneManager;
     private final Stack<Stage> stages;
 
     protected float w = Gdx.graphics.getWidth();
     protected float h = Gdx.graphics.getHeight();
 
-    public Scene(SceneController sceneController) {
-        this.sceneController = sceneController;
+    public Scene(SceneManager sceneManager) {
+        this.sceneManager = sceneManager;
         stages = new Stack<>();
     }
 
@@ -28,13 +30,13 @@ public abstract class Scene implements Screen {
 
     protected void handleInput() {
         for (Stage stage : stages) {
-            sceneController.addInputProcessor(stage);
+            sceneManager.addInputProcessor(stage);
         }
     }
 
     protected void stop(){
         for (Stage stage : stages) {
-            sceneController.removeInputProcessor(stage);
+            sceneManager.removeInputProcessor(stage);
         }
     }
 

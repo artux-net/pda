@@ -1,6 +1,5 @@
 package net.artux.pda.map.view;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -9,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.StringBuilder;
 
 import net.artux.pda.map.utils.model.Triple;
 
@@ -37,19 +36,28 @@ public class Logger extends VerticalGroup {
     @Override
     public void act(float delta) {
         super.act(delta);
+
         for (Actor l : getChildren()) {
-            for (Triple<Method, Object, String> tr :
-                    dataCollection) {
-                if (tr.getThird().equals(l.getName())) {
+            for (Triple<Method, Object, String> tr : dataCollection) {
+                if (tr.getThird().equals(l.getName()))
                     try {
-                        if (tr.getSecond() != null && tr.getFirst() != null)
-                            ((Label) l).setText(tr.getThird() + ": " + tr.getFirst().invoke(tr.getSecond()).toString());
+                        String result = tr.getFirst().invoke(tr.getSecond()).toString();
+
+                        StringBuilder stringBuilder = ((Label) l).getText();
+                        int index = stringBuilder.indexOf(":");
+                        if (index > 0)
+                            stringBuilder
+                                    .delete(++index, stringBuilder.length)
+                                    .append(result);
                         else
-                            ((Label) l).setText(tr.getThird() + ": null");
+                            stringBuilder
+                                    .append(tr.getThird())
+                                    .append(":")
+                                    .append(result);
+                        ((Label) l).invalidate();
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
-                }
             }
         }
     }
@@ -80,7 +88,7 @@ public class Logger extends VerticalGroup {
         } finally {
             if (method != null) {
                 dataCollection.add(new Triple<>(method, o, title));
-                Label label = new Label(title, labelStyle);
+                Label label = new Label("", labelStyle);
                 //label.setWrap(true);
                 label.setName(title);
                 addActor(label);

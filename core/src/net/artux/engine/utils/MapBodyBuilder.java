@@ -1,4 +1,4 @@
-package net.artux.pda.map.engine.ecs.entities;
+package net.artux.engine.utils;
 
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
@@ -27,7 +27,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class MapBodyBuilder {
 
-    // The pixels per tile. If your tiles are 16x16, this is set to 16f
+    // Пикселей на один тайл
     private static float ppt = 0;
 
     public static void buildShapes(TiledMap map, float pixels, World world) {

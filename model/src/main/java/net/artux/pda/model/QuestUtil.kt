@@ -2,41 +2,38 @@ package net.artux.pda.model
 
 import net.artux.pda.model.items.ItemModel
 import net.artux.pda.model.quest.story.StoryDataModel
-import java.util.Collections
-import java.util.LinkedList
+import java.util.*
 import java.util.stream.Collectors
 
 object QuestUtil {
     @JvmStatic
     fun check(
-        conditions: HashMap<String?, List<String>?>?,
+        conditions: HashMap<String, List<String>>,
         storyDataModel: StoryDataModel
     ): Boolean {
-        if (conditions != null) {
-            if (conditions.keys.isNotEmpty()) {
-                val map = storyDataModel.parametersMap
-                for (condition in conditions.keys) {
-                    when (condition) {
-                        "has" -> if (conditions[condition] != null) for (has in conditions[condition]!!) {
-                            if (!map.containsKey(has)
-                                && !containsItem(storyDataModel.allItems, has)
-                            ) return false
-                        }
+        if (conditions.keys.isEmpty())
+            return true
+        val map = storyDataModel.parametersMap
+        for (condition in conditions.keys) {
+            when (condition) {
+                "has" -> if (conditions[condition] != null) for (has in conditions[condition]!!) {
+                    if (!map.containsKey(has)
+                        && !containsItem(storyDataModel.allItems, has)
+                    ) return false
+                }
 
-                        "!has" -> if (conditions[condition] != null) for (has in conditions[condition]!!) {
-                            if (map.containsKey(has)
-                                || containsItem(storyDataModel.allItems, has)
-                            ) return false
-                        }
+                "!has" -> if (conditions[condition] != null) for (has in conditions[condition]!!) {
+                    if (map.containsKey(has)
+                        || containsItem(storyDataModel.allItems, has)
+                    ) return false
+                }
 
-                        "money>=" -> if (conditions[condition] != null) for (money in conditions[condition]!!) {
-                            if (storyDataModel.money < money.toInt()) return false
-                        }
+                "money>=" -> if (conditions[condition] != null) for (money in conditions[condition]!!) {
+                    if (storyDataModel.money < money.toInt()) return false
+                }
 
-                        "money<" -> if (conditions[condition] != null) for (money in conditions[condition]!!) {
-                            if (storyDataModel.money >= money.toInt()) return false
-                        }
-                    }
+                "money<" -> if (conditions[condition] != null) for (money in conditions[condition]!!) {
+                    if (storyDataModel.money >= money.toInt()) return false
                 }
             }
         }

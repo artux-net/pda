@@ -50,8 +50,8 @@ class LootMenu @Inject constructor(
         Gdx.app.postRunnable {
             val models = dataModel.allItems
             mainItemsView.update(models)
+            botItemsView.update(lastBotItems)
         }
-        botItemsView.update(lastBotItems)
     }
 
     fun updateBot(nickname: String, avatar: String, items: List<ItemModel>) {

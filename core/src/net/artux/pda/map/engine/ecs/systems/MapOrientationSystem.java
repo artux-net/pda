@@ -87,14 +87,6 @@ public class MapOrientationSystem extends EntitySystem {
         return tiledNavigator;
     }
 
-    public boolean isGraphActive() {
-        return worldGraph != null;
-    }
-
-    public TiledNavigator getMapBorders() {
-        return tiledNavigator;
-    }
-
     public boolean collides(Vector2 start, Vector2 end) {
         FlatTiledNode startNode = getWorldGraph().getNodeInPosition(start);
         FlatTiledNode endNode = getWorldGraph().getNodeInPosition(end);

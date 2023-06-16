@@ -62,8 +62,10 @@ public class MapLoggerSystem extends IteratingSystem implements Drawable, Dispos
         if (debug) {
             for (MapLayer layer : tiledMap.getLayers()) {
                 layer.setVisible(true);
-                layer.setOpacity(0.5f);
+                layer.setOpacity(0.2f);
             }
+            tiledMap.getLayers().get("tiles").setVisible(true);
+            tiledMap.getLayers().get("tiles").setOpacity(1f);
         } else {
             for (MapLayer layer : tiledMap.getLayers()) {
                 layer.setOpacity(1f);

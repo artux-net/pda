@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.engine.ecs.components.*
+import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem
 import net.artux.pda.map.utils.di.scope.PerGameMap
 import net.artux.pda.map.view.LootMenu
 import net.artux.pda.map.view.UserInterface
@@ -69,6 +70,7 @@ class DeadCheckerSystem @Inject constructor(
             val healthComponent = hm[entity]
             val bodyComponent = pm[entity]
             if (healthComponent.isDead()) {
+
                 val deadEntity = Entity()
                 deadEntity.add(BodyComponent(bodyComponent.position, world))
                     .add(SpriteComponent(assetManager.get("textures/icons/entity/gray.png", Texture::class.java), 4f, 4f))
@@ -90,6 +92,7 @@ class DeadCheckerSystem @Inject constructor(
                         ) { engine.removeEntity(entity) })
                         .add(stalkerComponent)
                 } else {
+                    engine.getSystem(InteractionSystem::class.java).setProcessing(false)
                     engine.removeEntity(player)
                 }
                 engine.addEntity(deadEntity)

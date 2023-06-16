@@ -1,7 +1,6 @@
 package net.artux.pda.map.engine.ecs.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
@@ -43,55 +42,54 @@ public class MovementTargetingSystem extends BaseSystem {
         BodyComponent bodyComponent = pm.get(entity);
         GraphMotionComponent targetMovingComponent = gmm.get(entity);
 
-        if (targetMovingComponent.isActive()) {
-            Vector2 target = targetMovingComponent.movementTarget;
+        if (!targetMovingComponent.isActive())
+            return;
 
-            if (mapOrientationSystem.isGraphActive()) {
-                FlatTiledNode startNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(bodyComponent.getX(), bodyComponent.getY());
-                FlatTiledNode endNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(targetMovingComponent.movementTarget.x, targetMovingComponent.movementTarget.y);
-                if (targetMovingComponent.getPath().nodes.size == 0 || !targetMovingComponent.getPath().nodes.peek().equals(endNode)) {
-                    //пути нет и конец не совпадает
-                    targetMovingComponent.reset();
-                    if (endNode.type.isWalkable()) {
-                        //если конец не стена можем искать
-                        pathFinder.searchNodePath(startNode, endNode, heuristic, targetMovingComponent.getPath());
-                        pathSmoother.smoothPath(targetMovingComponent.getPath());
-                    } else {
-                        targetMovingComponent.movementTarget = null;
-                    }
+        Vector2 target = targetMovingComponent.movementTarget;
+
+        FlatTiledNode startNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(bodyComponent.getX(), bodyComponent.getY());
+        FlatTiledNode endNode = mapOrientationSystem.getWorldGraph().getNodeInPosition(targetMovingComponent.movementTarget.x, targetMovingComponent.movementTarget.y);
+        if (targetMovingComponent.getPath().nodes.size == 0 || !targetMovingComponent.getPath().nodes.peek().equals(endNode)) {
+            //пути нет и конец не совпадает
+            targetMovingComponent.reset();
+            if (endNode.type.isWalkable()) {
+                //если конец не стена можем искать
+                pathFinder.searchNodePath(startNode, endNode, heuristic, targetMovingComponent.getPath());
+                pathSmoother.smoothPath(targetMovingComponent.getPath());
+            } else {
+                targetMovingComponent.movementTarget = null;
+            }
+        } else {
+            if (targetMovingComponent.iterator == null)
+                targetMovingComponent.iterator = targetMovingComponent.getPath().iterator();
+            if (targetMovingComponent.tempTarget == null
+                    || bodyComponent.getPosition().dst(
+                    new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY)) < 5) {
+                if (targetMovingComponent.iterator.hasNext()) {
+                    targetMovingComponent.tempTarget = targetMovingComponent.iterator.next();
+                    target = new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY);
                 } else {
-                    if (targetMovingComponent.iterator == null)
-                        targetMovingComponent.iterator = targetMovingComponent.getPath().iterator();
-                    if (targetMovingComponent.tempTarget == null
-                            || bodyComponent.getPosition().dst(
-                            new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY)) < 5) {
-                        if (targetMovingComponent.iterator.hasNext()) {
-                            targetMovingComponent.tempTarget = targetMovingComponent.iterator.next();
-                            target = new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY);
-                        } else {
-                            targetMovingComponent.getPath().clear();
-                            targetMovingComponent.movementTarget = null;
-                            targetMovingComponent.tempTarget = null;
-                            targetMovingComponent.iterator = null;
-                            target = Vector2.Zero;
-                        }
-                    } else
-                        target = new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY); // движемся к узлу
+                    targetMovingComponent.getPath().clear();
+                    targetMovingComponent.movementTarget = null;
+                    targetMovingComponent.tempTarget = null;
+                    targetMovingComponent.iterator = null;
+                    target = Vector2.Zero;
                 }
-            }
+            } else
+                target = new Vector2(targetMovingComponent.tempTarget.realX, targetMovingComponent.tempTarget.realY); // движемся к узлу
+        }
 
-            tempUnit.set(target.x - bodyComponent.getX(),
-                    target.y - bodyComponent.getY()).nor();
+        tempUnit.set(target.x - bodyComponent.getX(),
+                target.y - bodyComponent.getY()).nor();
 
-            if (!tempUnit.isZero()) {
-                bodyComponent.getBody().applyLinearImpulse(
-                        tempUnit.x * bodyComponent.getMovementForce(),
-                        tempUnit.y * bodyComponent.getMovementForce(),
-                        bodyComponent.getPosition().x,
-                        bodyComponent.getPosition().y,
-                        true
-                );
-            }
+        if (!tempUnit.isZero()) {
+            bodyComponent.getBody().applyLinearImpulse(
+                    tempUnit.x * bodyComponent.getMovementForce(),
+                    tempUnit.y * bodyComponent.getMovementForce(),
+                    bodyComponent.getPosition().x,
+                    bodyComponent.getPosition().y,
+                    true
+            );
         }
     }
 

@@ -1,4 +1,4 @@
-package net.artux.pda.map.states;
+package net.artux.pda.map.scenes;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Timer;
 
 import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.engine.scenes.Scene;
-import net.artux.engine.scenes.SceneController;
+import net.artux.engine.scenes.SceneManager;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.utils.di.components.CoreComponent;
@@ -21,9 +21,7 @@ import net.artux.pda.map.utils.di.components.DaggerMapComponent;
 import net.artux.pda.map.utils.di.components.MapComponent;
 import net.artux.pda.model.map.GameMap;
 
-import org.int4.dirk.api.Injector;
-import org.int4.dirk.di.Injectors;
-import org.int4.dirk.library.SingletonScopeResolver;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -44,8 +42,8 @@ public class PlayScene extends Scene {
     private final DataRepository dataRepository;
 
     @Inject
-    public PlayScene(final SceneController sceneController, DataRepository dataRepository, GameMap gameMap, CoreComponent coreComponent) {
-        super(sceneController);
+    public PlayScene(final SceneManager sceneManager, DataRepository dataRepository, GameMap gameMap, CoreComponent coreComponent) {
+        super(sceneManager);
         this.gameMap = gameMap;
         this.coreComponent = coreComponent;
         this.dataRepository = dataRepository;
@@ -76,7 +74,7 @@ public class PlayScene extends Scene {
 
         if (gameMap.getId() != map.getId()) {
             Gdx.app.getApplicationLogger().log(TAG, "Update map, old: " + gameMap.getId() + " new map: " + map.getId());
-            sceneController.set(coreComponent.getPreloadState());
+            sceneManager.set(coreComponent.getPreloadState());
         }
         engineManager.updateOnlyPlayer();
     }
@@ -89,7 +87,7 @@ public class PlayScene extends Scene {
     @Override
     protected void handleInput() {
         super.handleInput();
-        sceneController.addInputProcessor(new GestureDetector(engineManager.getGestureListener()));
+        sceneManager.addInputProcessor(new GestureDetector(engineManager.getGestureListener()));
     }
 
     @Override
@@ -139,4 +137,8 @@ public class PlayScene extends Scene {
         engineManager.dispose();
     }
 
+    @Override
+    public Map<String, Class> getAssets() {
+        return null;
+    }
 }

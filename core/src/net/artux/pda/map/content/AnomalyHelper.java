@@ -3,10 +3,8 @@ package net.artux.pda.map.content;
 import static com.badlogic.gdx.math.MathUtils.random;
 import static net.artux.pda.map.engine.ecs.entities.ai.TileType.ANOMALY;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
@@ -14,12 +12,8 @@ import com.badlogic.gdx.utils.Array;
 
 import net.artux.pda.map.engine.ecs.components.AnomalyComponent;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
-import net.artux.pda.map.engine.ecs.components.ClickComponent;
-import net.artux.pda.map.engine.ecs.components.HealthComponent;
-import net.artux.pda.map.engine.ecs.components.effects.Effects;
 import net.artux.pda.map.engine.ecs.entities.ai.TileType;
 import net.artux.pda.map.engine.ecs.entities.model.Anomaly;
-import net.artux.pda.map.engine.ecs.systems.RenderSystem;
 import net.artux.pda.map.utils.di.components.MapComponent;
 
 import java.util.HashSet;

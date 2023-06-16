@@ -22,10 +22,12 @@ import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.engine.ecs.systems.HealthSystem;
 import net.artux.pda.map.engine.ecs.systems.MapLoggerSystem;
 import net.artux.pda.map.engine.ecs.systems.RenderSystem;
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerMovingSystem;
+import net.artux.pda.map.engine.ecs.systems.statemachine.StatesSystem;
 import net.artux.pda.map.view.DebugMenu;
 import net.artux.pda.map.view.Logger;
 import net.artux.pda.map.view.MissionMenu;
@@ -36,7 +38,6 @@ import net.artux.pda.model.map.GameMap;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.Properties;
 
 import javax.inject.Named;
@@ -157,6 +158,13 @@ public class HeaderInterfaceModule {
                 }
             });
 
+            debugMenu.addCheckBox("Бессмертие", new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    engine.getSystem(HealthSystem.class).setImmortalPlayer(((CheckBox) actor).isChecked());
+                }
+            }, false);
+
             debugMenu.addCheckBox("Ускорение движения", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -191,6 +199,14 @@ public class HeaderInterfaceModule {
                     engine.getSystem(MapLoggerSystem.class).debugTiledMap(((CheckBox) actor).isChecked());
                 }
             }, false);
+
+            debugMenu.addCheckBox("Отобразить состояния сущностей", new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    engine.getSystem(StatesSystem.class).setDebugStates(((CheckBox) actor).isChecked());
+                }
+            }, false);
+
             debugMenu.addCheckBox("Пути ИИ", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {

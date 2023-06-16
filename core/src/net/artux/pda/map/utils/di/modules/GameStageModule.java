@@ -3,6 +3,7 @@ package net.artux.pda.map.utils.di.modules;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -63,6 +64,7 @@ public class GameStageModule {
     public Skin getSkin(AssetManager assetManager) {
         return assetManager.get("skins/cloud/cloud-form-ui.json");
     }
+
 
     @Provides
     @PerGameMap

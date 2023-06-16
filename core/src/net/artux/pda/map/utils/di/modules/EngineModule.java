@@ -2,7 +2,6 @@ package net.artux.pda.map.utils.di.modules;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -11,16 +10,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import net.artux.engine.di.System;
 import net.artux.pda.map.utils.MapInfo;
-import net.artux.pda.map.engine.ecs.entities.MapBodyBuilder;
+import net.artux.engine.utils.MapBodyBuilder;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.map.GameMap;
-
-import org.int4.dirk.di.Injectors;
-import org.int4.dirk.library.SingletonScopeResolver;
-import org.int4.dirk.spi.config.ScopeStrategy;
-import org.int4.dirk.spi.scope.ScopeResolver;
 
 import java.util.Set;
 
@@ -28,7 +21,6 @@ import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
-import jakarta.inject.Singleton;
 
 @Module(includes = EngineSystemsModule.class)
 public class EngineModule {

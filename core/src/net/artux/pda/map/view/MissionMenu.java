@@ -118,7 +118,6 @@ public class MissionMenu extends Table {
                 MissionBlock missionBlock = new MissionBlock(getSkin(), missionModel, assetsFinder, params);
                 menuTable.addActor(missionBlock);
                 missionBlock.addListener(new ActorGestureListener() {
-
                     @Override
                     public void tap(InputEvent event, float x, float y, int count, int button) {
                         super.tap(event, x, y, count, button);

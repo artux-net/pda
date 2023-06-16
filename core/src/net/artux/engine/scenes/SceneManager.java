@@ -3,8 +3,10 @@ package net.artux.engine.scenes;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
 
-import net.artux.pda.map.states.ErrorScene;
+import net.artux.engine.utils.AssetsController;
+import net.artux.pda.map.scenes.ErrorScene;
 import net.artux.pda.map.utils.di.components.CoreComponent;
 
 import java.util.Stack;
@@ -13,16 +15,18 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class SceneController {
+public class SceneManager implements Screen {
 
     private final Stack<Scene> scenes;
     private final InputMultiplexer multiplexer = new InputMultiplexer();
     private final CoreComponent coreComponent;
+    //private final AssetsController assetsController;
 
     @Inject
-    public SceneController(CoreComponent coreComponent) {
+    public SceneManager(CoreComponent coreComponent) {
         scenes = new Stack<>();
         this.coreComponent = coreComponent;
+        //assetsController = new AssetsController(coreComponent.getAssetsManager());
     }
 
     public void push(Scene scene) {
@@ -33,8 +37,17 @@ public class SceneController {
     }
 
     public void resume() {
-
         scenes.peek().resume();
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
     public Scene peek() {
@@ -45,6 +58,7 @@ public class SceneController {
         Scene current = scenes.pop();
         current.stop();
         current.dispose();
+        //assetsController.unload(current);
         clearInputProcessors();
         scenes.push(scene);
         scenes.peek().handleInput();
@@ -72,6 +86,11 @@ public class SceneController {
     public void resize(int width, int height) {
         if (scenes.size() > 0)
             scenes.peek().resize(width, height);
+    }
+
+    @Override
+    public void show() {
+
     }
 
     public void render(float dt) {
