@@ -24,10 +24,19 @@ public class Cache<T> {
         mSharedPreferences.edit().putString(id, gson.toJson(object)).apply();
     }
 
-    public T get(String id) {
+    private T getById(String id) {
         if (!mSharedPreferences.contains(id))
             return null;
         return gson.fromJson(mSharedPreferences.getString(id, ""), typeParameterClass);
+    }
+
+    public T get(String id) {
+        try {
+            return getById(id);
+        } catch (Exception e) {
+            clear();
+            return null;
+        }
     }
 
     public boolean remove(String id) {
@@ -44,9 +53,12 @@ public class Cache<T> {
 
     public List<T> getAll() {
         List<T> result = new LinkedList<>();
-        for (String id :
-                getIds()) {
-            result.add(get(id));
+        try {
+            for (String id : getIds()) {
+                result.add(get(id));
+            }
+        }catch (Exception e){
+            clear();
         }
         return result;
     }

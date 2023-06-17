@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import net.artux.pda.common.ActionHandler
 import net.artux.pda.map.utils.PlatformInterface
 import net.artux.pda.model.QuestUtil
 import net.artux.pda.model.items.ItemsContainerModel
@@ -64,6 +65,7 @@ class DataRepository(
 
     val gson = Gson()
     var updated: Boolean = true
+    var actionHandler: ActionHandler? = null
 
     init {
         dataModelFlow.tryEmit(storyDataModel)
@@ -91,6 +93,7 @@ class DataRepository(
             HashMap(QuestUtil.difference(storyDataModel, currentStoryDataModel))
         else
             HashMap()
+        actionHandler?.applyActions(actions)
         if (actions != null) {
             summaryMap.putAll(actions)
             platformInterface.applyActions(summaryMap)

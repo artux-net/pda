@@ -22,8 +22,8 @@ import dagger.hilt.InstallIn;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 import dagger.hilt.components.SingletonComponent;
 
-@InstallIn(SingletonComponent.class)
 @Module
+@InstallIn(SingletonComponent.class)
 public class CacheModule {
 
     @Provides
@@ -45,11 +45,6 @@ public class CacheModule {
     public Cache<UserDto> getUserCache(@ApplicationContext Context context, Gson gson) {
         return new Cache<>(UserDto.class, context, gson);
     }
-
-   /* @Provides
-    public Cache<StoryDto> getStoryCache(@ApplicationContext Context context, Gson gson) {
-        return new Cache<>(StoryDto.class, context, gson);
-    }*/
 
     @Provides
     public Cache<Summary> getSummaryCache(@ApplicationContext Context context, Gson gson) {
