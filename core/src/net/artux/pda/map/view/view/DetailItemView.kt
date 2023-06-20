@@ -3,34 +3,30 @@ package net.artux.pda.map.view.view
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Scaling
-import net.artux.engine.ui.InputListener
 import net.artux.engine.ui.ScalableLabel
 import net.artux.engine.utils.LocaleBundle
-import net.artux.pda.map.utils.Colors
+import net.artux.pda.map.view.dialog.ItemDescDialog
 import net.artux.pda.map.view.units.LazyImage
 import net.artux.pda.map.view.view.bars.Bar
-import net.artux.pda.map.view.view.bars.Utils
 import net.artux.pda.model.items.ArmorModel
 import net.artux.pda.model.items.WeaponModel
 import net.artux.pda.model.items.WearableModel
+import javax.inject.Inject
+import javax.inject.Named
 
-class DetailItemView(
-    itemModel: WearableModel?,
-    titleStyle: LabelStyle,
-    descStyle: LabelStyle,
+class DetailItemView @Inject constructor(
+    @Named("titleStyle") titleStyle: LabelStyle,
+    @Named("descStyle") descStyle: LabelStyle,
     private val localeBundle: LocaleBundle,
-    assetManager: AssetManager
+    assetManager: AssetManager,
+    private val dialog: ItemDescDialog
 ) : Table() {
     private val titleLabel: Label
     private val descLabel: Label
@@ -65,79 +61,13 @@ class DetailItemView(
         add(conditionBar)
             .fillX()
             .colspan(2)
-        setWearableModel(itemModel)
         addListener(object : ActorGestureListener() {
             override fun tap(event: InputEvent, x: Float, y: Float, count: Int, button: Int) {
                 super.tap(event, x, y, count, button)
                 if (wearableModel == null)
                     return
-                val textButtonStyle = TextButton.TextButtonStyle()
-                textButtonStyle.up = Utils.getColoredDrawable(1, 1, Colors.primaryColor)
-                textButtonStyle.font = titleStyle.font
-                textButtonStyle.fontColor = Color.WHITE
-
-                val btnClose = TextButton(localeBundle.get("main.close"), textButtonStyle)
-
-                val skinDialog: Skin = skin
-                val dialog: Dialog = object : Dialog("", skinDialog) {}
-                dialog.isModal = true
-                dialog.isMovable = false
-                dialog.isResizable = false
-                val descLabel = Label("", titleStyle)
-
-                if (wearableModel is ArmorModel) {
-                    val armor = (wearableModel as ArmorModel)
-                    descLabel.setText(
-                        localeBundle.get(
-                            "armor.desc",
-                            armor.thermalProtection,
-                            armor.electricProtection,
-                            armor.chemicalProtection,
-                            armor.radioProtection,
-                            armor.psyProtection,
-                            armor.damageProtection,
-                            armor.condition
-                        )
-                    )
-                } else if (wearableModel is WeaponModel) {
-                    val weapon = (wearableModel as WeaponModel)
-                    descLabel.setText(
-                        localeBundle.get(
-                            "weapon.desc",
-                            weapon.precision,
-                            weapon.speed,
-                            weapon.damage,
-                            weapon.condition
-                        )
-                    )
-                }
-                btnClose.addListener(object : InputListener() {
-                    override fun touchDown(
-                        event: InputEvent?, x: Float, y: Float,
-                        pointer: Int, button: Int
-                    ): Boolean {
-                        dialog.cancel()
-                        dialog.hide()
-                        return true
-                    }
-                })
-
-                val drawable: Drawable = Utils.getColoredDrawable(1, 1, Colors.backgroundColor)
-                dialog.background = drawable
-
-                val t = Table()
-                t.defaults().space(20f)
-
-                dialog.text(wearableModel!!.title, titleStyle)
-
-                dialog.contentTable.row()
-                dialog.contentTable.add(descLabel).left().grow()
-
-                t.add(btnClose).grow().uniform()
-
-                dialog.buttonTable.add(t).grow()
+                dialog.update(wearableModel!!)
                 dialog.show(stage)
-
             }
         })
     }

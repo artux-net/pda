@@ -8,10 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
 import net.artux.engine.pathfinding.TiledNavigator;
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.utils.MapInfo;
+import net.artux.pda.map.view.view.bars.Utils;
 
 public class UserInterface extends Group {
 
@@ -21,11 +23,14 @@ public class UserInterface extends Group {
     private final Group gameZone;
     private final UIFrame uiFrame;
     private final Skin skin;
+    private final AssetsFinder assetsFinder;
 
     public UserInterface(Skin skin, AssetsFinder assetsFinder, TiledNavigator tiledNavigator, Camera uiCamera, Camera camera, MapInfo mapInfo) {
         super();
+        this.assetsFinder = assetsFinder;
         this.stack = new Stack();
         this.skin = skin;
+        updateSkin(skin);
 
         font = assetsFinder.getFontManager().getFont(24);
         uiFrame = new UIFrame(assetsFinder.getManager(), camera, uiCamera, tiledNavigator, font, mapInfo);
@@ -75,6 +80,12 @@ public class UserInterface extends Group {
 
     public UIFrame getUIFrame() {
         return uiFrame;
+    }
+
+    private void updateSkin(Skin skin){
+        Window.WindowStyle windowStyle = skin.get(Window.WindowStyle.class);
+        windowStyle.titleFont = assetsFinder.getFontManager().getFont(38);
+        windowStyle.background = Utils.getColoredDrawable(1, 1, Color.BLACK);
     }
 
 }

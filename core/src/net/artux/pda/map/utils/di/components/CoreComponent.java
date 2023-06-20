@@ -12,6 +12,7 @@ import net.artux.pda.map.scenes.PlayScene;
 import net.artux.pda.map.scenes.PreloadScene;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.utils.di.modules.AppModule;
+import net.artux.pda.map.view.FontManager;
 import net.artux.pda.model.map.GameMap;
 
 import java.util.Properties;
@@ -46,6 +47,8 @@ public interface CoreComponent {
     GameMap getGameMap();
 
     Properties getProperties();
+
+    FontManager getFontManager();
 
     @Named("testerMode")
     Boolean isTesterMode();

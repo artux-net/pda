@@ -54,8 +54,8 @@ public class MoodComponent implements Component {
         this.angry = true;
     }
 
-    public MoodComponent(GroupComponent groupComponent) {
-        this(groupComponent.getGang(), groupComponent.getRelations(), groupComponent.getParams());
+    public MoodComponent(Group group) {
+        this(group.getGang(), group.getRelations(), group.getParams());
     }
 
     public boolean isEnemy(MoodComponent moodComponent) {

@@ -13,7 +13,8 @@ public interface PlatformInterface {
 
     void openPDA();
 
-    void rewardedAd();
+    void rewardedVideoAd();
+    void rewardedBannerAd();
 
     void debug(String msg);
 

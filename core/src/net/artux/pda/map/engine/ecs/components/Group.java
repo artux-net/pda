@@ -12,7 +12,7 @@ import net.artux.pda.model.user.Gang;
 
 import java.util.Set;
 
-public class GroupComponent implements Component {
+public class Group implements Component {
 
     ComponentMapper<BodyComponent> positionComponentComponentMapper = ComponentMapper.getFor(BodyComponent.class);
 
@@ -24,7 +24,7 @@ public class GroupComponent implements Component {
     private TargetMovingComponent.Targeting targeting;
     private final Set<String> params;
 
-    public GroupComponent(Gang gang, Integer[] relations, Strength strength, Set<String> params) {
+    public Group(Gang gang, Integer[] relations, Strength strength, Set<String> params) {
         this.gang = gang;
         this.relations = relations;
         this.strength = strength;

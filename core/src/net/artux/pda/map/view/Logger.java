@@ -68,7 +68,7 @@ public class Logger extends VerticalGroup {
             super.draw(batch, parentAlpha);
     }
 
-    public void put(String title, Object o, String nameOfMethod) {
+    public void putListiner(String title, Object o, String nameOfMethod) {
         Method method = null;
         try {
             if (nameOfMethod == null || nameOfMethod.equals(""))

@@ -19,7 +19,7 @@ import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.BulletComponent;
 import net.artux.pda.map.engine.ecs.components.FogOfWarComponent;
 import net.artux.pda.map.engine.ecs.components.GraphMotionComponent;
-import net.artux.pda.map.engine.ecs.components.GroupComponent;
+import net.artux.pda.map.engine.ecs.components.Group;
 import net.artux.pda.map.engine.ecs.components.HealthComponent;
 import net.artux.pda.map.engine.ecs.components.LeaderComponent;
 import net.artux.pda.map.engine.ecs.components.MoodComponent;
@@ -114,7 +114,7 @@ public class EntityBuilder {
         return new Vector2(basePosition.x + x, basePosition.y + y);
     }
 
-    public Entity createGroupStalker(Vector2 position, GroupComponent group) {
+    public Entity createGroupStalker(Vector2 position, Group group) {
         Entity entity = new Entity();
 
         WeaponModel w = new WeaponModel();
@@ -187,8 +187,8 @@ public class EntityBuilder {
         return entity;
     }
 
-    public Entity createLeader(Vector2 pos, GroupComponent groupComponent) {
-        Entity entity = createGroupStalker(pos, groupComponent);
+    public Entity createLeader(Vector2 pos, Group group) {
+        Entity entity = createGroupStalker(pos, group);
         entity.add(new LeaderComponent());
         return entity;
     }

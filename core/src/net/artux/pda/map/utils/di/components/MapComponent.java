@@ -18,6 +18,7 @@ import net.artux.pda.map.managers.ConditionEntityManager;
 import net.artux.pda.map.utils.di.modules.EngineModule;
 import net.artux.pda.map.utils.di.modules.ui.UserInterfaceModule;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
+import net.artux.pda.map.view.FontManager;
 import net.artux.pda.map.view.UserInterface;
 
 import java.util.Set;
@@ -63,5 +64,6 @@ public interface MapComponent extends CoreComponent {
     ConditionEntityManager getConditionManager();
 
     PostProcessing getPostProcessing();
+
 
 }

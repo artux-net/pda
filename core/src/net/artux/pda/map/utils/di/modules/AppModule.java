@@ -9,6 +9,7 @@ import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.utils.PlatformInterface;
+import net.artux.pda.map.view.FontManager;
 import net.artux.pda.model.map.GameMap;
 
 import java.util.Properties;
@@ -39,6 +40,12 @@ public class AppModule {
         return getProperties()
                 .getProperty(PropertyFields.TESTER_MODE, "false")
                 .equals("true");
+    }
+
+    @Provides
+    @Singleton
+    public FontManager fontManager(AssetsFinder assetsFinder) {
+        return assetsFinder.getFontManager();
     }
 
     @Provides

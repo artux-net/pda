@@ -3,68 +3,58 @@ package net.artux.pda.map.view
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.artux.engine.ui.InputListener
 import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.map.DataRepository
 import net.artux.pda.map.content.assets.AssetsFinder
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem
 import net.artux.pda.map.utils.Colors
-import net.artux.pda.map.utils.PlatformInterface
 import net.artux.pda.map.utils.di.scope.PerGameMap
 import net.artux.pda.map.view.blocks.SlotTextButton
+import net.artux.pda.map.view.dialog.AdsDialog
+import net.artux.pda.map.view.dialog.ThrowItemDialog
 import net.artux.pda.map.view.view.DetailItemView
 import net.artux.pda.map.view.view.HUD
 import net.artux.pda.map.view.view.ItemsTableView
 import net.artux.pda.map.view.view.OnItemClickListener
 import net.artux.pda.map.view.view.bars.Utils
-import net.artux.pda.model.items.ArmorModel
-import net.artux.pda.model.items.ItemModel
-import net.artux.pda.model.items.ItemType
-import net.artux.pda.model.items.MedicineModel
-import net.artux.pda.model.items.WeaponModel
-import net.artux.pda.model.items.WearableModel
+import net.artux.pda.model.items.*
 import net.artux.pda.model.quest.story.StoryDataModel
 import javax.inject.Inject
 
 
 @PerGameMap
 class BackpackMenu @Inject constructor(
+    private val localeBundle: LocaleBundle,
+    private val dataRepository: DataRepository,
+    private val armorView: DetailItemView,
+    private val rifleView: DetailItemView,
+    private val pistolView: DetailItemView,
+
     userInterface: UserInterface,
-    platformInterface: PlatformInterface,
-    hud: HUD,
     textButton: SlotTextButton,
     adButton: SlotTextButton,
     assetsFinder: AssetsFinder,
     playerSystem: PlayerSystem,
-    private val localeBundle: LocaleBundle,
-    private val dataRepository: DataRepository,
-    skin: Skin?,
-    soundsSystem: SoundsSystem
+    soundsSystem: SoundsSystem,
+    throwItemDialog: ThrowItemDialog,
+    adsDialog: AdsDialog,
+    skin: Skin,
+    hud: HUD
 ) : Table() {
     private var assetManager: AssetManager
     private var fontManager: FontManager
     private var infoLabel: Label
     private var mainItemsView: ItemsTableView
-    private var armorView: DetailItemView
-    private var rifleView: DetailItemView
-    private var pistolView: DetailItemView
     private lateinit var lastDataModel: StoryDataModel
 
     fun update(dataModel: StoryDataModel) {
@@ -111,16 +101,12 @@ class BackpackMenu @Inject constructor(
         leftTable.add(infoLabel)
         leftTable.row()
 
-        armorView = DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
         armorView.skin = userInterface.skin
         leftTable.add(armorView)
             .grow()
 
         val verticalGroup = Table()
-        rifleView = DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
         rifleView.skin = userInterface.skin
-        pistolView =
-            DetailItemView(null, titleLabelStyle, subtitleStyle, localeBundle, assetManager)
         pistolView.skin = userInterface.skin
         pistolView.disableDesc()
         rifleView.disableDesc()
@@ -164,92 +150,8 @@ class BackpackMenu @Inject constructor(
             }
 
             override fun onLongPress(itemModel: ItemModel) {
-                val textButtonStyle = TextButtonStyle()
-                textButtonStyle.up = Utils.getColoredDrawable(1, 1, Colors.primaryColor)
-                textButtonStyle.font = titleLabelStyle.font
-                textButtonStyle.fontColor = Color.WHITE
-
-                val btnYes = TextButton(localeBundle.get("main.throw"), textButtonStyle)
-                val btnNo = TextButton(localeBundle.get("main.cancel"), textButtonStyle)
-
-                val skinDialog: Skin = userInterface.skin
-                val dialog: Dialog = object : Dialog("", skinDialog) {}
-                dialog.isModal = true
-                dialog.isMovable = false
-                dialog.isResizable = false
-
-                val slider = Slider(1f, itemModel.quantity.toFloat(), 1f, false, skin)
-                slider.style.knob.minWidth = 50f
-                slider.style.knob.minHeight = 50f
-                val weightLabel =
-                    Label(localeBundle.get("item.weight", itemModel.weight), titleLabelStyle)
-
-                val quantityLabel =
-                    Label(localeBundle.get("item.quantity", 1), titleLabelStyle)
-
-                slider.addListener(object : ChangeListener() {
-                    override fun changed(event: ChangeEvent?, actor: Actor?) {
-                        weightLabel.setText(
-                            localeBundle.get(
-                                "item.weight",
-                                itemModel.weight * slider.value.toInt()
-                            )
-                        )
-                        quantityLabel.setText(
-                            localeBundle.get(
-                                "item.quantity",
-                                slider.value.toInt()
-                            )
-                        )
-                    }
-                })
-
-                btnYes.addListener(object : InputListener() {
-                    override fun touchDown(
-                        event: InputEvent?, x: Float, y: Float,
-                        pointer: Int, button: Int
-                    ): Boolean {
-                        val q = slider.value.toInt()
-                        itemModel.quantity -= q
-                        dataRepository.update()
-
-                        dialog.hide()
-                        dialog.cancel()
-                        dialog.remove()
-                        return true
-                    }
-                })
-
-                btnNo.addListener(object : InputListener() {
-                    override fun touchDown(
-                        event: InputEvent?, x: Float, y: Float,
-                        pointer: Int, button: Int
-                    ): Boolean {
-                        dialog.cancel()
-                        dialog.hide()
-                        return true
-                    }
-                })
-
-                val drawable: Drawable = Utils.getColoredDrawable(1, 1, Colors.backgroundColor)
-                dialog.background = drawable
-
-                val t = Table()
-                t.defaults().space(20f)
-
-                dialog.text(localeBundle.get("item.throw", itemModel.title), titleLabelStyle)
-                dialog.contentTable.row()
-                dialog.contentTable.add(quantityLabel).center().growX()
-                    .row()
-                if (itemModel.type.isCountable)
-                    dialog.contentTable.add(slider).growX().row()
-                dialog.contentTable.add(weightLabel).center().growX()
-
-                t.add(btnYes).grow().uniform()
-                t.add(btnNo).grow().uniform()
-
-                dialog.buttonTable.add(t).grow()
-                dialog.show(stage)
+                throwItemDialog.update(itemModel)
+                throwItemDialog.show(stage)
             }
 
         }
@@ -264,7 +166,7 @@ class BackpackMenu @Inject constructor(
         adButton.setText(localeBundle["main.ad.rewarded"])
         adButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent, x: Float, y: Float) {
-                platformInterface.rewardedAd()
+                adsDialog.show(stage)
             }
         })
 

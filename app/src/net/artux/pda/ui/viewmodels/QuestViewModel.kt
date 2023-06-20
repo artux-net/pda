@@ -220,9 +220,8 @@ class QuestViewModel @javax.inject.Inject constructor(
     }
 
     fun syncNow(map: Map<String, MutableList<String>>) {
-        commandController.process(map)
         viewModelScope.launch {
-            syncNow()
+            commandController.syncNow(map)
         }
     }
 

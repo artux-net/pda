@@ -76,7 +76,6 @@ class DataRepository(
         this.storyDataModel = SerializationUtils.clone(storyDataModel)
         currentStoryDataModel = storyDataModel
         dataModelFlow.tryEmit(storyDataModel)
-
     }
 
     fun sendData(map: Map<String, String>) {

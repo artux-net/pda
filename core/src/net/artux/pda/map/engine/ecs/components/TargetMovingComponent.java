@@ -5,10 +5,10 @@ import com.badlogic.gdx.math.Vector2;
 
 public class TargetMovingComponent implements Component {
     private Targeting targeting;
-    private GroupComponent groupComponent;
+    private Group group;
 
-    public TargetMovingComponent(GroupComponent groupComponent) {
-        this.groupComponent = groupComponent;
+    public TargetMovingComponent(Group group) {
+        this.group = group;
     }
 
     public TargetMovingComponent(Targeting targeting) {
@@ -16,9 +16,9 @@ public class TargetMovingComponent implements Component {
     }
 
     public Vector2 nextTarget() {
-        if (groupComponent != null)
-            if (targeting == null || targeting != groupComponent.getTargeting())
-                targeting = groupComponent.getTargeting();
+        if (group != null)
+            if (targeting == null || targeting != group.getTargeting())
+                targeting = group.getTargeting();
         return targeting.getTarget();
     }
 

@@ -18,11 +18,8 @@ import com.badlogic.gdx.backends.android.AndroidAudio;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.badlogic.gdx.backends.android.AsynchronousAndroidAudio;
 import com.yandex.mobile.ads.common.AdRequest;
-import com.yandex.mobile.ads.common.AdRequestError;
-import com.yandex.mobile.ads.common.ImpressionData;
-import com.yandex.mobile.ads.rewarded.Reward;
+import com.yandex.mobile.ads.interstitial.InterstitialAd;
 import com.yandex.mobile.ads.rewarded.RewardedAd;
-import com.yandex.mobile.ads.rewarded.RewardedAdEventListener;
 
 import net.artux.pda.app.PDAApplication;
 import net.artux.pda.map.DataRepository;
@@ -98,7 +95,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             GameMap map = (GameMap) args.getSerializable("map");
 
             DataRepository dataRepository = gdxAdapter.getDataRepository();
-            dataRepository.setUserData(dataModel);
+            //dataRepository.setUserData(dataModel);
             dataRepository.setGameMap(map);
 
             boolean updated = args.getBoolean("updated", false);
@@ -139,6 +136,18 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     }
 
     @Override
+    public void rewardedVideoAd() {
+        runOnUiThread(() -> {
+            RewardedAd rewardedAd = new RewardedAd(requireContext());
+            rewardedAd.setAdUnitId("R-M-2151056-2");
+
+            final AdRequest adRequest = new AdRequest.Builder().build();
+            rewardedAd.setRewardedAdEventListener(new VideoAdListener(this, rewardedAd));
+            rewardedAd.loadAd(adRequest);
+        });
+    }
+
+    @Override
     public void applyActions(Map<String, List<String>> actions) {
         questViewModel.syncNow(actions);
     }
@@ -169,65 +178,16 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     }
 
     @Override
-    public void rewardedAd() {
-        RewardedAd mRewardedAd = new RewardedAd(requireContext());
-        mRewardedAd.setAdUnitId("R-M-2151056-2");
+    public void rewardedBannerAd() {
+        runOnUiThread(() -> {
+            InterstitialAd interstitialAd = new InterstitialAd(requireContext());
+            interstitialAd.setAdUnitId("R-M-2151056-3");
 
-        // Создание объекта таргетирования рекламы.
-        final AdRequest adRequest = new AdRequest.Builder().build();
-
-        // Регистрация слушателя для отслеживания событий, происходящих в рекламе.
-        mRewardedAd.setRewardedAdEventListener(new RewardedAdEventListener() {
-
-            @Override
-            public void onRewarded(final Reward reward) {
-                questViewModel.syncNow(Map.of("money", List.of(String.valueOf(reward.getAmount()))));
-            }
-
-            @Override
-            public void onAdClicked() {
-
-            }
-
-            @Override
-            public void onAdLoaded() {
-                mRewardedAd.show();
-            }
-
-            @Override
-            public void onAdFailedToLoad(final AdRequestError adRequestError) {
-                //...
-            }
-
-            @Override
-            public void onAdShown() {
-                //...
-            }
-
-            @Override
-            public void onAdDismissed() {
-                //...
-            }
-
-            @Override
-            public void onLeftApplication() {
-                //...
-            }
-
-            @Override
-            public void onReturnedToApplication() {
-                //...
-            }
-
-            @Override
-            public void onImpression(@Nullable ImpressionData impressionData) {
-
-            }
+            final AdRequest adRequest = new AdRequest.Builder().build();
+            interstitialAd.setInterstitialAdEventListener(
+                    new InterstitialAdListener(this, interstitialAd));
+            interstitialAd.loadAd(adRequest);
         });
-
-        // Загрузка объявления.
-        mRewardedAd.loadAd(adRequest);
-
     }
 
     @Override

@@ -107,7 +107,8 @@ public class EjectionSystem extends EntitySystem {
         if (test)
             minutes = 1;
         notificationController.notify(NotificationType.ATTENTION,
-                localeBundle.get("main.ejection.begin"), localeBundle.get("main.ejection.begin.desc", minutes));
+                localeBundle.get("main.ejection.notif"), localeBundle.get("main.ejection.notif.desc", minutes));
+
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
@@ -119,7 +120,8 @@ public class EjectionSystem extends EntitySystem {
     private void processEjection() {
         ejectionActive = true;
         UserMessage message = notificationController.generateMessage();
-        message.setContent(localeBundle.get("main.ejection.begin.message"));
+        notificationController.setTitle(localeBundle.get("main.ejection.begin"));
+        message.setContent(localeBundle.get("main.ejection.notif.message"));
         notificationController.addMessage(message);
 
         int secs = random(40, 90);

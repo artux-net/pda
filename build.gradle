@@ -114,3 +114,15 @@ project(":core") {
     }
 }
 
+project(":desktop") {
+    apply plugin: "java"
+
+    dependencies {
+        implementation project(":core")
+        implementation project(":model")
+
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    }
+}
+

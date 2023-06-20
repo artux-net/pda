@@ -13,7 +13,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Pool;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
@@ -21,7 +20,7 @@ import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.ClickComponent;
-import net.artux.pda.map.engine.ecs.components.GroupComponent;
+import net.artux.pda.map.engine.ecs.components.Group;
 import net.artux.pda.map.engine.ecs.components.SpriteComponent;
 import net.artux.pda.map.engine.ecs.components.map.ConditionComponent;
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent;
@@ -47,15 +46,17 @@ public class EntityProcessorSystem extends EntitySystem {
     private final RenderSystem renderSystem;
     private final GangRelations gangRelations;
     private final World world;
+    private final MapOrientationSystem mapOrientationSystem;
     private final LocaleBundle localeBundle;
 
     @Inject
-    public EntityProcessorSystem(EntityBuilder entityBuilder, AssetManager assetManager, RenderSystem renderSystem, World world, LocaleBundle localeBundle) {
+    public EntityProcessorSystem(EntityBuilder entityBuilder, AssetManager assetManager, RenderSystem renderSystem, World world, MapOrientationSystem mapOrientationSystem, LocaleBundle localeBundle) {
         super();
         this.world = world;
         builder = entityBuilder;
         this.renderSystem = renderSystem;
         this.assetManager = assetManager;
+        this.mapOrientationSystem = mapOrientationSystem;
         this.localeBundle = localeBundle;
         JsonReader reader = new JsonReader(Gdx.files.internal("config/mobs.json").reader());
         gangRelations = new Gson().fromJson(reader, GangRelations.class);
@@ -81,14 +82,14 @@ public class EntityProcessorSystem extends EntitySystem {
         getEngine().addEntity(entity);
     }
 
-    public Entity generateSpawn(SpawnModel spawnModel) {
+    public Entity generateSpawn(SpawnModel spawnModel, boolean withSprite) {
         Gang gang = spawnModel.getGroup();
         SpawnComponent spawnComponent = new SpawnComponent(spawnModel);
         Vector2 position = spawnComponent.getPosition();
         Entity controlPoint = new Entity();
 
         if (gang != null) {
-            GroupComponent group = generateGroup(position, gang, gangRelations.get(gang),
+            Group group = generateGroup(position, gang,
                     spawnModel.getN(), spawnModel.getParams(), spawnModel.getStrength());
             spawnComponent.setGroup(group);
 
@@ -107,42 +108,63 @@ public class EntityProcessorSystem extends EntitySystem {
         return controlPoint;
     }
 
-
-    public GroupComponent generateGroup(Vector2 pos, Gang gang, Integer[] relations, int n, Set<String> params, Strength strength) {
-        GroupComponent groupComponent = new GroupComponent(gang, relations, strength, params);
-
-        Entity leader = builder.createLeader(pos, groupComponent);
-        groupComponent.addEntity(leader);
-        leader.add(new ClickComponent(10, () ->
-                renderSystem.showText(localeBundle.get(groupComponent.getGang().getTitleId()), pm.get(leader).getPosition())));
-        getEngine().addEntity(leader);
-
-        for (int i = 0; i < n; i++) {
-            Entity entity = builder.createGroupStalker(getRandomAround(pos, 15), groupComponent);
-            getEngine().addEntity(entity);
-            groupComponent.addEntity(entity);
-        }
-        return groupComponent;
-    }
-
     public void addBulletToEngine(Entity entity, Entity target, WeaponModel weaponModel) {
         Entity bullet = builder.bullet(entity, target, weaponModel);
         getEngine().addEntity(bullet);
     }
 
-    public void generateTakeSpawnGroup(Vector2 randomTransferPosition, Vector2 attackTarget) {
-        Gang gang = gangRelations.random();
-        GroupComponent group = generateGroup(randomTransferPosition, gang,
-                gangRelations.get(gang), random(4, 7), Collections.emptySet(), Strength.WEAK);
-        group.setTargeting(() -> attackTarget);
+    public Group generateGroup(Gang gang) {
+        return generateGroup(gang, random(4, 7));
     }
 
-    public void generateAttackSpawnGroup(Vector2 randomTransferPosition, SpawnComponent spawnComponent) {
+    public Group generateGroup(Gang gang, int n) {
+        Vector2 randomPosition = mapOrientationSystem.getPointToSpawnEntity();
+        return generateGroup(randomPosition, gang, n, Collections.emptySet(), Strength.WEAK);
+    }
+
+    public Group generateGroup(Vector2 pos, Gang gang, int n) {
+        return generateGroup(pos, gang, n, Collections.emptySet(), Strength.WEAK);
+    }
+
+    public Group generateGroup(Vector2 pos, Gang gang, int n, Strength strength) {
+        return generateGroup(pos, gang, n, Collections.emptySet(), strength);
+    }
+
+    public Group generateGroup(Vector2 pos, Gang gang, int n, Set<String> params, Strength strength) {
+        Integer[] relations = gangRelations.get(gang);
+        Group group = new Group(gang, relations, strength, params);
+
+        Entity leader = builder.createLeader(pos, group);
+        group.addEntity(leader);
+        leader.add(new ClickComponent(10, () ->
+                renderSystem.showText(localeBundle.get(group.getGang().getTitleId()), pm.get(leader).getPosition())));
+        getEngine().addEntity(leader);
+
+        for (int i = 0; i < n - 1; i++) {
+            Entity entity = builder.createGroupStalker(getRandomAround(pos, 15), group);
+            getEngine().addEntity(entity);
+            group.addEntity(entity);
+        }
+        return group;
+    }
+
+
+    public Group generateTakeSpawnGroup(Vector2 attackTarget) {
+        Gang gang = gangRelations.random();
+        return generateTakeSpawnGroup(gang, attackTarget);
+    }
+
+    public Group generateTakeSpawnGroup(Gang gang, Vector2 attackTarget) {
+        Group group = generateGroup(gang, random(4, 7));
+        group.setTargeting(() -> attackTarget);
+        return group;
+    }
+
+    public void generateAttackSpawnGroup(SpawnComponent spawnComponent) {
         Gang currentGang = spawnComponent.getSpawnModel().getGroup();
         Gang enemyGang = gangRelations.findEnemyByGang(currentGang);
         if (enemyGang != null) {
-            GroupComponent group = generateGroup(randomTransferPosition, enemyGang,
-                    gangRelations.get(enemyGang), random(4, 7), Collections.emptySet(), Strength.WEAK);
+            Group group = generateGroup(enemyGang, random(4, 7));
             group.setTargeting(spawnComponent::getPosition);
         }
     }

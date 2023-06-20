@@ -42,15 +42,17 @@ public interface StageMapper {
     default NotificationModel notification(Stage stage, StoryDataModel storyDataModel) {
         if (stage != null && stage.getMessage() != null && !stage.getMessage().trim().equals("")) {
             NotificationModel notificationModel = new NotificationModel();
-            String title = null;
+            String title;
             String message = formatText(stage.getMessage(), storyDataModel);
             if (message.contains(":")) {
                 String[] parts = message.split(":", 2);
                 title = parts[0];
                 message = parts[1];
+            } else {
+                title = "Уведомление";
             }
-            notificationModel.setTitle(title);
-            notificationModel.setMessage(message);
+            notificationModel.setTitle(title.trim());
+            notificationModel.setMessage(message.trim());
 
             if (stage.getTypeStage() == 0)
                 notificationModel.setType(NotificationType.ALERT);

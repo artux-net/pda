@@ -2,7 +2,11 @@ package net.artux.pda.map.engine.ecs.systems;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.ai.pfa.PathSmoother;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.ai.utils.Ray;
@@ -14,6 +18,8 @@ import net.artux.engine.pathfinding.FlatTiledNode;
 import net.artux.engine.pathfinding.TiledManhattanDistance;
 import net.artux.engine.pathfinding.TiledNavigator;
 import net.artux.engine.pathfinding.TiledRaycastCollisionDetector;
+import net.artux.pda.map.engine.ecs.components.BodyComponent;
+import net.artux.pda.map.engine.ecs.components.map.TransferComponent;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 
@@ -27,6 +33,7 @@ public class MapOrientationSystem extends EntitySystem {
     private final FlatTiledGraph worldGraph;
     private final TiledNavigator tiledNavigator;
 
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private final TiledManhattanDistance<FlatTiledNode> heuristic;
     private final IndexedAStarPathFinder<FlatTiledNode> pathFinder;
     private final PathSmoother<FlatTiledNode, Vector2> pathSmoother;
@@ -81,6 +88,21 @@ public class MapOrientationSystem extends EntitySystem {
     private Vector2 getRandomVectorWithInNode(int x, int y) {
         return new Vector2(x * tileSize + random.nextInt(tileSize),
                 y * tileSize + random.nextInt(tileSize));
+    }
+
+    /**
+     * выбирает рандомный переход или точку вне видимой области
+     * @return
+     */
+    public Vector2 getPointToSpawnEntity(){
+        ImmutableArray<Entity> transfers = getEngine().getEntitiesFor(Family.all(BodyComponent.class, TransferComponent.class).get());
+        Entity randomTransfer = transfers.random();
+        Vector2 randomTransferPosition;
+        if (randomTransfer == null)
+            randomTransferPosition = getRandomFreePoint();
+        else
+            randomTransferPosition = pm.get(randomTransfer).getPosition();
+        return randomTransferPosition;
     }
 
     public TiledNavigator getNavigator() {

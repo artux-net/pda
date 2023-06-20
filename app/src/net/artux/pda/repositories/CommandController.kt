@@ -8,8 +8,8 @@ import kotlinx.coroutines.launch
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.quest.story.StoryDataModel
-import net.artux.pda.ui.viewmodels.event.ScreenDestination
 import net.artux.pda.ui.viewmodels.event.OpenStageEvent
+import net.artux.pda.ui.viewmodels.event.ScreenDestination
 import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
 import net.artux.pdanetwork.model.CommandBlock
 import java.util.*
@@ -114,15 +114,20 @@ class CommandController @Inject constructor(
         cacheCommands["state"] = states
     }
 
-    suspend fun syncNow(): Result<StoryDataModel> =
-        repository.syncMember(CommandBlock().actions(cacheCommands))
+    suspend fun syncNow(commands: Map<String, List<String>>): Result<StoryDataModel> =
+        repository.syncMember(CommandBlock().actions(commands))
             .map { mapper.dataModel(it) }
             .onSuccess {
                 needSync = false
                 storyData.postValue(it)
-                cacheCommands = LinkedHashMap()// reset sync map
             }
             .onFailure { status.postValue(StatusModel(it)) }
+
+    suspend fun syncNow(): Result<StoryDataModel> =
+        syncNow(cacheCommands)
+            .onSuccess {
+                cacheCommands = LinkedHashMap()// reset sync map
+            }
 
     fun resetData() = scope.launch {
         repository.resetData()

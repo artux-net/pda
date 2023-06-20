@@ -36,25 +36,20 @@ public class RandomSpawnerHelper {
         SpawnSystem spawnSystem = engine.getSystem(SpawnSystem.class);
         MapOrientationSystem mapOrientationSystem = engine.getSystem(MapOrientationSystem.class);
         Properties properties = coreComponent.getDataRepository().getProperties();
-        ImmutableArray<Entity> transfers = engine.getEntitiesFor(Family.all(BodyComponent.class, TransferComponent.class).get());
+
 
         float groupFreq = Float.parseFloat((String) properties.get(PropertyFields.GROUP_BOT_FREQ));
         timerSystem.addTimerAction(groupFreq, () -> {
-            Entity randomTransfer = transfers.random();
-            Vector2 randomTransferPosition;
-            if (randomTransfer == null)
-                randomTransferPosition = mapOrientationSystem.getRandomFreePoint();
-            else
-                randomTransferPosition = pm.get(randomTransfer).getPosition();
-
             Entity targetSpawn = spawnSystem.getEmptySpawn();
             if (targetSpawn != null) {
+                // создает группу захвата спавна
                 Vector2 spawnPosition = pm.get(targetSpawn).getPosition();
-                entityProcessorSystem.generateTakeSpawnGroup(randomTransferPosition, spawnPosition);
+                entityProcessorSystem.generateTakeSpawnGroup(spawnPosition);
                 return;
             }
+            // создает группу атаки на заполненый спавн
             targetSpawn = spawnSystem.getRandomSpawn();
-            entityProcessorSystem.generateAttackSpawnGroup(randomTransferPosition, sm.get(targetSpawn));
+            entityProcessorSystem.generateAttackSpawnGroup(sm.get(targetSpawn));
         });
 
         float singleFreq = Float.parseFloat((String) properties.get(PropertyFields.SINGLE_BOT_FREQ));

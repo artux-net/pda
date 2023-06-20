@@ -1,26 +1,30 @@
 package net.artux.pda.map.engine.ecs.systems
 
-import com.badlogic.ashley.core.ComponentMapper
-import com.badlogic.ashley.core.Engine
-import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.core.EntityListener
-import com.badlogic.ashley.core.Family
-import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.ashley.core.*
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
 import net.artux.pda.map.DataRepository
-import net.artux.pda.map.engine.ecs.components.*
+import net.artux.pda.map.engine.ecs.components.BodyComponent
+import net.artux.pda.map.engine.ecs.components.Group
+import net.artux.pda.map.engine.ecs.components.PassivityComponent
+import net.artux.pda.map.engine.ecs.components.VisionComponent
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent
+import net.artux.pda.map.engine.ecs.components.player.PlayerComponent
+import net.artux.pda.map.managers.notification.NotificationController
 import net.artux.pda.map.utils.di.scope.PerGameMap
+import net.artux.pda.model.chat.ChatEvent
+import net.artux.pda.model.chat.UserMessage
+import net.artux.pda.model.user.Gang
 import javax.inject.Inject
 
 @PerGameMap
-class SpawnSystem @Inject constructor(private val dataRepository: DataRepository) : IteratingSystem(
-    Family.all(
-        VisionComponent::class.java, BodyComponent::class.java
-    ).exclude(
-        PassivityComponent::class.java
-    ).get()
+class SpawnSystem @Inject constructor(
+    private val notificationController: NotificationController,
+    private val entityProcessorSystem: EntityProcessorSystem,
+    private val dataRepository: DataRepository
+) : BaseSystem(
+    Family.all(VisionComponent::class.java, BodyComponent::class.java)
+        .exclude(PassivityComponent::class.java).get()
 ) {
     private var spawns: ImmutableArray<Entity>? = null
     private var groupEntities: ImmutableArray<Entity>? = null
@@ -31,7 +35,7 @@ class SpawnSystem @Inject constructor(private val dataRepository: DataRepository
         BodyComponent::class.java
     )
     private val gm = ComponentMapper.getFor(
-        GroupComponent::class.java
+        Group::class.java
     )
 
     override fun addedToEngine(engine: Engine) {
@@ -42,11 +46,11 @@ class SpawnSystem @Inject constructor(private val dataRepository: DataRepository
                 .exclude(PassivityComponent::class.java)
                 .get()
         )
-        val groupFamily = Family.all(GroupComponent::class.java, BodyComponent::class.java).get()
+        val groupFamily = Family.all(Group::class.java, BodyComponent::class.java).get()
 
         groupEntities = engine.getEntitiesFor(groupFamily)
 
-        engine.addEntityListener(groupFamily, object : EntityListener{
+        engine.addEntityListener(groupFamily, object : EntityListener {
             override fun entityAdded(entity: Entity?) {
             }
 
@@ -57,38 +61,64 @@ class SpawnSystem @Inject constructor(private val dataRepository: DataRepository
         })
     }
 
+    var timer: Float = 0f
+    var secsToTakeSpawn: Int = 10
+    var takingSpawm: SpawnComponent? = null
+
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
         for (i in 0 until spawns!!.size()) {
             val spawnComponent = sm[spawns!![i]]
             val spawnBodyComponent = pm[spawns!![i]]
 
-            if (spawnComponent.isEmpty) {
-                if (!spawnComponent.isActionsDone) {
-                    Gdx.app.applicationLogger.log("Spawn actions", "Actions sent")
-                    dataRepository.applyActions(spawnComponent.spawnModel.actions)
-                    spawnComponent.isActionsDone = true
+            if (!spawnComponent.isEmpty)
+                continue
+
+            if (!spawnComponent.isActionsDone) {
+                Gdx.app.applicationLogger.log("Spawn actions", "Actions sent")
+                dataRepository.applyActions(spawnComponent.spawnModel.actions)
+                spawnComponent.isActionsDone = true
+            }
+
+
+            var minDst = 120f
+            var dstToPlayer = pm.get(player).position.dst(spawnBodyComponent.position)
+            if (dstToPlayer < minDst) {
+                if (takingSpawm == null) {
+                    takingSpawm = spawnComponent
+                    timer = secsToTakeSpawn.toFloat()
                 }
-                var minDstGroup: GroupComponent? = null
-                var minDst = 50f
+                notificationController.setTitle("Захват позиции через " + timer.toInt() + " cекунд")
+                timer-=deltaTime
+                if (timer < 1) {
+                    notificationController.setTitle("Позиция захвачена!")
+                    notificationController.addMessage("Бля спасибо")
+                    takingSpawm == null
+                    val gang = dataRepository.storyDataModel.gang
+                    spawnComponent.setGroup(entityProcessorSystem.generateGroup(gang))
+                }
+            } else if (takingSpawm == spawnComponent)
+                takingSpawm = null
+            else {
+                var minDstGroup: Group? = null
                 for (entity in groupEntities!!) {
                     val group = gm[entity]
                     if (group.targeting !is SpawnComponent) {
                         val dst = group.centerPoint.dst(spawnBodyComponent.position)
-                        if (minDstGroup == null
-                            || dst < minDst
-                        ) {
+                        if (minDstGroup == null || dst < minDst) {
                             minDstGroup = group
                             minDst = dst
                         }
-                        spawnComponent.setGroup(group)
                     }
                 }
+                if (minDstGroup != null)
+                    spawnComponent.setGroup(minDstGroup)
             }
         }
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {}
+
     val emptySpawn: Entity?
         get() {
             for (entity in spawns!!) {

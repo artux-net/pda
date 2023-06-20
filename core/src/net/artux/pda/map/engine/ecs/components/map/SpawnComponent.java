@@ -5,7 +5,7 @@ import static com.badlogic.gdx.math.MathUtils.random;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.engine.ecs.components.GroupComponent;
+import net.artux.pda.map.engine.ecs.components.Group;
 import net.artux.pda.map.engine.ecs.components.TargetMovingComponent;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.map.SpawnModel;
@@ -15,24 +15,24 @@ import org.apache.commons.lang3.StringUtils;
 public class SpawnComponent implements Component, TargetMovingComponent.Targeting {
 
     private final SpawnModel spawnModel;
-    private GroupComponent groupComponent;
+    private Group group;
     private boolean actionsDone;
 
     public SpawnComponent(SpawnModel spawnModel) {
         this.spawnModel = spawnModel;
     }
 
-    public void setGroup(GroupComponent groupComponent) {
-        this.groupComponent = groupComponent;
-        groupComponent.setTargeting(this);
+    public void setGroup(Group group) {
+        this.group = group;
+        group.setTargeting(this);
     }
 
-    public GroupComponent getGroupComponent() {
-        return groupComponent;
+    public Group getGroupComponent() {
+        return group;
     }
 
     public boolean isEmpty() {
-        return groupComponent == null || groupComponent.getEntities().size < 1;
+        return group == null || group.getEntities().size < 1;
     }
 
     public Vector2 getPosition() {

@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
@@ -139,25 +140,18 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
 
         questViewModel.getNotification().observe(this, notificationModel -> {
             if (notificationModel != null) {
-                FragmentNotificationBinding binding = FragmentNotificationBinding.inflate(getLayoutInflater());
+                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
                 switch (notificationModel.getType()) {
                     case ALERT:
-                        binding.notificationTitle.setText(R.string.notification_alert);
+                        builder.setIcon(R.drawable.ic_alert);
                         break;
                     case MESSAGE:
-                        binding.notificationTitle.setText(R.string.notification_message);
+                        builder.setIcon(R.drawable.ic_message);
                         break;
                 }
-                if (notificationModel.getTitle() != null)
-                    binding.notificationTitle.setText(notificationModel.getTitle());
-
-                binding.notificationContent.setText(notificationModel.getMessage());
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(QuestActivity.this);
-                builder.setView(binding.getRoot());
+                builder.setTitle(notificationModel.getTitle());
+                builder.setMessage(notificationModel.getMessage());
                 AlertDialog dialog = builder.create();
-                Window window = dialog.getWindow();
-                window.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
                 dialog.show();
             }
         });

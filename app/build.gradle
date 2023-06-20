@@ -218,7 +218,7 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
     //ads
-    implementation 'com.yandex.android:mobileads:5.7.0'
+    implementation 'com.yandex.android:mobileads:5.8.0'
 }
 
 task copyAndroidNatives {

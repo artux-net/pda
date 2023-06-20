@@ -3,7 +3,6 @@ package net.artux.pda.map.utils.di.modules;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -70,18 +69,18 @@ public class GameStageModule {
     @PerGameMap
     public Logger getLogger(Skin skin, PlayerSystem playerSystem) {
         Logger logger = new Logger(skin);
-        logger.put("FPS", Gdx.app.getGraphics(), "getFramesPerSecond");
-        logger.put("Native Heap", Gdx.app, "getNativeHeap");
-        logger.put("Java Heap", Gdx.app, "getJavaHeap");
-        logger.put("Player position", playerSystem, "getPosition");
-        logger.put("Здоровье", playerSystem, "getHealthComponent");
-        logger.put("Опыт", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getXp");
-        logger.put("Params", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getParameters");
-        logger.put("Temp", playerSystem.getDataRepository().getCurrentStoryDataModel().getCurrentState(), "toString");
+        logger.putListiner("FPS", Gdx.app.getGraphics(), "getFramesPerSecond");
+        logger.putListiner("Native Heap", Gdx.app, "getNativeHeap");
+        logger.putListiner("Java Heap", Gdx.app, "getJavaHeap");
+        logger.putListiner("Player position", playerSystem, "getPosition");
+        logger.putListiner("Здоровье", playerSystem, "getHealthComponent");
+        logger.putListiner("Опыт", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getXp");
+        logger.putListiner("Params", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getParameters");
+        logger.putListiner("Temp", playerSystem.getDataRepository().getCurrentStoryDataModel().getCurrentState(), "toString");
 
-        logger.put("Screen width", Gdx.app.getGraphics(), "getWidth");
-        logger.put("Height", Gdx.app.getGraphics(), "getHeight");
-        logger.put("Density", Gdx.app.getGraphics(), "getDensity");
+        logger.putListiner("Screen width", Gdx.app.getGraphics(), "getWidth");
+        logger.putListiner("Height", Gdx.app.getGraphics(), "getHeight");
+        logger.putListiner("Density", Gdx.app.getGraphics(), "getDensity");
         return logger;
     }
 
