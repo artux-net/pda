@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - main
 
 jobs:
   publish:
@@ -18,5 +17,6 @@ jobs:
         with:
             GITHUB_TOKEN: ${{secrets.token}}
             java-version: 11
-            target-folder: 'javadoc'
+            javadoc-branch: javadoc
+            target-folder: javadoc
             project: gradle
