@@ -257,7 +257,3 @@ tasks.whenTaskAdded { packageTask ->
         packageTask.dependsOn "copyAndroidNatives"
     }
 }
-
-javadoc {
-    options.encoding = 'UTF-8'
-}
