@@ -26,6 +26,8 @@ import net.artux.pda.map.engine.ecs.components.map.ConditionComponent;
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent;
 import net.artux.pda.map.engine.ecs.entities.model.GangRelations;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
+import net.artux.pda.map.view.UserInterface;
+import net.artux.pda.map.view.dialog.ControlPointDialog;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.map.Strength;
@@ -49,8 +51,14 @@ public class EntityProcessorSystem extends EntitySystem {
     private final MapOrientationSystem mapOrientationSystem;
     private final LocaleBundle localeBundle;
 
+    private final ControlPointDialog controlPointDialog;
+    private final UserInterface userInterface;
+
     @Inject
-    public EntityProcessorSystem(EntityBuilder entityBuilder, AssetManager assetManager, RenderSystem renderSystem, World world, MapOrientationSystem mapOrientationSystem, LocaleBundle localeBundle) {
+    public EntityProcessorSystem(EntityBuilder entityBuilder, AssetManager assetManager,
+                                 RenderSystem renderSystem, World world,
+                                 MapOrientationSystem mapOrientationSystem,
+                                 LocaleBundle localeBundle, ControlPointDialog controlPointDialog1, UserInterface userInterface) {
         super();
         this.world = world;
         builder = entityBuilder;
@@ -58,6 +66,8 @@ public class EntityProcessorSystem extends EntitySystem {
         this.assetManager = assetManager;
         this.mapOrientationSystem = mapOrientationSystem;
         this.localeBundle = localeBundle;
+        this.controlPointDialog = controlPointDialog1;
+        this.userInterface = userInterface;
         JsonReader reader = new JsonReader(Gdx.files.internal("config/mobs.json").reader());
         gangRelations = new Gson().fromJson(reader, GangRelations.class);
     }
@@ -86,7 +96,7 @@ public class EntityProcessorSystem extends EntitySystem {
         Gang gang = spawnModel.getGroup();
         SpawnComponent spawnComponent = new SpawnComponent(spawnModel);
         Vector2 position = spawnComponent.getPosition();
-        Entity controlPoint = new Entity();
+        Entity entity = new Entity();
 
         if (gang != null) {
             Group group = generateGroup(position, gang,
@@ -94,18 +104,26 @@ public class EntityProcessorSystem extends EntitySystem {
             spawnComponent.setGroup(group);
 
             float size = spawnModel.getR() * 2 * 0.9f;
-            if (!spawnModel.getParams().contains("hide"))
-                controlPoint.add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size));
-            if (spawnModel.getCondition() != null)
-                controlPoint.add(new ConditionComponent(spawnModel.getCondition()));
-            else
-                controlPoint.add(new ConditionComponent(Collections.emptyMap()));
+            if (withSprite)
+                entity.add(new SpriteComponent(assetManager.get("controlPoint.png", Texture.class), size, size));
+            if (withSprite)
+                //add click component
+                entity.add(new ClickComponent(spawnModel.getR(),
+                        () -> {
+                            controlPointDialog.update(group, spawnComponent);
+                            controlPointDialog.show(userInterface.getStage());
+                        }));
 
-            controlPoint.add(new BodyComponent(position, world))
+            if (spawnModel.getCondition() != null)
+                entity.add(new ConditionComponent(spawnModel.getCondition()));
+            else
+                entity.add(new ConditionComponent(Collections.emptyMap()));
+
+            entity.add(new BodyComponent(position, world))
                     .add(spawnComponent);
         }
-        addEntity(controlPoint);
-        return controlPoint;
+        addEntity(entity);
+        return entity;
     }
 
     public void addBulletToEngine(Entity entity, Entity target, WeaponModel weaponModel) {

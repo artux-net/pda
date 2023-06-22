@@ -43,6 +43,8 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
+
+
 }
 
 
@@ -76,6 +78,8 @@ project(":app") {
         natives("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86")
         natives("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64")
     }
+
+
 }
 
 project(":core") {

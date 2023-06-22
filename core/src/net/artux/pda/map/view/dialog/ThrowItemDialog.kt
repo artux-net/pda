@@ -6,10 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import net.artux.engine.ui.InputListener
 import net.artux.engine.utils.LocaleBundle
-import net.artux.pda.map.DataRepository
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.utils.Colors
 import net.artux.pda.map.view.FontManager
 import net.artux.pda.map.view.UserInterface

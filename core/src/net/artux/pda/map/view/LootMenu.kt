@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.engine.utils.LocaleBundle
-import net.artux.pda.map.DataRepository
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.content.assets.AssetsFinder
 import net.artux.pda.map.utils.Colors
 import net.artux.pda.map.utils.di.scope.PerGameMap

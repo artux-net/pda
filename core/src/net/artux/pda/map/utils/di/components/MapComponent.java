@@ -10,15 +10,15 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.engine.scenes.SceneManager;
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.engine.ecs.systems.EntityProcessorSystem;
 import net.artux.pda.map.managers.ConditionEntityManager;
+import net.artux.pda.map.repository.EngineSaver;
 import net.artux.pda.map.utils.di.modules.EngineModule;
 import net.artux.pda.map.utils.di.modules.ui.UserInterfaceModule;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
-import net.artux.pda.map.view.FontManager;
 import net.artux.pda.map.view.UserInterface;
 
 import java.util.Set;
@@ -65,5 +65,5 @@ public interface MapComponent extends CoreComponent {
 
     PostProcessing getPostProcessing();
 
-
+    EngineSaver getGameSaver();
 }

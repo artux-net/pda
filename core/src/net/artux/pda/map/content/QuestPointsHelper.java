@@ -8,7 +8,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.World;
 
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.engine.ecs.components.BodyComponent;
 import net.artux.pda.map.engine.ecs.components.ClickComponent;
 import net.artux.pda.map.engine.ecs.components.InteractiveComponent;
@@ -19,7 +19,6 @@ import net.artux.pda.map.engine.ecs.components.map.QuestComponent;
 import net.artux.pda.map.engine.ecs.components.map.TransferComponent;
 import net.artux.pda.map.engine.ecs.systems.RenderSystem;
 import net.artux.pda.map.utils.Mappers;
-import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.utils.di.components.MapComponent;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.Point;

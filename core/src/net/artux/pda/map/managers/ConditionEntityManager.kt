@@ -7,7 +7,7 @@ import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.artux.pda.map.DataRepository
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.engine.ecs.components.PassivityComponent
 import net.artux.pda.map.engine.ecs.components.map.ConditionComponent
 import net.artux.pda.map.utils.di.scope.PerGameMap

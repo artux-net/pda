@@ -108,7 +108,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         super.onViewCreated(view, savedInstanceState);
 
         if (!viewModel.isChatAllowed()) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.PDADialogStyle);
             builder.setMessage(R.string.chatLimit);
             builder.setNegativeButton(R.string.okay, (dialogInterface, i) -> navigationPresenter.addFragment(new StoriesFragment(), true));
             builder.setOnCancelListener(dialogInterface ->
@@ -227,7 +227,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     @Override
     public void onLongClick(UserMessage message) {
         if (message.getAuthor().getId() != null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.PDADialogStyle);
             builder.setTitle(getString(R.string.any_select_action));
             builder.setItems(getResources().getStringArray(R.array.message_actions), (dialogInterface, i) -> {
                 switch (i) {

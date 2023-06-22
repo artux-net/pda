@@ -121,7 +121,7 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
     }
 
     private void showDialog(SellerRepository.OperationType operationType, ItemModel item) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.PDADialogStyle);
         float coefficient;
         if (operationType == SellerRepository.OperationType.BUY) {
             builder.setTitle(getString(R.string.buy_question, item.getTitle()));
@@ -177,7 +177,7 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
     }
 
     private void showInfoDialog(ItemModel item) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.PDADialogStyle);
         builder.setTitle(item.getTitle());
         builder.setMessage(ItemsHelper.getDesc(item, getContext()));
         builder.create().show();

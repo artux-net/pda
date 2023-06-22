@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import net.artux.engine.pathfinding.own.Connection
 import net.artux.engine.pathfinding.own.Digraph
 import net.artux.engine.pathfinding.own.DijkstraPathFinder
-import net.artux.pda.map.DataRepository
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.engine.ecs.components.BodyComponent
 import net.artux.pda.map.engine.ecs.components.PassivityComponent
 import net.artux.pda.map.engine.ecs.components.map.QuestComponent
@@ -26,7 +26,7 @@ import net.artux.pda.map.utils.di.scope.PerGameMap
 import net.artux.pda.map.view.blocks.MessagesPlane
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.map.Point
-import net.artux.pda.model.quest.MissionModel
+import net.artux.pda.model.quest.mission.MissionModel
 import net.artux.pda.model.quest.story.ParameterModel
 import net.artux.pda.model.quest.story.StoryDataModel
 import java.util.LinkedList
@@ -156,7 +156,8 @@ class MissionsSystem @Inject constructor(
         this.activeMission = activeMission
         if (activeMission == null) return
         val currentCheckpoint = activeMission.getCurrentCheckpoint(*params)
-        val chapter = currentCheckpoint?.chapter
+        //TODO
+        /*val chapter = currentCheckpoint.chapter
         val stage = currentCheckpoint?.stage
         var found = false
         for (questEntity in entities) {
@@ -184,7 +185,7 @@ class MissionsSystem @Inject constructor(
                         .vector2((gameMapConnection.userObject as Point).pos)
                 )
             }
-        }
+        }*/
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {}

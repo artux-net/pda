@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
-import net.artux.pda.map.DataRepository
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.engine.ecs.components.*
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem
 import net.artux.pda.map.utils.di.scope.PerGameMap
@@ -32,35 +32,29 @@ class DeadCheckerSystem @Inject constructor(
     dataRepository: DataRepository,
     assetManager: AssetManager,
     world: World
-) : BaseSystem(
-    Family.all(
-        HealthComponent::class.java, BodyComponent::class.java
-    ).get()
-) {
+) : BaseSystem(Family.all(HealthComponent::class.java, BodyComponent::class.java).get()) {
+
     private val gameZone: Group
     private val lootMenu: LootMenu
     private val labelStyle: LabelStyle
     private var deadMessage = false
     private val dataRepository: DataRepository
     private val userInterface: UserInterface
-    private val pm = ComponentMapper.getFor(
-        BodyComponent::class.java
-    )
-    private val hm = ComponentMapper.getFor(
-        HealthComponent::class.java
-    )
+    private val pm = ComponentMapper.getFor(BodyComponent::class.java)
+    private val hm = ComponentMapper.getFor(HealthComponent::class.java)
     private val assetManager: AssetManager
     private val world: World
 
     init {
-        gameZone = userInterface
         this.assetManager = assetManager
         this.userInterface = userInterface
         this.dataRepository = dataRepository
-        labelStyle = userInterface.labelStyle
-        this.world = world
-        labelStyle.fontColor = Color.RED
         this.lootMenu = lootMenu
+        this.world = world
+        labelStyle = userInterface.labelStyle
+        labelStyle.fontColor = Color.RED
+
+        gameZone = userInterface
     }
 
     override fun update(deltaTime: Float) {

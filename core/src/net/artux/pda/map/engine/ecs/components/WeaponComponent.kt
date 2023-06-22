@@ -6,7 +6,7 @@ import com.badlogic.gdx.audio.Sound
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.artux.pda.map.DataRepository
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.model.items.ItemModel
 import net.artux.pda.model.items.ItemType
 import net.artux.pda.model.items.WeaponModel

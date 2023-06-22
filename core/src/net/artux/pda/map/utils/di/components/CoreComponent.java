@@ -1,11 +1,10 @@
 package net.artux.pda.map.utils.di.components;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.utils.Logger;
 
 import net.artux.engine.scenes.SceneManager;
 import net.artux.engine.utils.LocaleBundle;
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.scenes.ErrorScene;
 import net.artux.pda.map.scenes.PlayScene;

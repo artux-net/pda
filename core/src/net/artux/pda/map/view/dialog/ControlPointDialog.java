@@ -6,16 +6,18 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 
 import net.artux.engine.utils.LocaleBundle;
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.engine.ecs.components.Group;
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent;
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.FontManager;
 import net.artux.pda.map.view.UserInterface;
+import net.artux.pda.map.view.blocks.SlotTextButton;
 import net.artux.pda.map.view.view.bars.Utils;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.user.Gang;
@@ -32,9 +34,13 @@ public class ControlPointDialog extends PDADialog {
     private final Label takenLabel;
     private final Label quantityLabel;
     private final Label strengthLabel;
+    private final Table manageTable;
 
     @Inject
     public ControlPointDialog(FontManager fontManager, LocaleBundle localeBundle,
+                              SlotTextButton updateLevelButton,
+                              SlotTextButton contentButton,
+                              SlotTextButton hireStalkerButton,
                               UserInterface userInterface, DataRepository dataRepository) {
         super("", userInterface.getSkin());
         this.userInterface = userInterface;
@@ -88,6 +94,21 @@ public class ControlPointDialog extends PDADialog {
         verticalGroup.addActor(quantityLabel);
         verticalGroup.addActor(strengthLabel);
 
+        updateLevelButton.setText(localeBundle.get("point.update"));
+        hireStalkerButton.setText(localeBundle.get("point.stalker.hire"));
+        contentButton.setText(localeBundle.get("point.stalker.content"));
+
+        manageTable = new Table();
+
+        manageTable.add(getButtonTable());
+
+        manageTable.add(updateLevelButton);
+        manageTable.add(hireStalkerButton);
+        manageTable.row();
+        manageTable.add(contentButton);
+
+        verticalGroup.addActor(manageTable);
+
         getButtonTable().add(btnClose).grow();
     }
 
@@ -103,11 +124,13 @@ public class ControlPointDialog extends PDADialog {
             quantityLabel.setText(localeBundle.get("point.quantity", group.getEntities().size));
             strengthLabel.setText(localeBundle.get("point.strength", "WEAK"));
 
-
+            manageTable.setVisible(gang == playerGang);
         } else {
             takenLabel.setText(localeBundle.get("point.taken", localeBundle.get("point.not.taken")));
             quantityLabel.setText("");
             strengthLabel.setText("");
+
+            manageTable.setVisible(false);
         }
 
     }

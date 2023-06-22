@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Align;
 import net.artux.engine.scenes.Scene;
 import net.artux.engine.scenes.SceneManager;
 import net.artux.engine.utils.LocaleBundle;
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.utils.di.components.CoreComponent;
 import net.artux.pda.model.map.GameMap;
 
@@ -59,7 +59,7 @@ public class ErrorScene extends Scene {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
                 super.tap(event, x, y, count, button);
-                dataRepository.getPlatformInterface().openPDA();
+                dataRepository.getPlatformInterface().exit();
             }
         });
 

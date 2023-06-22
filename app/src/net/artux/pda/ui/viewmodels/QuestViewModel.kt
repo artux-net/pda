@@ -27,6 +27,7 @@ class QuestViewModel @javax.inject.Inject constructor(
     var repository: QuestRepository,
     var stageMapper: StageMapper,
     var mapper: StoryMapper,
+    var missionController: MissionController,
     var commandController: CommandController,
     var statusMapper: StatusMapper
 ) : ViewModel() {
@@ -43,8 +44,6 @@ class QuestViewModel @javax.inject.Inject constructor(
 
     val storyData: MutableLiveData<StoryDataModel> get() = commandController.storyData
     val status: SingleLiveEvent<StatusModel> get() = commandController.status
-    val sellerEvent: SingleLiveEvent<Event<Int>> get() = commandController.sellerEvent
-    val exitEvent: SingleLiveEvent<ScreenDestination> get() = commandController.exitEvent
 
     var currentStoryId: Int = repository.getCurrentStoryId()
     var currentChapterId: Int = repository.getCurrentChapterId()
@@ -52,6 +51,7 @@ class QuestViewModel @javax.inject.Inject constructor(
     var transferDisabled = true
 
     init {
+        //подписка на команду открытия стадии
         commandController.stageEvent.observeForever {
             val stageId = it.payload.stageId
             var toSync = false
@@ -121,6 +121,12 @@ class QuestViewModel @javax.inject.Inject constructor(
                 .onFailure {
                     status.postValue(StatusModel(it))
                 }
+            repository.getCachedStory(storyId)
+                .map {
+                    mapper.story(it)
+                }.onSuccess {
+                    missionController.missions = it.missions
+                }
             loadingState.postValue(false)
         }
     }
@@ -130,11 +136,11 @@ class QuestViewModel @javax.inject.Inject constructor(
         commandController.process(chapterStage.actions)
 
         val texts = chapterStage.texts
-        if (texts != null && texts.isNotEmpty() && texts[0].text.isNotBlank())
+        if (texts.isNotEmpty() && texts[0].text.isNotBlank())
             summaryRepository.check(
                 UserMessage(
                     chapterStage.title,
-                    chapterStage.texts!![0].text,
+                    chapterStage.texts[0].text,
                     chapterStage.background
                 )
             )

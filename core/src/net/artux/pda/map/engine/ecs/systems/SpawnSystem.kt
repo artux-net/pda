@@ -3,18 +3,14 @@ package net.artux.pda.map.engine.ecs.systems
 import com.badlogic.ashley.core.*
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.Gdx
-import net.artux.pda.map.DataRepository
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.engine.ecs.components.BodyComponent
 import net.artux.pda.map.engine.ecs.components.Group
 import net.artux.pda.map.engine.ecs.components.PassivityComponent
 import net.artux.pda.map.engine.ecs.components.VisionComponent
 import net.artux.pda.map.engine.ecs.components.map.SpawnComponent
-import net.artux.pda.map.engine.ecs.components.player.PlayerComponent
 import net.artux.pda.map.managers.notification.NotificationController
 import net.artux.pda.map.utils.di.scope.PerGameMap
-import net.artux.pda.model.chat.ChatEvent
-import net.artux.pda.model.chat.UserMessage
-import net.artux.pda.model.user.Gang
 import javax.inject.Inject
 
 @PerGameMap
@@ -22,21 +18,12 @@ class SpawnSystem @Inject constructor(
     private val notificationController: NotificationController,
     private val entityProcessorSystem: EntityProcessorSystem,
     private val dataRepository: DataRepository
-) : BaseSystem(
-    Family.all(VisionComponent::class.java, BodyComponent::class.java)
-        .exclude(PassivityComponent::class.java).get()
-) {
+) : BaseSystem(Family.all(VisionComponent::class.java, BodyComponent::class.java).exclude(PassivityComponent::class.java).get()) {
     private var spawns: ImmutableArray<Entity>? = null
     private var groupEntities: ImmutableArray<Entity>? = null
-    private val sm = ComponentMapper.getFor(
-        SpawnComponent::class.java
-    )
-    private val pm = ComponentMapper.getFor(
-        BodyComponent::class.java
-    )
-    private val gm = ComponentMapper.getFor(
-        Group::class.java
-    )
+    private val sm = ComponentMapper.getFor(SpawnComponent::class.java)
+    private val pm = ComponentMapper.getFor(BodyComponent::class.java)
+    private val gm = ComponentMapper.getFor(Group::class.java)
 
     override fun addedToEngine(engine: Engine) {
         super.addedToEngine(engine)
@@ -82,7 +69,7 @@ class SpawnSystem @Inject constructor(
 
 
             var minDst = 120f
-            var dstToPlayer = pm.get(player).position.dst(spawnBodyComponent.position)
+            val dstToPlayer = pm.get(player).position.dst(spawnBodyComponent.position)
             if (dstToPlayer < minDst) {
                 if (takingSpawm == null) {
                     takingSpawm = spawnComponent

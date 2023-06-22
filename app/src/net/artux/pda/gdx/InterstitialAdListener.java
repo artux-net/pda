@@ -8,18 +8,18 @@ import com.yandex.mobile.ads.common.ImpressionData;
 import com.yandex.mobile.ads.interstitial.InterstitialAd;
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener;
 
-import net.artux.pda.map.utils.PlatformInterface;
+import net.artux.pda.ui.viewmodels.CommandViewModel;
 
 import java.util.List;
 import java.util.Map;
 
 public class InterstitialAdListener implements InterstitialAdEventListener {
 
-    private final PlatformInterface platformInterface;
+    private final CommandViewModel commandViewModel;
     private final InterstitialAd rewardedAd;
 
-    public InterstitialAdListener(PlatformInterface platformInterface, InterstitialAd rewardedAd) {
-        this.platformInterface = platformInterface;
+    public InterstitialAdListener(CommandViewModel commandViewModel, InterstitialAd rewardedAd) {
+        this.commandViewModel = commandViewModel;
         this.rewardedAd = rewardedAd;
     }
 
@@ -35,7 +35,7 @@ public class InterstitialAdListener implements InterstitialAdEventListener {
 
     @Override
     public void onAdShown() {
-        platformInterface.applyActions(Map.of("money", List.of(String.valueOf(100))));
+        commandViewModel.processWithServer(Map.of("money", List.of(String.valueOf(100))));
     }
 
     @Override

@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
@@ -25,20 +24,26 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.gson.Gson;
+import com.yandex.mobile.ads.common.AdRequest;
+import com.yandex.mobile.ads.interstitial.InterstitialAd;
+import com.yandex.mobile.ads.rewarded.RewardedAd;
 
 import net.artux.pda.R;
-import net.artux.pda.databinding.FragmentNotificationBinding;
 import net.artux.pda.gdx.CoreFragment;
+import net.artux.pda.gdx.InterstitialAdListener;
+import net.artux.pda.gdx.VideoAdListener;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.StageModel;
 import net.artux.pda.repositories.QuestSoundManager;
 import net.artux.pda.ui.fragments.quest.SellerFragment;
 import net.artux.pda.ui.fragments.quest.StageRootFragment;
+import net.artux.pda.ui.viewmodels.CommandViewModel;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.ui.viewmodels.SellerViewModel;
 import net.artux.pda.ui.viewmodels.UserViewModel;
 import net.artux.pda.ui.viewmodels.event.ScreenDestination;
+import net.artux.pda.utils.AdType;
 import net.artux.pda.utils.URLHelper;
 
 import javax.inject.Inject;
@@ -61,6 +66,7 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
     private CoreFragment coreFragment;
     private StageRootFragment stageRootFragment;
     private QuestViewModel questViewModel;
+    private CommandViewModel commandViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,35 +78,29 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
 
         ViewModelProvider provider = new ViewModelProvider(this);
         questViewModel = provider.get(QuestViewModel.class);
+        commandViewModel = provider.get(CommandViewModel.class);
 
         questViewModel.getChapter().observe(this, chapter -> {
-            if (chapter != null) {
-                //preload images
-                for (Stage stage : chapter.getStages().values()) {
-                    if (stage.getBackground() != null && !stage.getBackground().isEmpty()) {
-                        String background_url = URLHelper.getResourceURL(stage.getBackground());
+            if (chapter == null)
+                return;
 
-                        Glide.with(QuestActivity.this)
-                                .downloadOnly()
-                                .load(background_url)
-                                .submit();
-                    }
+            //preload images
+            for (Stage stage : chapter.getStages().values()) {
+                if (stage.getBackground() != null && !stage.getBackground().isEmpty()) {
+                    String background_url = URLHelper.getResourceURL(stage.getBackground());
+
+                    Glide.with(QuestActivity.this)
+                            .downloadOnly()
+                            .load(background_url)
+                            .submit();
                 }
             }
         });
 
         questViewModel.getStage().observe(this, this::setStage);
-
-        questViewModel.getMap().observe(this, map -> {
-            startMap(provider, map);
-        });
-
-        questViewModel.getLoadingState().observe(this, flag -> {
-            if (flag)
-                findViewById(R.id.loadingProgressBar).setVisibility(View.VISIBLE);
-            else
-                findViewById(R.id.loadingProgressBar).setVisibility(View.GONE);
-        });
+        questViewModel.getMap().observe(this, map -> startMap(provider, map));
+        questViewModel.getLoadingState().observe(this, flag ->
+                findViewById(R.id.loadingProgressBar).setVisibility(flag ? View.VISIBLE : View.GONE));
 
         questViewModel.getStatus().observe(this, statusModel -> {
             if (!statusModel.getSuccess()) {
@@ -115,7 +115,30 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
                         .show();
         });
 
-        questViewModel.getSellerEvent().observe(this, data -> {
+
+        questViewModel.getNotification().observe(this, notificationModel -> {
+            if (notificationModel == null)
+                return;
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.PDANotificationStyle);
+            switch (notificationModel.getType()) {
+                case ALERT:
+                    builder.setIcon(R.drawable.ic_alert);
+                    break;
+                case MESSAGE:
+                    builder.setIcon(R.drawable.ic_message);
+                    break;
+            }
+            builder.setTitle(notificationModel.getTitle());
+            builder.setMessage(notificationModel.getMessage());
+            AlertDialog dialog = builder.create();
+            Window window = dialog.getWindow();
+            window.setGravity(Gravity.START);
+            dialog.show();
+        });
+
+
+        commandViewModel.getSellerEvent().observe(this, data -> {
             int sellerId = data.getPayload();
             SellerFragment sellerFragment = SellerFragment.newInstance(sellerId);
 
@@ -129,7 +152,7 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
             Timber.d("Start seller activity - %s", sellerId);
         });
 
-        questViewModel.getExitEvent().observe(this, data -> {
+        commandViewModel.getExitEvent().observe(this, data -> {
             if (data == ScreenDestination.NONE)
                 return;
             Intent intent = new Intent(QuestActivity.this, MainActivity.class);
@@ -138,21 +161,22 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
             finish();
         });
 
-        questViewModel.getNotification().observe(this, notificationModel -> {
-            if (notificationModel != null) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
-                switch (notificationModel.getType()) {
-                    case ALERT:
-                        builder.setIcon(R.drawable.ic_alert);
-                        break;
-                    case MESSAGE:
-                        builder.setIcon(R.drawable.ic_message);
-                        break;
-                }
-                builder.setTitle(notificationModel.getTitle());
-                builder.setMessage(notificationModel.getMessage());
-                AlertDialog dialog = builder.create();
-                dialog.show();
+        commandViewModel.getAdEvent().observe(this, data -> {
+            if (data == AdType.VIDEO) {
+                RewardedAd rewardedAd = new RewardedAd(this);
+                rewardedAd.setAdUnitId(getString(R.string.quest_ads_video_id));
+
+                final AdRequest adRequest = new AdRequest.Builder().build();
+                rewardedAd.setRewardedAdEventListener(new VideoAdListener(commandViewModel, rewardedAd));
+                rewardedAd.loadAd(adRequest);
+            } else {
+                InterstitialAd interstitialAd = new InterstitialAd(this);
+                interstitialAd.setAdUnitId(getString(R.string.quest_ads_usual_id));
+
+                final AdRequest adRequest = new AdRequest.Builder().build();
+                interstitialAd.setInterstitialAdEventListener(
+                        new InterstitialAdListener(commandViewModel, interstitialAd));
+                interstitialAd.loadAd(adRequest);
             }
         });
 

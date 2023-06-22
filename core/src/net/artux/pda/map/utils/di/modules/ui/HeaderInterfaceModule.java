@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.common.PropertyFields;
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.engine.ecs.systems.HealthSystem;
 import net.artux.pda.map.engine.ecs.systems.MapLoggerSystem;
 import net.artux.pda.map.engine.ecs.systems.RenderSystem;

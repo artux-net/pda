@@ -6,7 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.common.PropertyFields;
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.view.FontManager;

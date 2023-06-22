@@ -11,14 +11,6 @@ public interface PlatformInterface {
 
     void restart();
 
-    void openPDA();
+    void exit();
 
-    void rewardedVideoAd();
-    void rewardedBannerAd();
-
-    void debug(String msg);
-
-    void toast(String msg);
-
-    void error(String msg, Throwable t);
 }

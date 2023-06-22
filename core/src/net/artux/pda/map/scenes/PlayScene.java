@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Timer;
 import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.engine.scenes.Scene;
 import net.artux.engine.scenes.SceneManager;
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.utils.di.components.CoreComponent;
 import net.artux.pda.map.utils.di.components.DaggerMapComponent;
@@ -74,6 +74,7 @@ public class PlayScene extends Scene {
 
         if (gameMap.getId() != map.getId()) {
             Gdx.app.getApplicationLogger().log(TAG, "Update map, old: " + gameMap.getId() + " new map: " + map.getId());
+            engineManager.save();
             sceneManager.set(coreComponent.getPreloadState());
         }
         engineManager.updateOnlyPlayer();

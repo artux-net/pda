@@ -14,27 +14,35 @@ object QuestUtil {
         if (conditions.keys.isEmpty())
             return true
         val map = storyDataModel.parametersMap
-        for (condition in conditions.keys) {
-            when (condition) {
-                "has" -> if (conditions[condition] != null) for (has in conditions[condition]!!) {
-                    if (!map.containsKey(has)
-                        && !containsItem(storyDataModel.allItems, has)
+        for (key in conditions.keys) {
+            if (conditions[key].isNullOrEmpty())
+                continue
+
+            when (key) {
+                "has" -> for (param in conditions[key]!!) {
+                    if (!map.containsKey(param)
+                        && !containsItem(storyDataModel.allItems, param)
                     ) return false
                 }
 
-                "!has" -> if (conditions[condition] != null) for (has in conditions[condition]!!) {
-                    if (map.containsKey(has)
-                        || containsItem(storyDataModel.allItems, has)
+                "!has" -> for (param in conditions[key]!!) {
+                    if (map.containsKey(param)
+                        || containsItem(storyDataModel.allItems, param)
                     ) return false
                 }
 
-                "money>=" -> if (conditions[condition] != null) for (money in conditions[condition]!!) {
-                    if (storyDataModel.money < money.toInt()) return false
+                "money>=" -> for (param in conditions[key]!!) {
+                    if (storyDataModel.money < param.toInt()) return false
                 }
 
-                "money<" -> if (conditions[condition] != null) for (money in conditions[condition]!!) {
-                    if (storyDataModel.money >= money.toInt()) return false
+                "money<" -> for (param in conditions[key]!!) {
+                    if (storyDataModel.money >= param.toInt()) return false
                 }
+
+                "reachedStage" -> {
+
+                }
+
             }
         }
         return true
@@ -50,7 +58,7 @@ object QuestUtil {
         return false
     }
 
-    fun isInteger(str: String?): Boolean {
+    private fun isInteger(str: String?): Boolean {
         if (str == null) {
             return false
         }

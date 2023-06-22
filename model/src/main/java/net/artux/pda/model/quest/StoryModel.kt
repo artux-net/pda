@@ -1,7 +1,7 @@
 package net.artux.pda.model.quest
 
 import net.artux.pda.model.map.GameMap
-import net.artux.pda.model.map.Point
+import net.artux.pda.model.quest.mission.MissionModel
 import java.io.Serializable
 import java.util.LinkedList
 

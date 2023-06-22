@@ -3,7 +3,7 @@ package net.artux.pda.map.content;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.ItemsContainerModel;

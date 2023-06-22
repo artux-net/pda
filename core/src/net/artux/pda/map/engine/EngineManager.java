@@ -13,20 +13,20 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.content.AnomalyHelper;
 import net.artux.pda.map.content.ControlPointsHelper;
 import net.artux.pda.map.content.QuestPointsHelper;
 import net.artux.pda.map.content.RandomSpawnerHelper;
 import net.artux.pda.map.content.SecretHelper;
 import net.artux.pda.map.content.entities.EntityBuilder;
-import net.artux.pda.map.engine.ecs.components.TargetMovingComponent;
 import net.artux.pda.map.engine.ecs.systems.Drawable;
 import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
 import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
 import net.artux.pda.map.engine.ecs.systems.player.MissionsSystem;
 import net.artux.pda.map.engine.ecs.systems.player.PlayerMovingSystem;
 import net.artux.pda.map.managers.ConditionEntityManager;
+import net.artux.pda.map.repository.EngineSaver;
 import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.map.utils.di.components.MapComponent;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
@@ -40,6 +40,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private final GameMap map;
     private final Engine engine;
     private final DataRepository dataRepository;
+    private final EngineSaver engineSaver;
 
     private final boolean controlPoints = true;
     private final boolean questPoints = true; //
@@ -47,10 +48,12 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
     @Inject
     public EngineManager(MapComponent mapComponent, MissionsSystem missionsSystem,
+                         EngineSaver engineSaver,
                          ConditionEntityManager conditionEntityManager) {
         this.dataRepository = mapComponent.getDataRepository();
         this.map = dataRepository.getGameMap();
         this.engine = mapComponent.getEngine();
+        this.engineSaver = engineSaver;
 
         Stage stage = mapComponent.gameStage();
 
@@ -117,5 +120,9 @@ public class EngineManager extends InputListener implements Drawable, Disposable
             engine.getSystem(PlayerMovingSystem.class).setPosition(pos);
             dataRepository.setUpdated(false);
         }
+    }
+
+    public void save() {
+        engineSaver.save(engine);
     }
 }

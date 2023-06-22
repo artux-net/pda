@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.engine.utils.LocaleBundle
-import net.artux.pda.map.DataRepository
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.content.assets.AssetsFinder
 import net.artux.pda.map.engine.ecs.systems.SoundsSystem
 import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem
@@ -160,7 +160,7 @@ class BackpackMenu @Inject constructor(
         textButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent, x: Float, y: Float) {
                 super.clicked(event, x, y)
-                dataRepository.platformInterface.openPDA()
+                dataRepository.platformInterface.exit()
             }
         })
         adButton.setText(localeBundle["main.ad.rewarded"])

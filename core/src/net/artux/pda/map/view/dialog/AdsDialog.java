@@ -5,9 +5,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import net.artux.engine.utils.LocaleBundle;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.SlotTextButton;
+
+import java.util.Collections;
 
 import javax.inject.Inject;
 
@@ -15,6 +18,7 @@ public class AdsDialog extends PDADialog {
 
     @Inject
     public AdsDialog(SlotTextButton usualAd, SlotTextButton videoAd, UserInterface userInterface,
+                     DataRepository dataRepository,
                      LocaleBundle localeBundle, PlatformInterface platformInterface) {
         super(localeBundle.get("main.ad.rewarded"), userInterface.getSkin());
 
@@ -23,7 +27,7 @@ public class AdsDialog extends PDADialog {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                platformInterface.rewardedBannerAd();
+                dataRepository.applyActions(Collections.singletonMap("showAd", Collections.singletonList("usual")), true);
             }
         });
 
@@ -32,7 +36,7 @@ public class AdsDialog extends PDADialog {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                platformInterface.rewardedVideoAd();
+                dataRepository.applyActions(Collections.singletonMap("showAd", Collections.singletonList("video")), true);
             }
         });
 

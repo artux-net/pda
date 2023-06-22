@@ -74,7 +74,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
     @Override
     public void onClick(ItemModel item) {
         Timber.i("Opened item dialog with item: %s", item.getTitle());
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.PDADialogStyle);
         builder.setTitle(item.getTitle());
         builder.setMessage(ItemsHelper.getDesc(item, getContext()));
 

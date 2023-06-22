@@ -9,18 +9,18 @@ import com.yandex.mobile.ads.rewarded.Reward;
 import com.yandex.mobile.ads.rewarded.RewardedAd;
 import com.yandex.mobile.ads.rewarded.RewardedAdEventListener;
 
-import net.artux.pda.map.utils.PlatformInterface;
+import net.artux.pda.ui.viewmodels.CommandViewModel;
 
 import java.util.List;
 import java.util.Map;
 
 public class VideoAdListener implements RewardedAdEventListener {
 
-    private final PlatformInterface platformInterface;
+    private final CommandViewModel commandViewModel;
     private final RewardedAd rewardedAd;
 
-    public VideoAdListener(PlatformInterface platformInterface, RewardedAd rewardedAd) {
-        this.platformInterface = platformInterface;
+    public VideoAdListener(CommandViewModel commandViewModel, RewardedAd rewardedAd) {
+        this.commandViewModel = commandViewModel;
         this.rewardedAd = rewardedAd;
     }
 
@@ -46,7 +46,7 @@ public class VideoAdListener implements RewardedAdEventListener {
 
     @Override
     public void onRewarded(@NonNull Reward reward) {
-        platformInterface.applyActions(Map.of("money", List.of(String.valueOf(500))));
+        commandViewModel.processWithServer(Map.of("money", List.of(String.valueOf(500))));
     }
 
     @Override

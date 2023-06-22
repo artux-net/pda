@@ -28,12 +28,18 @@ public interface StageMapper {
         StageModel stageModel = new StageModel();
         stageModel.setId(stage.getId());
         stageModel.setTitle(stage.getTitle());
-        if (stage.getTypeStage() == 1)
-            stageModel.setType(StageType.CHAPTER_OVER);
-        else if (stage.getTypeStage() == 7)
-            stageModel.setType(StageType.DIALOG);
-        else
-            stageModel.setType(StageType.USUAL);
+        switch (stage.getTypeStage()){
+            case 1:
+                stageModel.setType(StageType.CHAPTER_OVER);
+                break;
+            case 7:
+                stageModel.setType(StageType.DIALOG);
+                break;
+            default:
+                stageModel.setType(StageType.USUAL);
+                break;
+        }
+
         stageModel.setContent(getText(stage, dataCompanion));
         stageModel.setTransfers(getTransfers(stage, dataCompanion));
         return stageModel;
@@ -41,7 +47,6 @@ public interface StageMapper {
 
     default NotificationModel notification(Stage stage, StoryDataModel storyDataModel) {
         if (stage != null && stage.getMessage() != null && !stage.getMessage().trim().equals("")) {
-            NotificationModel notificationModel = new NotificationModel();
             String title;
             String message = formatText(stage.getMessage(), storyDataModel);
             if (message.contains(":")) {
@@ -51,15 +56,9 @@ public interface StageMapper {
             } else {
                 title = "Уведомление";
             }
-            notificationModel.setTitle(title.trim());
-            notificationModel.setMessage(message.trim());
-
-            if (stage.getTypeStage() == 0)
-                notificationModel.setType(NotificationType.ALERT);
-            else
-                notificationModel.setType(NotificationType.MESSAGE);
-
-            return notificationModel;
+            NotificationType type =
+                    stage.getTypeStage() == 0 ? NotificationType.ALERT : NotificationType.MESSAGE;
+            return new NotificationModel(title, message, type);
         }
         return null;
     }

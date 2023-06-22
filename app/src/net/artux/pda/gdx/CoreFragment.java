@@ -3,11 +3,9 @@ package net.artux.pda.gdx;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,19 +15,17 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidAudio;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.badlogic.gdx.backends.android.AsynchronousAndroidAudio;
-import com.yandex.mobile.ads.common.AdRequest;
-import com.yandex.mobile.ads.interstitial.InterstitialAd;
-import com.yandex.mobile.ads.rewarded.RewardedAd;
 
 import net.artux.pda.app.PDAApplication;
-import net.artux.pda.map.DataRepository;
 import net.artux.pda.map.GdxAdapter;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.ui.activities.MainActivity;
+import net.artux.pda.ui.viewmodels.CommandViewModel;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.utils.GDXTimberLogger;
 
@@ -43,6 +39,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     private GdxAdapter gdxAdapter;
     private QuestViewModel questViewModel;
+    private CommandViewModel commandViewModel;
     private GDXTimberLogger gdxTimberLogger;
 
     @Override
@@ -78,11 +75,11 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
         super.onViewCreated(view, savedInstanceState);
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         questViewModel = provider.get(QuestViewModel.class);
+        commandViewModel = provider.get(CommandViewModel.class);
         questViewModel.getStoryData().observe(getViewLifecycleOwner(), storyDataModel -> {
-                    if (gdxAdapter != null && !gdxAdapter.isDisposed())
-                        gdxAdapter.getDataRepository().setUserData(storyDataModel);
-                }
-        );
+            if (gdxAdapter != null && !gdxAdapter.isDisposed())
+                gdxAdapter.getDataRepository().setUserData(storyDataModel);
+        });
     }
 
     @Override
@@ -91,16 +88,13 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
         Bundle args = getArguments();
 
         if (args != null) {
-            StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
             GameMap map = (GameMap) args.getSerializable("map");
 
             DataRepository dataRepository = gdxAdapter.getDataRepository();
-            //dataRepository.setUserData(dataModel);
             dataRepository.setGameMap(map);
 
             boolean updated = args.getBoolean("updated", false);
-            if (updated)
-                args.putBoolean("updated", false);
+            if (updated) args.putBoolean("updated", false);
             dataRepository.setUpdated(updated);
             setArguments(args);
         }
@@ -129,65 +123,20 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     }
 
     @Override
-    public void openPDA() {
+    public void exit() {
         Map<String, String> data = new HashMap<>();
         data.put("openPda", "");
         send(data);
     }
 
     @Override
-    public void rewardedVideoAd() {
-        runOnUiThread(() -> {
-            RewardedAd rewardedAd = new RewardedAd(requireContext());
-            rewardedAd.setAdUnitId("R-M-2151056-2");
-
-            final AdRequest adRequest = new AdRequest.Builder().build();
-            rewardedAd.setRewardedAdEventListener(new VideoAdListener(this, rewardedAd));
-            rewardedAd.loadAd(adRequest);
-        });
-    }
-
-    @Override
     public void applyActions(Map<String, List<String>> actions) {
-        questViewModel.syncNow(actions);
-    }
-
-    @Override
-    public void debug(String msg) {
-        Timber.d(msg);
-    }
-
-    @Override
-    public void toast(String msg) {
-        if (Looper.myLooper() == null)
-            Looper.prepare();
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void error(String msg, Throwable t) {
-        Timber.e(t, msg);
-        if (Looper.myLooper() == null)
-            Looper.prepare();
-        Toast.makeText(getActivity(), "Error with map, try again later: " + msg, Toast.LENGTH_SHORT).show();
+        commandViewModel.process(actions);
     }
 
     @Override
     public void restart() {
         gdxAdapter.create();
-    }
-
-    @Override
-    public void rewardedBannerAd() {
-        runOnUiThread(() -> {
-            InterstitialAd interstitialAd = new InterstitialAd(requireContext());
-            interstitialAd.setAdUnitId("R-M-2151056-3");
-
-            final AdRequest adRequest = new AdRequest.Builder().build();
-            interstitialAd.setInterstitialAdEventListener(
-                    new InterstitialAdListener(this, interstitialAd));
-            interstitialAd.loadAd(adRequest);
-        });
     }
 
     @Override

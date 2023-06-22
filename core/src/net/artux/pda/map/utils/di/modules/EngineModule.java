@@ -2,6 +2,8 @@ package net.artux.pda.map.utils.di.modules;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -10,8 +12,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import net.artux.pda.map.utils.MapInfo;
 import net.artux.engine.utils.MapBodyBuilder;
+import net.artux.pda.map.utils.MapInfo;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.map.GameMap;
 
@@ -33,6 +35,12 @@ public class EngineModule {
         for (EntitySystem system : systems)
             engine.addSystem(system);
         return engine;
+    }
+
+    @Provides
+    @PerGameMap
+    public Preferences getPreferences() {
+        return Gdx.app.getPreferences("quest-prefs");
     }
 
     @Provides

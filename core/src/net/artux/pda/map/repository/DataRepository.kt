@@ -1,4 +1,4 @@
-package net.artux.pda.map
+package net.artux.pda.map.repository
 
 import com.badlogic.gdx.Gdx
 import com.google.gson.Gson

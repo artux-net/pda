@@ -43,12 +43,12 @@ public class DesktopStarter implements PlatformInterface {
             url = new URL("https://dev.artux.net/pdanetwork/");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            con.setAuthenticator(new Authenticator() {
+            /*con.setAuthenticator(new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication("max", "12345678".toCharArray());
                 }
-            });
+            });*/
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         } catch (ProtocolException e) {
@@ -75,32 +75,8 @@ public class DesktopStarter implements PlatformInterface {
     }
 
     @Override
-    public void openPDA() {
+    public void exit() {
 
     }
 
-    @Override
-    public void rewardedVideoAd() {
-
-    }
-
-    @Override
-    public void rewardedBannerAd() {
-
-    }
-
-    @Override
-    public void debug(String msg) {
-
-    }
-
-    @Override
-    public void toast(String msg) {
-
-    }
-
-    @Override
-    public void error(String msg, Throwable t) {
-
-    }
 }

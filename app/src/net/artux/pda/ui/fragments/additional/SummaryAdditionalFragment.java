@@ -78,7 +78,7 @@ public class SummaryAdditionalFragment extends AdditionalBaseFragment implements
 
     @Override
     public boolean onLongClick(int pos, String content) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.AlertDialogStyle);
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.PDADialogStyle);
         builder.setTitle("Удалить сводку от " + content + "?");
         builder.setPositiveButton("Да", (dialog, which) -> {
             summaryViewModel.removeSummary(content);

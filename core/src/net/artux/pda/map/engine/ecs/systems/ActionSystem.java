@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.ApplicationLogger;
 
 import net.artux.pda.common.ActionHandler;
-import net.artux.pda.map.DataRepository;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.engine.ecs.components.TimeComponent;
 import net.artux.pda.map.managers.notification.NotificationController;
 import net.artux.pda.map.utils.di.scope.PerGameMap;

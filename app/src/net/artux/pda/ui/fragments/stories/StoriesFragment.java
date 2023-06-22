@@ -92,7 +92,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
     public void onClick(StoryItem storyItem) {
         int id = storyItem.getId();
         if (id == -1) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.PDADialogStyle);
             builder.setTitle("Формат ввода {storyId}:{chapterId}:{stageId}");
 
             EditText input = new EditText(getActivity());
@@ -132,7 +132,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 if (firstStory.isPresent() && firstStory.get() != storyItem && sequenceWalkthrough) {
                     StoryStateModel stateModel = dataModel.getStateByStoryId(id - 1);
                     if (stateModel == null || !stateModel.getOver()) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.PDADialogStyle);
                         builder.setTitle("Нет доступа");
                         builder.setMessage("Прохождение этой истории недоступно пока не пройдены предыдущие");
                         builder.setNegativeButton(R.string.okay, (dialog, which) -> dialog.cancel());
@@ -143,7 +143,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
 
                 StoryStateModel storyStateModel = dataModel.getStateByStoryId(id);
                 if (storyStateModel != null && storyStateModel.getOver()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AlertDialogStyle);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.PDADialogStyle);
                     builder.setTitle("Нет доступа");
                     builder.setMessage("История уже пройдена, приступайте к прохождению других. " +
                             "При сбросе прохождения этой истории другие истории могут оказаться недоступны.");

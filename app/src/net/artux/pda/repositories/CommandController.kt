@@ -11,10 +11,14 @@ import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.ui.viewmodels.event.OpenStageEvent
 import net.artux.pda.ui.viewmodels.event.ScreenDestination
 import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
+import net.artux.pda.utils.AdType
 import net.artux.pdanetwork.model.CommandBlock
+import org.luaj.vm2.lib.jse.CoerceJavaToLua
+import org.luaj.vm2.lib.jse.JsePlatform
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+
 
 @Singleton
 class CommandController @Inject constructor(
@@ -26,13 +30,14 @@ class CommandController @Inject constructor(
     val sellerEvent: SingleLiveEvent<Event<Int>> = SingleLiveEvent()
     val stageEvent: SingleLiveEvent<Event<OpenStageEvent>> = SingleLiveEvent()
     val exitEvent: SingleLiveEvent<ScreenDestination> = SingleLiveEvent()
+    val adEvent: SingleLiveEvent<AdType> = SingleLiveEvent()
 
     private val scope = CoroutineScope(Dispatchers.Default)
     private var cacheCommands: MutableMap<String, MutableList<String>> = LinkedHashMap()
 
     val storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
     val status: SingleLiveEvent<StatusModel> = SingleLiveEvent()
-    val commandsToSync: List<String> = listOf("exitStory", "finishStory", "syncNow")
+    val commandsToSync: List<String> = listOf("exitStory", "finishStory", "syncNow", "showAd")
 
     var needSync = false
 
@@ -51,6 +56,8 @@ class CommandController @Inject constructor(
                 "stopMusic" -> soundManager.stop()
                 "pauseAllSound" -> soundManager.pause()
                 "resumeAllSound" -> soundManager.resume()
+                "showAd" -> showAd(command.value)
+                "script", "lua" -> runLua(command.value)
 
                 else -> {
                     // * commands for server * //
@@ -76,7 +83,17 @@ class CommandController @Inject constructor(
             }
     }
 
-    private fun addCommand(key: String, params: List<String>) {
+    fun clearCache() {
+        cacheCommands.clear()
+    }
+
+    fun cacheCommands(commands: Map<String, List<String>>) {
+        for (command in commands) {
+            cacheCommand(command.key, command.value)
+        }
+    }
+
+    private fun cacheCommand(key: String, params: List<String>) {
         val current = cacheCommands.getOrDefault(key, mutableListOf())
         current.addAll(params)
         cacheCommands[key] = current
@@ -137,5 +154,34 @@ class CommandController @Inject constructor(
                 status.postValue(StatusModel("Ok"))
             }
             .onFailure { status.postValue(StatusModel(it)) }
+    }
+
+    fun showAd(types: List<String>) {
+        if (types.isEmpty())
+            adEvent.postValue(AdType.USUAL)
+        else
+            showAd(types.first())
+    }
+
+    fun showAd(type: String) {
+        when (type) {
+            "video" -> adEvent.postValue(AdType.VIDEO)
+            "usual" -> adEvent.postValue(AdType.USUAL)
+            else -> adEvent.postValue(AdType.USUAL)
+        }
+    }
+
+    fun processWithServer(actions: Map<String, List<String>>) = scope.launch {
+        syncNow(actions)
+    }
+
+    private fun runLua(scripts: List<String>) {
+        val globals = JsePlatform.standardGlobals()
+        globals.set("commandController", CoerceJavaToLua.coerce(this))
+        globals.set("soundManager", CoerceJavaToLua.coerce(soundManager))
+        for (script in scripts) {
+            val chunk = globals.load(script)
+            chunk.call()
+        }
     }
 }

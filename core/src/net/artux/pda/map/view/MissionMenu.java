@@ -34,7 +34,7 @@ import net.artux.pda.map.view.blocks.ImageTextButton;
 import net.artux.pda.map.view.blocks.MissionBlock;
 import net.artux.pda.map.view.blocks.SlotTextButton;
 import net.artux.pda.map.view.view.bars.Utils;
-import net.artux.pda.model.quest.MissionModel;
+import net.artux.pda.model.quest.mission.MissionModel;
 
 import javax.inject.Inject;
 import javax.inject.Named;

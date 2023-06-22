@@ -9,8 +9,8 @@ import com.badlogic.gdx.utils.Scaling;
 
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.view.FontManager;
-import net.artux.pda.model.quest.CheckpointModel;
-import net.artux.pda.model.quest.MissionModel;
+import net.artux.pda.model.quest.mission.CheckpointModel;
+import net.artux.pda.model.quest.mission.MissionModel;
 
 public class MissionBlock extends Table {
 

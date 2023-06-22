@@ -4,15 +4,20 @@
         <item name="android:windowFullscreen">true</item>
         <item name="colorAccent">@color/yellow</item>
         <item name="android:windowBackground">@color/background</item>
-        <item name="android:dialogTheme">@style/AlertDialogStyle</item>
+        <item name="android:dialogTheme">@style/PDADialogStyle</item>
     </style>
 
-    <style name="AlertDialogStyle" parent="Theme.AppCompat.Light.Dialog">
-        <item name="android:dialogTheme">@style/AlertDialogStyle</item>
+    <style name="PDADialogStyle" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:dialogTheme">@style/PDADialogStyle</item>
         <item name="android:windowBackground">@drawable/border_background_black</item>
         <item name="android:colorAccent">#f3f3f3</item>
         <item name="android:textColor">#f3f3f3</item>
         <item name="android:textColorPrimary">#f3f3f3</item>
+    </style>
+
+    <style name="PDANotificationStyle" parent="PDADialogStyle">
+        <item name="android:dialogTheme">@style/PDADialogStyle</item>
+        <item name="android:windowBackground">#80000000</item>
     </style>
 
     <style name="EditTextStyle" parent="Theme.AppCompat.Light">
