@@ -5,7 +5,6 @@ plugins{
     //id "gdx"
 }
 
-
 javadoc {
     options.encoding = 'UTF-8'
 }
