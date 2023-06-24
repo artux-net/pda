@@ -14,6 +14,9 @@ import java.util.Stack;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ * Менеджер сцен
+ */
 @Singleton
 public class SceneManager implements Screen {
 
@@ -54,6 +57,10 @@ public class SceneManager implements Screen {
         return scenes.peek();
     }
 
+    /**
+     * Установка новой сцены
+     * @param scene
+     */
     public void set(Scene scene) {
         Scene current = scenes.pop();
         current.stop();

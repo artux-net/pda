@@ -18,6 +18,7 @@ import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -77,7 +78,7 @@ public class PlayerBattleSystem extends BaseSystem {
         }*/
 
 
-        LinkedList<Entity> playerEnemies = playerVision.getVisibleEntities();
+        List<Entity> playerEnemies = playerVision.getVisibleEntities();
         if (playerMood.hasEnemy() && !playerEnemies.contains(playerMood.getEnemy())) {
             boolean nextEnemyFound = false;
             for (int i = 0; i < playerEnemies.size(); i++) {

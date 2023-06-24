@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.engine.scenes.SceneManager;
+import net.artux.pda.map.managers.notification.NotificationController;
 import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.engine.EngineManager;
@@ -26,6 +27,10 @@ import java.util.Set;
 import javax.inject.Named;
 
 import dagger.Component;
+
+/**
+ * Интерфейс позволяющий обращатся к карте, движку и другим компонентам
+ */
 
 @PerGameMap
 @Component(modules = {EngineModule.class, UserInterfaceModule.class}, dependencies = CoreComponent.class)
@@ -45,7 +50,7 @@ public interface MapComponent extends CoreComponent {
 
     UserInterface getUserInterface();
 
-    SceneManager getGSC();
+    SceneManager getSceneManager();
 
     DataRepository getDataRepository();
 
@@ -66,4 +71,6 @@ public interface MapComponent extends CoreComponent {
     PostProcessing getPostProcessing();
 
     EngineSaver getGameSaver();
+
+    NotificationController getNotificationController();
 }

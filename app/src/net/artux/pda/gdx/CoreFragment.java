@@ -24,6 +24,7 @@ import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.repositories.CommandController;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.viewmodels.CommandViewModel;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
@@ -39,8 +40,9 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     private GdxAdapter gdxAdapter;
     private QuestViewModel questViewModel;
-    private CommandViewModel commandViewModel;
     private GDXTimberLogger gdxTimberLogger;
+
+    private CommandViewModel commandViewModel;
 
     @Override
     public AndroidAudio createAudio(Context context, AndroidApplicationConfiguration config) {
@@ -51,31 +53,36 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Bundle args = getArguments();
-        if (args != null) {
-            gdxTimberLogger = new GDXTimberLogger();
-            StoryModel storyModel = (StoryModel) args.getSerializable("story");
-            StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
-            GameMap map = (GameMap) args.getSerializable("map");
-            ItemsContainerModel items = (ItemsContainerModel) args.getSerializable("items");
+        if (args == null)
+            return null;
 
-            GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
-                    .map(map)
-                    .story(storyModel)
-                    .storyData(dataModel)
-                    .items(items)
-                    .props(((PDAApplication) requireActivity().getApplication()).getProperties());
-            gdxAdapter = (GdxAdapter) builder.build();
-            Timber.i("Core view created");
-            return initializeForView(gdxAdapter);
-        } else throw new RuntimeException("");
+        ViewModelProvider provider = new ViewModelProvider(requireActivity());
+        questViewModel = provider.get(QuestViewModel.class);
+        commandViewModel = provider.get(CommandViewModel.class);
+        CommandController commandController = commandViewModel.getCommandController();
+
+        gdxTimberLogger = new GDXTimberLogger();
+        StoryModel storyModel = (StoryModel) args.getSerializable("story");
+        StoryDataModel dataModel = (StoryDataModel) args.getSerializable("data");
+        GameMap map = (GameMap) args.getSerializable("map");
+        ItemsContainerModel items = (ItemsContainerModel) args.getSerializable("items");
+
+        GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
+                .map(map)
+                .luaTable(commandController.getLuaTable())
+                .story(storyModel)
+                .storyData(dataModel)
+                .items(items)
+                .props(((PDAApplication) requireActivity().getApplication()).getProperties());
+        gdxAdapter = (GdxAdapter) builder.build();
+        Timber.i("Core view created");
+        return initializeForView(gdxAdapter);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ViewModelProvider provider = new ViewModelProvider(requireActivity());
-        questViewModel = provider.get(QuestViewModel.class);
-        commandViewModel = provider.get(CommandViewModel.class);
+
         questViewModel.getStoryData().observe(getViewLifecycleOwner(), storyDataModel -> {
             if (gdxAdapter != null && !gdxAdapter.isDisposed())
                 gdxAdapter.getDataRepository().setUserData(storyDataModel);
@@ -97,6 +104,14 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             if (updated) args.putBoolean("updated", false);
             dataRepository.setUpdated(updated);
             setArguments(args);
+            commandViewModel
+                    .getCommandController()
+                    .putObjectToScriptContext("adapter", gdxAdapter)
+                    .putObjectToScriptContext("dataRepository", dataRepository)
+                    .putObjectToScriptContext("sceneManager", gdxAdapter.getSceneManager())
+                    .putObjectToScriptContext("core", gdxAdapter.getCoreComponent())
+                    .putObjectToScriptContext("assetManager",
+                            gdxAdapter.getCoreComponent().getAssetsManager());
         }
         setApplicationLogger(gdxTimberLogger);
         super.onResume();
@@ -113,11 +128,11 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
                     Timber.d("Start MainActivity");
                     intent = new Intent(getActivity(), MainActivity.class);
                 }
+                if (intent == null)
+                    return;
 
-                if (intent != null) {
-                    requireActivity().finish();
-                    startActivity(intent);
-                }
+                requireActivity().finish();
+                startActivity(intent);
             }
         });
     }

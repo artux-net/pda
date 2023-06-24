@@ -41,23 +41,46 @@ public class ContentGenerator {
         return text.split("\\r?\\n");
     }
 
-    public String generateName() {
+    /**
+     * @return случайное имя и кличка сталкера
+     */
+    public String generateStalkerName() {
         return names[random(0, names.length - 1)] + " " +
                 nicks[random(0, nicks.length - 1)];
     }
 
+    /**
+     * @return случайное текстовое сообщение от сталкера
+     */
     public String generateMessageContent() {
         return messages[random(0, messages.length - 1)];
     }
 
+    /**
+     * @return случайное сообщение от случайного сталкера
+     */
     public UserMessage generateMessage() {
-        return new UserMessage(generateName(), generateMessageContent(), generateAvatar());
+        return new UserMessage(generateStalkerName(), generateMessageContent(), generateStalkerAvatar());
     }
 
-    public String generateAvatar() {
+    /**
+     * @param msg текст, включаемый в сообщение
+     * @return сообщение с заданным текстом от случайного сталкера
+     */
+    public UserMessage generateMessage(String msg) {
+        return new UserMessage(generateStalkerName(), msg, generateStalkerAvatar());
+    }
+
+    /**
+     * @return возращает ссылку на случайный аватар
+     */
+    public String generateStalkerAvatar() {
         return "textures/avatars/a" + random(1, 30) + ".png";
     }
 
+    /**
+     * @return возращает случайный набор предметов
+     */
     public List<ItemModel> getRandomItems() {
         return itemsGenerator.getRandomItems();
     }

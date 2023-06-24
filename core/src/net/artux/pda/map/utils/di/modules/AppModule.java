@@ -6,11 +6,13 @@ import com.badlogic.gdx.assets.AssetManager;
 
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.common.PropertyFields;
-import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.content.assets.AssetsFinder;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.view.FontManager;
 import net.artux.pda.model.map.GameMap;
+
+import org.luaj.vm2.LuaTable;
 
 import java.util.Properties;
 
@@ -32,6 +34,11 @@ public class AppModule {
     @Provides
     public Properties getProperties() {
         return dataRepository.getProperties();
+    }
+
+    @Provides
+    public LuaTable getLuaTable() {
+        return dataRepository.getLuaTable();
     }
 
     @Provides

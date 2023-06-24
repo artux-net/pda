@@ -19,6 +19,9 @@ import java.util.Random;
 
 import javax.inject.Inject;
 
+/**
+ * Система отвечающая за проигрываение звуков и музыки на карте
+ */
 @PerGameMap
 public class SoundsSystem extends BaseSystem {
 
@@ -42,7 +45,6 @@ public class SoundsSystem extends BaseSystem {
         super.addedToEngine(engine);
         detections.add(assetManager.get("audio/sounds/pda/contact_0.ogg", Sound.class));
         detections.add(assetManager.get("audio/sounds/pda/contact_1.ogg", Sound.class));
-
 
         backgrounds.add(assetManager.get("audio/music/1.ogg", Music.class));
         backgrounds.add(assetManager.get("audio/music/2.ogg", Music.class));
@@ -95,6 +97,11 @@ public class SoundsSystem extends BaseSystem {
         detections.get(random.nextInt(detections.size())).play(VOLUME);
     }
 
+    /**
+     * Проигрывает звук на удалении от игрока
+     * @param sound
+     * @param position
+     */
     public void playSoundAtDistance(Sound sound, Vector2 position) {
         if (sound != null) {
             BodyComponent bodyComponent = pm.get(getPlayer());
@@ -105,12 +112,21 @@ public class SoundsSystem extends BaseSystem {
         }
     }
 
+    /**
+     * Проиграть звук
+     * @param sound звук
+     */
     public void playSound(Sound sound) {
         if (sound != null) {
             sound.play(VOLUME);
         }
     }
 
-
-
+    /**
+     * Проиграть звук по ссылке
+     * @param soundId ссылка на звук
+     */
+    public void playBySoundId(String soundId) {
+        playSound((Sound) assetManager.get(soundId));
+    }
 }

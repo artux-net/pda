@@ -4,7 +4,12 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 
 import java.util.LinkedList;
+import java.util.List;
 
+/**
+ * Компонент отражающий видимые сущностью другие сущности
+ * работает через {@link net.artux.pda.map.engine.ecs.systems.VisionSystem}
+ */
 public class VisionComponent implements Component {
     private final LinkedList<Entity> visibleEntities;
 

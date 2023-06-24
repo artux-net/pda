@@ -35,15 +35,15 @@ class QuestViewModel @javax.inject.Inject constructor(
     var title: MutableLiveData<String> = MutableLiveData()
     var loadingState: MutableLiveData<Boolean> = MutableLiveData()
     var stage: MutableLiveData<StageModel> = MutableLiveData()
-    var notification: MutableLiveData<NotificationModel> = MutableLiveData()
     var background: MutableLiveData<String> = MutableLiveData()
 
     var chapter: MutableLiveData<ChapterModel> = MutableLiveData()
     var map: MutableLiveData<GameMap> = MutableLiveData()
     var data: MutableLiveData<Map<String, String>> = MutableLiveData()
 
-    val storyData: MutableLiveData<StoryDataModel> get() = commandController.storyData
     val status: SingleLiveEvent<StatusModel> get() = commandController.status
+    val storyData: MutableLiveData<StoryDataModel> get() = commandController.storyData
+    val notification: SingleLiveEvent<NotificationModel> get() = commandController.notification
 
     var currentStoryId: Int = repository.getCurrentStoryId()
     var currentChapterId: Int = repository.getCurrentChapterId()

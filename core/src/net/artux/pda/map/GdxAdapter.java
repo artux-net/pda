@@ -19,18 +19,21 @@ import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 
+import org.luaj.vm2.Lua;
+import org.luaj.vm2.LuaTable;
+
 import java.util.Properties;
 
 public class GdxAdapter extends ApplicationAdapter {
 
-    private final SceneManager gsc;
+    private final SceneManager sceneManager;
     private final CoreComponent coreComponent;
     private AssetManager assetManager;
     private long startHeap;
 
     public GdxAdapter(DataRepository dataRepository) {
         coreComponent = DaggerCoreComponent.builder().appModule(new AppModule(dataRepository)).build();
-        gsc = coreComponent.getGSC();
+        sceneManager = coreComponent.getSceneManager();
     }
 
     public DataRepository getDataRepository() {
@@ -42,14 +45,14 @@ public class GdxAdapter extends ApplicationAdapter {
         startHeap = Gdx.app.getNativeHeap();
         assetManager = coreComponent.getAssetsManager();
 
-        gsc.clear();
+        sceneManager.clear();
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         Gdx.app.getApplicationLogger().log("GDX", "GDX load stared, version " + Gdx.app.getVersion());
         long loadMills = TimeUtils.millis();
 
         Gdx.app.debug("GDX", "Before load, heap " + startHeap);
         Scene firstScene = coreComponent.getPreloadState();
-        gsc.push(firstScene);
+        sceneManager.push(firstScene);
         Gdx.app.debug("GDX", "Loaded, heap " + Gdx.app.getNativeHeap());
         Gdx.app.getApplicationLogger().log("GDX", "GDX loading took " + (TimeUtils.millis() - loadMills) + " ms.");
         resume();
@@ -58,13 +61,13 @@ public class GdxAdapter extends ApplicationAdapter {
     @Override
     public void resume() {
         super.resume();
-        gsc.resume();
+        sceneManager.resume();
     }
 
     @Override
     public void pause() {
         super.pause();
-        gsc.pause();
+        sceneManager.pause();
     }
 
     @Override
@@ -79,8 +82,8 @@ public class GdxAdapter extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (!assetManager.isFinished())
             assetManager.update(17);
-        gsc.update(Gdx.graphics.getDeltaTime());
-        gsc.render(Gdx.graphics.getDeltaTime());
+        sceneManager.update(Gdx.graphics.getDeltaTime());
+        sceneManager.render(Gdx.graphics.getDeltaTime());
     }
 
     private boolean disposed;
@@ -94,7 +97,7 @@ public class GdxAdapter extends ApplicationAdapter {
         Gdx.app.debug("GDX", "Disposing, heap " + Gdx.app.getNativeHeap());
         super.dispose();
         if (!disposed) {
-            gsc.clear();
+            sceneManager.clear();
             coreComponent.getAssetsFinder().dispose();
             disposed = true;
             System.gc();
@@ -109,6 +112,7 @@ public class GdxAdapter extends ApplicationAdapter {
     public static class Builder {
 
         private final DataRepository.Builder builder;
+        private LuaTable luaTable;
 
         public Builder(PlatformInterface platformInterface) {
             builder = new DataRepository.Builder();
@@ -117,6 +121,11 @@ public class GdxAdapter extends ApplicationAdapter {
 
         public Builder storyData(StoryDataModel dataModel) {
             builder.storyDataModel(dataModel);
+            return this;
+        }
+
+        public Builder luaTable(LuaTable luaTable) {
+            builder.setLuaTable(luaTable);
             return this;
         }
 
@@ -141,7 +150,17 @@ public class GdxAdapter extends ApplicationAdapter {
         }
 
         public ApplicationAdapter build() {
-            return new GdxAdapter(builder.build());
+            if (luaTable != null)
+                return new GdxAdapter(builder.build());
+            return null;
         }
+    }
+
+    public SceneManager getSceneManager() {
+        return sceneManager;
+    }
+
+    public CoreComponent getCoreComponent() {
+        return coreComponent;
     }
 }

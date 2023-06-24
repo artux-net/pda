@@ -22,6 +22,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+/**
+ * Класс отвечает за работу с шейдерами
+ */
 @PerGameMap
 public class PostProcessing implements Disposable {
 

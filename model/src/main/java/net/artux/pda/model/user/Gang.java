@@ -1,5 +1,8 @@
 package net.artux.pda.model.user;
 
+/**
+ * Группировки сталкеров с id и ссылкой на ресурс подписи
+ */
 public enum Gang {
     LONERS(0, "gang.loners"),
     BANDITS(1, "gang.bandits"),

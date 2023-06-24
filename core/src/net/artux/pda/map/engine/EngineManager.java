@@ -3,6 +3,7 @@ package net.artux.pda.map.engine;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -32,6 +33,9 @@ import net.artux.pda.map.utils.di.components.MapComponent;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.model.map.GameMap;
 
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
+
 import javax.inject.Inject;
 
 @PerGameMap
@@ -39,16 +43,17 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
     private final GameMap map;
     private final Engine engine;
+    private final Entity player;
     private final DataRepository dataRepository;
     private final EngineSaver engineSaver;
 
     private final boolean controlPoints = true;
-    private final boolean questPoints = true; //
+    private final boolean questPoints = true;
     private final boolean anomalies = true;
 
     @Inject
     public EngineManager(MapComponent mapComponent, MissionsSystem missionsSystem,
-                         EngineSaver engineSaver,
+                         EngineSaver engineSaver, LuaTable luaTable,
                          ConditionEntityManager conditionEntityManager) {
         this.dataRepository = mapComponent.getDataRepository();
         this.map = dataRepository.getGameMap();
@@ -60,8 +65,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         long loadTime = TimeUtils.millis();
 
         EntityBuilder entityBuilder = mapComponent.getEntityBuilder();
-        Entity player = entityBuilder.player(Mappers.vector2(map.getDefPos()), dataRepository);
-
+        player = entityBuilder.player(Mappers.vector2(map.getDefPos()), dataRepository);
         engine.addEntity(player);
 
         if (controlPoints)
@@ -75,10 +79,19 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         RandomSpawnerHelper.init(mapComponent);
 
         missionsSystem.setActiveMission(missionsSystem.getActiveMission()); // finds points
-
+        initLuaTable(luaTable);
         stage.addListener(this);
         syncCameraPosition(stage);
         Gdx.app.getApplicationLogger().log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");
+    }
+
+    private void initLuaTable(LuaTable luaTable) {
+        luaTable.set("engine", CoerceJavaToLua.coerce(engine));
+        luaTable.set("player", CoerceJavaToLua.coerce(player));
+        ImmutableArray<EntitySystem> systems = engine.getSystems();
+        for (int i = 0; i < systems.size(); i++) {
+            luaTable.set(systems.getClass().getSimpleName(), CoerceJavaToLua.coerce(systems.get(i)));
+        }
     }
 
     private void syncCameraPosition(Stage stage) {

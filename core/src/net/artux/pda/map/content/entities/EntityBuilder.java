@@ -44,6 +44,9 @@ import java.util.ArrayList;
 
 import javax.inject.Inject;
 
+/**
+ * Отвечает за построение сущностей на карте
+ */
 @PerGameMap
 public class EntityBuilder {
 
@@ -154,7 +157,7 @@ public class EntityBuilder {
                 .add(healthComponent)
                 .add(group)
                 .add(new MoodComponent(group))
-                .add(new StalkerComponent(contentGenerator.generateName(), contentGenerator.generateAvatar(), contentGenerator.getRandomItems()))
+                .add(new StalkerComponent(contentGenerator.generateStalkerName(), contentGenerator.generateStalkerAvatar(), contentGenerator.getRandomItems()))
                 .add(new WeaponComponent(w, assetManager))
                 .add(statesComponent)
                 .add(new TargetMovingComponent(group))

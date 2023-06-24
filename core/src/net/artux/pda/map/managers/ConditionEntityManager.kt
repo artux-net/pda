@@ -3,6 +3,7 @@ package net.artux.pda.map.managers
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.ApplicationLogger
 import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,27 +19,23 @@ import javax.inject.Inject
 @PerGameMap
 class ConditionEntityManager @Inject constructor(
     private val engine: Engine,
-    val dataRepository: DataRepository
+    val dataRepository: DataRepository,
+    val logger: ApplicationLogger
 ) {
-    private val cm = ComponentMapper.getFor(
-        ConditionComponent::class.java
-    )
-
-    private val pcm = ComponentMapper.getFor(
-        PassivityComponent::class.java
-    )
+    private val cm = ComponentMapper.getFor(ConditionComponent::class.java)
+    private val pcm = ComponentMapper.getFor(PassivityComponent::class.java)
 
     fun update() {
         update(dataRepository.storyDataModel)
     }
 
-
     fun update(dataModel: StoryDataModel?) {
         val currentEntities =
             engine.getEntitiesFor(Family.one(ConditionComponent::class.java).get())
-        Gdx.app.applicationLogger.log("Points", "Update conditional-points.")
+        logger.log("Points", "Update conditional-points")
         for (i in 0 until currentEntities.size()) {
             val e = currentEntities.get(i)
+
             if (QuestUtil.check(cm[e], dataModel!!))
                 e.remove(PassivityComponent::class.java)
             else

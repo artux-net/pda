@@ -139,12 +139,12 @@ class BackpackMenu @Inject constructor(
                     if (itemModel.quantity > 0) {
                         itemModel.quantity = itemModel.quantity - 1
                         playerSystem.healthComponent.treat(itemModel)
-                        soundsSystem.playSound(assetManager.get("audio/sounds/person/medicine.ogg"))
+                        soundsSystem.playBySoundId(assetManager.get("audio/sounds/person/medicine.ogg"))
                     }
                     dataRepository.update()
                 } else if (itemModel is WearableModel) {
                     lastDataModel.setCurrentWearable(itemModel as WearableModel?)
-                    soundsSystem.playSound(assetManager.get("audio/sounds/person/equip.ogg"))
+                    soundsSystem.playBySoundId(assetManager.get("audio/sounds/person/equip.ogg"))
                     dataRepository.update()
                 }
             }

@@ -13,6 +13,7 @@ import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.quest.StoryModel
 import net.artux.pda.model.quest.story.StoryDataModel
 import org.apache.commons.lang3.SerializationUtils
+import org.luaj.vm2.LuaTable
 import java.util.*
 
 
@@ -22,12 +23,14 @@ class DataRepository(
     var gameMap: GameMap,
     val items: ItemsContainerModel,
     val storyModel: StoryModel,
-    val properties: Properties
+    val properties: Properties,
+    val luaTable: LuaTable
 ) {
     val TAG = "Data Repository"
 
     data class Builder(
         var platformInterface: PlatformInterface? = null,
+        var luaTable: LuaTable? = null,
         var storyDataModel: StoryDataModel? = null,
         var gameMap: GameMap? = null,
         var items: ItemsContainerModel? = null,
@@ -52,7 +55,8 @@ class DataRepository(
             gameMap!!,
             items!!,
             storyModel!!,
-            properties!!
+            properties!!,
+            luaTable!!
         )
     }
 

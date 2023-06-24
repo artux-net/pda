@@ -166,7 +166,6 @@ public class EntityProcessorSystem extends EntitySystem {
         return group;
     }
 
-
     public Group generateTakeSpawnGroup(Vector2 attackTarget) {
         Gang gang = gangRelations.random();
         return generateTakeSpawnGroup(gang, attackTarget);

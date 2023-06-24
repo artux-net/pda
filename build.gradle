@@ -77,6 +77,10 @@ project(":app") {
         natives("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a")
         natives("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86")
         natives("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64")
+
+        // lua script engine
+        // https://mvnrepository.com/artifact/org.luaj/luaj-jse
+        implementation 'org.luaj:luaj-jse:3.0.1'
     }
 
 
@@ -115,6 +119,10 @@ project(":core") {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
         implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
         implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
+
+        // lua script engine
+        // https://mvnrepository.com/artifact/org.luaj/luaj-jse
+        implementation 'org.luaj:luaj-jse:3.0.1'
     }
 }
 

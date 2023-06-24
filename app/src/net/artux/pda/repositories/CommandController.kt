@@ -7,14 +7,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.mapper.StoryMapper
+import net.artux.pda.model.quest.NotificationModel
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.ui.viewmodels.event.OpenStageEvent
 import net.artux.pda.ui.viewmodels.event.ScreenDestination
 import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
 import net.artux.pda.utils.AdType
 import net.artux.pdanetwork.model.CommandBlock
+import org.luaj.vm2.LuaError
+import org.luaj.vm2.WeakTable
 import org.luaj.vm2.lib.jse.CoerceJavaToLua
 import org.luaj.vm2.lib.jse.JsePlatform
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,7 +35,11 @@ class CommandController @Inject constructor(
     val stageEvent: SingleLiveEvent<Event<OpenStageEvent>> = SingleLiveEvent()
     val exitEvent: SingleLiveEvent<ScreenDestination> = SingleLiveEvent()
     val adEvent: SingleLiveEvent<AdType> = SingleLiveEvent()
+    var notification: SingleLiveEvent<NotificationModel> = SingleLiveEvent()
 
+    val globals = JsePlatform.standardGlobals()
+        @JvmName("getLuaTable")
+        get
     private val scope = CoroutineScope(Dispatchers.Default)
     private var cacheCommands: MutableMap<String, MutableList<String>> = LinkedHashMap()
 
@@ -40,6 +48,10 @@ class CommandController @Inject constructor(
     val commandsToSync: List<String> = listOf("exitStory", "finishStory", "syncNow", "showAd")
 
     var needSync = false
+
+    init {
+        globals.setmetatable(WeakTable.make(false, true))
+    }
 
     fun process(commands: Map<String, List<String>>?) = scope.launch {
         if (commands.isNullOrEmpty())
@@ -175,13 +187,26 @@ class CommandController @Inject constructor(
         syncNow(actions)
     }
 
+    fun putObjectToScriptContext(name: String, o: Any): CommandController {
+        globals.set(name, CoerceJavaToLua.coerce(o))
+        globals.useWeakKeys()
+        return this
+    }
+
     private fun runLua(scripts: List<String>) {
-        val globals = JsePlatform.standardGlobals()
         globals.set("commandController", CoerceJavaToLua.coerce(this))
         globals.set("soundManager", CoerceJavaToLua.coerce(soundManager))
+        //globals.set("notificationController", CoerceJavaToLua.coerce(notificationController))
+
         for (script in scripts) {
-            val chunk = globals.load(script)
-            chunk.call()
+            try {
+                val chunk = globals.load(script)
+                chunk.call()
+            } catch (e: LuaError) {
+                Timber.tag("LUA Script").e(e)
+                //notificationController.addMessage("Script error ${e.message}")
+            }
         }
     }
+
 }

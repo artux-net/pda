@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Lifecycle;
@@ -55,18 +56,19 @@ import timber.log.Timber;
 @AndroidEntryPoint
 public class QuestActivity extends FragmentActivity implements AndroidFragmentApplication.Callbacks {
 
-    private ImageSwitcher switcher;
-
     @Inject
     protected Gson gson;
     @Inject
     protected QuestSoundManager soundManager;
+    protected QuestViewModel questViewModel;
+    protected CommandViewModel commandViewModel;
 
-    private String currentBackground = "";
+    private ImageSwitcher switcher;
     private CoreFragment coreFragment;
     private StageRootFragment stageRootFragment;
-    private QuestViewModel questViewModel;
-    private CommandViewModel commandViewModel;
+
+    private String currentBackground = "";
+    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +193,10 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
         startLoading();
     }
 
+    private boolean isMapActive() {
+        return currentFragment == coreFragment;
+    }
+
     private void setStage(StageModel stageModel) {
         soundManager.resume();
         FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -207,6 +213,8 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
                 .show(stageRootFragment)
                 .commitNow();
         stageRootFragment.setStage(stageModel);
+
+        currentFragment = stageRootFragment;
     }
 
     private void startMap(ViewModelProvider provider, GameMap map) {
@@ -234,6 +242,8 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
                 .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
                 .replace(R.id.containerView, coreFragment)
                 .commitNow();
+
+        currentFragment = coreFragment;
     }
 
     private void startLoading() {

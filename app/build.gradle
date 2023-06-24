@@ -219,11 +219,6 @@ dependencies {
 
     //ads
     implementation 'com.yandex.android:mobileads:5.8.0'
-
-    // lua script engine
-    // https://mvnrepository.com/artifact/org.luaj/luaj-jse
-    implementation 'org.luaj:luaj-jse:3.0.1'
-
 }
 
 task copyAndroidNatives {

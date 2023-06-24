@@ -8,6 +8,9 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import net.artux.pda.map.engine.ecs.entities.BodyBuilder;
 
+/**
+ * Компонент физического тела сущности, определяет ее позицию, скорость, вес и так далее
+ */
 public class BodyComponent implements Component {
 
     public final Body body;

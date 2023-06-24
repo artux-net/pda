@@ -1,7 +1,5 @@
 package net.artux.pda.map.managers.notification;
 
-import static com.badlogic.gdx.math.MathUtils.random;
-
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.MathUtils;
@@ -16,7 +14,6 @@ import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
 import net.artux.pda.map.utils.di.scope.PerGameMap;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.MessagesPlane;
-import net.artux.pda.model.chat.ChatEvent;
 import net.artux.pda.model.chat.UserMessage;
 
 import java.util.EnumMap;
@@ -29,11 +26,9 @@ public class NotificationController {
     private final ContentGenerator contentGenerator;
     private final MessagesPlane messagesPlane;
     private final SoundsSystem soundsSystem;
-    private final AssetManager assetManager;
     private final EnumMap<NotificationType, Sound> soundMap;
 
     private final Label titleLabel;
-    private final Group gameZone;
     private final Timer.Task delayTitleTask = new Timer.Task() {
         @Override
         public void run() {
@@ -44,7 +39,6 @@ public class NotificationController {
     @Inject
     public NotificationController(UserInterface userInterface, AssetManager assetManager, SoundsSystem soundsSystem, MessagesPlane messagesPlane, ContentGenerator contentGenerator) {
         this.contentGenerator = contentGenerator;
-        this.assetManager = assetManager;
         this.soundsSystem = soundsSystem;
         this.messagesPlane = messagesPlane;
         Timer.schedule(new Timer.Task() {
@@ -58,7 +52,7 @@ public class NotificationController {
         for (NotificationType type : NotificationType.values()) {
             soundMap.put(type, assetManager.get(type.getSound()));
         }
-        gameZone = userInterface.getGameZone();
+        Group gameZone = userInterface.getGameZone();
 
         titleLabel = new Label("test", userInterface.getLabelStyle());
         titleLabel.setTouchable(Touchable.disabled);
@@ -69,9 +63,50 @@ public class NotificationController {
         gameZone.addActor(titleLabel);
     }
 
+    /**
+     * Добавление сообщения на экран без звука
+     *
+     * @param icon    ссылка на ресурс для изображения
+     * @param title   заголовок
+     * @param content содержимое
+     * @param length  длительность отображения
+     */
+    public void addSilentMessage(String icon, String title, String content, MessagesPlane.Length length) {
+        messagesPlane.addMessage(icon, title, content, length);
+    }
+
+    /**
+     * Добавление сообщения на экран со звуком подсказки, работает как {@link #addSilentMessage(String, String, String, MessagesPlane.Length)}}
+     */
+    public void addMessage(String icon, String title, String content, MessagesPlane.Length length) {
+        soundsSystem.playBySoundId("audio/sounds/pda/pda_tip.ogg");
+        addSilentMessage(icon, title, content, length);
+    }
+
+    /**
+     * Добавление сообщения на экран со звуком
+     *
+     * @param sound ссылка на звук
+     */
+    public void addMessage(String sound, String icon, String title, String content, MessagesPlane.Length length) {
+        soundsSystem.playBySoundId(sound);
+        addSilentMessage(icon, title, content, length);
+    }
+
+    public void notify(NotificationType type, String title, String content) {
+        addSilentMessage(type.getIcon(),
+                title,
+                content, MessagesPlane.Length.SHORT);
+        soundsSystem.playSound(soundMap.get(type));
+    }
+
+    /**
+     * Отображение сообщения со звуком
+     *
+     * @param message сообщение для показа
+     */
     public void addMessage(UserMessage message) {
-        soundsSystem.playSound(assetManager.get("audio/sounds/pda/pda_tip.ogg"));
-        messagesPlane.addMessage(message.getAuthor().getAvatar(),
+        addSilentMessage(message.getAuthor().getAvatar(),
                 message.getAuthor().getLogin(),
                 message.getContent(), MessagesPlane.Length.LONG);
     }
@@ -80,31 +115,21 @@ public class NotificationController {
         addMessage(generateMessage(message));
     }
 
-    public void notify(NotificationType type, String title, String content) {
-        messagesPlane.addMessage(type.getIcon(),
-                title,
-                content, MessagesPlane.Length.SHORT);
-        soundsSystem.playSound(soundMap.get(type));
-    }
-
-    public void msg(String message) {
-        addMessage(UserMessage.event(ChatEvent.Companion.of(message)));
-    }
-
     public UserMessage generateMessage(String msg) {
-        return new UserMessage(contentGenerator.generateName(), msg,
-                "textures/avatars/a" + random(1, 30) + ".png");
+        return contentGenerator.generateMessage(msg);
     }
 
     public UserMessage generateMessage() {
-        return new UserMessage(contentGenerator.generateName(),
-                contentGenerator.generateMessageContent(),
-                "textures/avatars/a" + random(1, 30) + ".png");
+        return contentGenerator.generateMessage();
     }
 
+    /**
+     * Устанавливает заголовок по центру экрана на три секунды
+     *
+     * @param titleText текст заголовка
+     */
     public void setTitle(String titleText) {
-        if (!titleLabel.getText().equals(titleText))
-            titleLabel.setText(titleText);
+        titleLabel.setText(titleText);
         titleLabel.setVisible(true);
 
         if (delayTitleTask.isScheduled())
