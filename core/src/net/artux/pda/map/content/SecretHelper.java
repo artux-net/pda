@@ -1,7 +1,7 @@
 package net.artux.pda.map.content;
 
 import static com.badlogic.gdx.math.MathUtils.random;
-import static net.artux.pda.map.engine.ecs.entities.ai.TileType.SEARCH;
+import static net.artux.pda.map.engine.entities.ai.TileType.SEARCH;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
@@ -10,10 +10,10 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
-import net.artux.pda.map.engine.ecs.components.map.SecretComponent;
-import net.artux.pda.map.engine.ecs.entities.ai.TileType;
-import net.artux.pda.map.utils.di.components.MapComponent;
+import net.artux.pda.map.ecs.interactive.map.SecretComponent;
+import net.artux.pda.map.ecs.physics.BodyComponent;
+import net.artux.pda.map.engine.entities.ai.TileType;
+import net.artux.pda.map.di.components.MapComponent;
 
 import java.util.HashSet;
 import java.util.Set;

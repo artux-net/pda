@@ -1,6 +1,6 @@
 package net.artux.pda.map.content.entities;
 
-import net.artux.pda.map.engine.ecs.components.InfightingComponent;
+import net.artux.pda.map.ecs.battle.InfightingComponent;
 
 public enum MutantType {
 

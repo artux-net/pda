@@ -1,29 +1,26 @@
 package net.artux.pda.map.repository
 
 import com.badlogic.ashley.core.Engine
-import com.badlogic.gdx.Preferences
-import net.artux.pda.map.engine.ecs.systems.SpawnSystem
+import com.google.gson.Gson
 import net.artux.pda.map.utils.PlatformInterface
-import net.artux.pda.map.utils.di.scope.PerGameMap
+import net.artux.pda.map.di.scope.PerGameMap
+import net.artux.pda.model.map.GameMap
 import javax.inject.Inject
 
 @PerGameMap
 class EngineSaver @Inject constructor(
+    val gameMap: GameMap,
     val platformInterface: PlatformInterface,
-    var entitySaver: EntitySaver,
-    val preferences: Preferences
+    var spawnController: SpawnController,
+    val gson: Gson
 ) {
 
     fun save(engine: Engine) {
-        val entities = engine.getSystem(SpawnSystem::class.java).entities
-        for (i in 0 until entities.size()) {
-            val entity = entities[i]
-
-        }
+        spawnController.save(engine)
     }
 
     fun restore(engine: Engine){
-
+        spawnController.restore(engine)
     }
 
 

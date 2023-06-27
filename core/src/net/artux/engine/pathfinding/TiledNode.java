@@ -3,7 +3,7 @@ package net.artux.engine.pathfinding;
 import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.utils.Array;
 
-import net.artux.pda.map.engine.ecs.entities.ai.TileType;
+import net.artux.pda.map.engine.entities.ai.TileType;
 
 public abstract class TiledNode<N extends TiledNode<N>> {
 

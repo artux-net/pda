@@ -5,9 +5,8 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 
-import net.artux.engine.utils.AssetsController;
 import net.artux.pda.map.scenes.ErrorScene;
-import net.artux.pda.map.utils.di.components.CoreComponent;
+import net.artux.pda.map.di.components.CoreComponent;
 
 import java.util.Stack;
 

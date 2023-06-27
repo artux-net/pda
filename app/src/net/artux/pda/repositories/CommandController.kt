@@ -5,6 +5,7 @@ import com.google.android.datatransport.Event
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.artux.pda.commands.Commands
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.quest.NotificationModel
@@ -16,6 +17,7 @@ import net.artux.pda.utils.AdType
 import net.artux.pdanetwork.model.CommandBlock
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.WeakTable
+import org.luaj.vm2.lib.DebugLib
 import org.luaj.vm2.lib.jse.CoerceJavaToLua
 import org.luaj.vm2.lib.jse.JsePlatform
 import timber.log.Timber
@@ -45,12 +47,18 @@ class CommandController @Inject constructor(
 
     val storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
     val status: SingleLiveEvent<StatusModel> = SingleLiveEvent()
-    val commandsToSync: List<String> = listOf("exitStory", "finishStory", "syncNow", "showAd")
 
     var needSync = false
 
     init {
         globals.setmetatable(WeakTable.make(false, true))
+        globals.load(DebugLib())
+    }
+
+    fun processWithServer(actions: Map<String, List<String>>) = scope.launch {
+        needSync = true
+        cacheCommands(actions)
+        process(actions)
     }
 
     fun process(commands: Map<String, List<String>>?) = scope.launch {
@@ -74,8 +82,9 @@ class CommandController @Inject constructor(
                 else -> {
                     // * commands for server * //
                     // addCommand(command.key, command.value)
-                    if (command.key in commandsToSync)
+                    if (command.key in Commands.commandsToSync) {
                         needSync = true
+                    }
                 }
 
             }
@@ -101,7 +110,8 @@ class CommandController @Inject constructor(
 
     fun cacheCommands(commands: Map<String, List<String>>) {
         for (command in commands) {
-            cacheCommand(command.key, command.value)
+            if (command.key in Commands.serverCommands)
+                cacheCommand(command.key, command.value)
         }
     }
 
@@ -183,9 +193,6 @@ class CommandController @Inject constructor(
         }
     }
 
-    fun processWithServer(actions: Map<String, List<String>>) = scope.launch {
-        syncNow(actions)
-    }
 
     fun putObjectToScriptContext(name: String, o: Any): CommandController {
         globals.set(name, CoerceJavaToLua.coerce(o))
@@ -194,9 +201,8 @@ class CommandController @Inject constructor(
     }
 
     private fun runLua(scripts: List<String>) {
-        globals.set("commandController", CoerceJavaToLua.coerce(this))
+        globals.set("controller", CoerceJavaToLua.coerce(this))
         globals.set("soundManager", CoerceJavaToLua.coerce(soundManager))
-        //globals.set("notificationController", CoerceJavaToLua.coerce(notificationController))
 
         for (script in scripts) {
             try {

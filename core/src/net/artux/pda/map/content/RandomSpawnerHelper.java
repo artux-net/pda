@@ -5,20 +5,17 @@ import static com.badlogic.gdx.math.MathUtils.random;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
-import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.content.entities.EntityBuilder;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
-import net.artux.pda.map.engine.ecs.components.map.SpawnComponent;
-import net.artux.pda.map.engine.ecs.components.map.TransferComponent;
-import net.artux.pda.map.engine.ecs.systems.EntityProcessorSystem;
-import net.artux.pda.map.engine.ecs.systems.MapOrientationSystem;
-import net.artux.pda.map.engine.ecs.systems.SpawnSystem;
-import net.artux.pda.map.engine.ecs.systems.TimerSystem;
-import net.artux.pda.map.utils.di.components.MapComponent;
+import net.artux.pda.map.di.components.MapComponent;
+import net.artux.pda.map.ecs.ai.MapOrientationSystem;
+import net.artux.pda.map.ecs.creation.EntityProcessorSystem;
+import net.artux.pda.map.ecs.interactive.TimerSystem;
+import net.artux.pda.map.ecs.interactive.map.SpawnComponent;
+import net.artux.pda.map.ecs.physics.BodyComponent;
+import net.artux.pda.map.ecs.takeover.SpawnSystem;
 
 import java.util.Properties;
 
@@ -49,7 +46,8 @@ public class RandomSpawnerHelper {
             }
             // создает группу атаки на заполненый спавн
             targetSpawn = spawnSystem.getRandomSpawn();
-            entityProcessorSystem.generateAttackSpawnGroup(sm.get(targetSpawn));
+            if (targetSpawn != null)
+                entityProcessorSystem.generateAttackSpawnGroup(sm.get(targetSpawn));
         });
 
         float singleFreq = Float.parseFloat((String) properties.get(PropertyFields.SINGLE_BOT_FREQ));

@@ -4,18 +4,17 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.engine.utils.LocaleBundle
-import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.content.assets.AssetsFinder
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.utils.Colors
-import net.artux.pda.map.utils.di.scope.PerGameMap
+import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.view.blocks.MediaItem
-import net.artux.pda.map.view.view.ItemsTableView
+import net.artux.pda.map.view.view.ScrollItemsTableView
 import net.artux.pda.map.view.view.OnItemClickListener
 import net.artux.pda.map.view.view.bars.Utils
 import net.artux.pda.model.items.ItemModel
@@ -30,16 +29,15 @@ class LootMenu @Inject constructor(
     assetsFinder: AssetsFinder,
     private val localeBundle: LocaleBundle,
     private val dataRepository: DataRepository,
-    skin: Skin
+    private var mainItemsView: ScrollItemsTableView,
+    private var botItemsView: ScrollItemsTableView,
 ) : Table() {
 
     private var assetManager: AssetManager
     private var fontManager: FontManager
     private var mainInfo: MediaItem
-    private var mainItemsView: ItemsTableView
 
     private var botInfo: MediaItem
-    private var botItemsView: ItemsTableView
 
     private var lastDataModel: StoryDataModel
     private var lastBotItems: MutableList<ItemModel> = mutableListOf()
@@ -73,7 +71,7 @@ class LootMenu @Inject constructor(
             .pad(10f)
             .space(20f)
         defaults().fill()
-        lastDataModel = dataRepository.storyDataModel
+        lastDataModel = dataRepository.initDataModel
         fontManager = assetsFinder.fontManager
 
         val titleLabelStyle = fontManager.getLabelStyle(38, Color.WHITE)
@@ -97,26 +95,12 @@ class LootMenu @Inject constructor(
 
         leftTable.row()
 
-        botItemsView = ItemsTableView(
-            localeBundle["main.inventory"],
-            titleLabelStyle,
-            subtitleStyle,
-            assetsFinder,
-            skin
-        )
+        botItemsView.setTitle(localeBundle["main.inventory"])
         leftTable.add(botItemsView)
             .grow()
             .uniformY()
 
-        mainItemsView = ItemsTableView(
-            localeBundle["main.inventory"],
-            titleLabelStyle,
-            subtitleStyle,
-            assetsFinder,
-            skin
-        )
-
-
+        mainItemsView.setTitle(localeBundle["main.inventory"])
         leftTable.add(mainItemsView)
             .grow()
             .uniformY()

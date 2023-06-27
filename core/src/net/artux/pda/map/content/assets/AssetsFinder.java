@@ -1,5 +1,6 @@
 package net.artux.pda.map.content.assets;
 
+import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
@@ -29,17 +30,18 @@ public class AssetsFinder implements Disposable {
     public AssetManager assetManager;
     private final FontManager fontManager;
     private final Properties properties;
+    private final ApplicationLogger logger;
 
     @Inject
-    public AssetsFinder(Properties properties) {
+    public AssetsFinder(ApplicationLogger logger, Properties properties) {
         fontManager = new FontManager();
+        this.logger = logger;
         this.properties = properties;
     }
 
     public AssetManager getManager() {
         if (assetManager == null) {
-            //assetManager.setLogger();
-            Gdx.app.getApplicationLogger().log("Assets", "Setup assets for loading.");
+            logger.log("Assets", "Setup assets for loading.");
             assetManager = new AssetManager();
 
             for (int i = 0; i < 31; i++) {
@@ -78,8 +80,6 @@ public class AssetsFinder implements Disposable {
             assetManager.setLoader(NetTexture.class, new NetTextureAssetLoader(properties));
             assetManager.setLoader(LocaleBundle.class, new LocaleBundleLoader(assetManager.getFileHandleResolver()));
             assetManager.load("locale/ui.properties", LocaleBundle.class);
-        } else {
-            Gdx.app.getApplicationLogger().log("Assets", "Assets are already set. Return cache.");
         }
         return assetManager;
     }

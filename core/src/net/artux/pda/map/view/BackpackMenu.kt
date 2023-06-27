@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import kotlinx.coroutines.CoroutineScope
@@ -15,16 +14,16 @@ import kotlinx.coroutines.launch
 import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.content.assets.AssetsFinder
-import net.artux.pda.map.engine.ecs.systems.SoundsSystem
-import net.artux.pda.map.engine.ecs.systems.player.PlayerSystem
+import net.artux.pda.map.ecs.sound.SoundsSystem
+import net.artux.pda.map.ecs.player.PlayerSystem
 import net.artux.pda.map.utils.Colors
-import net.artux.pda.map.utils.di.scope.PerGameMap
+import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.view.blocks.SlotTextButton
 import net.artux.pda.map.view.dialog.AdsDialog
 import net.artux.pda.map.view.dialog.ThrowItemDialog
 import net.artux.pda.map.view.view.DetailItemView
 import net.artux.pda.map.view.view.HUD
-import net.artux.pda.map.view.view.ItemsTableView
+import net.artux.pda.map.view.view.ScrollItemsTableView
 import net.artux.pda.map.view.view.OnItemClickListener
 import net.artux.pda.map.view.view.bars.Utils
 import net.artux.pda.model.items.*
@@ -48,13 +47,12 @@ class BackpackMenu @Inject constructor(
     soundsSystem: SoundsSystem,
     throwItemDialog: ThrowItemDialog,
     adsDialog: AdsDialog,
-    skin: Skin,
+    var mainItemsView: ScrollItemsTableView,
     hud: HUD
 ) : Table() {
     private var assetManager: AssetManager
     private var fontManager: FontManager
     private var infoLabel: Label
-    private var mainItemsView: ItemsTableView
     private lateinit var lastDataModel: StoryDataModel
 
     fun update(dataModel: StoryDataModel) {
@@ -121,13 +119,7 @@ class BackpackMenu @Inject constructor(
             .colspan(1)
             .left()
             .uniformX().fill()
-        mainItemsView = ItemsTableView(
-            localeBundle["main.inventory"],
-            titleLabelStyle,
-            subtitleStyle,
-            assetsFinder,
-            skin
-        )
+        mainItemsView.setTitle(localeBundle["main.inventory"])
         add(mainItemsView)
             .left()
             .colspan(2)
@@ -139,12 +131,12 @@ class BackpackMenu @Inject constructor(
                     if (itemModel.quantity > 0) {
                         itemModel.quantity = itemModel.quantity - 1
                         playerSystem.healthComponent.treat(itemModel)
-                        soundsSystem.playBySoundId(assetManager.get("audio/sounds/person/medicine.ogg"))
+                        soundsSystem.playBySoundId("audio/sounds/person/medicine.ogg")
                     }
                     dataRepository.update()
                 } else if (itemModel is WearableModel) {
                     lastDataModel.setCurrentWearable(itemModel as WearableModel?)
-                    soundsSystem.playBySoundId(assetManager.get("audio/sounds/person/equip.ogg"))
+                    soundsSystem.playBySoundId("audio/sounds/person/equip.ogg")
                     dataRepository.update()
                 }
             }

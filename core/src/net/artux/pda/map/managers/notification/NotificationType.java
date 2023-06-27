@@ -4,7 +4,6 @@ public enum NotificationType {
     ATTENTION("textures/ui/icons/ic_attention.png",
             "audio/sounds/pda/pda_news.ogg");
 
-
     private final String icon;
     private final String sound;
 

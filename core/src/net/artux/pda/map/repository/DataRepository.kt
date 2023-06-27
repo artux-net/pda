@@ -1,11 +1,11 @@
 package net.artux.pda.map.repository
 
+import com.badlogic.gdx.ApplicationLogger
 import com.badlogic.gdx.Gdx
 import com.google.gson.Gson
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import net.artux.pda.common.ActionHandler
 import net.artux.pda.map.utils.PlatformInterface
 import net.artux.pda.model.QuestUtil
 import net.artux.pda.model.items.ItemsContainerModel
@@ -19,12 +19,13 @@ import java.util.*
 
 class DataRepository(
     val platformInterface: PlatformInterface,
-    var storyDataModel: StoryDataModel,
+    var initDataModel: StoryDataModel,
     var gameMap: GameMap,
     val items: ItemsContainerModel,
     val storyModel: StoryModel,
     val properties: Properties,
-    val luaTable: LuaTable
+    val luaTable: LuaTable,
+    val applicationLogger: ApplicationLogger
 ) {
     val TAG = "Data Repository"
 
@@ -35,7 +36,8 @@ class DataRepository(
         var gameMap: GameMap? = null,
         var items: ItemsContainerModel? = null,
         var storyModel: StoryModel? = null,
-        var properties: Properties? = null
+        var properties: Properties? = null,
+        var applicationLogger: ApplicationLogger? = null
     ) {
 
 
@@ -56,11 +58,12 @@ class DataRepository(
             items!!,
             storyModel!!,
             properties!!,
-            luaTable!!
+            luaTable!!,
+            applicationLogger!!
         )
     }
 
-    var currentStoryDataModel = storyDataModel
+    var currentStoryDataModel = initDataModel
     private val dataModelFlow: MutableSharedFlow<StoryDataModel> = MutableSharedFlow(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
@@ -69,15 +72,14 @@ class DataRepository(
 
     val gson = Gson()
     var updated: Boolean = true
-    var actionHandler: ActionHandler? = null
 
     init {
-        dataModelFlow.tryEmit(storyDataModel)
+        dataModelFlow.tryEmit(initDataModel)
     }
 
     fun setUserData(storyDataModel: StoryDataModel) {
         Gdx.app.applicationLogger.log(TAG, "Story data updated.")
-        this.storyDataModel = SerializationUtils.clone(storyDataModel)
+        this.initDataModel = SerializationUtils.clone(storyDataModel)
         currentStoryDataModel = storyDataModel
         dataModelFlow.tryEmit(storyDataModel)
     }
@@ -93,13 +95,17 @@ class DataRepository(
 
     fun applyActions(actions: Map<String, List<String>>?, calculateDiff: Boolean = true) {
         val summaryMap = if (calculateDiff)
-            HashMap(QuestUtil.difference(storyDataModel, currentStoryDataModel))
+            HashMap(QuestUtil.difference(initDataModel, currentStoryDataModel))
         else
             HashMap()
-        actionHandler?.applyActions(actions)
         if (actions != null) {
             summaryMap.putAll(actions)
+            summaryMap.put("syncNow", listOf())
             platformInterface.applyActions(summaryMap)
         }
+    }
+
+    fun applyActions(actions: Map<String, List<String>>?) {
+        applyActions(actions, true)
     }
 }

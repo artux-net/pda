@@ -53,8 +53,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Bundle args = getArguments();
-        if (args == null)
-            return null;
+        if (args == null) return null;
 
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         questViewModel = provider.get(QuestViewModel.class);
@@ -67,14 +66,16 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
         GameMap map = (GameMap) args.getSerializable("map");
         ItemsContainerModel items = (ItemsContainerModel) args.getSerializable("items");
 
-        GdxAdapter.Builder builder = new GdxAdapter.Builder(this)
+        gdxAdapter = (GdxAdapter) new GdxAdapter.Builder(this)
                 .map(map)
                 .luaTable(commandController.getLuaTable())
                 .story(storyModel)
                 .storyData(dataModel)
                 .items(items)
-                .props(((PDAApplication) requireActivity().getApplication()).getProperties());
-        gdxAdapter = (GdxAdapter) builder.build();
+                .logger(gdxTimberLogger)
+                .props(((PDAApplication) requireActivity().getApplication()).getProperties())
+                .build();
+
         Timber.i("Core view created");
         return initializeForView(gdxAdapter);
     }
@@ -146,7 +147,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     @Override
     public void applyActions(Map<String, List<String>> actions) {
-        commandViewModel.process(actions);
+        commandViewModel.processWithServer(actions);
     }
 
     @Override

@@ -10,8 +10,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.map.content.ContentGenerator;
-import net.artux.pda.map.engine.ecs.systems.SoundsSystem;
-import net.artux.pda.map.utils.di.scope.PerGameMap;
+import net.artux.pda.map.ecs.sound.SoundsSystem;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.MessagesPlane;
 import net.artux.pda.model.chat.UserMessage;

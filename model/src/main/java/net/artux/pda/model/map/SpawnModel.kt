@@ -2,6 +2,7 @@ package net.artux.pda.model.map
 
 import net.artux.pda.model.user.Gang
 import java.io.Serializable
+import java.util.Collections
 
 data class SpawnModel(
     var id: Int = 0,
@@ -11,15 +12,14 @@ data class SpawnModel(
     var strength: Strength? = null,
     var r: Int = 0,
     var n: Int = 0,
-    var pos: String? = null,
-    var data: HashMap<String, List<String>>? = null,
-    var actions: HashMap<String, List<String>>? = null,
-    var condition: HashMap<String, List<String>>? = null,
+    var pos: String = "500:500"
 ) : Serializable {
 
+    var data: Map<String, List<String>> = mutableMapOf()
+    var actions: Map<String, List<String>> = mutableMapOf()
+    var condition: Map<String, List<String>> = mutableMapOf()
+
     fun getParams(): Set<String> {
-        if (data == null)
-            data = HashMap()
-        return data!!.keys
+        return data.keys
     }
 }

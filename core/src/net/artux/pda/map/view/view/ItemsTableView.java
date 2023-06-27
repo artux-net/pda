@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
@@ -22,6 +21,9 @@ import net.artux.pda.model.items.ItemModel;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 public class ItemsTableView extends Table {
 
     private final Label titleLabel;
@@ -32,16 +34,19 @@ public class ItemsTableView extends Table {
     private OnItemClickListener onItemClickListener;
     private float weightSum;
 
-    Label.LabelStyle titleStyle;
-    Label.LabelStyle subtitleStyle;
+    private final Label.LabelStyle titleStyle;
+    private final Label.LabelStyle subtitleStyle;
 
-    public ItemsTableView(String title, Label.LabelStyle titleLabelStyle, Label.LabelStyle descLabelStyle, AssetsFinder assetsFinder, Skin skin) {
+    @Inject
+    public ItemsTableView(@Named("titleStyle") Label.LabelStyle titleLabelStyle,
+                          @Named("descStyle") Label.LabelStyle descLabelStyle,
+                          AssetsFinder assetsFinder, Skin skin) {
         super(skin);
         this.assetManager = assetsFinder.getManager();
         this.localeBundle = assetsFinder.getLocaleBundle();
 
         Table.debugCellColor = Colors.primaryColor;
-        titleLabel = new Label(title, titleLabelStyle);
+        titleLabel = new Label("", titleLabelStyle);
         descLabel = new Label("", descLabelStyle);
         add(titleLabel)
                 .left()
@@ -68,12 +73,7 @@ public class ItemsTableView extends Table {
                 .pad(5)
                 .space(15);
 
-        ScrollPane scrollPane = new ScrollPane(itemsTable, skin);
-        scrollPane.setClamp(false);
-        scrollPane.setFadeScrollBars(false);
-        scrollPane.setScrollingDisabled(true, false);
-
-        add(scrollPane)
+        add(itemsTable)
                 .top()
                 .fill()
                 .expand()

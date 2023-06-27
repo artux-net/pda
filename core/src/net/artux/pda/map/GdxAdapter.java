@@ -2,50 +2,60 @@ package net.artux.pda.map;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.engine.scenes.SceneManager;
 import net.artux.engine.scenes.Scene;
+import net.artux.engine.scenes.SceneManager;
+import net.artux.pda.map.di.components.CoreComponent;
+import net.artux.pda.map.di.components.DaggerCoreComponent;
+import net.artux.pda.map.di.modules.AppModule;
 import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.utils.PlatformInterface;
-import net.artux.pda.map.utils.di.components.CoreComponent;
-import net.artux.pda.map.utils.di.components.DaggerCoreComponent;
-import net.artux.pda.map.utils.di.modules.AppModule;
 import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 
-import org.luaj.vm2.Lua;
 import org.luaj.vm2.LuaTable;
 
 import java.util.Properties;
 
 public class GdxAdapter extends ApplicationAdapter {
 
-    private final SceneManager sceneManager;
-    private final CoreComponent coreComponent;
+    private final DataRepository dataRepository;
+    private SceneManager sceneManager;
+    private CoreComponent coreComponent;
     private AssetManager assetManager;
     private long startHeap;
 
     public GdxAdapter(DataRepository dataRepository) {
-        coreComponent = DaggerCoreComponent.builder().appModule(new AppModule(dataRepository)).build();
-        sceneManager = coreComponent.getSceneManager();
+        this.dataRepository = dataRepository;
     }
 
     public DataRepository getDataRepository() {
-        return coreComponent.getDataRepository();
+        return dataRepository;
+    }
+
+    public void init() {
+        AppModule appModule = new AppModule(dataRepository);
+        coreComponent = DaggerCoreComponent.builder()
+                .appModule(appModule)
+                .build();
+
+        sceneManager = coreComponent.getSceneManager();
+        assetManager = coreComponent.getAssetsManager();
+        sceneManager.clear();
     }
 
     @Override
     public void create() {
         startHeap = Gdx.app.getNativeHeap();
-        assetManager = coreComponent.getAssetsManager();
+        init();
 
-        sceneManager.clear();
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         Gdx.app.getApplicationLogger().log("GDX", "GDX load stared, version " + Gdx.app.getVersion());
         long loadMills = TimeUtils.millis();
@@ -112,7 +122,6 @@ public class GdxAdapter extends ApplicationAdapter {
     public static class Builder {
 
         private final DataRepository.Builder builder;
-        private LuaTable luaTable;
 
         public Builder(PlatformInterface platformInterface) {
             builder = new DataRepository.Builder();
@@ -149,10 +158,13 @@ public class GdxAdapter extends ApplicationAdapter {
             return this;
         }
 
+        public Builder logger(ApplicationLogger logger) {
+            builder.setApplicationLogger(logger);
+            return this;
+        }
+
         public ApplicationAdapter build() {
-            if (luaTable != null)
-                return new GdxAdapter(builder.build());
-            return null;
+            return new GdxAdapter(builder.build());
         }
     }
 

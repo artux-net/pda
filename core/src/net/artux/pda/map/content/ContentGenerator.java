@@ -6,7 +6,7 @@ import static com.badlogic.gdx.math.MathUtils.random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
-import net.artux.pda.map.utils.di.scope.PerGameMap;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.model.items.ItemModel;
 

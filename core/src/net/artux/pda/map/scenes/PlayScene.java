@@ -14,11 +14,11 @@ import com.badlogic.gdx.utils.Timer;
 import net.artux.engine.graphics.postprocessing.PostProcessing;
 import net.artux.engine.scenes.Scene;
 import net.artux.engine.scenes.SceneManager;
-import net.artux.pda.map.repository.DataRepository;
+import net.artux.pda.map.di.components.CoreComponent;
+import net.artux.pda.map.di.components.DaggerMapComponent;
+import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.map.engine.EngineManager;
-import net.artux.pda.map.utils.di.components.CoreComponent;
-import net.artux.pda.map.utils.di.components.DaggerMapComponent;
-import net.artux.pda.map.utils.di.components.MapComponent;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.model.map.GameMap;
 
 import java.util.Map;
@@ -125,7 +125,7 @@ public class PlayScene extends Scene {
 
     @Override
     public void pause() {
-        
+
     }
 
     @Override

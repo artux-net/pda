@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.Align;
 import net.artux.engine.scenes.SceneManager;
 import net.artux.engine.scenes.Scene;
 import net.artux.pda.map.repository.DataRepository;
-import net.artux.pda.map.utils.di.components.CoreComponent;
+import net.artux.pda.map.di.components.CoreComponent;
 import net.artux.pda.model.map.GameMap;
 
 import java.text.DecimalFormat;

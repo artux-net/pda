@@ -16,21 +16,20 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.content.AnomalyHelper;
-import net.artux.pda.map.content.ControlPointsHelper;
 import net.artux.pda.map.content.QuestPointsHelper;
 import net.artux.pda.map.content.RandomSpawnerHelper;
 import net.artux.pda.map.content.SecretHelper;
 import net.artux.pda.map.content.entities.EntityBuilder;
-import net.artux.pda.map.engine.ecs.systems.Drawable;
-import net.artux.pda.map.engine.ecs.systems.player.CameraSystem;
-import net.artux.pda.map.engine.ecs.systems.player.InteractionSystem;
-import net.artux.pda.map.engine.ecs.systems.player.MissionsSystem;
-import net.artux.pda.map.engine.ecs.systems.player.PlayerMovingSystem;
+import net.artux.pda.map.ecs.render.Drawable;
+import net.artux.pda.map.ecs.camera.CameraSystem;
+import net.artux.pda.map.ecs.interactive.InteractionSystem;
+import net.artux.pda.map.ecs.player.MissionsSystem;
+import net.artux.pda.map.ecs.physics.PlayerMovingSystem;
 import net.artux.pda.map.managers.ConditionEntityManager;
 import net.artux.pda.map.repository.EngineSaver;
 import net.artux.pda.map.utils.Mappers;
-import net.artux.pda.map.utils.di.components.MapComponent;
-import net.artux.pda.map.utils.di.scope.PerGameMap;
+import net.artux.pda.map.di.components.MapComponent;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.model.map.GameMap;
 
 import org.luaj.vm2.LuaTable;
@@ -47,7 +46,6 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private final DataRepository dataRepository;
     private final EngineSaver engineSaver;
 
-    private final boolean controlPoints = true;
     private final boolean questPoints = true;
     private final boolean anomalies = true;
 
@@ -68,12 +66,12 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         player = entityBuilder.player(Mappers.vector2(map.getDefPos()), dataRepository);
         engine.addEntity(player);
 
-        if (controlPoints)
-            ControlPointsHelper.createControlPointsEntities(mapComponent);
         if (questPoints)
             QuestPointsHelper.createQuestPointsEntities(mapComponent);
         if (anomalies)
             AnomalyHelper.createAnomalies(mapComponent);
+        engineSaver.restore(engine);
+
         SecretHelper.createAnomalies(mapComponent);
         conditionEntityManager.update();
         RandomSpawnerHelper.init(mapComponent);

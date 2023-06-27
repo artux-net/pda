@@ -9,17 +9,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.World;
 
 import net.artux.pda.map.repository.DataRepository;
-import net.artux.pda.map.engine.ecs.components.BodyComponent;
-import net.artux.pda.map.engine.ecs.components.ClickComponent;
-import net.artux.pda.map.engine.ecs.components.InteractiveComponent;
-import net.artux.pda.map.engine.ecs.components.SpriteComponent;
-import net.artux.pda.map.engine.ecs.components.map.ConditionComponent;
-import net.artux.pda.map.engine.ecs.components.map.PointComponent;
-import net.artux.pda.map.engine.ecs.components.map.QuestComponent;
-import net.artux.pda.map.engine.ecs.components.map.TransferComponent;
-import net.artux.pda.map.engine.ecs.systems.RenderSystem;
+import net.artux.pda.map.ecs.physics.BodyComponent;
+import net.artux.pda.map.ecs.interactive.ClickComponent;
+import net.artux.pda.map.ecs.interactive.InteractiveComponent;
+import net.artux.pda.map.ecs.render.SpriteComponent;
+import net.artux.pda.map.ecs.interactive.map.ConditionComponent;
+import net.artux.pda.map.ecs.interactive.map.PointComponent;
+import net.artux.pda.map.ecs.interactive.map.QuestComponent;
+import net.artux.pda.map.ecs.interactive.map.TransferComponent;
+import net.artux.pda.map.ecs.render.RenderSystem;
 import net.artux.pda.map.utils.Mappers;
-import net.artux.pda.map.utils.di.components.MapComponent;
+import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.Point;
 

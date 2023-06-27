@@ -8,10 +8,10 @@ import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.artux.pda.map.ecs.interactive.PassivityComponent
+import net.artux.pda.map.ecs.interactive.map.ConditionComponent
 import net.artux.pda.map.repository.DataRepository
-import net.artux.pda.map.engine.ecs.components.PassivityComponent
-import net.artux.pda.map.engine.ecs.components.map.ConditionComponent
-import net.artux.pda.map.utils.di.scope.PerGameMap
+import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.model.QuestUtil
 import net.artux.pda.model.quest.story.StoryDataModel
 import javax.inject.Inject
@@ -26,7 +26,7 @@ class ConditionEntityManager @Inject constructor(
     private val pcm = ComponentMapper.getFor(PassivityComponent::class.java)
 
     fun update() {
-        update(dataRepository.storyDataModel)
+        update(dataRepository.initDataModel)
     }
 
     fun update(dataModel: StoryDataModel?) {
@@ -41,6 +41,16 @@ class ConditionEntityManager @Inject constructor(
             else
                 if (!pcm.has(e))
                     e.add(PassivityComponent())
+        }
+    }
+
+    fun disableConditions() {
+        val currentEntities =
+            engine.getEntitiesFor(Family.one(ConditionComponent::class.java).get())
+
+        for (i in 0 until currentEntities.size()) {
+            val e = currentEntities.get(i)
+            e.remove(PassivityComponent::class.java)
         }
     }
 
