@@ -19,7 +19,7 @@ public interface TimeMapper {
     }
 
     default Instant to(OffsetDateTime instant) {
-        if (instant == null) {
+        if (instant == null || instant.toLocalDateTime() == null) {
             return Instant.now();
         }
         return Instant.ofEpochSecond(instant.toEpochSecond());

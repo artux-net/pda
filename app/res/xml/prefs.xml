@@ -91,6 +91,11 @@
         app:key="support_category"
         app:title="@string/support">
 
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="show_logs"
+            app:title="@string/logs" />
+
         <PreferenceScreen
             app:iconSpaceReserved="false"
             app:summary="@string/write_to_developer_summary"

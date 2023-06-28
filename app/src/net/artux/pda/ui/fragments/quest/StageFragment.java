@@ -77,7 +77,7 @@ public class StageFragment extends Fragment {
 
             Properties properties = ((PDAApplication) getActivity().getApplication())
                     .getProperties();
-            if (properties.getProperty(PropertyFields.TESTER_MODE, "false").equals("true")) {
+            if (properties.get(PropertyFields.TESTER_MODE).equals(true)) {
                 mainText.setEffect(false);
             }
 

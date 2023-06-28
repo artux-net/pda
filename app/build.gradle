@@ -44,7 +44,7 @@ gradle.projectsEvaluated {
 android {
     signingConfigs {
         release {
-            storeFile file("$projectDir/keystore/pda.jks")
+            storeFile file(var)
             storePassword "pass"
             keyAlias "pda"
             keyPassword "pass"
@@ -77,6 +77,7 @@ android {
         versionName "0.4.0"
         proguardFiles "proguard-rules.pro"
         testProguardFiles "proguard-rules.pro"
+        signingConfig signingConfigs.debug
     }
 
     applicationVariants.all { variant ->
@@ -99,10 +100,9 @@ android {
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-4707001480680280/1079779549\"")
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-4707001480680280/2723145658\"")
         }
+
         debug {
             debuggable true
-            minifyEnabled false
-            shrinkResources false
 
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")

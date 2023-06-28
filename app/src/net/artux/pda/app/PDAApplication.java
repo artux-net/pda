@@ -3,10 +3,8 @@ package net.artux.pda.app;
 import android.app.Application;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
-import android.util.Log;
 
 import com.google.firebase.FirebaseApp;
-import com.yandex.mobile.ads.common.InitializationListener;
 import com.yandex.mobile.ads.common.MobileAds;
 
 import net.artux.pda.R;
@@ -25,7 +23,7 @@ import timber.log.Timber;
 public class PDAApplication extends Application {
 
     @Inject
-    protected List<Timber.Tree> forest;
+    protected List<Timber.Tree> logForest;
     @Inject
     protected Properties properties;
     @Inject
@@ -50,7 +48,7 @@ public class PDAApplication extends Application {
         FirebaseApp.initializeApp(this);
         super.onCreate();
         //Appodeal.setTesting(BuildConfig.DEBUG);
-        for (Timber.Tree tree : forest) {
+        for (Timber.Tree tree : logForest) {
             Timber.plant(tree);
             Timber.i("%s planted", tree.getClass().getSimpleName());
         }

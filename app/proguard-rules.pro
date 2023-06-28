@@ -4,6 +4,12 @@
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
 
+
+-keep class org.** { *; }
+-keep class java.** { *; }
+-keep class javax.** { *; }
+-keep class com.badlogic.** { *; }
+
 -verbose
 
 -dontwarn android.support.**
@@ -46,15 +52,15 @@
    *;
 }
 
--keep public class net.artux.pda.map.engine.ecs.entities.** {
+-keep public class net.artux.pda.map.engine.entities.** {
    *;
 }
-
 
 
 -keep public class net.artux.pdanetwork.** {
    *;
 }
+
 
 # Required if using Box2D extension
 -keepclassmembers class com.badlogic.gdx.physics.box2d.World {

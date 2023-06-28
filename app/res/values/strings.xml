@@ -245,4 +245,5 @@
     <string name="online">Online</string>
     <string name="offline">Offline</string>
     <string name="position_p">Позиция в рейтинге: %1$s</string>
+    <string name="logs">Show logs</string>
 </resources>

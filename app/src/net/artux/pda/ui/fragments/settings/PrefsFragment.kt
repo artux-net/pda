@@ -12,10 +12,12 @@ import androidx.preference.PreferenceFragmentCompat
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import net.artux.pda.R
+import net.artux.pda.ui.activities.LogActivity
 import net.artux.pda.ui.activities.LoginActivity
 import net.artux.pda.ui.activities.MainActivity
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation
 import net.artux.pda.ui.viewmodels.QuestViewModel
+import net.artux.pda.ui.viewmodels.SettingsViewModel
 import net.artux.pda.ui.viewmodels.UserViewModel
 import timber.log.Timber
 import java.io.File
@@ -25,6 +27,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
 
     private val questViewModel: QuestViewModel by viewModels()
     private val viewModel: UserViewModel by viewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
     private lateinit var navigationPresenter: FragmentNavigation.Presenter
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -77,6 +80,18 @@ class PrefsFragment : PreferenceFragmentCompat() {
             clearSharedPreferences(requireContext().applicationContext)
             questViewModel.resetData()
             true
+        }
+
+        val logsPreference = findPreference<Preference>("show_logs")
+        logsPreference?.setOnPreferenceClickListener {
+            settingsViewModel.update()
+            true
+        }
+
+        settingsViewModel.log.observe(viewLifecycleOwner) {
+            val intent = Intent(requireContext(), LogActivity::class.java)
+            intent.putExtra("text", it)
+            requireContext().startActivity(intent)
         }
 
         questViewModel.status.observe(viewLifecycleOwner) {

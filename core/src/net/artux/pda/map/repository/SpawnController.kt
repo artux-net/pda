@@ -69,39 +69,40 @@ class SpawnController @Inject constructor(
     }
 
     fun restore(engine: Engine) {
-        val savedMap =
-            gson.fromJson(preferences.getString(gameMap.id.toString()), SavedMap::class.java)
+        val savedKey = gameMap.id.toString()
 
-        //add spawns on map
+        val savedMap = if (preferences.contains(savedKey))
+            gson.fromJson(preferences.getString(savedKey), SavedMap::class.java)
+        else
+            null
+
         val spawns: List<SpawnModel> = gameMap.spawns ?: return
 
-        for (i in spawns.indices) {
+        logger.log(tag, "Start to restore ${spawns.size} spawns")
+        for (i in 0..spawns.size - 1) {
             val spawnModel = spawns[i]
+            logger.log(tag, "Start to restore spawns")
             val withSprite = !spawnModel.getParams().contains("hide")
             var groupCreated = false
 
             val spawnEntity = entityProcessorSystem.generateNewSpawn(spawnModel, withSprite)
             val spawnComponent = spawnEntity.getComponent(SpawnComponent::class.java)
-            if (savedMap != null && !spawnModel.title.isNullOrBlank()) {
+            if (savedMap?.spawns != null
+                && !spawnModel.title.isNullOrBlank()) {
                 val savedSpawn = savedMap.spawns.find { it.title == spawnModel.title }
                 if (savedSpawn != null) {
-                    val stalkerGroup =
-                        entityProcessorSystem.restoreGroup(spawnComponent.position, savedSpawn)
+                    val stalkerGroup = entityProcessorSystem.restoreGroup(spawnComponent.position, savedSpawn)
                     spawnComponent.stalkerGroup = stalkerGroup
                     groupCreated = true
-                    logger.log(
-                        tag,
-                        "${spawnModel.title}: Restored group ${stalkerGroup.gang} with ${stalkerGroup.size()} stalkers"
+                    logger.log(tag, "${spawnModel.title}: Restored group ${stalkerGroup.gang} with ${stalkerGroup.size()} stalkers"
                     )
                 }
             }
-
             if (!groupCreated && spawnModel.group != null) {
                 val stalkerGroup =
                     entityProcessorSystem.generateNewGroup(spawnComponent.position, spawnModel)
                 spawnComponent.stalkerGroup = stalkerGroup
-                logger.log(
-                    tag,
+                logger.log(tag,
                     "${spawnModel.title}: Created new group ${stalkerGroup.gang} with ${stalkerGroup.size()} stalkers"
                 )
             }

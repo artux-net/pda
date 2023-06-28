@@ -18,7 +18,6 @@ import kotlin.coroutines.suspendCoroutine
 @Singleton
 class UserRepository @Inject constructor(
     private val webservice: DefaultApi,
-    private val properties: Properties,
     private val userCache: Cache<Profile>,
     private val dataCache: Cache<StoryData>,
     private val memberCache: Cache<UserDto>
@@ -94,6 +93,12 @@ class UserRepository @Inject constructor(
         else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
+    fun isUserTester():Boolean{
+        return getCachedMember().map { it.role }.map {
+            it != UserDto.RoleEnum.USER
+        }.getOrElse { false }
+    }
+
     suspend fun getMember(): Result<UserDto> {
         return suspendCoroutine {
             Timber.i("Request server for userDto")
@@ -106,10 +111,7 @@ class UserRepository @Inject constructor(
                     Timber.i("Got response")
                     if (data != null) {
                         memberCache.put("user", data)
-                        if (data.role.name != UserDto.RoleEnum.USER.name)
-                            properties.setProperty(PropertyFields.TESTER_MODE, true.toString())
-                        else
-                            properties.setProperty(PropertyFields.TESTER_MODE, false.toString())
+
                         it.resume(Result.success(data))
                     } else {
                         val error = response.toString()

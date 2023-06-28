@@ -164,7 +164,7 @@ public class HeaderInterfaceModule {
     public Actor initDebugMode(SoundsSystem soundsSystem, UIFrame uiFrame, UserInterface userInterface,
                                DebugMenu debugMenu, CheckBoxWidget checkBoxWidget,
                                Engine engine, Properties properties) {
-        if (properties.getProperty(PropertyFields.TESTER_MODE, "false").equals("true")) {
+        if (properties.get(PropertyFields.TESTER_MODE).equals(true)) {
             Label testModeLabel = new Label("Тестирование", userInterface.getLabelStyle());
             testModeLabel.addListener(new ClickListener() {
                 @Override

@@ -1,5 +1,6 @@
 package net.artux.pda.map.scenes;
 
+import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -27,11 +28,13 @@ public class ErrorScene extends Scene {
 
     private final Stage stage;
     private final Label label;
+    private final ApplicationLogger logger;
 
     @Inject
     public ErrorScene(final SceneManager gsm, DataRepository dataRepository,
-                      CoreComponent coreComponent, LocaleBundle localeBundle) {
+                      CoreComponent coreComponent, LocaleBundle localeBundle, ApplicationLogger logger) {
         super(gsm);
+        this.logger = logger;
         BitmapFont font = coreComponent.getAssetsFinder().getFontManager().getFont(22);
         GameMap gameMap = dataRepository.getGameMap();
 
@@ -86,7 +89,7 @@ public class ErrorScene extends Scene {
         for (StackTraceElement stackTraceElement : throwable.getStackTrace()) {
             label.setText(label.getText() + "\n" + stackTraceElement);
         }
-        Gdx.app.getApplicationLogger().error("Core", "Map Core error", throwable);
+        logger.error("Core", "Map Core error", throwable);
     }
 
     public void resume() {

@@ -1,8 +1,6 @@
 package net.artux.pda.di
 
 import android.content.Context
-import android.util.Log
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.Module
 import dagger.Provides
@@ -11,7 +9,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import net.artux.pda.BuildConfig
 import net.artux.pda.common.PropertyFields
+import net.artux.pda.repositories.UserRepository
+import net.artux.pda.utils.CrashReportingTree
 import net.artux.pda.utils.FileLogTree
+import net.artux.pda.utils.InternalLogTree
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.io.IOException
@@ -27,7 +28,8 @@ class AppModule {
     @Singleton
     fun properties(
         @ApplicationContext context: Context,
-        remoteConfig: FirebaseRemoteConfig
+        remoteConfig: FirebaseRemoteConfig,
+        userRepository: UserRepository
     ): Properties {
         val properties = Properties()
         try {
@@ -37,37 +39,27 @@ class AppModule {
         }
         properties[PropertyFields.API_URL] = BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API
         properties[PropertyFields.RESOURCE_URL] = BuildConfig.PROTOCOL + "://" + BuildConfig.URL
+        properties[PropertyFields.TESTER_MODE] = userRepository.isUserTester()
         properties.putAll(remoteConfig.all.mapValues { it.value.asString() })
         return properties
     }
 
     @Provides
     @Singleton
-    fun logForest(): List<Timber.Tree> {
+    fun logForest(internalLogTree: InternalLogTree): List<Timber.Tree> {
         val list = LinkedList<Timber.Tree>()
+        list.add(internalLogTree)
         if (BuildConfig.DEBUG) {
             list.add(DebugTree())
             list.add(FileLogTree())
-        }else
+        } else
             list.add(CrashReportingTree())
         return list
     }
 
-    private class CrashReportingTree : Timber.Tree() {
-        override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-            if (priority == Log.VERBOSE || priority == Log.DEBUG) {
-                return
-            }
-            val finalMessage = if (tag != null && tag.isNotBlank())
-                "$tag : $message"
-            else
-                message
-
-            FirebaseCrashlytics.getInstance().log(finalMessage)
-            if (t != null && !BuildConfig.DEBUG) {
-                FirebaseCrashlytics.getInstance().recordException(t)
-                t.printStackTrace()
-            }
-        }
+    @Provides
+    @Singleton
+    fun internalLogTree(): InternalLogTree {
+        return InternalLogTree()
     }
 }
