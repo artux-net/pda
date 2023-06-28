@@ -73,6 +73,13 @@ class WeaponComponent : Component {
 
                 if (!sounds.shot.isNullOrBlank())
                     shotSoundName = prefix + type + "/" + sounds.shot
+            } else{
+                var path = prefix + weaponModel.baseId + "/reload.ogg"
+                if (assetManager.contains(path))
+                   reloadSoundName = path
+                path = prefix + weaponModel.baseId + "/shoot.ogg"
+                if (assetManager.contains(path))
+                    shotSoundName = path
             }
             shotSound = assetManager.get(shotSoundName)
             reloadSound = assetManager.get(reloadSoundName)
