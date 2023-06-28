@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.repository.DataRepository;
-import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.SlotTextButton;
 
@@ -17,9 +16,10 @@ import javax.inject.Inject;
 public class AdsDialog extends PDADialog {
 
     @Inject
-    public AdsDialog(SlotTextButton usualAd, SlotTextButton videoAd, UserInterface userInterface,
+    public AdsDialog(SlotTextButton usualAd, SlotTextButton videoAd,
+                     UserInterface userInterface,
                      DataRepository dataRepository,
-                     LocaleBundle localeBundle, PlatformInterface platformInterface) {
+                     LocaleBundle localeBundle) {
         super(localeBundle.get("main.ad.rewarded"), userInterface.getSkin());
 
         usualAd.setText(localeBundle.get("main.ad.rewarded.usual"));

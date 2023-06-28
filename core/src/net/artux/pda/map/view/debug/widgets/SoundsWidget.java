@@ -1,4 +1,4 @@
-package net.artux.pda.map.view.debug;
+package net.artux.pda.map.view.debug.widgets;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;

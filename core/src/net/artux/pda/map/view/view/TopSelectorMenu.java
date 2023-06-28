@@ -11,12 +11,12 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import javax.inject.Inject;
 
 @PerGameMap
-public class SelectorMenu extends Table {
+public class TopSelectorMenu extends Table {
 
     private final Label.LabelStyle labelStyle;
 
     @Inject
-    public SelectorMenu(Label.LabelStyle labelStyle) {
+    public TopSelectorMenu(Label.LabelStyle labelStyle) {
         super();
         this.labelStyle = labelStyle;
 

@@ -49,7 +49,10 @@ net.artux.pda.map.utils.model
 net.artux.pda.map.view
 net.artux.pda.map.view.blocks
 net.artux.pda.map.view.debug
+net.artux.pda.map.view.debug.widgets
 net.artux.pda.map.view.dialog
+net.artux.pda.map.view.statistic
+net.artux.pda.map.view.template
 net.artux.pda.map.view.units
 net.artux.pda.map.view.view
 net.artux.pda.map.view.view.bars

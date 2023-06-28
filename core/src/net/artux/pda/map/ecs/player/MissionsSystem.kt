@@ -14,20 +14,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.engine.pathfinding.own.Digraph
 import net.artux.engine.pathfinding.own.DijkstraPathFinder
+import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.ecs.camera.CameraSystem
-import net.artux.pda.map.repository.DataRepository
-import net.artux.pda.map.ecs.physics.BodyComponent
 import net.artux.pda.map.ecs.interactive.PassivityComponent
 import net.artux.pda.map.ecs.interactive.map.QuestComponent
-import net.artux.pda.map.ecs.systems.BaseSystem
+import net.artux.pda.map.ecs.physics.BodyComponent
 import net.artux.pda.map.ecs.sound.SoundsSystem
-import net.artux.pda.map.di.scope.PerGameMap
+import net.artux.pda.map.ecs.systems.BaseSystem
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.view.blocks.MessagesPlane
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.quest.mission.MissionModel
 import net.artux.pda.model.quest.story.ParameterModel
 import net.artux.pda.model.quest.story.StoryDataModel
-import java.util.LinkedList
+import java.util.*
 import java.util.stream.Collectors
 import javax.inject.Inject
 
@@ -38,8 +38,11 @@ class MissionsSystem @Inject constructor(
     private val dataRepository: DataRepository,
     private val soundsSystem: SoundsSystem,
     private val cameraSystem: CameraSystem
-) : BaseSystem(Family.all(BodyComponent::class.java, QuestComponent::class.java).exclude(
-    PassivityComponent::class.java).get()), Disposable {
+) : BaseSystem(
+    Family.all(BodyComponent::class.java, QuestComponent::class.java).exclude(
+        PassivityComponent::class.java
+    ).get()
+), Disposable {
 
     private val pm = ComponentMapper.getFor(BodyComponent::class.java)
     private val qcm = ComponentMapper.getFor(QuestComponent::class.java)
@@ -56,15 +59,15 @@ class MissionsSystem @Inject constructor(
         missionUpdatedSound = assetManager.get("audio/sounds/pda/pda_objective.ogg")
         mapDigraph = buildSystemFromStory()
         pathFinder = DijkstraPathFinder()
+        currentStoryDataModel = dataRepository.initDataModel
 
         CoroutineScope(Dispatchers.Main).launch {
             dataRepository.storyDataModelFlow.collect {
+                val oldDataModel = currentStoryDataModel
                 currentStoryDataModel = it
-                updateData(dataRepository.initDataModel)
+                updateData(oldDataModel)
             }
         }
-
-        currentStoryDataModel = dataRepository.initDataModel
     }
 
     override fun addedToEngine(engine: Engine) {
@@ -74,9 +77,8 @@ class MissionsSystem @Inject constructor(
     }
 
     fun updateData(oldDataModel: StoryDataModel) {
-        val paramSet = getUpdatedParams(oldDataModel)
-        val paramArr = paramSet.toTypedArray()
-        val updatedMissions = getMissions(paramArr)
+        val paramArr = getUpdatedParams(oldDataModel).toTypedArray()
+        val updatedMissions = getMissionsByParams(paramArr)
         for (m in updatedMissions) {
             val checkpointModel = m.getCurrentCheckpoint(*paramArr)
             messagesPlane.addMessage(
@@ -87,28 +89,29 @@ class MissionsSystem @Inject constructor(
         }
     }
 
-    fun getParams(dataModel: StoryDataModel): MutableSet<String> {
+    fun getParamsByData(dataModel: StoryDataModel): MutableSet<String> {
         return dataModel.parameters.stream()
             .map { obj: ParameterModel -> obj.key }.collect(Collectors.toSet())
     }
 
     fun getUpdatedParams(oldDataModel: StoryDataModel): Set<String> {
-        val oldParams: Set<String> = getParams(oldDataModel)
-        val params = getParams(currentStoryDataModel)
-        params.removeIf { o: String -> oldParams.contains(o) }
-        return params
+        val oldParams: Set<String> = getParamsByData(oldDataModel)
+        val currentParams = getParamsByData(currentStoryDataModel)
+        currentParams.removeIf { o: String -> oldParams.contains(o) }
+        return currentParams
     }
 
-    val params: Array<String>
+    val currentParams: Array<String>
         get() {
             val dataModel = currentStoryDataModel
             return dataModel.parameters.stream()
                 .map { obj: ParameterModel -> obj.key }.collect(Collectors.toSet()).toTypedArray()
         }
-    val missions: List<MissionModel>
-        get() = getMissions(params)
 
-    fun getMissions(params: Array<String>): List<MissionModel> {
+    val currentMissions: List<MissionModel>
+        get() = getMissionsByParams(currentParams)
+
+    private fun getMissionsByParams(params: Array<String>): List<MissionModel> {
         return dataRepository.storyModel.getCurrentMissions(*params)
     }
 
@@ -122,7 +125,7 @@ class MissionsSystem @Inject constructor(
         }
 
     fun setActiveMissionByName(name: String) {
-        val missionModels = missions
+        val missionModels = currentMissions
         for (m in missionModels) {
             if (m.name == name) {
                 setActiveMission(activeMission)
@@ -143,7 +146,7 @@ class MissionsSystem @Inject constructor(
     fun setActiveMission(activeMission: MissionModel?) {
         this.activeMission = activeMission
         if (activeMission == null) return
-        val currentCheckpoint = activeMission.getCurrentCheckpoint(*params)
+        val currentCheckpoint = activeMission.getCurrentCheckpoint(*currentParams)
         //TODO
         /*val chapter = currentCheckpoint.chapter
         val stage = currentCheckpoint?.stage
@@ -234,6 +237,7 @@ class MissionsSystem @Inject constructor(
             val playerPosition = pm[player]
             return playerPosition.position
         }
+
     val targetDistance: Int
         get() {
             if (targetPosition != null) {
@@ -243,6 +247,7 @@ class MissionsSystem @Inject constructor(
             }
             return -1
         }
+
     val targetAngle: Double
         get() {
             if (targetPosition != null) {

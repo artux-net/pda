@@ -3,18 +3,18 @@ package net.artux.pda.map.di.modules;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import net.artux.pda.map.content.assets.AssetsFinder;
-import net.artux.pda.map.utils.MapInfo;
-import net.artux.pda.map.ecs.ai.MapOrientationSystem;
-import net.artux.pda.map.ecs.player.PlayerSystem;
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.ecs.player.PlayerSystem;
+import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.Logger;
-import net.artux.pda.map.view.UserInterface;
 
 import javax.inject.Named;
 
@@ -41,7 +41,6 @@ public class GameStageModule {
         return new Stage(screenViewport);
     }
 
-
     @Provides
     @PerGameMap
     public Camera getCamera(@Named("gameStage") Stage stage) {
@@ -50,18 +49,25 @@ public class GameStageModule {
 
     @Provides
     @PerGameMap
-    public UserInterface userInterface(Skin skin, AssetsFinder finder,
-                                       MapOrientationSystem mapOrientationSystem,
-                                       @Named("uiStage") Stage uiStage,
-                                       @Named("gameStage") Stage stage, MapInfo mapInfo) {
-        UserInterface userInterface = new UserInterface(skin, finder, mapOrientationSystem.getNavigator(), uiStage.getCamera(), stage.getCamera(), mapInfo);
-        uiStage.addActor(userInterface);
-        return userInterface;
+    @Named("uiCamera")
+    public Camera getUICamera(@Named("uiStage") Stage stage) {
+        return stage.getCamera();
     }
+
 
     @Provides
     public Skin getSkin(AssetManager assetManager) {
-        return assetManager.get("skins/cloud/cloud-form-ui.json");
+        Skin skin = assetManager.get("skins/cloud/cloud-form-ui.json");
+        skin.add("primary", Colors.primaryColor);
+        skin.add("background", Colors.backgroundColor);
+
+        TextureRegionDrawable pauseDrawable = new TextureRegionDrawable(assetManager.get("textures/ui/exit.png", Texture.class));
+        ImageButton.ImageButtonStyle pauseButtonStyle = new ImageButton.ImageButtonStyle(null,
+                null, null, pauseDrawable, pauseDrawable, pauseDrawable);
+        skin.add("close", pauseButtonStyle);
+
+
+        return skin;
     }
 
 

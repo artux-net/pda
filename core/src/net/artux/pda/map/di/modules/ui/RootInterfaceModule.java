@@ -18,11 +18,6 @@ import dagger.Provides;
 public class RootInterfaceModule {
 
     @Provides
-    public UIFrame uiFrame(UserInterface userInterface) {
-        return userInterface.getUIFrame();
-    }
-
-    @Provides
     @Named("assistantTable")
     public Table getAssistantTable(@Named("gameZone") Group gameZone) {
         Table assistantBlock = new Table();

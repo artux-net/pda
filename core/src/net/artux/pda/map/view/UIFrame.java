@@ -20,10 +20,11 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.utils.MapInfo;
-import net.artux.pda.map.view.view.SelectorMenu;
+import net.artux.pda.map.view.view.TopSelectorMenu;
 import net.artux.pda.map.view.view.bars.Utils;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 @PerGameMap
 public class UIFrame extends WidgetGroup {
@@ -31,20 +32,29 @@ public class UIFrame extends WidgetGroup {
     private final Camera camera;
     private final Label counter;
 
-    int w;
-    int h;
+    private final int w;
+    private final int h;
 
-    private final SelectorMenu selectorMenu;
+    public int getH() {
+        return h;
+    }
+
+    public int getW() {
+        return w;
+    }
+
+    private final TopSelectorMenu topSelectorMenu;
     private final Table rightGroup;
     private final MapInfo mapInfo;
 
     @Inject
     public UIFrame(AssetManager assetManager,
-                   Camera usualCamera, Camera uiCamera, TiledNavigator tiledNavigator,
-                   BitmapFont font, MapInfo mapInfo) {
+                   Camera usualCamera, @Named("uiCamera") Camera uiCamera,
+                   TiledNavigator tiledNavigator,
+                   BitmapFont font, MapInfo mapInfo, TopSelectorMenu topSelectorMenu) {
         super();
         this.camera = usualCamera;
-        this.selectorMenu = new SelectorMenu(new Label.LabelStyle(font, Color.WHITE));
+        this.topSelectorMenu = topSelectorMenu;
 
         w = (int) uiCamera.viewportWidth;
         h = (int) uiCamera.viewportHeight;
@@ -62,7 +72,7 @@ public class UIFrame extends WidgetGroup {
         float topHeaderOffset = (additionalSizes) / 2;
         headerHeight = h - topHeaderOffset - headerBottomY;
 
-        selectorMenu.defaults().height(headerHeight);
+        topSelectorMenu.defaults().height(headerHeight);
 
         rightGroup = new Table();
         rightGroup.defaults()
@@ -97,7 +107,7 @@ public class UIFrame extends WidgetGroup {
         headerTable.setBackground(new TextureRegionDrawable(assetManager.get("textures/ui/title_background.png", Texture.class)));
         addActor(headerTable);
 
-        headerTable.add(selectorMenu)
+        headerTable.add(topSelectorMenu)
                 .left()
                 .expandX();
         headerTable.add(rightGroup)
@@ -135,8 +145,8 @@ public class UIFrame extends WidgetGroup {
     Slider horizontalSlider;
     Slider verticalSlider;
 
-    public SelectorMenu getMenu() {
-        return selectorMenu;
+    public TopSelectorMenu getMenu() {
+        return topSelectorMenu;
     }
 
     public Table getRightHeaderTable() {

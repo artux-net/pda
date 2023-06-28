@@ -1,86 +1,44 @@
 package net.artux.pda.map.view;
 
-import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ActorGestureListener;
 
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.ecs.interactive.map.ConditionComponent;
-import net.artux.pda.map.ecs.interactive.map.PointComponent;
-import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.player.MissionsSystem;
-import net.artux.pda.map.ecs.player.PlayerSystem;
-import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.blocks.MissionBlock;
-import net.artux.pda.map.view.view.bars.Utils;
+import net.artux.pda.map.view.template.SideMenu;
 import net.artux.pda.model.quest.mission.MissionModel;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 @PerGameMap
-public class MissionMenu extends Table {
+public class MissionMenu extends SideMenu {
 
-    private final VerticalGroup menuTable;
     private final MissionsSystem missionsSystem;
-    private final PlayerSystem playerSystem;
     private final AssetsFinder assetsFinder;
-    private final AssetManager assetManager;
-    private final boolean testMode;
-
-    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
-    private final ComponentMapper<PointComponent> pcm = ComponentMapper.getFor(PointComponent.class);
-    private final ComponentMapper<ConditionComponent> ccm = ComponentMapper.getFor(ConditionComponent.class);
 
     @Inject
-    public MissionMenu(@Named("testerMode") boolean testMode,
-                       PlayerSystem playerSystem, MissionsSystem missionsSystem,
-                       TextButton.TextButtonStyle textButtonStyle,
+    public MissionMenu(MissionsSystem missionsSystem,
+                       LocaleBundle localeBundle,
                        AssetsFinder assetsFinder, Skin skin) {
-        super(skin);
-        this.testMode = testMode;
-        this.playerSystem = playerSystem;
+        super(localeBundle.get("sideMenu.missions"), skin);
         this.assetsFinder = assetsFinder;
         this.missionsSystem = missionsSystem;
-        this.assetManager = assetsFinder.getManager();
 
-        setFillParent(true);
-        top();
-
-        menuTable = new VerticalGroup();
-        menuTable
-                .expand()
-                .fill();
-        row();
-        ScrollPane scrollPane = new ScrollPane(menuTable, skin);
-        scrollPane.setClamp(false);
-        scrollPane.setFadeScrollBars(false);
-        scrollPane.setScrollingDisabled(false, false);
-        scrollPane.setScrollbarsVisible(true);
-
-        add(scrollPane)
-                .top()
-                .fill()
-                .expand()
-                .colspan(2);
-
-        setBackground(Utils.getColoredDrawable(1, 1, Colors.backgroundColor));
         update();
     }
 
     public void update() {
-        menuTable.clear();
-        String[] params = missionsSystem.getParams();
-        for (final MissionModel missionModel : missionsSystem.getMissions()) {
+        VerticalGroup content = getContent();
+        content.clear();
+        String[] params = missionsSystem.getCurrentParams();
+        for (final MissionModel missionModel : missionsSystem.getCurrentMissions()) {
             MissionBlock missionBlock = new MissionBlock(getSkin(), missionModel, assetsFinder, params);
-            menuTable.addActor(missionBlock);
+            content.addActor(missionBlock);
             missionBlock.addListener(new ActorGestureListener() {
                 @Override
                 public void tap(InputEvent event, float x, float y, int count, int button) {

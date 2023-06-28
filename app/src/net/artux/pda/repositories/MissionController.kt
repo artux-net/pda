@@ -7,7 +7,7 @@ class MissionController @Inject constructor(
     var commandController: CommandController
 ) {
 
-    lateinit var missions: MutableList<MissionModel>
+    lateinit var missions: List<MissionModel>
 
     init {
         commandController.storyData.observeForever {

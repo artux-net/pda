@@ -15,7 +15,8 @@ public class MediaItem extends Table {
     private final Label titleLabel;
     private final Label subtitleLabel;
 
-    public MediaItem(String imageFilename, String title, String subtitle, Label.LabelStyle titleStyle, Label.LabelStyle subtitleStyle, AssetManager assetManager) {
+    public MediaItem(String imageFilename, String title, String subtitle,
+                     Label.LabelStyle titleStyle, Label.LabelStyle subtitleStyle, AssetManager assetManager) {
         super();
 
         image = new LazyImage(assetManager);

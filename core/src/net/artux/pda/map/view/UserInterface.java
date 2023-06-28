@@ -1,6 +1,5 @@
 package net.artux.pda.map.view;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -10,11 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
-import net.artux.engine.pathfinding.TiledNavigator;
 import net.artux.pda.map.content.assets.AssetsFinder;
-import net.artux.pda.map.utils.MapInfo;
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.view.view.bars.Utils;
 
+import javax.inject.Inject;
+
+@PerGameMap
 public class UserInterface extends Group {
 
     private final BitmapFont font;
@@ -25,20 +26,21 @@ public class UserInterface extends Group {
     private final Skin skin;
     private final AssetsFinder assetsFinder;
 
-    public UserInterface(Skin skin, AssetsFinder assetsFinder, TiledNavigator tiledNavigator, Camera uiCamera, Camera camera, MapInfo mapInfo) {
+    @Inject
+    public UserInterface(Skin skin, AssetsFinder assetsFinder, UIFrame uiFrame) {
         super();
         this.assetsFinder = assetsFinder;
-        this.stack = new Stack();
+        this.stack = new OneStack();
         this.skin = skin;
+        this.uiFrame = uiFrame;
         updateSkin(skin);
 
         font = assetsFinder.getFontManager().getFont(24);
-        uiFrame = new UIFrame(assetsFinder.getManager(), camera, uiCamera, tiledNavigator, font, mapInfo);
         uiFrame.setFillParent(true);
         addActor(uiFrame);
 
-        float w = uiCamera.viewportWidth;
-        float h = uiCamera.viewportHeight;
+        float w = uiFrame.getW();
+        float h = uiFrame.getH();
 
         setSize(w, h);
 
@@ -70,6 +72,7 @@ public class UserInterface extends Group {
         return stack;
     }
 
+
     public Label.LabelStyle getLabelStyle() {
         return new Label.LabelStyle(font, Color.WHITE);
     }
@@ -82,7 +85,7 @@ public class UserInterface extends Group {
         return uiFrame;
     }
 
-    private void updateSkin(Skin skin){
+    private void updateSkin(Skin skin) {
         Window.WindowStyle windowStyle = skin.get(Window.WindowStyle.class);
         windowStyle.titleFont = assetsFinder.getFontManager().getFont(38);
         windowStyle.background = Utils.getColoredDrawable(1, 1, Color.BLACK);

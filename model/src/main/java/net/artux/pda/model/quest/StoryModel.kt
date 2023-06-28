@@ -3,14 +3,16 @@ package net.artux.pda.model.quest
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.quest.mission.MissionModel
 import java.io.Serializable
-import java.util.LinkedList
+import java.util.*
 
-class StoryModel : Serializable {
-    var id: Long? = null
-    var title: String = ""
-    val maps: MutableMap<Long, GameMap> = mutableMapOf()
-    var chapters: MutableMap<String, ChapterModel> = mutableMapOf()
+class StoryModel(
+    var id: Long = -1,
+    var title: String = "",
+    val maps: MutableMap<Long, GameMap> = mutableMapOf(),
+    var chapters: MutableMap<String, ChapterModel> = mutableMapOf(),
     var missions: MutableList<MissionModel> = mutableListOf()
+) : Serializable {
+
 
     fun getChapter(id: String): ChapterModel? {
         return chapters[id]

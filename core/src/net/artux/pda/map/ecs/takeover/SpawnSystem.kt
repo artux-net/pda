@@ -82,7 +82,7 @@ class SpawnSystem @Inject constructor(
                 timer-=deltaTime
                 if (timer < 1) {
                     notificationController.setTitle("Позиция захвачена!")
-                    notificationController.addMessage("Спасибо, отправили группу на занятие позиции.")
+                    notificationController.addMessage("Спасибо, уже отправили группу на занятие позиции.")
                     takingSpawm == null
                     val gang = dataRepository.initDataModel.gang
                     spawnComponent.stalkerGroup = entityProcessorSystem.generateNewGroup(gang)

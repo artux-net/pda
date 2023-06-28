@@ -100,8 +100,10 @@ public class ControlPointDialog extends PDADialog {
         updateLevelButton.setText(localeBundle.get("point.update", 0));
         hireStalkerButton.setText(localeBundle.get("point.stalker.hire"));
         stalkersButton.setText(localeBundle.get("point.stalkers"));
+        stalkersButton.setDisabled(true);
 
         manageTable = new Table();
+        manageTable.defaults().pad(10);
         manageTable.add(stalkersButton);
         manageTable.add(updateLevelButton);
         updateLevelButton.addListener(new ClickListener() {

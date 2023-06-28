@@ -13,6 +13,11 @@ import com.badlogic.gdx.utils.Align;
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.Logger;
 import net.artux.pda.map.view.blocks.SlotTextButton;
+import net.artux.pda.map.view.debug.widgets.ActionsWidget;
+import net.artux.pda.map.view.debug.widgets.CheckBoxWidget;
+import net.artux.pda.map.view.debug.widgets.ItemsWidget;
+import net.artux.pda.map.view.debug.widgets.MapsWidget;
+import net.artux.pda.map.view.debug.widgets.SoundsWidget;
 import net.artux.pda.map.view.view.bars.Utils;
 
 import javax.inject.Inject;

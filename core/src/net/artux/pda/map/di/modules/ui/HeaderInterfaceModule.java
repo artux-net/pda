@@ -2,19 +2,18 @@ package net.artux.pda.map.di.modules.ui;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.common.PropertyFields;
@@ -24,12 +23,13 @@ import net.artux.pda.map.ecs.logger.MapLoggerSystem;
 import net.artux.pda.map.ecs.physics.PlayerMovingSystem;
 import net.artux.pda.map.ecs.render.RenderSystem;
 import net.artux.pda.map.ecs.sound.SoundsSystem;
-import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.view.MissionMenu;
+import net.artux.pda.map.view.NavigationMenu;
 import net.artux.pda.map.view.UIFrame;
 import net.artux.pda.map.view.UserInterface;
-import net.artux.pda.map.view.debug.CheckBoxWidget;
 import net.artux.pda.map.view.debug.DebugMenu;
+import net.artux.pda.map.view.debug.widgets.CheckBoxWidget;
+import net.artux.pda.map.view.statistic.StatisticMenu;
 import net.artux.pda.model.map.GameMap;
 
 import java.time.Instant;
@@ -52,15 +52,23 @@ public class HeaderInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initHeader(MissionMenu missionMenu, GameMap map,
+    public Actor initGameZone(UserInterface userInterface, @Named("uiStage") Stage stage) {
+        stage.addActor(userInterface);
+        return userInterface;
+    }
+
+    @IntoSet
+    @Provides
+    public Actor initHeader(MissionMenu missionMenu,
+                            NavigationMenu navigationMenu,
+                            StatisticMenu statisticMenu,
+                            GameMap map,
                             @Named("gameZone") Group gameZone,
                             Label.LabelStyle labelStyle, UIFrame uiFrame,
                             UserInterface userInterface,
-                            AssetManager assetManager, DataRepository dataRepository) {
-
-        TextureRegionDrawable pauseDrawable = new TextureRegionDrawable(assetManager.get("textures/ui/exit.png", Texture.class));
-        Button.ButtonStyle pauseButtonStyle = new Button.ButtonStyle(pauseDrawable, pauseDrawable, pauseDrawable);
-        Button pauseButton = new Button(pauseButtonStyle);
+                            Skin skin) {
+        Group stack = userInterface.getStack();
+        ImageButton pauseButton = new ImageButton(skin.get("close", ImageButton.ImageButtonStyle.class));
         pauseButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -79,23 +87,43 @@ public class HeaderInterfaceModule {
             }
         });
 
-        Label missionsButton = new Label("Задания", userInterface.getLabelStyle());
+        Label missionsButton = new Label("Задачи", userInterface.getLabelStyle());
         Label navigationButton = new Label("Навигация", userInterface.getLabelStyle());
-
-        Group missionsContainer = new Group();
-        missionsContainer.setHeight(gameZone.getHeight());
-        missionsContainer.setWidth(gameZone.getWidth() / 4);
-        missionsContainer.addActor(missionMenu);
+        Label statisticButton = new Label("Статистика", userInterface.getLabelStyle());
 
         missionsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                if (gameZone.getChildren().indexOf(missionsContainer, false) == -1)
-                    gameZone.addActor(missionsContainer);
+                if (stack.getChildren().indexOf(missionMenu, false) == -1)
+                    stack.addActor(missionMenu);
                 else
-                    gameZone.removeActor(missionsContainer);
+                    stack.removeActor(missionMenu);
                 missionMenu.update();
+            }
+        });
+
+        navigationButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                if (stack.getChildren().indexOf(navigationMenu, false) == -1)
+                    stack.addActor(navigationMenu);
+                else
+                    stack.removeActor(navigationMenu);
+                navigationMenu.update();
+            }
+        });
+
+        statisticButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                if (stack.getChildren().contains(statisticMenu, false))
+                    stack.removeActor(statisticMenu);
+                else {
+                    stack.addActor(statisticMenu);
+                }
             }
         });
 
@@ -122,6 +150,10 @@ public class HeaderInterfaceModule {
         uiFrame.getMenu()
                 .add(navigationButton, true)
                 .uniform();
+
+        uiFrame.getMenu()
+                .add(statisticButton, true)
+                .uniform();
         uiFrame.getRightHeaderTable().add(pauseButton).uniform();
 
         return missionsButton;
@@ -138,11 +170,11 @@ public class HeaderInterfaceModule {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
-                    Stack widget = userInterface.getStack();
-                    if (widget.getChildren().indexOf(debugMenu, false) == -1)
-                        widget.add(debugMenu);
+                    Stack stack = userInterface.getStack();
+                    if (stack.getChildren().indexOf(debugMenu, false) == -1)
+                        stack.add(debugMenu);
                     else
-                        widget.removeActor(debugMenu);
+                        stack.removeActor(debugMenu);
                 }
             });
 
