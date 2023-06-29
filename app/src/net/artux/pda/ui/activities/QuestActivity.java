@@ -277,6 +277,9 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
     }
 
     public void setBackground(String nextBackground) {
+        if (nextBackground == null)
+            return;
+
         if (!currentBackground.equals(nextBackground)) {
             currentBackground = URLHelper.getResourceURL(nextBackground);
 

@@ -56,6 +56,7 @@ public class NavigationMenu extends SideMenu {
         this.missionsSystem = missionsSystem;
         this.assetManager = assetsFinder.getManager();
 
+        getContent().space(10f);
         update();
     }
 

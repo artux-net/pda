@@ -1,5 +1,6 @@
 package net.artux.pda.map.scenes;
 
+import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -40,10 +41,14 @@ public class PlayScene extends Scene {
     private final OrthogonalTiledMapRenderer renderer;
     private final PostProcessing postProcessing;
     private final DataRepository dataRepository;
+    private final ApplicationLogger logger;
 
     @Inject
-    public PlayScene(final SceneManager sceneManager, DataRepository dataRepository, GameMap gameMap, CoreComponent coreComponent) {
+    public PlayScene(final SceneManager sceneManager, DataRepository dataRepository,
+                     ApplicationLogger logger,
+                     GameMap gameMap, CoreComponent coreComponent) {
         super(sceneManager);
+        this.logger = logger;
         this.gameMap = gameMap;
         this.coreComponent = coreComponent;
         this.dataRepository = dataRepository;
@@ -73,7 +78,7 @@ public class PlayScene extends Scene {
         GameMap map = dataRepository.getGameMap();
 
         if (gameMap.getId() != map.getId()) {
-            Gdx.app.getApplicationLogger().log(TAG, "Update map, old: " + gameMap.getId() + " new map: " + map.getId());
+            logger.log(TAG, "Update map, old: " + gameMap.getId() + " new map: " + map.getId());
             engineManager.save();
             sceneManager.set(coreComponent.getPreloadState());
         }

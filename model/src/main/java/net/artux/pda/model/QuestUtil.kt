@@ -8,10 +8,10 @@ import java.util.stream.Collectors
 object QuestUtil {
     @JvmStatic
     fun check(
-        conditions: HashMap<String, List<String>>,
+        conditions: HashMap<String, List<String>>?,
         storyDataModel: StoryDataModel
     ): Boolean {
-        if (conditions.keys.isEmpty())
+        if(conditions.isNullOrEmpty())
             return true
         val map = storyDataModel.parametersMap
         for (key in conditions.keys) {

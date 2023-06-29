@@ -75,18 +75,18 @@ public class GameStageModule {
     @PerGameMap
     public Logger getLogger(Skin skin, PlayerSystem playerSystem) {
         Logger logger = new Logger(skin);
-        logger.putListiner("FPS", Gdx.app.getGraphics(), "getFramesPerSecond");
-        logger.putListiner("Native Heap", Gdx.app, "getNativeHeap");
-        logger.putListiner("Java Heap", Gdx.app, "getJavaHeap");
-        logger.putListiner("Player position", playerSystem, "getPosition");
-        logger.putListiner("Здоровье", playerSystem, "getHealthComponent");
-        logger.putListiner("Опыт", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getXp");
-        logger.putListiner("Params", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getParameters");
-        logger.putListiner("Temp", playerSystem.getDataRepository().getCurrentStoryDataModel().getCurrentState(), "toString");
+        logger.putListener("FPS", Gdx.app.getGraphics(), "getFramesPerSecond");
+        logger.putListener("Native Heap", Gdx.app, "getNativeHeap");
+        logger.putListener("Java Heap", Gdx.app, "getJavaHeap");
+        logger.putListener("Player position", playerSystem, "getPosition");
+        logger.putListener("Здоровье", playerSystem, "getHealthComponent");
+        logger.putListener("Опыт", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getXp");
+        logger.putListener("Params", playerSystem.getDataRepository().getCurrentStoryDataModel(), "getParameters");
+        logger.putListener("Temp", playerSystem.getDataRepository().getCurrentStoryDataModel().getCurrentState(), "toString");
 
-        logger.putListiner("Screen width", Gdx.app.getGraphics(), "getWidth");
-        logger.putListiner("Height", Gdx.app.getGraphics(), "getHeight");
-        logger.putListiner("Density", Gdx.app.getGraphics(), "getDensity");
+        logger.putListener("Screen width", Gdx.app.getGraphics(), "getWidth");
+        logger.putListener("Height", Gdx.app.getGraphics(), "getHeight");
+        logger.putListener("Density", Gdx.app.getGraphics(), "getDensity");
         return logger;
     }
 

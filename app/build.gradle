@@ -74,7 +74,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 32
         versionCode 1
-        versionName "-"
+        versionName "dev-build"
         proguardFiles "proguard-rules.pro"
         testProguardFiles "proguard-rules.pro"
         signingConfig signingConfigs.debug

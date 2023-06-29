@@ -68,10 +68,13 @@ public class Logger extends VerticalGroup {
             super.draw(batch, parentAlpha);
     }
 
-    public void putListiner(String title, Object o, String nameOfMethod) {
+    public void putListener(String title, Object o, String nameOfMethod) {
+        if (o == null || title == null || nameOfMethod == null)
+            return;
+
         Method method = null;
         try {
-            if (nameOfMethod == null || nameOfMethod.equals(""))
+            if (nameOfMethod.equals(""))
                 throw new NoSuchMethodException();
             method = o.getClass().getDeclaredMethod(nameOfMethod);
 

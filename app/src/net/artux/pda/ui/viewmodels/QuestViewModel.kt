@@ -232,7 +232,7 @@ class QuestViewModel @javax.inject.Inject constructor(
     }
 
     fun exitStory() {
-        commandController.process(mapOf(Pair("exitStory", listOf())))
+        commandController.processWithServer(mapOf(Pair("exitStory", listOf())))
     }
 
     fun resetData() {

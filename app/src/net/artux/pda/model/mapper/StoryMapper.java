@@ -22,6 +22,8 @@ import net.artux.pdanetwork.model.Transfer;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
 import java.util.HashMap;
@@ -29,7 +31,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-@Mapper(uses = {ItemMapper.class, UserMapper.class}, nullValueMappingStrategy = RETURN_DEFAULT)
+@Mapper(uses = {ItemMapper.class, UserMapper.class},
+        nullValueMappingStrategy = RETURN_DEFAULT,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface StoryMapper {
 
     StoryMapper INSTANCE = Mappers.getMapper(StoryMapper.class);

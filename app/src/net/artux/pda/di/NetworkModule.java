@@ -1,5 +1,7 @@
 package net.artux.pda.di;
 
+import android.content.ContentResolver;
+
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.gson.Gson;
@@ -29,6 +31,8 @@ import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import timber.log.Timber;
@@ -52,18 +56,23 @@ public class NetworkModule {
                 requestBuilder.addHeader("Authorization", dataManager.getAuthToken());
             }
 
-            return chain.proceed(requestBuilder.build());
+            try {
+                return chain.proceed(requestBuilder.build());
+            }catch (Exception e){
+                return new Response.Builder()
+                        .request(requestBuilder.build())
+                        .code(503)
+                        .message(e.getMessage())
+                        .body(null)
+                        .build();
+            }
+
         });
 
-        if (BuildConfig.DEBUG) {
-            httpClient
-                    .connectTimeout(10, TimeUnit.SECONDS)
-                    .writeTimeout(10, TimeUnit.SECONDS)
-                    .readTimeout(600, TimeUnit.SECONDS);
-        } else
-            httpClient.connectTimeout(10, TimeUnit.SECONDS)
-                    .readTimeout(10, TimeUnit.SECONDS)
-                    .writeTimeout(10, TimeUnit.SECONDS);
+
+        httpClient.connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS);
 
         return httpClient.build();
     }

@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
 import net.artux.pda.map.ecs.physics.BodyComponent;
@@ -16,6 +17,8 @@ import net.artux.pda.map.ecs.sound.SoundsSystem;
 import net.artux.pda.map.ecs.vision.VisionComponent;
 import net.artux.pda.map.ecs.characteristics.PlayerComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
+
+import java.util.HashSet;
 
 import javax.inject.Inject;
 
@@ -50,6 +53,7 @@ public class BattleSystem extends BaseSystem {
 
     @Override
     public void update(float deltaTime) {
+        playedSounds.clear();
         super.update(deltaTime);
         for (Entity bullet : bullets) {
             BulletComponent bulletComponent = bcm.get(bullet);
@@ -78,6 +82,8 @@ public class BattleSystem extends BaseSystem {
         }
     }
 
+    private final HashSet<Sound> playedSounds = new HashSet<>();
+
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         WeaponComponent entityWeapon = wm.get(entity);
@@ -87,9 +93,10 @@ public class BattleSystem extends BaseSystem {
 
         if (moodComponent.hasEnemy())
             if (visionComponent.isSeeing(moodComponent.getEnemy()))
-                if (entityWeapon.shoot()) {
+                if (entityWeapon.shoot() && !playedSounds.contains(entityWeapon.getShotSound())) {
                     entityProcessorSystem.addBulletToEngine(entity, moodComponent.getEnemy(), entityWeapon.getSelected());
                     soundsSystem.playSoundAtDistance(entityWeapon.getShotSound(), pm.get(moodComponent.getEnemy()).getPosition());
+                    playedSounds.add(entityWeapon.getShotSound());
                 }
         //todo count dst
     }
