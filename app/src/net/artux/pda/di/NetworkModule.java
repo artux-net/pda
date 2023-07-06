@@ -1,5 +1,7 @@
 package net.artux.pda.di;
 
+import static okhttp3.Protocol.HTTP_2;
+
 import android.content.ContentResolver;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
@@ -60,6 +62,7 @@ public class NetworkModule {
                 return chain.proceed(requestBuilder.build());
             }catch (Exception e){
                 return new Response.Builder()
+                        .protocol(HTTP_2)
                         .request(requestBuilder.build())
                         .code(503)
                         .message(e.getMessage())
