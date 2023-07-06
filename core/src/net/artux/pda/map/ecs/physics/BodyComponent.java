@@ -59,7 +59,15 @@ public class BodyComponent implements Component {
     public BodyComponent velocity(double vX, double vY) {
         body.setLinearDamping(0);
         body.setLinearVelocity((float) vX, (float) vY);
-        //body.setTransform(body.getPosition().x, body.getPosition().y, 30f);
+        return this;
+    }
+
+    public BodyComponent setPosition(Vector2 position) {
+        return setPosition(position.x, position.y);
+    }
+
+    public BodyComponent setPosition(float x, float y) {
+        body.setTransform(x, y, 0);
         return this;
     }
 

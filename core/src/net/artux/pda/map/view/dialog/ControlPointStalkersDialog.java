@@ -22,6 +22,7 @@ import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.FontManager;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.SlotTextButton;
+import net.artux.pda.map.view.template.PDADialog;
 import net.artux.pda.map.view.view.bars.Utils;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.map.Strength;

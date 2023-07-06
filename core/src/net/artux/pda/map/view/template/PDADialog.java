@@ -1,10 +1,16 @@
-package net.artux.pda.map.view.dialog;
+package net.artux.pda.map.view.template;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+
+import net.artux.pda.map.utils.Colors;
+import net.artux.pda.map.view.view.bars.Utils;
 
 public abstract class PDADialog extends Dialog {
 
@@ -24,7 +30,7 @@ public abstract class PDADialog extends Dialog {
         setModal(true);
         setMovable(true);
         setResizable(false);
-
+        addListener(new ClickListener());
         addListener(new InputListener() {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 if (x < 0 || x > getWidth() || y < 0 || y > getHeight()) {

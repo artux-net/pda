@@ -5,20 +5,17 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
-import net.artux.pda.map.ecs.physics.BodyComponent;
-import net.artux.pda.map.ecs.characteristics.HealthComponent;
-import net.artux.pda.map.ecs.interactive.PassivityComponent;
-import net.artux.pda.map.ecs.systems.BaseSystem;
-import net.artux.pda.map.ecs.creation.EntityProcessorSystem;
-import net.artux.pda.map.ecs.sound.SoundsSystem;
-import net.artux.pda.map.ecs.vision.VisionComponent;
-import net.artux.pda.map.ecs.characteristics.PlayerComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
-
-import java.util.HashSet;
+import net.artux.pda.map.ecs.characteristics.HealthComponent;
+import net.artux.pda.map.ecs.characteristics.PlayerComponent;
+import net.artux.pda.map.ecs.creation.EntityProcessorSystem;
+import net.artux.pda.map.ecs.interactive.PassivityComponent;
+import net.artux.pda.map.ecs.physics.BodyComponent;
+import net.artux.pda.map.ecs.sound.SoundsSystem;
+import net.artux.pda.map.ecs.systems.BaseSystem;
+import net.artux.pda.map.ecs.vision.VisionComponent;
 
 import javax.inject.Inject;
 
@@ -28,6 +25,7 @@ public class BattleSystem extends BaseSystem {
     private ImmutableArray<Entity> bullets;
 
     private final EntityProcessorSystem entityProcessorSystem;
+    private final BulletPool bulletPool;
     private final SoundsSystem soundsSystem;
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
@@ -38,51 +36,68 @@ public class BattleSystem extends BaseSystem {
     private final ComponentMapper<BulletComponent> bcm = ComponentMapper.getFor(BulletComponent.class);
 
     @Inject
-    public BattleSystem(SoundsSystem soundsSystem, EntityProcessorSystem entityProcessorSystem) {
-        super(Family.all(HealthComponent.class, VisionComponent.class,
-                MoodComponent.class, BodyComponent.class, WeaponComponent.class).exclude(PlayerComponent.class, PassivityComponent.class).get());
+    public BattleSystem(SoundsSystem soundsSystem, EntityProcessorSystem entityProcessorSystem, BulletPool bulletPool) {
+        super(Family.all(HealthComponent.class, VisionComponent.class, MoodComponent.class, BodyComponent.class, WeaponComponent.class).exclude(PlayerComponent.class, PassivityComponent.class).get());
         this.entityProcessorSystem = entityProcessorSystem;
         this.soundsSystem = soundsSystem;
+        this.bulletPool = bulletPool;
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        bullets = engine.getEntitiesFor(Family.all(BodyComponent.class, BulletComponent.class).get());
+        bullets = engine.getEntitiesFor(Family.all(BodyComponent.class, BulletComponent.class).exclude(PassivityComponent.class).get());
     }
 
     @Override
     public void update(float deltaTime) {
-        playedSounds.clear();
         super.update(deltaTime);
         for (Entity bullet : bullets) {
             BulletComponent bulletComponent = bcm.get(bullet);
-            Vector2 bulletBodyComponent = pm.get(bullet).getPosition();
-            Vector2 targetPosition = bulletComponent.getTargetPosition();
 
-            Vector2 targetEntityBodyComponent = pm.get(bulletComponent.getTarget()).getPosition();
-            MoodComponent targetEntityMood = mm.get(bulletComponent.getTarget());
-            HealthComponent targetEntityHealth = hm.get(bulletComponent.getTarget());
-
-            float dstToTarget = bulletBodyComponent.dst(targetPosition);
-            if (targetEntityBodyComponent.epsilonEquals(bulletBodyComponent, 4f)) {
-                targetEntityHealth.damage(bulletComponent.getDamage());
-
-                if (!targetEntityMood.hasEnemy()) {
-                    targetEntityMood.setEnemy(bulletComponent.getAuthor());
-                    MoodComponent playerMood = mm.get(getPlayer());
-                    if (bulletComponent.getAuthor() == getPlayer() && !targetEntityMood.isEnemy(playerMood)) {
-                        playerMood.setRelation(targetEntityMood, -10);
-                    }
+            if (bulletComponent.isFree()) {
+                for (int i = 0; i < getEntities().size(); i++) {
+                    Entity entity = getEntities().get(i);
+                    if (checkHit(bullet, entity, false))
+                        break;
                 }
-            } else if (dstToTarget > bulletComponent.getLastDstToTarget())
-                getEngine().removeEntity(bullet);
-            else
-                bulletComponent.setLastDstToTarget(dstToTarget);
+            } else {
+                checkHit(bullet, bulletComponent.getTarget(), true);
+            }
         }
     }
 
-    private final HashSet<Sound> playedSounds = new HashSet<>();
+    private boolean checkHit(Entity bullet, Entity npc, boolean deleteBullet) {
+        BulletComponent bulletComponent = bcm.get(bullet);
+        BodyComponent bulletBody = pm.get(bullet);
+        Vector2 entityPosition = pm.get(npc).getPosition();
+        MoodComponent targetEntityMood = mm.get(npc);
+        HealthComponent targetEntityHealth = hm.get(npc);
+
+        boolean hit = false;
+
+        if (entityPosition.epsilonEquals(bulletBody.getPosition(), 4f)) {
+            targetEntityHealth.damage(bulletComponent.getDamage());
+            hit = true;
+            if (!targetEntityMood.hasEnemy()) {
+                targetEntityMood.setEnemy(bulletComponent.getAuthor());
+                MoodComponent playerMood = mm.get(getPlayer());
+                if (bulletComponent.getAuthor() == getPlayer() && !targetEntityMood.isEnemy(playerMood)) {
+                    playerMood.setRelation(targetEntityMood, -10);
+                }
+            }
+        }
+        if (!hit) {
+            if (bulletComponent.getTargetPosition().epsilonEquals(bulletBody.getPosition(), 4)) {
+                hit = true;
+            }
+        }
+
+        if (hit)
+            bulletPool.free(bullet);
+
+        return hit;
+    }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
@@ -93,10 +108,9 @@ public class BattleSystem extends BaseSystem {
 
         if (moodComponent.hasEnemy())
             if (visionComponent.isSeeing(moodComponent.getEnemy()))
-                if (entityWeapon.shoot() && !playedSounds.contains(entityWeapon.getShotSound())) {
-                    entityProcessorSystem.addBulletToEngine(entity, moodComponent.getEnemy(), entityWeapon.getSelected());
+                if (entityWeapon.shoot()) {
+                    entityProcessorSystem.startBullet(entity, moodComponent.getEnemy(), entityWeapon.getSelected());
                     soundsSystem.playSoundAtDistance(entityWeapon.getShotSound(), pm.get(moodComponent.getEnemy()).getPosition());
-                    playedSounds.add(entityWeapon.getShotSound());
                 }
         //todo count dst
     }

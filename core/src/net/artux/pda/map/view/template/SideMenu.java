@@ -1,25 +1,21 @@
 package net.artux.pda.map.view.template;
 
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.view.bars.Utils;
 
-public abstract class SideMenu extends Table {
+public abstract class SideMenu extends Window {
 
     private final VerticalGroup contentGroup;
 
     public SideMenu(String title, Skin skin) {
-        super(skin);
+        super("", skin);
 
         setFillParent(true);
         top();

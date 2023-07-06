@@ -63,16 +63,16 @@ public class PlayerBattleSystem extends BaseSystem {
                 if (playerVision.isSeeing(playerMood.getEnemy()))
                     if (playerShoot && playerWeapon.shoot()) {
                         soundStarted = false;
-                        entityProcessorSystem.addBulletToEngine(player, playerMood.getEnemy(), playerWeapon.getSelected());
-                        soundsSystem.playSoundAtDistance(playerWeapon.getShotSound(), pm.get(playerMood.getEnemy()).getPosition());
+                        entityProcessorSystem.startBullet(player, playerMood.getEnemy(), playerWeapon.getSelected());
+                        soundsSystem.playSound(playerWeapon.getShotSound());
                     }
-        }/*else{
+        }else{
             if (playerShoot && playerWeapon.shoot()) {
                 soundStarted = false;
-                entityProcessorSystem.addBulletToEngine(player, moodComponent.getEnemy(), playerWeapon.getSelected());
-                soundsSystem.playSoundAtDistance(playerWeapon.getShotSound(), pm.get(moodComponent.getEnemy()));
+                entityProcessorSystem.startBullet(player, playerWeapon.getSelected());
+                soundsSystem.playSound(playerWeapon.getShotSound());
             }
-        }*/
+        }
 
 
         List<Entity> playerEnemies = playerVision.getVisibleEntities();

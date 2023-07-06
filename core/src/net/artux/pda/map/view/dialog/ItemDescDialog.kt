@@ -3,6 +3,7 @@ package net.artux.pda.map.view.dialog
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
 import net.artux.engine.utils.LocaleBundle
+import net.artux.pda.map.view.template.PDADialog
 import net.artux.pda.model.items.ArmorModel
 import net.artux.pda.model.items.ItemsContainerModel
 import net.artux.pda.model.items.WeaponModel

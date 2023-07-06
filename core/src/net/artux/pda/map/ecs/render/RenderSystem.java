@@ -186,15 +186,14 @@ public class RenderSystem extends BaseSystem implements Drawable {
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
             BodyComponent bodyComponent = pm.get(entity);
-            SpriteComponent spriteComponent = sm.get(entity);
-            Sprite sprite = spriteComponent.sprite;
+            SpriteComponent sprite = sm.get(entity);
             if (!showAll && fog.has(entity)) {
                 sprite.setAlpha(fog.get(entity).visionCoefficient);
                 batch.setColor(sprite.getColor());
             }
 
             batch.draw(sprite, bodyComponent.getX() - sprite.getOriginX(), bodyComponent.getY() - sprite.getOriginY(), sprite.getOriginX(),
-                    sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), spriteComponent.getRotation());
+                    sprite.getOriginY(), sprite.getWidth(), sprite.getHeight(), sprite.getScaleX(), sprite.getScaleY(), sprite.getRotation());
             batch.setColor(Color.WHITE);
         }
 

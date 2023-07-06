@@ -3,11 +3,7 @@ package net.artux.pda.map.ecs.creation;
 import static com.badlogic.gdx.math.MathUtils.random;
 
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntityListener;
-import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -25,6 +21,7 @@ import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.ecs.ai.MapOrientationSystem;
 import net.artux.pda.map.ecs.ai.StalkerComponent;
 import net.artux.pda.map.ecs.ai.StalkerGroup;
+import net.artux.pda.map.ecs.global.WorldSystem;
 import net.artux.pda.map.ecs.interactive.ClickComponent;
 import net.artux.pda.map.ecs.interactive.map.ConditionComponent;
 import net.artux.pda.map.ecs.interactive.map.SpawnComponent;
@@ -48,7 +45,7 @@ import java.util.Set;
 import javax.inject.Inject;
 
 @PerGameMap
-public class EntityProcessorSystem extends EntitySystem {
+public class EntityProcessorSystem {
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
 
@@ -63,6 +60,7 @@ public class EntityProcessorSystem extends EntitySystem {
 
     private final ControlPointDialog controlPointDialog;
     private final UserInterface userInterface;
+    private final WorldSystem worldSystem;
     private final ApplicationLogger logger;
 
     @Inject
@@ -72,7 +70,7 @@ public class EntityProcessorSystem extends EntitySystem {
                                  ContentGenerator contentGenerator,
                                  ApplicationLogger logger,
                                  Gson gson,
-                                 LocaleBundle localeBundle, ControlPointDialog controlPointDialog1, UserInterface userInterface) {
+                                 LocaleBundle localeBundle, ControlPointDialog controlPointDialog1, UserInterface userInterface, WorldSystem worldSystem) {
         super();
         this.logger = logger;
         this.world = world;
@@ -83,33 +81,14 @@ public class EntityProcessorSystem extends EntitySystem {
         this.localeBundle = localeBundle;
         this.controlPointDialog = controlPointDialog1;
         this.userInterface = userInterface;
+        this.worldSystem = worldSystem;
         JsonReader reader = new JsonReader(Gdx.files.internal("config/mobs.json").reader());
         gangRelations = gson.fromJson(reader, GangRelations.class);
         this.contentGenerator = contentGenerator;
     }
 
-    @Override
-    public void addedToEngine(Engine engine) {
-        super.addedToEngine(engine);
-        engine.addEntityListener(Family.all(BodyComponent.class).get(), new EntityListener() {
-            @Override
-            public void entityAdded(Entity entity) {
-
-            }
-
-            @Override
-            public void entityRemoved(Entity entity) {
-                BodyComponent bodyComponent = pm.get(entity);
-                if (!bodyComponent.isDestroyed()) {
-                    bodyComponent.setDestroyed(true);
-                    world.destroyBody(bodyComponent.body);
-                }
-            }
-        });
-    }
-
     public void addEntity(Entity entity) {
-        getEngine().addEntity(entity);
+        worldSystem.addEntity(entity);
     }
 
     public Entity generateNewSpawn(SpawnModel spawnModel, boolean withSprite) {
@@ -133,9 +112,12 @@ public class EntityProcessorSystem extends EntitySystem {
         return spawnEntity;
     }
 
-    public void addBulletToEngine(Entity entity, Entity target, WeaponModel weaponModel) {
-        Entity bullet = builder.bullet(entity, target, weaponModel);
-        getEngine().addEntity(bullet);
+    public void startBullet(Entity entity, Entity target, WeaponModel weaponModel) {
+        builder.bullet(entity, target, weaponModel);
+    }
+
+    public void startBullet(Entity entity, WeaponModel weaponModel) {
+        builder.bullet(entity, weaponModel);
     }
 
     public StalkerGroup restoreGroup(Vector2 position, SavedSpawn savedSpawn) {
@@ -185,12 +167,12 @@ public class EntityProcessorSystem extends EntitySystem {
                 stalkerGroup.addEntity(leader);
                 leader.add(new ClickComponent(10, () ->
                         renderSystem.showText(localeBundle.get(stalkerGroup.getGang().getTitleId()), pm.get(leader).getPosition())));
-                getEngine().addEntity(leader);
+                addEntity(leader);
                 n--;
             }
             for (int i = 0; i < n; i++) {
                 Entity entity = builder.createGroupStalker(getRandomAround(pos, 15), stalkerGroup);
-                getEngine().addEntity(entity);
+                addEntity(entity);
                 stalkerGroup.addEntity(entity);
             }
         }

@@ -11,6 +11,7 @@ import net.artux.pda.map.ecs.effects.ejection.EjectionSystem;
 import net.artux.pda.map.ecs.creation.EntityProcessorSystem;
 import net.artux.pda.map.ecs.characteristics.HealthSystem;
 import net.artux.pda.map.ecs.battle.InfightingSystem;
+import net.artux.pda.map.ecs.global.WorldSystem;
 import net.artux.pda.map.ecs.logger.MapLoggerSystem;
 import net.artux.pda.map.ecs.ai.MapOrientationSystem;
 import net.artux.pda.map.ecs.physics.MovementTargetingSystem;
@@ -99,7 +100,7 @@ public abstract class EngineSystemsModule {
 
     @IntoSet
     @Binds
-    public abstract EntitySystem worldSystem(AnomalySystem anomalySystem);
+    public abstract EntitySystem anomalySystem(AnomalySystem anomalySystem);
 
     @IntoSet
     @Binds
@@ -139,7 +140,7 @@ public abstract class EngineSystemsModule {
 
     @IntoSet
     @Binds
-    public abstract EntitySystem entityProcessorSystem(EntityProcessorSystem entityProcessorSystem);
+    public abstract EntitySystem worldSystem(WorldSystem worldSystem);
 
     @IntoSet
     @Binds

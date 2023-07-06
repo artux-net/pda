@@ -9,7 +9,6 @@ import com.badlogic.gdx.ai.msg.MessageDispatcher;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import net.artux.engine.utils.LocaleBundle;
@@ -25,6 +24,7 @@ import net.artux.pda.map.ecs.ai.statemachine.MessagingCodes;
 import net.artux.pda.map.ecs.ai.states.MutantState;
 import net.artux.pda.map.ecs.ai.states.StalkerState;
 import net.artux.pda.map.ecs.battle.BulletComponent;
+import net.artux.pda.map.ecs.battle.BulletPool;
 import net.artux.pda.map.ecs.battle.MoodComponent;
 import net.artux.pda.map.ecs.battle.WeaponComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
@@ -50,26 +50,34 @@ import javax.inject.Inject;
 public class EntityBuilder {
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<BulletComponent> bm = ComponentMapper.getFor(BulletComponent.class);
+    private final ComponentMapper<SpriteComponent> sm = ComponentMapper.getFor(SpriteComponent.class);
+
     private final ApplicationLogger logger;
     private final AssetManager assetManager;
     private final StrengthUpdater strengthUpdater;
     private final ContentGenerator contentGenerator;
     private final LocaleBundle localeBundle;
-    private final Texture bulletTexture;
+    private final BulletPool bulletPool;
+    private final Texture smallBulletTexture;
+    private final Texture gaussBulletTexture;
     private final World world;
 
     @Inject
     public EntityBuilder(ApplicationLogger logger, AssetManager assetManager,
                          StrengthUpdater strengthUpdater,
-                         ContentGenerator contentGenerator, LocaleBundle localeBundle, World world) {
+                         ContentGenerator contentGenerator, LocaleBundle localeBundle, BulletPool bulletPool, World world) {
         this.logger = logger;
         this.assetManager = assetManager;
         this.strengthUpdater = strengthUpdater;
         this.contentGenerator = contentGenerator;
         this.localeBundle = localeBundle;
+        this.bulletPool = bulletPool;
         this.world = world;
 
-        bulletTexture = assetManager.get("textures/icons/entity/bullet.png", Texture.class);
+//        simpleBulletTexture = assetManager.get("textures/icons/entity/bullet.png", Texture.class);
+        smallBulletTexture = assetManager.get("textures/icons/entity/bullet.png", Texture.class);
+        gaussBulletTexture = assetManager.get("textures/icons/entity/bullet.png", Texture.class);
     }
 
     public Entity player(Vector2 position, DataRepository dataRepository) {
@@ -85,9 +93,44 @@ public class EntityBuilder {
     }
 
     public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {
+        Entity bullet = bulletPool.obtain();
         BodyComponent bodyComponent = pm.get(author);
 
         Vector2 targetPosition = pm.get(target).getPosition();
+        targetPosition = getPointNear(targetPosition, weaponModel.getPrecision());
+
+        Vector2 velocityUnit = targetPosition.cpy().sub(bodyComponent.getPosition()).nor();
+
+        float vX = velocityUnit.x * weaponModel.getSpeed() * 10000;
+        float vY = velocityUnit.y * weaponModel.getSpeed() * 10000;
+
+        Vector2 direction = targetPosition.cpy().sub(bodyComponent.getPosition());
+        float degrees = (float) (Math.atan2(
+                -direction.x,
+                direction.y
+        ) * 180.0d / Math.PI);
+
+        sm.get(bullet).setRotation(degrees + 90);
+
+        BodyComponent bulletBodyComponent = pm.get(bullet);
+        bulletBodyComponent.body.setTransform(bodyComponent.getPosition(), 0f);
+        bulletBodyComponent.velocity((double) vX * 10000, (double) vY * 10000);
+
+        BulletComponent bulletComponent = bm.get(bullet);
+        bulletComponent.update(author, target, targetPosition, weaponModel.getDamage());
+        return bullet;
+    }
+
+    public Entity bullet(Entity author, WeaponModel weaponModel) {
+        Entity bullet = bulletPool.obtain();
+
+        SpriteComponent authorSprite = sm.get(author);
+        float rotationDeg = authorSprite.getRotation();
+
+        BodyComponent bodyComponent = pm.get(author);
+        Vector2 targetPosition = bodyComponent.getPosition().cpy();
+        targetPosition.y += 200;
+        targetPosition.rotateAroundDeg(bodyComponent.getPosition(), rotationDeg - 90);
         targetPosition = getPointNear(targetPosition, weaponModel.getPrecision());
 
         Vector2 velocityUnit = targetPosition.cpy().sub(bodyComponent.getPosition()).nor();
@@ -101,14 +144,15 @@ public class EntityBuilder {
                 direction.y
         ) * 180.0d / Math.PI);
 
-        SpriteComponent spriteComponent = new SpriteComponent(bulletTexture, 15, 2);
-        spriteComponent.setRotation(degrees + 90);
+        sm.get(bullet).setRotation(90 + degrees);
+        BodyComponent bulletBodyComponent = pm.get(bullet);
+        bulletBodyComponent.body.setTransform(bodyComponent.getX(), bodyComponent.getY(), 0f);
+        bulletBodyComponent.velocity((double) vX * 10000, (double) vY * 10000);
 
-        return new Entity()
-                .add(new BodyComponent(bodyComponent.getPosition(), BodyDef.BodyType.KinematicBody, world).velocity((double) vX * 10000, (double) vY * 10000))
-                .add(spriteComponent)
-                .add(new FogOfWarComponent())
-                .add(new BulletComponent(author, target, targetPosition, weaponModel.getDamage()));
+        BulletComponent bulletComponent = bm.get(bullet);
+        bulletComponent.update(author, targetPosition, weaponModel.getDamage());
+
+        return bullet;
     }
 
     public Vector2 getPointNear(Vector2 basePosition, float precision) {

@@ -65,7 +65,7 @@ class WeaponComponent : Component {
                 shotSoundName = pistolDefaultShotSound
                 reloadSoundName = pistolDefaultReloadSound
             }
-            val sounds = weaponModel.sounds
+            /*val sounds = weaponModel.sounds
             if (sounds != null) {
                 val type = weaponModel.type.name.lowercase()
                 if (!sounds.reload.isNullOrBlank())
@@ -73,14 +73,16 @@ class WeaponComponent : Component {
 
                 if (!sounds.shot.isNullOrBlank())
                     shotSoundName = prefix + type + "/" + sounds.shot
-            } else{
+            } else*/
+
+
                 var path = prefix + weaponModel.baseId + "/reload.ogg"
                 if (assetManager.contains(path))
                    reloadSoundName = path
                 path = prefix + weaponModel.baseId + "/shoot.ogg"
                 if (assetManager.contains(path))
                     shotSoundName = path
-            }
+
             shotSound = assetManager.get(shotSoundName)
             reloadSound = assetManager.get(reloadSoundName)
             reload()
@@ -130,7 +132,8 @@ class WeaponComponent : Component {
             if (stack < 4 && magazine > 0) {
                 this.magazine--
                 timeout += 1 / weaponModel!!.speed
-                if (player) bulletModel!!.quantity = bulletModel!!.quantity - 1
+                if (player)
+                    bulletModel!!.quantity = bulletModel!!.quantity - 1
                 stack++
                 shootLastFrame = true
             } else if (magazine == 0) {

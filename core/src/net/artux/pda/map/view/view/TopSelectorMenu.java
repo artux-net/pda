@@ -1,9 +1,11 @@
 package net.artux.pda.map.view.view;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 import net.artux.pda.map.di.scope.PerGameMap;
@@ -23,6 +25,9 @@ public class TopSelectorMenu extends Table {
         align(Align.left);
         defaults()
                 .pad(10);
+
+        setTouchable(Touchable.enabled);
+        addListener(new ClickListener());
     }
 
     public Cell<Actor> add(Actor actor, boolean asButton) {

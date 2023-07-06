@@ -8,6 +8,7 @@ import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.SlotTextButton;
+import net.artux.pda.map.view.template.PDADialog;
 
 import java.util.Collections;
 

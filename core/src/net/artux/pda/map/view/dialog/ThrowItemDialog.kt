@@ -12,6 +12,7 @@ import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.utils.Colors
 import net.artux.pda.map.view.FontManager
 import net.artux.pda.map.view.UserInterface
+import net.artux.pda.map.view.template.PDADialog
 import net.artux.pda.map.view.view.bars.Utils
 import net.artux.pda.model.items.ItemModel
 import javax.inject.Inject

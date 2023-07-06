@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 
 import net.artux.engine.utils.LocaleBundle;
@@ -23,6 +24,7 @@ import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.FontManager;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.SlotTextButton;
+import net.artux.pda.map.view.template.PDADialog;
 import net.artux.pda.map.view.view.bars.Utils;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.map.Strength;
@@ -135,6 +137,9 @@ public class ControlPointDialog extends PDADialog {
         });
 
         verticalGroup.addActor(manageTable);
+
+        Drawable background = Utils.getColoredDrawable(1, 1, Colors.backgroundColor);
+        setBackground(background);
     }
 
     public void update(SpawnComponent spawnComponent) {

@@ -18,6 +18,7 @@ import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
 import net.artux.pda.map.ecs.battle.MoodComponent;
 import net.artux.pda.map.ecs.interactive.PassivityComponent;
+import net.artux.pda.map.ecs.physics.WorldObject;
 import net.artux.pda.map.ecs.systems.BaseSystem;
 import net.artux.pda.map.ecs.render.Drawable;
 import net.artux.pda.map.ecs.ai.MapOrientationSystem;
@@ -78,8 +79,7 @@ public class VisionSystem extends BaseSystem implements Drawable {
                     && !mapOrientationSystem.collides(bodyComponentComponent1.getPosition(), bodyComponentComponent2.getPosition())) {
                 wall.set(false);
                 world.rayCast((fixture, point, normal, fraction) -> {
-                    if (fixture.getBody().getType() == BodyDef.BodyType.StaticBody)
-                        wall.set(true);
+                    wall.set(fixture.getBody().getUserData() == WorldObject.WALL);
                     return 1;
                 }, bodyComponentComponent2.getPosition(), bodyComponentComponent1.getPosition());
                 if (!wall.get())

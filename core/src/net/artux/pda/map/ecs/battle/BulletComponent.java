@@ -6,18 +6,44 @@ import com.badlogic.gdx.math.Vector2;
 
 public class BulletComponent implements Component {
 
-    private final Entity author;
-    private final Entity target;
-    private final Vector2 targetPosition;
-    private final float damage;
+    private Entity author;
+    private Vector2 targetPosition;
+    private float damage;
     private float lastDstToTarget;
 
+    private Entity target;
+    private boolean free;
+
+    public BulletComponent(){
+
+    }
+
     public BulletComponent(Entity author, Entity target, Vector2 targetPosition, float damage) {
+        update(author, target, targetPosition, damage);
+    }
+
+    public BulletComponent(Entity author, Vector2 targetPosition, float damage) {
+        update(author, null, targetPosition, damage);
+    }
+
+    public void update(Entity author, Vector2 targetPosition, float damage){
+        this.author = author;
+        this.target = null;
+        this.targetPosition = targetPosition;
+        this.damage = damage;
+        lastDstToTarget = 1000;
+    }
+
+    public void update(Entity author, Entity target, Vector2 targetPosition, float damage){
         this.author = author;
         this.target = target;
         this.targetPosition = targetPosition;
         this.damage = damage;
         lastDstToTarget = 1000;
+    }
+
+    public boolean isFree() {
+        return target == null;
     }
 
     public Entity getAuthor() {

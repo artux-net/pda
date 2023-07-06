@@ -25,6 +25,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 
+import net.artux.pda.map.ecs.physics.WorldObject;
+
 public class MapBodyBuilder {
 
     // Пикселей на один тайл
@@ -73,7 +75,7 @@ public class MapBodyBuilder {
             bd.position.set(xSwift, ySwift);
             bd.type = BodyDef.BodyType.StaticBody;
             Body body = world.createBody(bd);
-
+            body.setUserData(WorldObject.detectType(object.getProperties()));
             body.createFixture(shape, 0);
 
             shape.dispose();
