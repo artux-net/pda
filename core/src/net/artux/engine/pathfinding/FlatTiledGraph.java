@@ -4,13 +4,16 @@ import com.badlogic.gdx.ai.pfa.Connection;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+import net.artux.pda.map.engine.entities.ai.TileType;
+
 public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
 
-    private int tileSize;
+    private final int tileSize;
     public int sizeX;
     public int sizeY;
 
     protected Array<FlatTiledNode> nodes;
+    private final FlatTiledNode emptyNode;
 
     public static boolean diagonal;
     public FlatTiledNode startNode;
@@ -21,6 +24,8 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
         tileSize = tiledNavigator.getLayer().getTileHeight();
         this.nodes = new Array<>(sizeX * sizeY);
         diagonal = true;
+
+        emptyNode = new FlatTiledNode(this, -1, -1, -1, -1, TileType.WALL, 0);
 
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
@@ -51,6 +56,9 @@ public class FlatTiledGraph implements TiledGraph<FlatTiledNode> {
             xTile = sizeX - 1;
         if (yTile >= sizeY)
             yTile = sizeY - 1;
+
+        if (sizeY + y >= nodes.size)
+            return emptyNode;
 
         return getNode(xTile, yTile);
     }
