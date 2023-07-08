@@ -47,7 +47,7 @@ public class AnomalyComponent implements Component {
                 "Аномалия" +
                 '\n' +
                 "Наименование: " +
-                getAnomaly().getName() +
+                getAnomaly().getTitle() +
                 '\n' +
                 "Размер: " +
                 size * 2;

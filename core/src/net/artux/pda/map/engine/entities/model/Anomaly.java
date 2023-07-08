@@ -58,7 +58,7 @@ public enum Anomaly {
         this.name = title;
     }
 
-    public String getName() {
+    public String getTitle() {
         return name;
     }
 

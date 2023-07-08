@@ -33,10 +33,11 @@ public class SoundsSystem extends BaseSystem {
     private static float VOLUME = 1f;
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<MusicComponent> mm = ComponentMapper.getFor(MusicComponent.class);
 
     @Inject
     public SoundsSystem(AssetManager assetManager) {
-        super(Family.all().get());
+        super(Family.all(MusicComponent.class, BodyComponent.class).get());
         this.assetManager = assetManager;
     }
 
@@ -46,9 +47,9 @@ public class SoundsSystem extends BaseSystem {
         detections.add(assetManager.get("audio/sounds/pda/contact_0.ogg", Sound.class));
         detections.add(assetManager.get("audio/sounds/pda/contact_1.ogg", Sound.class));
 
-        backgrounds.add(assetManager.get("audio/music/1.ogg", Music.class));
-        backgrounds.add(assetManager.get("audio/music/2.ogg", Music.class));
-        backgrounds.add(assetManager.get("audio/music/3.ogg", Music.class));
+        backgrounds.add(assetManager.get("audio/music/background/1.ogg", Music.class));
+        backgrounds.add(assetManager.get("audio/music/background/2.ogg", Music.class));
+        backgrounds.add(assetManager.get("audio/music/background/3.ogg", Music.class));
         for (Music m : backgrounds) {
             m.setVolume(0.71f);
         }
@@ -75,7 +76,23 @@ public class SoundsSystem extends BaseSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+        if (!isPlayerActive())
+            return;
 
+        BodyComponent playerBody = pm.get(getPlayer());
+        BodyComponent bodyComponent = pm.get(entity);
+        MusicComponent musicComponent = mm.get(entity);
+        float dst = bodyComponent.getPosition().dst(playerBody.getPosition());
+        if (dst > 50 && musicComponent.isPlaying()) {
+            musicComponent.stop();
+            return;
+        }
+        float volume = (50 - dst) / 50f;
+        if (dst > 50)
+            return;
+        musicComponent.setVolume(volume);
+        if (!musicComponent.isPlaying())
+            musicComponent.play();
     }
 
     public void changeState(boolean mute) {

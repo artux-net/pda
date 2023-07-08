@@ -41,10 +41,9 @@ public class BulletPool extends Pool<Entity> {
 
     @Override
     protected Entity newObject() {
-        logger.log("BulletPool", "newObject");
         Entity entity = new Entity()
                 .add(new BodyComponent(new Vector2(), BodyDef.BodyType.KinematicBody, world)
-                        .velocity((double) 10000, (double) 10000))
+                        .velocity(10000, 10000))
                 .add(new SpriteComponent(simpleBulletTexture, 15, 2))
                 .add(new FogOfWarComponent())
                 .add(new BulletComponent());
@@ -54,7 +53,6 @@ public class BulletPool extends Pool<Entity> {
 
     @Override
     public Entity obtain() {
-        logger.log("BulletPool", "bullet obtained");
         Entity entity = super.obtain();
         bm.get(entity).body.setActive(true);
         entity.remove(PassivityComponent.class);
@@ -63,7 +61,6 @@ public class BulletPool extends Pool<Entity> {
 
     @Override
     public void free(Entity object) {
-        logger.log("BulletPool", "bullet freed");
         super.free(object);
     }
 
@@ -76,7 +73,6 @@ public class BulletPool extends Pool<Entity> {
 
     @Override
     protected void discard(Entity object) {
-        logger.log("BulletPool", "bullet discarded");
         super.discard(object);
         worldSystem.removeEntity(object);
     }

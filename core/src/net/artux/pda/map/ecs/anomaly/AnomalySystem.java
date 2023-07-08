@@ -109,7 +109,7 @@ public class AnomalySystem extends EntitySystem {
                                         () -> renderSystem.showText(anomaly.desc(), anomalyBody.getPosition())));
                         notificationController.notify(NotificationType.ATTENTION,
                                 localeBundle.get("main.anomaly.found"),
-                                localeBundle.get("main.anomaly.found.desc", anomaly.getAnomaly().getName()));
+                                localeBundle.get("main.anomaly.found.desc", anomaly.getAnomaly().getTitle()));
                     }
 
                 }

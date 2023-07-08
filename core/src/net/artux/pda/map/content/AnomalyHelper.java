@@ -5,6 +5,7 @@ import static net.artux.pda.map.engine.entities.ai.TileType.ANOMALY;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 
 import net.artux.pda.map.ecs.anomaly.AnomalyComponent;
 import net.artux.pda.map.ecs.physics.BodyComponent;
+import net.artux.pda.map.ecs.sound.MusicComponent;
 import net.artux.pda.map.engine.entities.ai.TileType;
 import net.artux.pda.map.engine.entities.model.Anomaly;
 import net.artux.pda.map.di.components.MapComponent;
@@ -24,6 +26,8 @@ public class AnomalyHelper {
     public static void createAnomalies(MapComponent coreComponent) {
         Engine engine = coreComponent.getEngine();
         TiledMap tiledMap = coreComponent.getTiledMap();
+        AssetManager assetManager = coreComponent.getAssetsManager();
+        String prefix = "audio/music/anomalies/";
 
         TiledMapTileLayer layer = (TiledMapTileLayer) tiledMap.getLayers().get("tiles");
         Set<Vector2> anomalyPotentialPositions = new HashSet<>();
@@ -57,15 +61,21 @@ public class AnomalyHelper {
             Vector2 position = anomaliesArr.get(randomIndex);
             anomaliesArr.removeIndex(randomIndex);
 
-            Entity anomaly = new Entity();
-
             int size = random(20, 30);
-            final AnomalyComponent anomalyComponent = new AnomalyComponent(Anomaly.values()[random(0, Anomaly.values().length - 1)], size);
-
             final Vector2 finalPosition = position;
-            anomaly.add(new BodyComponent(finalPosition, coreComponent.getWorld()))
-                    .add(anomalyComponent);
-            engine.addEntity(anomaly);
+
+            Entity anomalyEntity = new Entity()
+                    .add(new BodyComponent(finalPosition, coreComponent.getWorld()))
+                    .add(new AnomalyComponent(Anomaly.values()[random(0, Anomaly.values().length - 1)], size));
+
+            String name = anomalyEntity.getComponent(AnomalyComponent.class)
+                    .getAnomaly()
+                    .name()
+                    .toLowerCase();
+
+            anomalyEntity.add(new MusicComponent(assetManager.get(prefix + name + "/idle.ogg"), true));
+
+            engine.addEntity(anomalyEntity);
         }
 
     }
