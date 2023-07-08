@@ -13,7 +13,7 @@ import net.artux.pda.map.ecs.characteristics.PlayerComponent;
 import net.artux.pda.map.ecs.creation.EntityProcessorSystem;
 import net.artux.pda.map.ecs.interactive.PassivityComponent;
 import net.artux.pda.map.ecs.physics.BodyComponent;
-import net.artux.pda.map.ecs.sound.SoundsSystem;
+import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.ecs.systems.BaseSystem;
 import net.artux.pda.map.ecs.vision.VisionComponent;
 
@@ -26,7 +26,7 @@ public class BattleSystem extends BaseSystem {
 
     private final EntityProcessorSystem entityProcessorSystem;
     private final BulletPool bulletPool;
-    private final SoundsSystem soundsSystem;
+    private final AudioSystem audioSystem;
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<VisionComponent> vm = ComponentMapper.getFor(VisionComponent.class);
@@ -36,10 +36,10 @@ public class BattleSystem extends BaseSystem {
     private final ComponentMapper<BulletComponent> bcm = ComponentMapper.getFor(BulletComponent.class);
 
     @Inject
-    public BattleSystem(SoundsSystem soundsSystem, EntityProcessorSystem entityProcessorSystem, BulletPool bulletPool) {
+    public BattleSystem(AudioSystem audioSystem, EntityProcessorSystem entityProcessorSystem, BulletPool bulletPool) {
         super(Family.all(HealthComponent.class, VisionComponent.class, MoodComponent.class, BodyComponent.class, WeaponComponent.class).exclude(PlayerComponent.class, PassivityComponent.class).get());
         this.entityProcessorSystem = entityProcessorSystem;
-        this.soundsSystem = soundsSystem;
+        this.audioSystem = audioSystem;
         this.bulletPool = bulletPool;
     }
 
@@ -110,7 +110,7 @@ public class BattleSystem extends BaseSystem {
             if (visionComponent.isSeeing(moodComponent.getEnemy()))
                 if (entityWeapon.shoot()) {
                     entityProcessorSystem.startBullet(entity, moodComponent.getEnemy(), entityWeapon.getSelected());
-                    soundsSystem.playSoundAtDistance(entityWeapon.getShotSound(), pm.get(moodComponent.getEnemy()).getPosition());
+                    audioSystem.playSoundAtDistance(entityWeapon.getShotSound(), pm.get(moodComponent.getEnemy()).getPosition());
                 }
         //todo count dst
     }

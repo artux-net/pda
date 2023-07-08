@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.map.content.ContentGenerator;
-import net.artux.pda.map.ecs.sound.SoundsSystem;
+import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.view.UserInterface;
 import net.artux.pda.map.view.blocks.MessagesPlane;
@@ -25,7 +25,7 @@ public class NotificationController {
 
     private final ContentGenerator contentGenerator;
     private final MessagesPlane messagesPlane;
-    private final SoundsSystem soundsSystem;
+    private final AudioSystem audioSystem;
     private final EnumMap<NotificationType, Sound> soundMap;
 
     private final Label titleLabel;
@@ -37,9 +37,9 @@ public class NotificationController {
     };
 
     @Inject
-    public NotificationController(UserInterface userInterface, AssetManager assetManager, SoundsSystem soundsSystem, MessagesPlane messagesPlane, ContentGenerator contentGenerator) {
+    public NotificationController(UserInterface userInterface, AssetManager assetManager, AudioSystem audioSystem, MessagesPlane messagesPlane, ContentGenerator contentGenerator) {
         this.contentGenerator = contentGenerator;
-        this.soundsSystem = soundsSystem;
+        this.audioSystem = audioSystem;
         this.messagesPlane = messagesPlane;
         Timer.schedule(new Timer.Task() {
             @Override
@@ -79,7 +79,7 @@ public class NotificationController {
      * Добавление сообщения на экран со звуком подсказки, работает как {@link #addSilentMessage(String, String, String, MessagesPlane.Length)}}
      */
     public void addMessage(String icon, String title, String content, MessagesPlane.Length length) {
-        soundsSystem.playBySoundId("audio/sounds/pda/pda_tip.ogg");
+        audioSystem.playBySoundId("audio/sounds/pda/pda_tip.ogg");
         addSilentMessage(icon, title, content, length);
     }
 
@@ -89,7 +89,7 @@ public class NotificationController {
      * @param sound ссылка на звук
      */
     public void addMessage(String sound, String icon, String title, String content, MessagesPlane.Length length) {
-        soundsSystem.playBySoundId(sound);
+        audioSystem.playBySoundId(sound);
         addSilentMessage(icon, title, content, length);
     }
 
@@ -97,7 +97,7 @@ public class NotificationController {
         addSilentMessage(type.getIcon(),
                 title,
                 content, MessagesPlane.Length.SHORT);
-        soundsSystem.playSound(soundMap.get(type));
+        audioSystem.playSound(soundMap.get(type));
     }
 
     /**

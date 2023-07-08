@@ -124,12 +124,19 @@ class WeaponComponent : Component {
         }*/
     }
 
+    fun limit(): Int{
+        return if (player) selected!!.bulletQuantity else 4
+    }
+
     var reloading = false
     fun shoot(): Boolean {
+        if (selected==null)
+            return false
+
         if (timeout <= 0 && (bulletModel != null && bulletModel!!.quantity > 0 || !player)) {
             val weaponModel = selected
             val magazine = magazine
-            if (stack < 4 && magazine > 0) {
+            if (stack < limit() && magazine > 0) {
                 this.magazine--
                 timeout += 1 / weaponModel!!.speed
                 if (player)

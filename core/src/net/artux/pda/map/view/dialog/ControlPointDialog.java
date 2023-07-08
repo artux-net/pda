@@ -138,7 +138,7 @@ public class ControlPointDialog extends PDADialog {
 
         verticalGroup.addActor(manageTable);
 
-        Drawable background = Utils.getColoredDrawable(1, 1, Colors.backgroundColor);
+        Drawable background = Utils.getColoredDrawable(1, 1, Colors.backgroundAlphaColor);
         setBackground(background);
     }
 

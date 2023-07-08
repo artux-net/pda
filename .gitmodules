@@ -1,3 +1,7 @@
 [submodule "assets"]
 	path = assets
 	url = https://pass@github.com/artux-net/pda-assets.git
+
+[submodule "libgdx-oboe"]
+	path = libgdx-oboe
+	url = https://github.com/barsoosayque/libgdx-oboe.git

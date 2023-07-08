@@ -12,8 +12,8 @@ import net.artux.engine.pathfinding.TiledNavigator;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
 import net.artux.pda.map.ecs.interactive.PassivityComponent;
+import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.ecs.systems.BaseSystem;
-import net.artux.pda.map.ecs.sound.SoundsSystem;
 import net.artux.pda.map.engine.entities.ai.TileType;
 import net.artux.pda.map.di.scope.PerGameMap;
 
@@ -27,16 +27,16 @@ public class EffectsSystem extends BaseSystem {
     private final ComponentMapper<EffectsComponent> ecm = ComponentMapper.getFor(EffectsComponent.class);
 
     private final TiledNavigator tiledNavigator;
-    private final SoundsSystem soundsSystem;
+    private final AudioSystem audioSystem;
     private final Sound geigerSound;
 
     private float geigerTime;
 
     @Inject
-    public EffectsSystem(TiledNavigator tiledNavigator, SoundsSystem soundsSystem, AssetManager assetManager) {
+    public EffectsSystem(TiledNavigator tiledNavigator, AudioSystem audioSystem, AssetManager assetManager) {
         super(Family.all(EffectsComponent.class, BodyComponent.class, HealthComponent.class).exclude(PassivityComponent.class).get());
         this.tiledNavigator = tiledNavigator;
-        this.soundsSystem = soundsSystem;
+        this.audioSystem = audioSystem;
 
         geigerSound = assetManager.get("audio/sounds/pda/geiger.ogg");
     }
@@ -63,7 +63,7 @@ public class EffectsSystem extends BaseSystem {
             if (entity == getPlayer()) {
                 geigerTime -= deltaTime;
                 if (geigerTime < 0) {
-                    soundsSystem.playSound(geigerSound);
+                    audioSystem.playSound(geigerSound);
                     geigerTime += radiation.geigerTime;
                 }
             }

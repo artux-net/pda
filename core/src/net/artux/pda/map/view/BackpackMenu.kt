@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import kotlinx.coroutines.CoroutineScope
@@ -14,13 +15,14 @@ import kotlinx.coroutines.launch
 import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.content.assets.AssetsFinder
-import net.artux.pda.map.ecs.sound.SoundsSystem
+import net.artux.pda.map.ecs.sound.AudioSystem
 import net.artux.pda.map.ecs.player.PlayerSystem
 import net.artux.pda.map.utils.Colors
 import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.view.blocks.SlotTextButton
 import net.artux.pda.map.view.dialog.AdsDialog
 import net.artux.pda.map.view.dialog.ThrowItemDialog
+import net.artux.pda.map.view.template.PDAWindow
 import net.artux.pda.map.view.view.DetailItemView
 import net.artux.pda.map.view.view.HUD
 import net.artux.pda.map.view.view.ScrollItemsTableView
@@ -39,17 +41,18 @@ class BackpackMenu @Inject constructor(
     private val rifleView: DetailItemView,
     private val pistolView: DetailItemView,
 
+    skin: Skin,
     userInterface: UserInterface,
     textButton: SlotTextButton,
     adButton: SlotTextButton,
     assetsFinder: AssetsFinder,
     playerSystem: PlayerSystem,
-    soundsSystem: SoundsSystem,
+    soundsSystem: AudioSystem,
     throwItemDialog: ThrowItemDialog,
     adsDialog: AdsDialog,
     var mainItemsView: ScrollItemsTableView,
     hud: HUD
-) : Table() {
+) : PDAWindow(skin) {
     private var assetManager: AssetManager
     private var fontManager: FontManager
     private var infoLabel: Label
@@ -176,7 +179,6 @@ class BackpackMenu @Inject constructor(
 
 
         mainItemsView.setOnClickListener(onItemClickListener)
-        background = Utils.getColoredDrawable(1, 1, Colors.backgroundColor)
         touchable = Touchable.enabled
         CoroutineScope(Dispatchers.Main).launch {
             dataRepository.storyDataModelFlow.collect {

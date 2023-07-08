@@ -17,6 +17,7 @@ import net.artux.pda.map.view.debug.widgets.ActionsWidget;
 import net.artux.pda.map.view.debug.widgets.CheckBoxWidget;
 import net.artux.pda.map.view.debug.widgets.ItemsWidget;
 import net.artux.pda.map.view.debug.widgets.MapsWidget;
+import net.artux.pda.map.view.debug.widgets.MusicWidget;
 import net.artux.pda.map.view.debug.widgets.SoundsWidget;
 import net.artux.pda.map.view.view.bars.Utils;
 
@@ -31,11 +32,12 @@ public class DebugMenu extends Table {
     @Inject
     public DebugMenu(Skin skin, Label.LabelStyle labelStyle, CheckBoxWidget checkBoxWidget,
                      Logger logger, ItemsWidget itemsWidget, MapsWidget mapsWidget,
-                     ActionsWidget actionsWidget,
+                     ActionsWidget actionsWidget, MusicWidget musicWidget,
                      SoundsWidget soundsWidget,
                      SlotTextButton loggerButton,
                      SlotTextButton mapsButton,
                      SlotTextButton soundButton,
+                     SlotTextButton musicButton,
                      SlotTextButton actionsButton,
                      SlotTextButton checks, SlotTextButton items) {
         super(skin);
@@ -90,6 +92,15 @@ public class DebugMenu extends Table {
                 setWidget(soundsWidget);
             }
         });
+
+        musicButton.setText("Музыка");
+        musicButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                setWidget(musicWidget);
+            }
+        });
         actionsButton.setText("Действия");
         actionsButton.addListener(new ClickListener() {
             @Override
@@ -104,6 +115,7 @@ public class DebugMenu extends Table {
         buttons.addActor(items);
         buttons.addActor(mapsButton);
         buttons.addActor(soundButton);
+        buttons.addActor(musicButton);
         buttons.addActor(actionsButton);
 
         selectPane = new ScrollPane(buttons, skin);

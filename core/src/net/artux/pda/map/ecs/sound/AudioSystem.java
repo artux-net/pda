@@ -9,9 +9,9 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.systems.BaseSystem;
-import net.artux.pda.map.di.scope.PerGameMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import javax.inject.Inject;
  * Система отвечающая за проигрываение звуков и музыки на карте
  */
 @PerGameMap
-public class SoundsSystem extends BaseSystem {
+public class AudioSystem extends BaseSystem {
 
     private final List<Sound> detections = new ArrayList<>();
     private final List<Music> backgrounds = new ArrayList<>();
@@ -36,7 +36,7 @@ public class SoundsSystem extends BaseSystem {
     private final ComponentMapper<MusicComponent> mm = ComponentMapper.getFor(MusicComponent.class);
 
     @Inject
-    public SoundsSystem(AssetManager assetManager) {
+    public AudioSystem(AssetManager assetManager) {
         super(Family.all(MusicComponent.class, BodyComponent.class).get());
         this.assetManager = assetManager;
     }
@@ -83,16 +83,13 @@ public class SoundsSystem extends BaseSystem {
         BodyComponent bodyComponent = pm.get(entity);
         MusicComponent musicComponent = mm.get(entity);
         float dst = bodyComponent.getPosition().dst(playerBody.getPosition());
-        if (dst > 50 && musicComponent.isPlaying()) {
-            musicComponent.stop();
-            return;
-        }
         float volume = (50 - dst) / 50f;
-        if (dst > 50)
+        if (dst > 50 || volume < 0)
             return;
         musicComponent.setVolume(volume);
-        if (!musicComponent.isPlaying())
+        if (!musicComponent.isPlaying()) {
             musicComponent.play();
+        }
     }
 
     public void changeState(boolean mute) {
@@ -116,21 +113,43 @@ public class SoundsSystem extends BaseSystem {
 
     /**
      * Проигрывает звук на удалении от игрока
+     *
      * @param sound
      * @param position
      */
     public void playSoundAtDistance(Sound sound, Vector2 position) {
         if (sound != null) {
-            BodyComponent bodyComponent = pm.get(getPlayer());
-            float dst = position.dst(bodyComponent.getPosition());
-            float volume = (500 - dst) / 1000f;
+            BodyComponent playerBody = pm.get(getPlayer());
+            float dst = position.dst(playerBody.getPosition());
+            float dx = position.x - playerBody.getPosition().x;
+            float pan = dx / 100f;
+            if (pan < -0.8f) pan = -0.8f;
+            else if (pan > 0.8f) pan = 0.8f;
+
+            float volume = (300 - dst) / 700f;
             if (volume > 0)
-                sound.play(volume * VOLUME);
+                sound.play(volume * VOLUME, 1, pan);
+        }
+    }
+
+    public void playSoundAtDistance(Sound sound, Vector2 position, float db) {
+        if (sound != null) {
+            BodyComponent playerBody = pm.get(getPlayer());
+            float dst = position.dst(playerBody.getPosition());
+            float dx = position.x - playerBody.getPosition().x;
+            float pan = dx / 100f;
+            if (pan < -0.8f) pan = -0.8f;
+            else if (pan > 0.8f) pan = 0.8f;
+
+            float volume = (db - dst) / 100f;
+            if (volume > 0)
+                sound.play(volume * VOLUME, 1, pan);
         }
     }
 
     /**
      * Проиграть звук
+     *
      * @param sound звук
      */
     public void playSound(Sound sound) {
@@ -139,8 +158,15 @@ public class SoundsSystem extends BaseSystem {
         }
     }
 
+    public void playMusic(Music music) {
+        if (music != null) {
+            music.play();
+        }
+    }
+
     /**
      * Проиграть звук по ссылке
+     *
      * @param soundId ссылка на звук
      */
     public void playBySoundId(String soundId) {

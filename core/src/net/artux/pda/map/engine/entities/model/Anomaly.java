@@ -18,7 +18,7 @@ import net.artux.pda.map.ecs.player.PlayerSystem;
 
 public enum Anomaly {
 
-    SPRINGBOARD("Трамплин") {
+    SPRINGBOARD("Трамплин", "audio/sounds/anomalies/springboard/work.ogg") {
         @Override
         public void interact(Engine engine, Entity entity) {
             pm.get(entity).body.setLinearVelocity(random(-600000, 600000), random(-600000, 600000));
@@ -27,14 +27,14 @@ public enum Anomaly {
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.FLY, 1);
         }
     },
-    ELECTRA("Электра") {
+    ELECTRA("Электра", "audio/sounds/anomalies/electra/work.ogg") {
         @Override
         public void interact(Engine engine, Entity entity) {
             hcm.get(entity).electric(random(10, 30));
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.STUCK, 5);
         }
     },
-    TELEPORT("Пузырь") {
+    TELEPORT("Пузырь", "audio/sounds/anomalies/teleport/work.ogg") {
         @Override
         public void interact(Engine engine, Entity entity) {
             Vector2 nextPosition = engine.getSystem(MapOrientationSystem.class).getRandomFreePoint();
@@ -45,21 +45,27 @@ public enum Anomaly {
                 engine.getSystem(RenderSystem.class).setBlurEffect(10);
         }
     },
-    GRAVITY("Гравити") {
+    GRAVITY("Гравити", "audio/sounds/anomalies/gravity/work.ogg") {
         @Override
         public void interact(Engine engine, Entity entity) {
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.BROKE_GRAVITY, 5);
         }
     };
 
-    private final String name;
+    private final String title;
+    private final String soundId;
 
-    Anomaly(String title) {
-        this.name = title;
+    Anomaly(String title, String soundId) {
+        this.title = title;
+        this.soundId = soundId;
     }
 
     public String getTitle() {
-        return name;
+        return title;
+    }
+
+    public String getSoundId() {
+        return soundId;
     }
 
     public abstract void interact(Engine engine, Entity entity);

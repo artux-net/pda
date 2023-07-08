@@ -8,11 +8,11 @@ import com.badlogic.gdx.Gdx;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
 import net.artux.pda.map.ecs.interactive.PassivityComponent;
+import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.ecs.vision.VisionComponent;
 import net.artux.pda.map.ecs.characteristics.PlayerComponent;
 import net.artux.pda.map.ecs.systems.BaseSystem;
 import net.artux.pda.map.ecs.creation.EntityProcessorSystem;
-import net.artux.pda.map.ecs.sound.SoundsSystem;
 import net.artux.pda.map.di.scope.PerGameMap;
 
 import java.util.List;
@@ -23,7 +23,7 @@ import javax.inject.Inject;
 public class PlayerBattleSystem extends BaseSystem {
 
     private final EntityProcessorSystem entityProcessorSystem;
-    private final SoundsSystem soundsSystem;
+    private final AudioSystem audioSystem;
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<VisionComponent> vm = ComponentMapper.getFor(VisionComponent.class);
@@ -33,11 +33,11 @@ public class PlayerBattleSystem extends BaseSystem {
     private boolean playerShoot = false;
 
     @Inject
-    public PlayerBattleSystem(EntityProcessorSystem entityProcessorSystem, SoundsSystem soundsSystem) {
+    public PlayerBattleSystem(EntityProcessorSystem entityProcessorSystem, AudioSystem audioSystem) {
         super(Family.all(PlayerComponent.class, HealthComponent.class, VisionComponent.class,
                 MoodComponent.class, BodyComponent.class, WeaponComponent.class).exclude(PassivityComponent.class).get());
         this.entityProcessorSystem = entityProcessorSystem;
-        this.soundsSystem = soundsSystem;
+        this.audioSystem = audioSystem;
     }
 
     public void setPlayerShoot(boolean playerShoot) {
@@ -52,7 +52,7 @@ public class PlayerBattleSystem extends BaseSystem {
         VisionComponent playerVision = vm.get(player);
 
         if (playerWeapon.getReloading() && !soundStarted) {
-            soundsSystem.playSound(playerWeapon.getReloadSound());
+            audioSystem.playSound(playerWeapon.getReloadSound());
             soundStarted = true;
         }
 
@@ -64,13 +64,13 @@ public class PlayerBattleSystem extends BaseSystem {
                     if (playerShoot && playerWeapon.shoot()) {
                         soundStarted = false;
                         entityProcessorSystem.startBullet(player, playerMood.getEnemy(), playerWeapon.getSelected());
-                        soundsSystem.playSound(playerWeapon.getShotSound());
+                        audioSystem.playSound(playerWeapon.getShotSound());
                     }
         }else{
             if (playerShoot && playerWeapon.shoot()) {
                 soundStarted = false;
                 entityProcessorSystem.startBullet(player, playerWeapon.getSelected());
-                soundsSystem.playSound(playerWeapon.getShotSound());
+                audioSystem.playSound(playerWeapon.getShotSound());
             }
         }
 

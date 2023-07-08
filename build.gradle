@@ -1,6 +1,6 @@
 buildscript {
-    ext.kotlin_version = "1.8.20"
-    ext.dagger_version = "2.45"
+    ext.kotlin_version = DependenciesVersions.KOTLIN
+    ext.dagger_version = "2.46.1"
 
     repositories {
         google()
@@ -26,7 +26,7 @@ buildscript {
 allprojects {
     version = "1.0"
     ext {
-        kotlin_version = "1.8.20"
+        kotlin_version = DependenciesVersions.KOTLIN
         appName = "PDA"
         gdxVersion = "1.11.0"
         ashleyVersion = "1.7.4"
@@ -58,6 +58,7 @@ project(":app") {
     dependencies {
         implementation project(":core")
         implementation project(":model")
+        implementation project(":libgdx-oboe")
 
         api("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
         natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")

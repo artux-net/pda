@@ -1,7 +1,7 @@
 package net.artux.pda.map.view.debug.widgets;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -10,29 +10,29 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 
+import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.utils.Colors;
-import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.view.FontManager;
 import net.artux.pda.map.view.view.bars.Utils;
 
 import javax.inject.Inject;
 
 @PerGameMap
-public class SoundsWidget extends Table {
+public class MusicWidget extends Table {
 
     @Inject
-    public SoundsWidget(Skin skin, AssetManager assetManager, AudioSystem audioSystem, FontManager fontManager) {
+    public MusicWidget(Skin skin, AssetManager assetManager, AudioSystem audioSystem, FontManager fontManager) {
         super(skin);
         left();
         defaults().left();
         setBackground(Utils.getColoredDrawable(1, 1, Colors.backgroundColor));
 
         Label.LabelStyle labelStyle = new Label.LabelStyle(fontManager.getFont(48), Color.GRAY);
-        Array<Sound> out = new Array<>();
-        assetManager.getAll(Sound.class, out);
+        Array<Music> out = new Array<>();
+        assetManager.getAll(Music.class, out);
         for (int i = 0; i < out.size; i++) {
-            Sound sound = out.get(i);
+            Music sound = out.get(i);
             String name = assetManager.getAssetFileName(sound);
             Label label = new Label(name, labelStyle);
             add(label);
@@ -41,7 +41,7 @@ public class SoundsWidget extends Table {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
-                    audioSystem.playSound(sound);
+                    audioSystem.playMusic(sound);
                 }
             });
         }

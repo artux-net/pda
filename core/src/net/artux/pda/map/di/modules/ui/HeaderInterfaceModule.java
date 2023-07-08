@@ -22,7 +22,7 @@ import net.artux.pda.map.ecs.characteristics.HealthSystem;
 import net.artux.pda.map.ecs.logger.MapLoggerSystem;
 import net.artux.pda.map.ecs.physics.PlayerMovingSystem;
 import net.artux.pda.map.ecs.render.RenderSystem;
-import net.artux.pda.map.ecs.sound.SoundsSystem;
+import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.view.MissionMenu;
 import net.artux.pda.map.view.NavigationMenu;
 import net.artux.pda.map.view.UIFrame;
@@ -161,7 +161,7 @@ public class HeaderInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initDebugMode(SoundsSystem soundsSystem, UIFrame uiFrame, UserInterface userInterface,
+    public Actor initDebugMode(AudioSystem audioSystem, UIFrame uiFrame, UserInterface userInterface,
                                DebugMenu debugMenu, CheckBoxWidget checkBoxWidget,
                                Engine engine, Properties properties) {
         if (properties.get(PropertyFields.TESTER_MODE).equals(true)) {
@@ -244,7 +244,7 @@ public class HeaderInterfaceModule {
             checkBoxWidget.addCheckBox("Звуки и музыка", new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
-                    soundsSystem.changeState(((CheckBox) actor).isChecked());
+                    audioSystem.changeState(((CheckBox) actor).isChecked());
                 }
             }, false);
 

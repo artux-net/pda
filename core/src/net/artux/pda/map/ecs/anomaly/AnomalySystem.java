@@ -21,11 +21,13 @@ import net.artux.pda.map.ecs.render.SpriteComponent;
 import net.artux.pda.map.ecs.characteristics.PlayerComponent;
 import net.artux.pda.map.ecs.camera.CameraSystem;
 import net.artux.pda.map.ecs.render.RenderSystem;
-import net.artux.pda.map.ecs.sound.SoundsSystem;
+import net.artux.pda.map.ecs.sound.AudioSystem;
+import net.artux.pda.map.engine.entities.model.Anomaly;
 import net.artux.pda.map.managers.notification.NotificationController;
 import net.artux.pda.map.managers.notification.NotificationType;
 import net.artux.pda.map.di.scope.PerGameMap;
 
+import java.util.EnumMap;
 import java.util.Random;
 
 import javax.inject.Inject;
@@ -44,28 +46,32 @@ public class AnomalySystem extends EntitySystem {
     private final ComponentMapper<HealthComponent> hcm = ComponentMapper.getFor(HealthComponent.class);
     private final ComponentMapper<AnomalyComponent> am = ComponentMapper.getFor(AnomalyComponent.class);
     private final ComponentMapper<SpriteComponent> scm = ComponentMapper.getFor(SpriteComponent.class);
-
     private final ComponentMapper<PlayerComponent> pcm = ComponentMapper.getFor(PlayerComponent.class);
 
     private final CameraSystem cameraSystem;
-    private final SoundsSystem soundsSystem;
+    private final AudioSystem audioSystem;
     private final NotificationController notificationController;
     private final LocaleBundle localeBundle;
     private final Sound anomaly;
+
+    private final EnumMap<Anomaly, Sound> anomaliesWorkSounds;
 
     public static boolean radiation = true;
 
     @Inject
     public AnomalySystem(AssetManager assetManager, CameraSystem cameraSystem,
-                         SoundsSystem soundsSystem, NotificationController notificationController,
+                         AudioSystem audioSystem, NotificationController notificationController,
                          RenderSystem renderSystem, LocaleBundle localeBundle) {
         this.assetManager = assetManager;
         this.localeBundle = localeBundle;
         this.cameraSystem = cameraSystem;
-        this.soundsSystem = soundsSystem;
+        this.audioSystem = audioSystem;
         this.renderSystem = renderSystem;
         this.notificationController = notificationController;
-
+        anomaliesWorkSounds = new EnumMap(Anomaly.class);
+        for (Anomaly a : Anomaly.values()) {
+            anomaliesWorkSounds.put(a, assetManager.get(a.getSoundId()));
+        }
         anomaly = assetManager.get("audio/sounds/pda/d-beep.ogg", Sound.class);
     }
 
@@ -89,15 +95,16 @@ public class AnomalySystem extends EntitySystem {
             AnomalyComponent anomaly = am.get(anomalyEntity);
 
             boolean somebodyIsInAnomaly = false;
+
+
             for (int i = 0; i < entities.size(); i++) {
                 Entity entity = entities.get(i);
                 BodyComponent bodyComponent = pm.get(entity);
                 HealthComponent healthComponent = hcm.get(entity);
                 boolean player = pcm.has(entity);
 
-                //if (radiation)
-                //  healthComponent.damage(healthComponent.radiation * deltaTime * 0.01f);
                 float dst = anomalyBody.getPosition().dst(bodyComponent.getPosition());
+                // detection of anomalies with notification
                 if (dst < anomaly.getSize() + 30f && player) {
                     playerNearAnomaly = true;
 
@@ -114,14 +121,12 @@ public class AnomalySystem extends EntitySystem {
 
                 }
 
-
                 if (dst > anomaly.getSize())
                     continue;
 
                 somebodyIsInAnomaly = true;
                 if (radiation)
                     healthComponent.radiationValue(0.006f);
-
 
                 if (!player)
                     continue;
@@ -141,11 +146,12 @@ public class AnomalySystem extends EntitySystem {
             if (somebodyIsInAnomaly) {
                 //delay act
                 if (!anomaly.isScheduled()) {
-                    int seconds = random(5, 15);
+                    int seconds = random(3, 5);
                     anomaly.setDelayedInteraction(
                             Timer.schedule(new Timer.Task() {
                                 @Override
                                 public void run() {
+                                    audioSystem.playSoundAtDistance(anomaliesWorkSounds.get(anomaly.getAnomaly()), anomalyBody.getPosition(), 100);
                                     for (Entity e : entities) {
                                         BodyComponent bodyComponent = pm.get(e);
                                         if (anomalyBody.getPosition()
@@ -153,6 +159,7 @@ public class AnomalySystem extends EntitySystem {
                                             continue;
                                         anomaly.getAnomaly().interact(getEngine(), e);
                                     }
+
                                 }
                             }, seconds)
                     );
@@ -166,7 +173,7 @@ public class AnomalySystem extends EntitySystem {
         if (playerIsInAnomaly) {
             timeToPlay -= deltaTime;
             if (timeToPlay < 0) {
-                soundsSystem.playSound(anomaly);
+                audioSystem.playSound(anomaly);
                 long currentMillis = System.nanoTime() / 1000000;
                 long milsDif = playerAnomaly.getTimeToActivate() - currentMillis;
                 timeToPlay = milsDif / (1000f * 10);
@@ -174,7 +181,7 @@ public class AnomalySystem extends EntitySystem {
         } else if (playerNearAnomaly) {
             timeToPlay -= deltaTime;
             if (timeToPlay < 0) {
-                soundsSystem.playSound(anomaly);
+                audioSystem.playSound(anomaly);
                 timeToPlay = 1f;
             }
         }

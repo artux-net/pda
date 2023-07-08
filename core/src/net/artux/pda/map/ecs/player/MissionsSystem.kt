@@ -19,7 +19,7 @@ import net.artux.pda.map.ecs.camera.CameraSystem
 import net.artux.pda.map.ecs.interactive.PassivityComponent
 import net.artux.pda.map.ecs.interactive.map.QuestComponent
 import net.artux.pda.map.ecs.physics.BodyComponent
-import net.artux.pda.map.ecs.sound.SoundsSystem
+import net.artux.pda.map.ecs.sound.AudioSystem
 import net.artux.pda.map.ecs.systems.BaseSystem
 import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.view.blocks.MessagesPlane
@@ -36,7 +36,7 @@ class MissionsSystem @Inject constructor(
     private val messagesPlane: MessagesPlane,
     assetManager: AssetManager,
     private val dataRepository: DataRepository,
-    private val soundsSystem: SoundsSystem,
+    private val soundsSystem: AudioSystem,
     private val cameraSystem: CameraSystem
 ) : BaseSystem(
     Family.all(BodyComponent::class.java, QuestComponent::class.java).exclude(
@@ -185,7 +185,7 @@ class MissionsSystem @Inject constructor(
         val storyModel = dataRepository.storyModel
         for (map in storyModel.maps.values) {
             if (map.points != null)
-                for (point in map.points!!) {
+                for (point in map.points) {
                     val currentData: Map<String, String> = point.data
                     val chapterString = currentData["chapter"]
                     val stageString = currentData["stage"]
@@ -204,7 +204,7 @@ class MissionsSystem @Inject constructor(
         val mapDigraph = Digraph<GameMap>()
         for (map in storyModel.maps.values) {
             val node = mapDigraph.offer(map)
-            for (point in map.points!!) {
+            for (point in map.points) {
                 if (point.type == 7) {
                     val currentData: HashMap<String, String>? = point.data
                     val chapterString = currentData?.get("chapter")

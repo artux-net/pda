@@ -7,11 +7,11 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Frustum;
 
 import net.artux.pda.map.ecs.camera.CameraSystem;
+import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.interactive.PassivityComponent;
 import net.artux.pda.map.ecs.systems.BaseSystem;
-import net.artux.pda.map.ecs.sound.SoundsSystem;
 import net.artux.pda.map.di.scope.PerGameMap;
 
 import javax.inject.Inject;
@@ -22,14 +22,14 @@ public class FogSystem extends BaseSystem {
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<FogOfWarComponent> fwm = ComponentMapper.getFor(FogOfWarComponent.class);
 
-    private final SoundsSystem soundsSystem;
+    private final AudioSystem audioSystem;
     private final CameraSystem cameraSystem;
     private final Frustum frustum;
 
     @Inject
-    public FogSystem(SoundsSystem soundsSystem, CameraSystem cameraSystem) {
+    public FogSystem(AudioSystem audioSystem, CameraSystem cameraSystem) {
         super(Family.all(BodyComponent.class, FogOfWarComponent.class).exclude(PassivityComponent.class).get());
-        this.soundsSystem = soundsSystem;
+        this.audioSystem = audioSystem;
         this.cameraSystem = cameraSystem;
 
         frustum = cameraSystem.getCamera().frustum;
@@ -64,7 +64,7 @@ public class FogSystem extends BaseSystem {
                     && frustum.pointInFrustum(firstBodyComponent.getX(), firstBodyComponent.getY(), 0)) {
                 if (!fogOfWarComponent.isCameraVisible
                         && !cameraSystem.isDetached()) {
-                    soundsSystem.playStalkerDetection();
+                    audioSystem.playStalkerDetection();
                 }
                 fogOfWarComponent.setCameraVisible(true);
             } else

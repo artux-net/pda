@@ -1,2 +1,8 @@
-include(":app", "core", ":model")
-include(":desktop")
+include(
+    ":app",
+    "core",
+    ":model",
+    ":desktop",
+    ":libgdx-oboe"
+)
+project(":libgdx-oboe").projectDir = file("/libgdx-oboe/library")

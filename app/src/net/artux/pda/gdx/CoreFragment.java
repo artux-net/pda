@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import barsoosayque.libgdxoboe.OboeAudio;
 import timber.log.Timber;
 
 public class CoreFragment extends AndroidFragmentApplication implements PlatformInterface {
@@ -46,7 +47,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     @Override
     public AndroidAudio createAudio(Context context, AndroidApplicationConfiguration config) {
-        return new AsynchronousAndroidAudio(context, config);
+        return new OboeAudio(context.getAssets());
     }
 
     @Nullable
