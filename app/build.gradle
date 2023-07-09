@@ -148,6 +148,8 @@ ext {
 }
 
 dependencies {
+    implementation fileTree(dir: "libs", include: ["*.aar"])
+
     implementation "androidx.multidex:multidex:2.0.1"
     //mapstruct
     implementation "org.mapstruct:mapstruct:1.5.2.Final"

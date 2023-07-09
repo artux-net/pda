@@ -2,7 +2,5 @@ include(
     ":app",
     "core",
     ":model",
-    ":desktop",
-    ":libgdx-oboe"
+    ":desktop"
 )
-project(":libgdx-oboe").projectDir = file("/libgdx-oboe/library")

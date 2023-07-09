@@ -28,7 +28,7 @@ allprojects {
     ext {
         kotlin_version = DependenciesVersions.KOTLIN
         appName = "PDA"
-        gdxVersion = "1.11.0"
+        gdxVersion = DependenciesVersions.GDX
         ashleyVersion = "1.7.4"
         aiVersion = "1.8.2"
         gdxControllersVersion = "2.2.1"
@@ -44,11 +44,7 @@ allprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
-
-
 }
-
-
 
 project(":app") {
     apply plugin: "com.android.application"
@@ -58,7 +54,7 @@ project(":app") {
     dependencies {
         implementation project(":core")
         implementation project(":model")
-        implementation project(":libgdx-oboe")
+        //implementation project(":libgdx-oboe")
 
         api("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
         natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
