@@ -62,6 +62,7 @@ public class NetworkModule {
             try {
                 return chain.proceed(requestBuilder.build());
             }catch (Exception e){
+                Timber.e(e.getMessage());
                 return new Response.Builder()
                         .protocol(HTTP_2)
                         .request(requestBuilder.build())
