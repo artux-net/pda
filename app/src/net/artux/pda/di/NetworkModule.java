@@ -31,6 +31,7 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -66,7 +67,7 @@ public class NetworkModule {
                         .request(requestBuilder.build())
                         .code(503)
                         .message(e.getMessage())
-                        .body(null)
+                        .body(ResponseBody.create(MediaType.get("application/json"), "{}"))
                         .build();
             }
 

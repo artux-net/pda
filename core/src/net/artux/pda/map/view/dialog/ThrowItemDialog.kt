@@ -19,7 +19,6 @@ import javax.inject.Inject
 
 class ThrowItemDialog
 @Inject constructor(
-    assetManager: AssetManager,
     fontManager: FontManager,
     val localeBundle: LocaleBundle,
     val dataRepository: DataRepository,

@@ -30,7 +30,7 @@ class QuestSoundManager(
     var muted = false
 
     init {
-        soundPool.setOnLoadCompleteListener { soundPool, sampleId, status ->
+        soundPool.setOnLoadCompleteListener { soundPool, sampleId, _ ->
             if (!muted)
                 soundPool.play(sampleId, leftVolume, rightVolume, 1, 0, 1f)
         }

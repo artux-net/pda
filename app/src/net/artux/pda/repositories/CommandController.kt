@@ -53,6 +53,7 @@ class CommandController @Inject constructor(
     init {
         globals.setmetatable(WeakTable.make(false, true))
         globals.load(DebugLib())
+        globals.useWeakKeys()
     }
 
     fun processWithServer(actions: Map<String, List<String>>) = scope.launch {
@@ -194,9 +195,12 @@ class CommandController @Inject constructor(
     }
 
 
-    fun putObjectToScriptContext(name: String, o: Any): CommandController {
-        globals.set(name, CoerceJavaToLua.coerce(o))
-        globals.useWeakKeys()
+    fun putObjectToScriptContext(name: String, o: Any?): CommandController {
+        if(o != null)
+            globals.set(name, CoerceJavaToLua.coerce(o))
+        else
+            Timber.e("Object is not putted to Lua Context: $name")
+
         return this
     }
 

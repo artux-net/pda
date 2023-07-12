@@ -1,46 +1,20 @@
-buildscript {
-    ext.kotlin_version = DependenciesVersions.KOTLIN
-    ext.dagger_version = "2.46.1"
-
-    repositories {
-        google()
-        mavenLocal()
-        mavenCentral()
-        maven { url "https://jitpack.io" }
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    }
-
-    dependencies {
-        //classpath("io.github.prygunov:gdx-engine:0.2")
-        classpath("com.android.tools.build:gradle:7.4.0")
-        classpath("com.google.gms:google-services:4.3.13")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.5")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
-        classpath("com.google.dagger:hilt-android-gradle-plugin:$dagger_version")
-    }
-
+ext {
+    kotlin_version = Versions.KOTLIN
+    gdxVersion = Versions.GDX
+    ashleyVersion = Versions.ASHLEY
+    dagger_version = Versions.DAGGER
+    aiVersion = "1.8.2"
+    gdxControllersVersion = "2.2.1"
+    keystore = '..\\keystore\\pda.jks'
 }
 
-
 allprojects {
-    version = "1.0"
-    ext {
-        kotlin_version = DependenciesVersions.KOTLIN
-        appName = "PDA"
-        gdxVersion = DependenciesVersions.GDX
-        ashleyVersion = "1.7.4"
-        aiVersion = "1.8.2"
-        gdxControllersVersion = "2.2.1"
-        keystore = '..\\keystore\\pda.jks'
-    }
-
     repositories {
         google()
         mavenLocal()
         mavenCentral()
+
         maven { url "https://jitpack.io" }
-        maven { url "https://artifactory.appodeal.com/appodeal" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
@@ -54,7 +28,6 @@ project(":app") {
     dependencies {
         implementation project(":core")
         implementation project(":model")
-        //implementation project(":libgdx-oboe")
 
         api("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
         natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
@@ -88,7 +61,8 @@ project(":core") {
     apply plugin: "java-library"
     apply plugin: "kotlin"
     apply plugin: "kotlin-kapt"
-/*
+
+    /*
     apply plugin: "gdx"
     assets{
         assetsDirectory.set(files("${rootDir}/assets"))
@@ -102,20 +76,20 @@ project(":core") {
         implementation("org.apache.commons:commons-lang3:3.0")
 
         api("com.badlogicgames.gdx:gdx:$gdxVersion")
-        api("com.badlogicgames.ashley:ashley:$ashleyVersion")
-        api("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
         api("com.badlogicgames.gdx:gdx-ai:$aiVersion")
+        api("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
+        api("com.badlogicgames.ashley:ashley:$ashleyVersion")
         api("com.badlogicgames.gdx:gdx-freetype:$gdxVersion")
         api("com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion")
 
         //dagger
+        kapt("com.google.dagger:dagger-compiler:$dagger_version")
         implementation("com.google.dagger:dagger:$dagger_version")
         annotationProcessor("com.google.dagger:dagger-compiler:$dagger_version")
-        kapt("com.google.dagger:dagger-compiler:$dagger_version")
 
         //kotlin
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
         implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
         implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
 
         // lua script engine
@@ -124,7 +98,7 @@ project(":core") {
     }
 }
 
-project(":desktop") {
+/*project(":desktop") {
     apply plugin: "java"
 
     dependencies {
@@ -134,5 +108,5 @@ project(":desktop") {
         implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
-}
+}*/
 

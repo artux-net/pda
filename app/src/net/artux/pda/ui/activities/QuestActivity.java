@@ -144,7 +144,6 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
             int sellerId = data.getPayload();
             SellerFragment sellerFragment = SellerFragment.newInstance(sellerId);
 
-            findViewById(R.id.navbar).setVisibility(View.GONE);
             FragmentTransaction mFragmentTransaction = getSupportFragmentManager().beginTransaction();
             mFragmentTransaction
                     .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)

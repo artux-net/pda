@@ -15,8 +15,8 @@ dependencies {
     implementation 'org.int4.dirk:dirk-di:1.0.0-beta1'
 }
 
-sourceCompatibility = 1.8
-java.targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = BuildConfig.JDK
+targetCompatibility = BuildConfig.JDK
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 [compileJava, compileTestJava]*.options*.encoding = "UTF-8"

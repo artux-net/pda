@@ -19,8 +19,8 @@ class EngineSaver @Inject constructor(
         spawnController.save(engine)
     }
 
-    fun restore(engine: Engine){
-        spawnController.restore(engine)
+    fun restore() {
+        spawnController.restore()
     }
 
 

@@ -70,7 +70,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
             QuestPointsHelper.createQuestPointsEntities(mapComponent);
         if (anomalies)
             AnomalyHelper.createAnomalies(mapComponent);
-        engineSaver.restore(engine);
+        engineSaver.restore();
 
         SecretHelper.createAnomalies(mapComponent);
         conditionEntityManager.update();

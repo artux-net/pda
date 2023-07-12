@@ -25,6 +25,7 @@ public interface ItemMapper {
     @Mapping(target = "copy", ignore = true)
     DetectorModel model(DetectorDto dto);
 
+    @Mapping(target = "all", ignore = true)
     ItemsContainerModel model(ItemsContainer itemsContainer);
 
     default ItemType type(ArmorDto.TypeEnum type) {

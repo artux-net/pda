@@ -53,6 +53,7 @@ public class ControlPointDialog extends PDADialog {
     @Inject
     public ControlPointDialog(FontManager fontManager, LocaleBundle localeBundle,
                               MapComponent mapComponent,
+                              ControlPointStalkersDialog controlPointStalkersDialog,
                               SlotTextButton updateLevelButton,
                               SlotTextButton stalkersButton,
                               SlotTextButton hireStalkerButton,
@@ -102,7 +103,14 @@ public class ControlPointDialog extends PDADialog {
         updateLevelButton.setText(localeBundle.get("point.update", 0));
         hireStalkerButton.setText(localeBundle.get("point.stalker.hire"));
         stalkersButton.setText(localeBundle.get("point.stalkers"));
-        stalkersButton.setDisabled(true);
+        stalkersButton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                controlPointStalkersDialog.update(spawnComponent);
+                controlPointStalkersDialog.show(getStage());
+            }
+        });
 
         manageTable = new Table();
         manageTable.defaults().pad(10);

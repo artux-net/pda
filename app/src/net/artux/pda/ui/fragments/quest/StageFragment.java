@@ -1,5 +1,6 @@
 package net.artux.pda.ui.fragments.quest;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -73,10 +74,15 @@ public class StageFragment extends Fragment {
             colorStateList = mainText.getTextColors();
 
             mainText.setmText(stage.getContent());
-            mainText.setListener(() -> setSceneResponses(stage.getTransfers()));
+            mainText.setListener(() -> {
+                if (!isDetached())
+                    setSceneResponses(stage.getTransfers());
+            });
 
-            Properties properties = ((PDAApplication) getActivity().getApplication())
+            Properties properties = ((PDAApplication) getActivity()
+                    .getApplication())
                     .getProperties();
+
             if (properties.get(PropertyFields.TESTER_MODE).equals(true)) {
                 mainText.setEffect(false);
             }

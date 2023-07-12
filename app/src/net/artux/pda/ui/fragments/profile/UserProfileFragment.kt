@@ -18,6 +18,7 @@ import net.artux.pda.ui.fragments.profile.adapters.GroupRelationsAdapter
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper
 import net.artux.pda.ui.viewmodels.ProfileViewModel
 import net.artux.pda.utils.GroupHelper
+import net.artux.pda.utils.serializable
 import java.util.*
 
 @AndroidEntryPoint
@@ -167,7 +168,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                     )
                 )
             } else
-                profileViewModel.updateProfile(requireArguments().getSerializable("pdaId") as UUID)
+                profileViewModel.updateProfile(requireArguments().serializable("pdaId"))
         else
             profileViewModel.updateProfile(viewModel.getId())
     }

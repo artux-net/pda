@@ -22,8 +22,8 @@ class SpawnController @Inject constructor(
     val gameMap: GameMap,
     val gson: Gson,
     val logger: ApplicationLogger,
-    val entityProcessorSystem: EntityProcessorSystem,
-    val platformInterface: PlatformInterface
+    val platformInterface: PlatformInterface,
+    private val entityProcessorSystem: EntityProcessorSystem
 ) {
     val tag = "SpawnController"
     val preferences = Gdx.app.getPreferences("spawns")
@@ -68,7 +68,7 @@ class SpawnController @Inject constructor(
         preferences.flush()
     }
 
-    fun restore(engine: Engine) {
+    fun restore() {
         val savedKey = gameMap.id.toString()
 
         val savedMap = if (preferences.contains(savedKey))
@@ -76,7 +76,7 @@ class SpawnController @Inject constructor(
         else
             null
 
-        val spawns: List<SpawnModel> = gameMap.spawns ?: return
+        val spawns: List<SpawnModel> = gameMap.spawns
 
         logger.log(tag, "Start to restore ${spawns.size} spawns")
         for (i in 0..spawns.size - 1) {

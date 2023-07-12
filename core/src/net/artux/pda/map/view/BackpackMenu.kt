@@ -90,7 +90,6 @@ class BackpackMenu @Inject constructor(
         defaults().fill()
         fontManager = assetsFinder.fontManager
 
-        val titleLabelStyle = fontManager.getLabelStyle(38, Color.WHITE)
         val subtitleStyle = fontManager.getLabelStyle(30, Color.GRAY)
 
         val leftTable = Table()

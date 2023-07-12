@@ -9,11 +9,6 @@ plugins {
     id "com.google.firebase.crashlytics"
 }
 
-repositories {
-    mavenCentral()
-    maven { url "https://jitpack.io" }
-}
-
 task downloadAPI {
     def url = new URL("https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest")
     def uc = url.openConnection()
@@ -50,8 +45,7 @@ android {
             keyPassword "pass"
         }
     }
-    buildToolsVersion "32.0.0"
-    compileSdkVersion 33
+
     namespace "net.artux.pda"
     sourceSets {
         main {
@@ -69,10 +63,13 @@ android {
             excludes += ["META-INF/robovm/ios/robovm.xml", "META-INF/NOTICE.md"]
         }
     }
+
     defaultConfig {
+        targetSdkVersion BuildConfig.SDK
+        compileSdk BuildConfig.SDK
+        minSdkVersion BuildConfig.MIN_SDK
+
         applicationId "net.artux.pda"
-        minSdkVersion 26
-        targetSdkVersion 32
         versionCode 1
         versionName "dev-build"
         proguardFiles "proguard-rules.pro"
@@ -82,8 +79,8 @@ android {
 
     applicationVariants.all { variant ->
         {
+            // add versions to resources
             variant.resValue "string", "versionName", variant.versionName
-
             variant.resValue "string", "versionCode", variant.versionCode.toString()
         }
     }
@@ -113,15 +110,15 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = 11
-        targetCompatibility = 11
+        sourceCompatibility = BuildConfig.JDK
+        targetCompatibility = BuildConfig.JDK
     }
 
     kotlin {
         jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
+            languageVersion.set(JavaLanguageVersion.of(BuildConfig.JDK))
         }
-        jvmToolchain(11)
+        jvmToolchain(BuildConfig.JDK)
     }
 
     buildFeatures {
@@ -201,7 +198,7 @@ dependencies {
     implementation "com.google.firebase:firebase-crashlytics"
 
     //ktx
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:${DependenciesVersions.KOTLIN}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${Versions.KOTLIN}"
 
 
     implementation "com.github.bumptech.glide:glide:$glide_version"
