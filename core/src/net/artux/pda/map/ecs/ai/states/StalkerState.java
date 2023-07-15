@@ -77,7 +77,6 @@ public enum StalkerState implements State<Entity> {
 
     ATTACKING() {
         //global
-
         @Override
         public void update(Entity entity) {
             MoodComponent moodComponent = mm.get(entity);
@@ -109,7 +108,7 @@ public enum StalkerState implements State<Entity> {
                             || dst > distanceToAttack(weaponModel.getPrecision())) {
                         gmm.get(entity).setMovementTarget(enemyBodyComponent);
                         sm.get(entity).changeState(MOVING);
-                    } else if (dst > 20 && dst < distanceToAttack(weaponModel.getPrecision())) {
+                    } else if (dst > 75 && dst < distanceToAttack(weaponModel.getPrecision())) {
                         gmm.get(entity).setMovementTarget(null);
                         sm.get(entity).changeState(STANDING);
                     } else {

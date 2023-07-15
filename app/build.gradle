@@ -65,9 +65,9 @@ android {
     }
 
     defaultConfig {
-        targetSdkVersion BuildConfig.SDK
+        targetSdk BuildConfig.SDK
         compileSdk BuildConfig.SDK
-        minSdkVersion BuildConfig.MIN_SDK
+        minSdk BuildConfig.MIN_SDK
 
         applicationId "net.artux.pda"
         versionCode 1

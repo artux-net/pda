@@ -33,9 +33,9 @@ import net.artux.pda.map.ecs.interactive.InteractionSystem;
 import net.artux.pda.map.ecs.battle.PlayerBattleSystem;
 import net.artux.pda.map.ecs.physics.PlayerMovingSystem;
 import net.artux.pda.map.ecs.player.PlayerSystem;
-import net.artux.pda.map.view.BackpackMenu;
-import net.artux.pda.map.view.UserInterface;
-import net.artux.pda.map.view.blocks.MessagesPlane;
+import net.artux.pda.map.view.window.BackpackWindow;
+import net.artux.pda.map.view.root.UserInterface;
+import net.artux.pda.map.view.collection.list.MessagesList;
 import net.artux.pda.map.view.view.DetailedHUD;
 import net.artux.pda.map.view.view.bars.Slot;
 import net.artux.pda.model.items.ItemModel;
@@ -57,7 +57,7 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initJoyTable(MessagesPlane messagesPlane, @Named("joyTable") Table joyTable,
+    public Actor initJoyTable(MessagesList messagesList, @Named("joyTable") Table joyTable,
                               @Named("gameZone") Group gameZone, AssetsFinder assetsFinder,
                               PlayerMovingSystem playerMovingSystem) {
         Touchpad.TouchpadStyle style = new Touchpad.TouchpadStyle();
@@ -85,7 +85,7 @@ public class UserInterfaceModule {
                     touchpad.setColor(color.r, color.g, color.b, 0.9f);
             }
         });
-        joyTable.add(messagesPlane);
+        joyTable.add(messagesList);
         joyTable.row();
         float size = gameZone.getHeight() / 2.5f;
         joyTable.add(touchpad)
@@ -170,17 +170,17 @@ public class UserInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initHud(BackpackMenu backpackMenu, DetailedHUD hud, Slot weaponSlot, @Named("hudTable") Table hudTable,
+    public Actor initHud(BackpackWindow backpackWindow, DetailedHUD hud, Slot weaponSlot, @Named("hudTable") Table hudTable,
                          UserInterface userInterface, PlayerSystem playerSystem, PlayerBattleSystem playerBattleSystem) {
         hudTable.add(hud);
         hud.addListener(new ActorGestureListener() {
             @Override
             public void tap(InputEvent event, float x, float y, int count, int button) {
                 super.tap(event, x, y, count, button);
-                if (userInterface.getStack().getChildren().contains(backpackMenu, false))
-                    userInterface.getStack().removeActor(backpackMenu);
+                if (userInterface.getStack().getChildren().contains(backpackWindow, false))
+                    userInterface.getStack().removeActor(backpackWindow);
                 else {
-                    userInterface.getStack().add(backpackMenu);
+                    userInterface.getStack().add(backpackWindow);
                 }
             }
         });

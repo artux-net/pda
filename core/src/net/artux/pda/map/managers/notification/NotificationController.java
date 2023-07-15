@@ -12,8 +12,8 @@ import com.badlogic.gdx.utils.Timer;
 import net.artux.pda.map.content.ContentGenerator;
 import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.view.UserInterface;
-import net.artux.pda.map.view.blocks.MessagesPlane;
+import net.artux.pda.map.view.root.UserInterface;
+import net.artux.pda.map.view.collection.list.MessagesList;
 import net.artux.pda.model.chat.UserMessage;
 
 import java.util.EnumMap;
@@ -24,7 +24,7 @@ import javax.inject.Inject;
 public class NotificationController {
 
     private final ContentGenerator contentGenerator;
-    private final MessagesPlane messagesPlane;
+    private final MessagesList messagesList;
     private final AudioSystem audioSystem;
     private final EnumMap<NotificationType, Sound> soundMap;
 
@@ -37,10 +37,10 @@ public class NotificationController {
     };
 
     @Inject
-    public NotificationController(UserInterface userInterface, AssetManager assetManager, AudioSystem audioSystem, MessagesPlane messagesPlane, ContentGenerator contentGenerator) {
+    public NotificationController(UserInterface userInterface, AssetManager assetManager, AudioSystem audioSystem, MessagesList messagesList, ContentGenerator contentGenerator) {
         this.contentGenerator = contentGenerator;
         this.audioSystem = audioSystem;
-        this.messagesPlane = messagesPlane;
+        this.messagesList = messagesList;
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
@@ -71,14 +71,14 @@ public class NotificationController {
      * @param content содержимое
      * @param length  длительность отображения
      */
-    public void addSilentMessage(String icon, String title, String content, MessagesPlane.Length length) {
-        messagesPlane.addMessage(icon, title, content, length);
+    public void addSilentMessage(String icon, String title, String content, MessagesList.Length length) {
+        messagesList.addMessage(icon, title, content, length);
     }
 
     /**
-     * Добавление сообщения на экран со звуком подсказки, работает как {@link #addSilentMessage(String, String, String, MessagesPlane.Length)}}
+     * Добавление сообщения на экран со звуком подсказки, работает как {@link #addSilentMessage(String, String, String, MessagesList.Length)}}
      */
-    public void addMessage(String icon, String title, String content, MessagesPlane.Length length) {
+    public void addMessage(String icon, String title, String content, MessagesList.Length length) {
         audioSystem.playBySoundId("audio/sounds/pda/pda_tip.ogg");
         addSilentMessage(icon, title, content, length);
     }
@@ -88,7 +88,7 @@ public class NotificationController {
      *
      * @param sound ссылка на звук
      */
-    public void addMessage(String sound, String icon, String title, String content, MessagesPlane.Length length) {
+    public void addMessage(String sound, String icon, String title, String content, MessagesList.Length length) {
         audioSystem.playBySoundId(sound);
         addSilentMessage(icon, title, content, length);
     }
@@ -96,7 +96,7 @@ public class NotificationController {
     public void notify(NotificationType type, String title, String content) {
         addSilentMessage(type.getIcon(),
                 title,
-                content, MessagesPlane.Length.SHORT);
+                content, MessagesList.Length.SHORT);
         audioSystem.playSound(soundMap.get(type));
     }
 
@@ -108,7 +108,7 @@ public class NotificationController {
     public void addMessage(UserMessage message) {
         addSilentMessage(message.getAuthor().getAvatar(),
                 message.getAuthor().getLogin(),
-                message.getContent(), MessagesPlane.Length.LONG);
+                message.getContent(), MessagesList.Length.LONG);
     }
 
     public void addMessage(String message) {

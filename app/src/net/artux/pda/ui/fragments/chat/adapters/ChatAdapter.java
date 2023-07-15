@@ -116,7 +116,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             UserModel userModel = userMessage.getAuthor();
 
             if (userModel != null) {
-                nicknameView.setText(userModel.getName() + " " + userModel.getNickname());
+                if (userModel.getName() == null)
+                    nicknameView.setText(userModel.getNickname());
+                else if (userModel.getNickname() == null)
+                    nicknameView.setText(userModel.getName());
+                else nicknameView.setText(userModel.getName() + " " + userModel.getNickname());
                 itemView.setOnLongClickListener(view -> {
                     listener.onLongClick(userMessage);
                     return false;

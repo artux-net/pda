@@ -1,7 +1,6 @@
 package net.artux.pda.map.di.modules;
 
 import com.badlogic.gdx.ApplicationLogger;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.google.gson.Gson;
 
@@ -10,7 +9,7 @@ import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.utils.PlatformInterface;
-import net.artux.pda.map.view.FontManager;
+import net.artux.pda.map.view.root.FontManager;
 import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pda.model.map.GameMap;
 

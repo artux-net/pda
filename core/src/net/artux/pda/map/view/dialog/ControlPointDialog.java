@@ -21,11 +21,10 @@ import net.artux.pda.map.ecs.ai.StalkerGroup;
 import net.artux.pda.map.ecs.interactive.map.SpawnComponent;
 import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.utils.Colors;
-import net.artux.pda.map.view.FontManager;
-import net.artux.pda.map.view.UserInterface;
-import net.artux.pda.map.view.blocks.SlotTextButton;
-import net.artux.pda.map.view.template.PDADialog;
-import net.artux.pda.map.view.view.bars.Utils;
+import net.artux.pda.map.view.root.FontManager;
+import net.artux.pda.map.view.root.UserInterface;
+import net.artux.pda.map.view.button.PDAButton;
+import net.artux.pda.map.view.Utils;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.map.Strength;
 import net.artux.pda.model.user.Gang;
@@ -46,7 +45,7 @@ public class ControlPointDialog extends PDADialog {
     private final Label strengthLabel;
     private final Table manageTable;
 
-    private final SlotTextButton updateLevelButton;
+    private final PDAButton updateLevelButton;
 
     private SpawnComponent spawnComponent;
 
@@ -54,9 +53,9 @@ public class ControlPointDialog extends PDADialog {
     public ControlPointDialog(FontManager fontManager, LocaleBundle localeBundle,
                               MapComponent mapComponent,
                               ControlPointStalkersDialog controlPointStalkersDialog,
-                              SlotTextButton updateLevelButton,
-                              SlotTextButton stalkersButton,
-                              SlotTextButton hireStalkerButton,
+                              PDAButton updateLevelButton,
+                              PDAButton stalkersButton,
+                              PDAButton hireStalkerButton,
                               StrengthUpdater strengthUpdater,
                               UserInterface userInterface, DataRepository dataRepository) {
         super("", userInterface.getSkin());

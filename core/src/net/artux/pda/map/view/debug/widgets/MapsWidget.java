@@ -12,8 +12,8 @@ import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.di.components.CoreComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.view.FontManager;
-import net.artux.pda.map.view.view.bars.Utils;
+import net.artux.pda.map.view.root.FontManager;
+import net.artux.pda.map.view.Utils;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
 

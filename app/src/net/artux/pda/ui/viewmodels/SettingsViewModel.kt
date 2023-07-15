@@ -13,12 +13,21 @@ class SettingsViewModel @javax.inject.Inject constructor(
     val log: MutableLiveData<String> = MutableLiveData()
 
     fun update() {
+        log.postValue(getLog())
+    }
+
+    fun resetLogFile() {
+        logRepository.resetFile()
+    }
+
+    fun getLog(): String {
         val logBuilder = StringBuilder()
-        for (log in logRepository.getLogs()){
+        for (log in logRepository.getLogs()) {
             logBuilder
                 .append(log)
                 .append('\n')
         }
-        log.postValue(logBuilder.toString())
+        return logBuilder.toString()
     }
+
 }

@@ -11,7 +11,7 @@ import com.badlogic.gdx.utils.Scaling;
 import net.artux.pda.map.ecs.player.MissionsSystem;
 import net.artux.pda.map.ecs.player.PlayerSystem;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.view.UserInterface;
+import net.artux.pda.map.view.root.UserInterface;
 
 import javax.inject.Inject;
 

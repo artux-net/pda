@@ -154,10 +154,10 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Description</th>
 </tr>
 <tr class="altColor">
-<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(net.artux.pda.map.view.UserInterface,com.badlogic.gdx.assets.AssetManager,net.artux.pda.map.ecs.sound.AudioSystem,net.artux.pda.map.view.blocks.MessagesPlane,net.artux.pda.map.content.ContentGenerator)">NotificationController</a></span>&#8203;(<a href="../../view/UserInterface.html" title="class in net.artux.pda.map.view">UserInterface</a>&nbsp;userInterface,
+<th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(net.artux.pda.map.view.root.UserInterface,com.badlogic.gdx.assets.AssetManager,net.artux.pda.map.ecs.sound.AudioSystem,net.artux.pda.map.view.collection.list.MessagesList,net.artux.pda.map.content.ContentGenerator)">NotificationController</a></span>&#8203;(<a href="../../view/UserInterface.html" title="class in net.artux.pda.map.view">UserInterface</a>&nbsp;userInterface,
                       com.badlogic.gdx.assets.AssetManager&nbsp;assetManager,
                       <a href="../../ecs/sound/SoundsSystem.html" title="class in net.artux.pda.map.ecs.sound">SoundsSystem</a>&nbsp;audioSystem,
-                      <a href="../../view/blocks/MessagesPlane.html" title="class in net.artux.pda.map.view.blocks">MessagesPlane</a>&nbsp;messagesPlane,
+                      <a href="../../view/blocks/MessagesPlane.html" title="class in net.artux.pda.map.view.blocks">MessagesPlane</a>&nbsp;messagesList,
                       <a href="../../content/ContentGenerator.html" title="class in net.artux.pda.map.content">ContentGenerator</a>&nbsp;contentGenerator)</code></th>
 <td class="colLast">&nbsp;</td>
 </tr>
@@ -186,7 +186,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addMessage(java.lang.String,java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.blocks.MessagesPlane.Length)">addMessage</a></span>&#8203;(java.lang.String&nbsp;sound,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addMessage(java.lang.String,java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.collection.list.MessagesList.Length)">addMessage</a></span>&#8203;(java.lang.String&nbsp;sound,
           java.lang.String&nbsp;icon,
           java.lang.String&nbsp;title,
           java.lang.String&nbsp;content,
@@ -197,12 +197,12 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.blocks.MessagesPlane.Length)">addMessage</a></span>&#8203;(java.lang.String&nbsp;icon,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.collection.list.MessagesList.Length)">addMessage</a></span>&#8203;(java.lang.String&nbsp;icon,
           java.lang.String&nbsp;title,
           java.lang.String&nbsp;content,
           <a href="../../view/blocks/MessagesPlane.Length.html" title="enum in net.artux.pda.map.view.blocks">MessagesPlane.Length</a>&nbsp;length)</code></th>
 <td class="colLast">
-<div class="block">Добавление сообщения на экран со звуком подсказки, работает как <a href="#addSilentMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.blocks.MessagesPlane.Length)"><code>addSilentMessage(String, String, String, MessagesPlane.Length)</code></a>}</div>
+<div class="block">Добавление сообщения на экран со звуком подсказки, работает как <a href="#addSilentMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.collection.list.MessagesList.Length)"><code>addSilentMessage(String, String, String, MessagesPlane.Length)</code></a>}</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
@@ -214,7 +214,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addSilentMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.blocks.MessagesPlane.Length)">addSilentMessage</a></span>&#8203;(java.lang.String&nbsp;icon,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#addSilentMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.collection.list.MessagesList.Length)">addSilentMessage</a></span>&#8203;(java.lang.String&nbsp;icon,
                 java.lang.String&nbsp;title,
                 java.lang.String&nbsp;content,
                 <a href="../../view/blocks/MessagesPlane.Length.html" title="enum in net.artux.pda.map.view.blocks">MessagesPlane.Length</a>&nbsp;length)</code></th>
@@ -270,7 +270,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a id="&lt;init&gt;(net.artux.pda.map.view.UserInterface,com.badlogic.gdx.assets.AssetManager,net.artux.pda.map.ecs.sound.AudioSystem,net.artux.pda.map.view.blocks.MessagesPlane,net.artux.pda.map.content.ContentGenerator)">
+<a id="&lt;init&gt;(net.artux.pda.map.view.root.UserInterface,com.badlogic.gdx.assets.AssetManager,net.artux.pda.map.ecs.sound.AudioSystem,net.artux.pda.map.view.collection.list.MessagesList,net.artux.pda.map.content.ContentGenerator)">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -280,7 +280,7 @@ extends java.lang.Object</pre>
 public&nbsp;NotificationController&#8203;(<a href="../../view/UserInterface.html" title="class in net.artux.pda.map.view">UserInterface</a>&nbsp;userInterface,
                               com.badlogic.gdx.assets.AssetManager&nbsp;assetManager,
                               <a href="../../ecs/sound/SoundsSystem.html" title="class in net.artux.pda.map.ecs.sound">SoundsSystem</a>&nbsp;audioSystem,
-                              <a href="../../view/blocks/MessagesPlane.html" title="class in net.artux.pda.map.view.blocks">MessagesPlane</a>&nbsp;messagesPlane,
+                              <a href="../../view/blocks/MessagesPlane.html" title="class in net.artux.pda.map.view.blocks">MessagesPlane</a>&nbsp;messagesList,
                               <a href="../../content/ContentGenerator.html" title="class in net.artux.pda.map.content">ContentGenerator</a>&nbsp;contentGenerator)</pre>
 </li>
 </ul>
@@ -294,7 +294,7 @@ public&nbsp;NotificationController&#8203;(<a href="../../view/UserInterface.html
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="addSilentMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.blocks.MessagesPlane.Length)">
+<a id="addSilentMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.collection.list.MessagesList.Length)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -314,7 +314,7 @@ public&nbsp;NotificationController&#8203;(<a href="../../view/UserInterface.html
 </dl>
 </li>
 </ul>
-<a id="addMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.blocks.MessagesPlane.Length)">
+<a id="addMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.collection.list.MessagesList.Length)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -324,10 +324,10 @@ public&nbsp;NotificationController&#8203;(<a href="../../view/UserInterface.html
                        java.lang.String&nbsp;title,
                        java.lang.String&nbsp;content,
                        <a href="../../view/blocks/MessagesPlane.Length.html" title="enum in net.artux.pda.map.view.blocks">MessagesPlane.Length</a>&nbsp;length)</pre>
-<div class="block">Добавление сообщения на экран со звуком подсказки, работает как <a href="#addSilentMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.blocks.MessagesPlane.Length)"><code>addSilentMessage(String, String, String, MessagesPlane.Length)</code></a>}</div>
+<div class="block">Добавление сообщения на экран со звуком подсказки, работает как <a href="#addSilentMessage(java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.collection.list.MessagesList.Length)"><code>addSilentMessage(String, String, String, MessagesPlane.Length)</code></a>}</div>
 </li>
 </ul>
-<a id="addMessage(java.lang.String,java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.blocks.MessagesPlane.Length)">
+<a id="addMessage(java.lang.String,java.lang.String,java.lang.String,java.lang.String,net.artux.pda.map.view.collection.list.MessagesList.Length)">
 <!--   -->
 </a>
 <ul class="blockList">

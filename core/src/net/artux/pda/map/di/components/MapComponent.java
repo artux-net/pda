@@ -20,7 +20,7 @@ import net.artux.pda.map.engine.EngineManager;
 import net.artux.pda.map.ecs.creation.EntityProcessorSystem;
 import net.artux.pda.map.managers.ConditionEntityManager;
 import net.artux.pda.map.repository.EngineSaver;
-import net.artux.pda.map.view.UserInterface;
+import net.artux.pda.map.view.root.UserInterface;
 
 import java.util.Set;
 

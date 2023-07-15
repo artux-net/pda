@@ -1,11 +1,16 @@
 package net.artux.pda.ui.fragments.settings
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -21,6 +26,10 @@ import net.artux.pda.ui.viewmodels.SettingsViewModel
 import net.artux.pda.ui.viewmodels.UserViewModel
 import timber.log.Timber
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.nio.charset.StandardCharsets
+
 
 @AndroidEntryPoint
 class PrefsFragment : PreferenceFragmentCompat() {
@@ -30,15 +39,31 @@ class PrefsFragment : PreferenceFragmentCompat() {
     private val settingsViewModel: SettingsViewModel by viewModels()
     private lateinit var navigationPresenter: FragmentNavigation.Presenter
 
+    private lateinit var launcher: ActivityResultLauncher<Intent>
+    private var baseDocumentTreeUri: Uri? = null
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.prefs, rootKey)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                baseDocumentTreeUri = it.data?.data
+                val takeFlags =
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                requireContext().contentResolver.takePersistableUriPermission(
+                    it.data?.data!!,
+                    takeFlags
+                )
 
+                writeFile("pda_log", settingsViewModel.getLog())
+            } else {
+                Timber.e("Получен неуспешный код: $it")
+            }
+        }
         navigationPresenter = (requireActivity() as MainActivity).presenter
-        Timber.d("Fragment %s created", javaClass.name)
         navigationPresenter.setTitle(getString(R.string.settings))
 
         val signOutPreference = findPreference<Preference>("sign_out")
@@ -82,8 +107,8 @@ class PrefsFragment : PreferenceFragmentCompat() {
             true
         }
 
-        val logsPreference = findPreference<Preference>("show_logs")
-        logsPreference?.setOnPreferenceClickListener {
+        val showLogsPreference = findPreference<Preference>("show_logs")
+        showLogsPreference?.setOnPreferenceClickListener {
             settingsViewModel.update()
             true
         }
@@ -94,12 +119,39 @@ class PrefsFragment : PreferenceFragmentCompat() {
             requireContext().startActivity(intent)
         }
 
+        val saveLogsPreference = findPreference<Preference>("save_logs")
+        saveLogsPreference?.setOnPreferenceClickListener {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+            launcher.launch(intent)
+            true
+        }
+
+        val resetLogsPreference = findPreference<Preference>("reset_logs")
+        resetLogsPreference?.setOnPreferenceClickListener {
+            settingsViewModel.resetLogFile()
+            true
+        }
+
+
         questViewModel.status.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it.description, Toast.LENGTH_SHORT).show()
         }
 
     }
 
+    private fun writeFile(fileName: String, content: String) {
+        try{
+            var content = "<html><head><meta charset=\"UTF-8\"/></head><body>$content</body></html>"
+            content = content.replace(System.lineSeparator(), "<br>")
+            val directory = DocumentFile.fromTreeUri(requireContext(), baseDocumentTreeUri!!)!!
+            val file = directory.createFile("text/html", fileName)
+            val pfd = requireContext().contentResolver.openFileDescriptor(file!!.uri, "w")
+            val fos = FileOutputStream(pfd!!.fileDescriptor)
+            fos.write(content.toByteArray(StandardCharsets.UTF_8))
+            fos.close()
+        } catch (e: IOException) {
+        }
+    }
 
     private fun clearSharedPreferences(ctx: Context) {
         val dir = File(ctx.filesDir.parent!! + "/shared_prefs/")
@@ -113,4 +165,5 @@ class PrefsFragment : PreferenceFragmentCompat() {
             }
         }
     }
+
 }

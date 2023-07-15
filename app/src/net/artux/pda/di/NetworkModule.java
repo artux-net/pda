@@ -122,9 +122,9 @@ public class NetworkModule {
         remoteConfig.fetch().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 remoteConfig.activate();
-                Timber.i("Remote config fetched.");
+                Timber.i("Обновлен Firebase - конфиг");
             } else
-                Timber.e("Unable to fetch remote config.");
+                Timber.e("Не удалось обновить Firebase - конфиг");
         });
         return remoteConfig;
     }
@@ -139,7 +139,7 @@ public class NetworkModule {
             apiClient.getAdapterBuilder().baseUrl(BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);
         else if (!baseUrl.equals(FirebaseRemoteConfig.DEFAULT_VALUE_FOR_STRING)) {
             apiClient.getAdapterBuilder().baseUrl(baseUrl);
-            Timber.d("BaseUrl was changed: %s", baseUrl);
+            Timber.i("BaseUrl was changed: %s", baseUrl);
         } else
             Timber.d("Default server url was used.");
         return apiClient;

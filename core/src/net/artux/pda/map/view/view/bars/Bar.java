@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 
+import net.artux.pda.map.view.Utils;
+
 public class Bar extends ProgressBar {
 
     public Bar(Color color) {

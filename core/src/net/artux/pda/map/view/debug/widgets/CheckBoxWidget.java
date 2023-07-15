@@ -8,7 +8,7 @@ import com.badlogic.gdx.utils.Scaling;
 
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.view.view.bars.Utils;
+import net.artux.pda.map.view.Utils;
 
 import javax.inject.Inject;
 

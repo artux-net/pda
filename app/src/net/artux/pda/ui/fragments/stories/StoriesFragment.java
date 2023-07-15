@@ -73,7 +73,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
 
         navigationPresenter.setLoadingState(true);
 
-        storiesViewModel.updateData().observe(getViewLifecycleOwner(), memberResult -> {
+        storiesViewModel.getStoryData().observe(getViewLifecycleOwner(), memberResult -> {
             if (memberResult.getCurrentState() != null) {
                 StoryStateModel storyState = memberResult.getCurrentState();
                 Intent intent = new Intent(getActivity(), QuestActivity.class);
@@ -83,8 +83,10 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
                 intent.putExtra("stageId", storyState.getStageId());
                 requireActivity().startActivity(intent);
                 requireActivity().finish();
-            } else storiesViewModel.updateStories();
+            } else
+                storiesViewModel.updateStories();
         });
+        storiesViewModel.updateData();
     }
 
 
@@ -120,8 +122,7 @@ public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnSt
             Intent intent = new Intent(requireContext(), QuestActivity.class);
             StoryDataModel dataModel = storiesViewModel.getStoryData().getValue();
             if (dataModel != null) {
-                boolean sequenceWalkthrough = Boolean.parseBoolean(properties
-                        .getProperty(PropertyFields.STORIES_SEQUENCE, "true"));
+                boolean sequenceWalkthrough = true;
 
                 Object testMode = properties.get(PropertyFields.TESTER_MODE);
                 if (testMode != null && testMode.equals(true))

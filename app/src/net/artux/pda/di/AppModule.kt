@@ -46,14 +46,15 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun logForest(internalLogTree: InternalLogTree): List<Timber.Tree> {
+    fun logForest(internalLogTree: InternalLogTree, fileLogTree: FileLogTree): List<Timber.Tree> {
         val list = LinkedList<Timber.Tree>()
         list.add(internalLogTree)
+        list.add(fileLogTree)
         if (BuildConfig.DEBUG) {
             list.add(DebugTree())
-            list.add(FileLogTree())
         } else
             list.add(CrashReportingTree())
+
         return list
     }
 

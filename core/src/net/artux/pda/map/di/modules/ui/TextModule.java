@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.view.FontManager;
+import net.artux.pda.map.view.root.FontManager;
 
 import javax.inject.Named;
 

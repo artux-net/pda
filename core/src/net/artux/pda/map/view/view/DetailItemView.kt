@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Scaling
 import net.artux.engine.ui.ScalableLabel
 import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.map.view.dialog.ItemDescDialog
-import net.artux.pda.map.view.units.LazyImage
+import net.artux.pda.map.view.image.LazyImage
 import net.artux.pda.map.view.view.bars.Bar
 import net.artux.pda.model.items.ArmorModel
 import net.artux.pda.model.items.WeaponModel

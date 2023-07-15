@@ -16,7 +16,7 @@ import net.artux.pda.map.ecs.characteristics.PlayerComponent
 import net.artux.pda.map.ecs.physics.PlayerMovingSystem
 import net.artux.pda.map.ecs.systems.BaseSystem
 import net.artux.pda.map.di.scope.PerGameMap
-import net.artux.pda.map.view.UserInterface
+import net.artux.pda.map.view.root.UserInterface
 import net.artux.pda.model.quest.story.StoryDataModel
 import javax.inject.Inject
 import kotlin.math.abs

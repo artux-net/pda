@@ -5,8 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
-import net.artux.pda.map.view.UIFrame;
-import net.artux.pda.map.view.UserInterface;
+import net.artux.pda.map.view.root.UserInterface;
 
 import javax.inject.Named;
 

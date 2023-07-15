@@ -7,6 +7,7 @@ import android.media.SoundPool;
 import com.google.firebase.FirebaseApp;
 import com.yandex.mobile.ads.common.MobileAds;
 
+import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.utils.URLHelper;
@@ -47,13 +48,14 @@ public class PDAApplication extends Application {
     public void onCreate() {
         FirebaseApp.initializeApp(this);
         super.onCreate();
-        //Appodeal.setTesting(BuildConfig.DEBUG);
         for (Timber.Tree tree : logForest) {
             Timber.plant(tree);
-            Timber.i("%s planted", tree.getClass().getSimpleName());
+            Timber.i("%s - логирование включено", tree.getClass().getSimpleName());
         }
-        Timber.i("App started.");
-        MobileAds.initialize(this, () -> Timber.i("Mobile ADS SDK initialized"));
+        Timber.i(getString(R.string.hello_message));
+        Timber.i("Сталкерский ПДА запущен, версия: " + BuildConfig.VERSION_NAME  + " (" + BuildConfig.VERSION_CODE + "), тип: " + BuildConfig.BUILD_TYPE);
+        Timber.i("Режим тестирования: %s", isTesterMode());
+        MobileAds.initialize(this, () -> Timber.i("Инициализирован Yandex ADS SDK"));
         URLHelper.init(properties);
     }
 
@@ -62,8 +64,7 @@ public class PDAApplication extends Application {
     }
 
     public boolean isTesterMode() {
-        return properties.getProperty(PropertyFields.TESTER_MODE, "false")
-                .equals("true");
+        return properties.get(PropertyFields.TESTER_MODE).equals(true);
     }
 
     @Override

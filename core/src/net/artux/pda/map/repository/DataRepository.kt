@@ -15,6 +15,7 @@ import net.artux.pda.model.quest.story.StoryDataModel
 import org.apache.commons.lang3.SerializationUtils
 import org.luaj.vm2.LuaTable
 import java.util.*
+import kotlin.collections.LinkedHashMap
 
 
 class DataRepository(
@@ -95,12 +96,12 @@ class DataRepository(
 
     fun applyActions(actions: Map<String, List<String>>?, calculateDiff: Boolean = true) {
         val summaryMap = if (calculateDiff)
-            HashMap(QuestUtil.difference(initDataModel, currentStoryDataModel))
+            QuestUtil.calculateDifference(initDataModel, currentStoryDataModel)
         else
-            HashMap()
+            LinkedHashMap()
         if (actions != null) {
             summaryMap.putAll(actions)
-            summaryMap.put("syncNow", listOf())
+            summaryMap["syncNow"] = emptyList()
             platformInterface.applyActions(summaryMap)
         }
     }

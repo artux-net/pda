@@ -22,7 +22,6 @@ class SpawnController @Inject constructor(
     val gameMap: GameMap,
     val gson: Gson,
     val logger: ApplicationLogger,
-    val platformInterface: PlatformInterface,
     private val entityProcessorSystem: EntityProcessorSystem
 ) {
     val tag = "SpawnController"
@@ -81,7 +80,6 @@ class SpawnController @Inject constructor(
         logger.log(tag, "Start to restore ${spawns.size} spawns")
         for (i in 0..spawns.size - 1) {
             val spawnModel = spawns[i]
-            logger.log(tag, "Start to restore spawns")
             val withSprite = !spawnModel.getParams().contains("hide")
             var groupCreated = false
 

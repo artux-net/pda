@@ -1,6 +1,5 @@
 package net.artux.pda.map.view.dialog
 
-import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -10,10 +9,9 @@ import net.artux.engine.ui.InputListener
 import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.utils.Colors
-import net.artux.pda.map.view.FontManager
-import net.artux.pda.map.view.UserInterface
-import net.artux.pda.map.view.template.PDADialog
-import net.artux.pda.map.view.view.bars.Utils
+import net.artux.pda.map.view.root.FontManager
+import net.artux.pda.map.view.root.UserInterface
+import net.artux.pda.map.view.Utils
 import net.artux.pda.model.items.ItemModel
 import javax.inject.Inject
 

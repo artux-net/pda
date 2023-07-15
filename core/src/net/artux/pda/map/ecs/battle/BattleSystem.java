@@ -58,16 +58,16 @@ public class BattleSystem extends BaseSystem {
             if (bulletComponent.isFree()) {
                 for (int i = 0; i < getEntities().size(); i++) {
                     Entity entity = getEntities().get(i);
-                    if (checkHit(bullet, entity, false))
+                    if (checkHit(bullet, entity))
                         break;
                 }
             } else {
-                checkHit(bullet, bulletComponent.getTarget(), true);
+                checkHit(bullet, bulletComponent.getTarget());
             }
         }
     }
 
-    private boolean checkHit(Entity bullet, Entity npc, boolean deleteBullet) {
+    private boolean checkHit(Entity bullet, Entity npc) {
         BulletComponent bulletComponent = bcm.get(bullet);
         BodyComponent bulletBody = pm.get(bullet);
         Vector2 entityPosition = pm.get(npc).getPosition();
@@ -87,11 +87,10 @@ public class BattleSystem extends BaseSystem {
                 }
             }
         }
-        if (!hit) {
-            if (bulletComponent.getTargetPosition().epsilonEquals(bulletBody.getPosition(), 4)) {
-                hit = true;
-            }
-        }
+        if (!hit
+                && bulletComponent.getTargetPosition().epsilonEquals(bulletBody.getPosition(), 1))
+            hit = true;
+
 
         if (hit)
             bulletPool.free(bullet);

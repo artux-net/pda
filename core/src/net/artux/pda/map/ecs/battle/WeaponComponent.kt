@@ -145,7 +145,7 @@ class WeaponComponent : Component {
                 shootLastFrame = true
             } else if (magazine == 0) {
                 reload()
-                timeout += 30 / weaponModel!!.speed // перезарядка
+                timeout += 5 / weaponModel!!.speed // перезарядка
                 shootLastFrame = false
             } else {
                 stack = 0

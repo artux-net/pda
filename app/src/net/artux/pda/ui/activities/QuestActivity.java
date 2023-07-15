@@ -253,7 +253,7 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
             if (storyId < 0) {
                 // если нет номера истории в намерении
                 Intent intent = new Intent(this, MainActivity.class);
-                intent.putExtra("section", "stories");
+                intent.putExtra("section", ScreenDestination.STORIES);
                 startActivity(intent);
                 finish();
             }

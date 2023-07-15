@@ -4,12 +4,18 @@ import net.artux.pda.model.Summary
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.quest.story.StoryStateModel
 import net.artux.pdanetwork.api.DefaultApi
-import net.artux.pdanetwork.model.*
+import net.artux.pdanetwork.model.ChapterDto
+import net.artux.pdanetwork.model.CommandBlock
+import net.artux.pdanetwork.model.GameMap
+import net.artux.pdanetwork.model.Status
+import net.artux.pdanetwork.model.StoryData
+import net.artux.pdanetwork.model.StoryDto
+import net.artux.pdanetwork.model.StoryInfo
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -61,6 +67,7 @@ class QuestRepository @Inject constructor(
     }
 
     suspend fun updateStories(): Result<List<StoryInfo>> {
+        Timber.i("Fetch stories info from server")
         return suspendCoroutine {
             defaultApi.stories.enqueue(object : Callback<List<StoryInfo>> {
                 override fun onResponse(
@@ -69,16 +76,15 @@ class QuestRepository @Inject constructor(
                 ) {
                     val data = response.body()
                     if (data != null) {
-                        for (story in data) {
-                            //storyCache.put(story.id.toString(), story)//TODO
-                        }
+                        Timber.i("${data.size} stories fetched from server")
                         it.resume(Result.success(data))
                     } else
-                        it.resume(Result.failure(Exception("Chapter null: $response")))
+                        it.resume(Result.failure(Exception("Не удалось обновить сюжеты с сервера")))
                 }
 
                 override fun onFailure(call: Call<List<StoryInfo>>, t: Throwable) {
-                    it.resume(Result.failure(java.lang.Exception(t)))
+                    Timber.e(t.message)
+                    it.resume(Result.failure(Exception("Не удалось обновить сюжеты с сервера")))
                 }
             })
         }

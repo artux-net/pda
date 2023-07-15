@@ -31,7 +31,7 @@ import net.artux.pda.map.ecs.render.SpriteComponent;
 import net.artux.pda.map.engine.entities.model.GangRelations;
 import net.artux.pda.map.repository.SavedSpawn;
 import net.artux.pda.map.repository.SavedStalker;
-import net.artux.pda.map.view.UserInterface;
+import net.artux.pda.map.view.root.UserInterface;
 import net.artux.pda.map.view.dialog.ControlPointDialog;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.map.SpawnModel;

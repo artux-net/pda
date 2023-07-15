@@ -81,8 +81,10 @@ public class EntityBuilder {
     }
 
     public Entity player(Vector2 position, DataRepository dataRepository) {
+        BodyComponent bodyComponent = new BodyComponent(Bodies.stalker(position, world));
+        bodyComponent.setMovementForce(40);
         return new Entity()
-                .add(new BodyComponent(Bodies.stalker(position, world)))
+                .add(bodyComponent)
                 .add(new VisionComponent())
                 .add(new EffectsComponent())
                 .add(new SpriteComponent(assetManager.get("gg.png", Texture.class), 32, 32))

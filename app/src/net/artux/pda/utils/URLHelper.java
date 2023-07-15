@@ -4,6 +4,8 @@ import net.artux.pda.common.PropertyFields;
 
 import java.util.Properties;
 
+import timber.log.Timber;
+
 public class URLHelper {
 
     private static String resourceUrl;
@@ -12,6 +14,8 @@ public class URLHelper {
     public static void init(Properties properties) {
         resourceUrl = properties.getProperty(PropertyFields.RESOURCE_URL);
         apiUrl = properties.getProperty(PropertyFields.API_URL);
+        Timber.i("PDANETWORK API: %s", apiUrl);
+        Timber.i("Resource URL: %s", resourceUrl);
     }
 
     public static String getResourceURL(String part) {

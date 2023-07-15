@@ -24,8 +24,8 @@ import net.artux.pda.map.ecs.interactive.TimeComponent
 import net.artux.pda.map.ecs.render.SpriteComponent
 import net.artux.pda.map.ecs.systems.BaseSystem
 import net.artux.pda.map.di.scope.PerGameMap
-import net.artux.pda.map.view.LootMenu
-import net.artux.pda.map.view.UserInterface
+import net.artux.pda.map.view.window.LootWindow
+import net.artux.pda.map.view.root.UserInterface
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -34,14 +34,14 @@ import javax.inject.Inject
 @PerGameMap
 class DeadCheckerSystem @Inject constructor(
     userInterface: UserInterface,
-    lootMenu: LootMenu,
+    lootWindow: LootWindow,
     dataRepository: DataRepository,
     assetManager: AssetManager,
     world: World
 ) : BaseSystem(Family.all(HealthComponent::class.java, BodyComponent::class.java).get()) {
 
     private val gameZone: Group
-    private val lootMenu: LootMenu
+    private val lootWindow: LootWindow
     private val labelStyle: LabelStyle
     private var deadMessage = false
     private val dataRepository: DataRepository
@@ -55,7 +55,7 @@ class DeadCheckerSystem @Inject constructor(
         this.assetManager = assetManager
         this.userInterface = userInterface
         this.dataRepository = dataRepository
-        this.lootMenu = lootMenu
+        this.lootWindow = lootWindow
         this.world = world
         labelStyle = userInterface.labelStyle
         labelStyle.fontColor = Color.RED
@@ -94,12 +94,12 @@ class DeadCheckerSystem @Inject constructor(
                             "Обыскать: " + stalkerComponent.name,
                             5
                         ) {
-                            lootMenu.updateBot(
+                            lootWindow.updateBot(
                                 stalkerComponent.name,
                                 stalkerComponent.getAvatar(),
                                 stalkerComponent.inventory
                             )
-                            userInterface.stack.add(lootMenu)
+                            userInterface.stack.add(lootWindow)
                             engine.removeEntity(deadEntity)
                         })
                         .add(TimeComponent(

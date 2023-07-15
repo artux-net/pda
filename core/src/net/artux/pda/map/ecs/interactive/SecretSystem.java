@@ -16,8 +16,8 @@ import net.artux.pda.map.ecs.systems.BaseSystem;
 import net.artux.pda.map.managers.notification.NotificationController;
 import net.artux.pda.map.managers.notification.NotificationType;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.view.LootMenu;
-import net.artux.pda.map.view.UserInterface;
+import net.artux.pda.map.view.window.LootWindow;
+import net.artux.pda.map.view.root.UserInterface;
 
 import javax.inject.Inject;
 
@@ -28,7 +28,7 @@ public class SecretSystem extends BaseSystem {
     private final AssetManager assetManager;
     private final UserInterface userInterface;
     private final ContentGenerator contentGenerator;
-    private final LootMenu lootMenu;
+    private final LootWindow lootWindow;
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<SecretComponent> sm = ComponentMapper.getFor(SecretComponent.class);
@@ -40,12 +40,12 @@ public class SecretSystem extends BaseSystem {
     @Inject
     public SecretSystem(AssetManager assetManager,
                         NotificationController notificationController,
-                        RenderSystem renderSystem, UserInterface userInterface, ContentGenerator contentGenerator, LootMenu lootMenu, LocaleBundle localeBundle) {
+                        RenderSystem renderSystem, UserInterface userInterface, ContentGenerator contentGenerator, LootWindow lootWindow, LocaleBundle localeBundle) {
         super(Family.all(SecretComponent.class, BodyComponent.class).get());
         this.assetManager = assetManager;
         this.userInterface = userInterface;
         this.contentGenerator = contentGenerator;
-        this.lootMenu = lootMenu;
+        this.lootWindow = lootWindow;
         this.localeBundle = localeBundle;
         this.renderSystem = renderSystem;
         this.notificationController = notificationController;
@@ -74,8 +74,8 @@ public class SecretSystem extends BaseSystem {
                 String title = localeBundle.get("main.secret");
                 secretEntity
                         .add(new InteractiveComponent(title, 5, () -> {
-                            lootMenu.updateBot(title, "cache.png", contentGenerator.getRandomItems());
-                            userInterface.getStack().add(lootMenu);
+                            lootWindow.updateBot(title, "cache.png", contentGenerator.getRandomItems());
+                            userInterface.getStack().add(lootWindow);
 
                             getEngine().removeEntity(secretEntity);
                         }))

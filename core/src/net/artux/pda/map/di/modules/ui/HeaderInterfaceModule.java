@@ -23,13 +23,13 @@ import net.artux.pda.map.ecs.logger.MapLoggerSystem;
 import net.artux.pda.map.ecs.physics.PlayerMovingSystem;
 import net.artux.pda.map.ecs.render.RenderSystem;
 import net.artux.pda.map.ecs.sound.AudioSystem;
-import net.artux.pda.map.view.MissionMenu;
-import net.artux.pda.map.view.NavigationMenu;
-import net.artux.pda.map.view.UIFrame;
-import net.artux.pda.map.view.UserInterface;
-import net.artux.pda.map.view.debug.DebugMenu;
+import net.artux.pda.map.view.debug.DebugWindow;
+import net.artux.pda.map.view.sidebar.NavigationBar;
+import net.artux.pda.map.view.sidebar.MissionList;
+import net.artux.pda.map.view.root.UIFrame;
+import net.artux.pda.map.view.root.UserInterface;
 import net.artux.pda.map.view.debug.widgets.CheckBoxWidget;
-import net.artux.pda.map.view.statistic.StatisticMenu;
+import net.artux.pda.map.view.window.StatisticWindow;
 import net.artux.pda.model.map.GameMap;
 
 import java.time.Instant;
@@ -59,9 +59,9 @@ public class HeaderInterfaceModule {
 
     @IntoSet
     @Provides
-    public Actor initHeader(MissionMenu missionMenu,
-                            NavigationMenu navigationMenu,
-                            StatisticMenu statisticMenu,
+    public Actor initHeader(MissionList missionList,
+                            NavigationBar navigationBar,
+                            StatisticWindow statisticWindow,
                             GameMap map,
                             @Named("gameZone") Group gameZone,
                             Label.LabelStyle labelStyle, UIFrame uiFrame,
@@ -95,11 +95,11 @@ public class HeaderInterfaceModule {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                if (stack.getChildren().indexOf(missionMenu, false) == -1)
-                    stack.addActor(missionMenu);
+                if (stack.getChildren().indexOf(missionList, false) == -1)
+                    stack.addActor(missionList);
                 else
-                    stack.removeActor(missionMenu);
-                missionMenu.update();
+                    stack.removeActor(missionList);
+                missionList.update();
             }
         });
 
@@ -107,11 +107,11 @@ public class HeaderInterfaceModule {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                if (stack.getChildren().indexOf(navigationMenu, false) == -1)
-                    stack.addActor(navigationMenu);
+                if (stack.getChildren().indexOf(navigationBar, false) == -1)
+                    stack.addActor(navigationBar);
                 else
-                    stack.removeActor(navigationMenu);
-                navigationMenu.update();
+                    stack.removeActor(navigationBar);
+                navigationBar.update();
             }
         });
 
@@ -119,10 +119,10 @@ public class HeaderInterfaceModule {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                if (stack.getChildren().contains(statisticMenu, false))
-                    stack.removeActor(statisticMenu);
+                if (stack.getChildren().contains(statisticWindow, false))
+                    stack.removeActor(statisticWindow);
                 else {
-                    stack.addActor(statisticMenu);
+                    stack.addActor(statisticWindow);
                 }
             }
         });
@@ -162,7 +162,7 @@ public class HeaderInterfaceModule {
     @IntoSet
     @Provides
     public Actor initDebugMode(AudioSystem audioSystem, UIFrame uiFrame, UserInterface userInterface,
-                               DebugMenu debugMenu, CheckBoxWidget checkBoxWidget,
+                               DebugWindow debugWindow, CheckBoxWidget checkBoxWidget,
                                Engine engine, Properties properties) {
         if (properties.get(PropertyFields.TESTER_MODE).equals(true)) {
             Label testModeLabel = new Label("Тестирование", userInterface.getLabelStyle());
@@ -171,10 +171,10 @@ public class HeaderInterfaceModule {
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
                     Stack stack = userInterface.getStack();
-                    if (stack.getChildren().indexOf(debugMenu, false) == -1)
-                        stack.add(debugMenu);
+                    if (stack.getChildren().indexOf(debugWindow, false) == -1)
+                        stack.add(debugWindow);
                     else
-                        stack.removeActor(debugMenu);
+                        stack.removeActor(debugWindow);
                 }
             });
 

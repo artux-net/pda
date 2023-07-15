@@ -13,7 +13,7 @@ import net.artux.pda.map.scenes.PlayScene;
 import net.artux.pda.map.scenes.PreloadScene;
 import net.artux.pda.map.utils.PlatformInterface;
 import net.artux.pda.map.di.modules.AppModule;
-import net.artux.pda.map.view.FontManager;
+import net.artux.pda.map.view.root.FontManager;
 import net.artux.pda.model.items.ItemsContainerModel;
 import net.artux.pda.model.map.GameMap;
 

@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">PDA</string>
     <string name="app_full_name">PDA Network</string>
+    <string name="hello_message" translatable="false">
+\n
+░█████╗░██████╗░████████╗██╗░░░██╗██╗░░██╗  ░░░░░░  ██████╗░██████╗░░█████╗░
+██╔══██╗██╔══██╗╚══██╔══╝██║░░░██║╚██╗██╔╝  ░░░░░░  ██╔══██╗██╔══██╗██╔══██╗
+███████║██████╔╝░░░██║░░░██║░░░██║░╚███╔╝░  █████╗  ██████╔╝██║░░██║███████║
+██╔══██║██╔══██╗░░░██║░░░██║░░░██║░██╔██╗░  ╚════╝  ██╔═══╝░██║░░██║██╔══██║
+██║░░██║██║░░██║░░░██║░░░╚██████╔╝██╔╝╚██╗  ░░░░░░  ██║░░░░░██████╔╝██║░░██║
+╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░░╚═════╝░╚═╝░░╚═╝  ░░░░░░  ╚═╝░░░░░╚═════╝░╚═╝░░╚═╝
+\n
+    </string>
     <string name="quest_ads_usual_id" translatable="false">R-M-2151056-3</string>
     <string name="quest_ads_video_id" translatable="false">R-M-2151056-2</string>
 
@@ -239,11 +249,13 @@
     <string name="build">Build</string>
     <string name="support">Support</string>
     <string name="write_to_developer">Write a suggestion to developer.</string>
-    <string name="write_to_developer_summary" >Found a bug? Let us know</string>
+    <string name="write_to_developer_summary">Found a bug? Let us know</string>
     <string name="exit_story_summary">Exit only current story, let you choose another</string>
     <string name="update_stories_summary">" "</string>
     <string name="online">Online</string>
     <string name="offline">Offline</string>
     <string name="position_p">Позиция в рейтинге: %1$s</string>
-    <string name="logs">Show logs</string>
+    <string name="show_logs">Show logs</string>
+    <string name="save_logs">Save logs to file</string>
+    <string name="reset_logs">Reset logs</string>
 </resources>

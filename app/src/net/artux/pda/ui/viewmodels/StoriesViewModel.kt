@@ -15,7 +15,7 @@ import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.repositories.QuestRepository
 import net.artux.pda.repositories.UserRepository
 import net.artux.pdanetwork.model.CommandBlock
-import java.util.*
+import java.util.Properties
 
 @HiltViewModel
 class StoriesViewModel @javax.inject.Inject constructor(
@@ -28,55 +28,33 @@ class StoriesViewModel @javax.inject.Inject constructor(
 
     var stories: MutableLiveData<List<StoryItem>> = MutableLiveData()
     var status: MutableLiveData<StatusModel> = MutableLiveData()
-
     var storyData: MutableLiveData<StoryDataModel> = MutableLiveData()
 
-
-    var currentStoryId: Int = -1
-    var currentChapterId: Int = -1
-
-    fun updateStories() {
+    fun updateStories() =
         viewModelScope.launch {
             repository.updateStories()
                 .map { mapper.storyItem(it) }
                 .onSuccess {
-                    if (properties.getProperty(
-                            PropertyFields.TESTER_MODE,
-                            "false"
-                        ).equals(true.toString())
-                    ) {
-                        val item = StoryItem()
-                        item.id = -1
-                        item.title = "Загрузка стадии на выбор"
-                        item.desc = ".."
-                        it.add(item)
-                    }
+                    if (properties[PropertyFields.TESTER_MODE] == true)
+                        it.add(StoryItem(
+                            -1,
+                            "Загрузка стадии на выбор",
+                            null,
+                            "Используется для тестирования, ввод формата история:глава:номер стадии"))
                     stories.postValue(it)
                 }
+                .onFailure {
+                    status.postValue(StatusModel(it))
+                }
+        }
+
+    fun updateData() =
+        viewModelScope.launch {
+            repository.getStoryData()
+                .map { mapper.dataModel(it) }
+                .onSuccess { storyData.postValue(it) }
                 .onFailure { status.postValue(StatusModel(it)) }
         }
-    }
-
-    fun getCurrentStory(): StoryModel {
-        return repository.getCachedStory(currentStoryId)
-            .map { mapper.story(it) }
-            .getOrThrow()
-    }
-
-    fun updateData(): MutableLiveData<StoryDataModel> {
-        storyData = MutableLiveData()
-        viewModelScope.launch {
-            suspendUpdateData()
-        }
-        return storyData
-    }
-
-    private suspend fun suspendUpdateData() {
-        storyData.value = repository.getStoryData()
-            .map { mapper.dataModel(it) }
-            .onSuccess { storyData.postValue(it) }
-            .getOrThrow()
-    }
 
     fun resetSingleStory(id: Int) {
         viewModelScope.launch {
@@ -94,12 +72,6 @@ class StoriesViewModel @javax.inject.Inject constructor(
 
     fun clear() {
         repository.clearCache()
-    }
-
-    fun updateDataFromCache() {
-        repository.getCachedStoryData()
-            .map { mapper.dataModel(it) }
-            .onSuccess { storyData.postValue(it) }
     }
 
 }

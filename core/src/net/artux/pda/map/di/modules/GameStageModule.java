@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.ecs.player.PlayerSystem;
 import net.artux.pda.map.utils.Colors;
-import net.artux.pda.map.view.Logger;
+import net.artux.pda.map.view.debug.Logger;
 
 import javax.inject.Named;
 

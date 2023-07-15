@@ -22,7 +22,7 @@ import net.artux.pda.map.ecs.physics.BodyComponent
 import net.artux.pda.map.ecs.sound.AudioSystem
 import net.artux.pda.map.ecs.systems.BaseSystem
 import net.artux.pda.map.repository.DataRepository
-import net.artux.pda.map.view.blocks.MessagesPlane
+import net.artux.pda.map.view.collection.list.MessagesList
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.quest.mission.MissionModel
 import net.artux.pda.model.quest.story.ParameterModel
@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 @PerGameMap
 class MissionsSystem @Inject constructor(
-    private val messagesPlane: MessagesPlane,
+    private val messagesList: MessagesList,
     assetManager: AssetManager,
     private val dataRepository: DataRepository,
     private val soundsSystem: AudioSystem,
@@ -81,9 +81,9 @@ class MissionsSystem @Inject constructor(
         val updatedMissions = getMissionsByParams(paramArr)
         for (m in updatedMissions) {
             val checkpointModel = m.getCurrentCheckpoint(*paramArr)
-            messagesPlane.addMessage(
+            messagesList.addMessage(
                 "textures/avatars/a0.png", "Задание обновлено: " + m.title,
-                "Новая цель: " + checkpointModel!!.title, MessagesPlane.Length.SHORT
+                "Новая цель: " + checkpointModel!!.title, MessagesList.Length.SHORT
             )
             soundsSystem.playSound(missionUpdatedSound)
         }
@@ -206,9 +206,9 @@ class MissionsSystem @Inject constructor(
             for (point in map.points) {
                 if (point.type == 7) {
                     val currentData: HashMap<String, String> = point.data
-                    val chapterString = currentData?.get("chapter")
-                    val stageString = currentData?.get("stage")
-                    var targetMap = currentData?.get("map") //with map
+                    val chapterString = currentData["chapter"]
+                    val stageString = currentData["stage"]
+                    var targetMap = currentData["map"] //with map
                     if (chapterString != null && stageString != null) {
                         //with chapter
                         val stage = stageString.toLong()

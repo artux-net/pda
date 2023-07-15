@@ -13,8 +13,8 @@ import com.badlogic.gdx.utils.Array;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.utils.Colors;
-import net.artux.pda.map.view.FontManager;
-import net.artux.pda.map.view.view.bars.Utils;
+import net.artux.pda.map.view.root.FontManager;
+import net.artux.pda.map.view.Utils;
 
 import javax.inject.Inject;
 

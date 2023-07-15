@@ -178,7 +178,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>com.badlogic.gdx.scenes.scene2d.Actor</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#initDebugMode(net.artux.pda.map.engine.ecs.systems.SoundsSystem,net.artux.pda.map.view.Logger,net.artux.pda.map.view.UIFrame,net.artux.pda.map.view.UserInterface,com.badlogic.gdx.scenes.scene2d.ui.Skin,com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle,com.badlogic.ashley.core.Engine,com.badlogic.gdx.assets.AssetManager,java.util.Properties)">initDebugMode</a></span>&#8203;(<a href="../../../../engine/ecs/systems/SoundsSystem.html" title="class in net.artux.pda.map.engine.ecs.systems">SoundsSystem</a>&nbsp;audioSystem,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#initDebugMode(net.artux.pda.map.engine.ecs.systems.SoundsSystem,net.artux.pda.map.view.debug.Logger,net.artux.pda.map.view.root.UIFrame,net.artux.pda.map.view.root.UserInterface,com.badlogic.gdx.scenes.scene2d.ui.Skin,com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle,com.badlogic.ashley.core.Engine,com.badlogic.gdx.assets.AssetManager,java.util.Properties)">initDebugMode</a></span>&#8203;(<a href="../../../../engine/ecs/systems/SoundsSystem.html" title="class in net.artux.pda.map.engine.ecs.systems">SoundsSystem</a>&nbsp;audioSystem,
              <a href="../../../../view/Logger.html" title="class in net.artux.pda.map.view">Logger</a>&nbsp;logger,
              <a href="../../../../view/UIFrame.html" title="class in net.artux.pda.map.view">UIFrame</a>&nbsp;uiFrame,
              <a href="../../../../view/UserInterface.html" title="class in net.artux.pda.map.view">UserInterface</a>&nbsp;userInterface,
@@ -191,7 +191,7 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>com.badlogic.gdx.scenes.scene2d.Actor</code></td>
-<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#initHeader(net.artux.pda.map.view.MissionMenu,net.artux.pda.model.map.GameMap,com.badlogic.gdx.scenes.scene2d.Group,com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle,net.artux.pda.map.view.UIFrame,net.artux.pda.map.view.UserInterface,com.badlogic.gdx.assets.AssetManager,net.artux.pda.map.repository.DataRepository)">initHeader</a></span>&#8203;(<a href="../../../../view/MissionMenu.html" title="class in net.artux.pda.map.view">MissionMenu</a>&nbsp;missionMenu,
+<th class="colSecond" scope="row"><code><span class="memberNameLink"><a href="#initHeader(net.artux.pda.map.view.sidebar.MissionList,net.artux.pda.model.map.GameMap,com.badlogic.gdx.scenes.scene2d.Group,com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle,net.artux.pda.map.view.root.UIFrame,net.artux.pda.map.view.root.UserInterface,com.badlogic.gdx.assets.AssetManager,net.artux.pda.map.repository.DataRepository)">initHeader</a></span>&#8203;(<a href="../../../../view/MissionMenu.html" title="class in net.artux.pda.map.view">MissionMenu</a>&nbsp;missionList,
           net.artux.pda.model.map.GameMap&nbsp;map,
           com.badlogic.gdx.scenes.scene2d.Group&nbsp;gameZone,
           com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle&nbsp;labelStyle,
@@ -244,7 +244,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a id="initHeader(net.artux.pda.map.view.MissionMenu,net.artux.pda.model.map.GameMap,com.badlogic.gdx.scenes.scene2d.Group,com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle,net.artux.pda.map.view.UIFrame,net.artux.pda.map.view.UserInterface,com.badlogic.gdx.assets.AssetManager,net.artux.pda.map.repository.DataRepository)">
+<a id="initHeader(net.artux.pda.map.view.sidebar.MissionList,net.artux.pda.model.map.GameMap,com.badlogic.gdx.scenes.scene2d.Group,com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle,net.artux.pda.map.view.root.UIFrame,net.artux.pda.map.view.root.UserInterface,com.badlogic.gdx.assets.AssetManager,net.artux.pda.map.repository.DataRepository)">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -252,7 +252,7 @@ extends java.lang.Object</pre>
 <h4>initHeader</h4>
 <pre class="methodSignature">@IntoSet
 @Provides
-public&nbsp;com.badlogic.gdx.scenes.scene2d.Actor&nbsp;initHeader&#8203;(<a href="../../../../view/MissionMenu.html" title="class in net.artux.pda.map.view">MissionMenu</a>&nbsp;missionMenu,
+public&nbsp;com.badlogic.gdx.scenes.scene2d.Actor&nbsp;initHeader&#8203;(<a href="../../../../view/MissionMenu.html" title="class in net.artux.pda.map.view">MissionMenu</a>&nbsp;missionList,
                                                         net.artux.pda.model.map.GameMap&nbsp;map,
                                                         @Named("gameZone")
                                                         com.badlogic.gdx.scenes.scene2d.Group&nbsp;gameZone,
@@ -263,7 +263,7 @@ public&nbsp;com.badlogic.gdx.scenes.scene2d.Actor&nbsp;initHeader&#8203;(<a href
                                                         net.artux.pda.map.repository.DataRepository&nbsp;dataRepository)</pre>
 </li>
 </ul>
-<a id="initDebugMode(net.artux.pda.map.engine.ecs.systems.SoundsSystem,net.artux.pda.map.view.Logger,net.artux.pda.map.view.UIFrame,net.artux.pda.map.view.UserInterface,com.badlogic.gdx.scenes.scene2d.ui.Skin,com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle,com.badlogic.ashley.core.Engine,com.badlogic.gdx.assets.AssetManager,java.util.Properties)">
+<a id="initDebugMode(net.artux.pda.map.engine.ecs.systems.SoundsSystem,net.artux.pda.map.view.debug.Logger,net.artux.pda.map.view.root.UIFrame,net.artux.pda.map.view.root.UserInterface,com.badlogic.gdx.scenes.scene2d.ui.Skin,com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle,com.badlogic.ashley.core.Engine,com.badlogic.gdx.assets.AssetManager,java.util.Properties)">
 <!--   -->
 </a>
 <ul class="blockListLast">

@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/storyIcon"
-        android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_width="1300dp"
+        android:layout_height="130dp"
         android:paddingTop="3dp"
         android:src="@mipmap/ic_launcher"
         android:layout_weight="5"/>

@@ -1,9 +1,9 @@
 package net.artux.pda.map.view.dialog
 
-import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
 import net.artux.engine.utils.LocaleBundle
-import net.artux.pda.map.view.template.PDADialog
 import net.artux.pda.model.items.ArmorModel
 import net.artux.pda.model.items.ItemsContainerModel
 import net.artux.pda.model.items.WeaponModel
@@ -11,8 +11,11 @@ import net.artux.pda.model.items.WearableModel
 import javax.inject.Inject
 
 
-class ItemDescDialog @Inject constructor(skin: Skin, val itemsContainerModel: ItemsContainerModel, val textButtonStyle: TextButtonStyle, val localeBundle: LocaleBundle) :
-    PDADialog("", skin) {
+class ItemDescDialog @Inject constructor(
+    skin: Skin,
+    val itemsContainerModel: ItemsContainerModel,
+    val textButtonStyle: TextButtonStyle, val localeBundle: LocaleBundle
+) : PDADialog("", skin) {
 
     private val descLabel: Label = Label("", Label.LabelStyle(textButtonStyle.font, textButtonStyle.fontColor))
 
@@ -20,7 +23,7 @@ class ItemDescDialog @Inject constructor(skin: Skin, val itemsContainerModel: It
         contentTable.add(descLabel).left().grow()
     }
 
-    fun update(wearableModel: WearableModel){
+    fun update(wearableModel: WearableModel) {
         titleLabel.setText(wearableModel.title)
         if (wearableModel is ArmorModel) {
             descLabel.setText(
@@ -36,7 +39,8 @@ class ItemDescDialog @Inject constructor(skin: Skin, val itemsContainerModel: It
                 )
             )
         } else if (wearableModel is WeaponModel) {
-            val bulletModel = itemsContainerModel.bullets?.find { it.baseId == wearableModel.bulletId }
+            val bulletModel =
+                itemsContainerModel.bullets.find { it.baseId == wearableModel.bulletId }
             descLabel.setText(
                 localeBundle.get(
                     "weapon.desc",

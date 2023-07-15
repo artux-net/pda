@@ -94,7 +94,17 @@
         <Preference
             app:iconSpaceReserved="false"
             app:key="show_logs"
-            app:title="@string/logs" />
+            app:title="@string/show_logs" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="save_logs"
+            app:title="@string/save_logs" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="reset_logs"
+            app:title="@string/reset_logs" />
 
         <PreferenceScreen
             app:iconSpaceReserved="false"
