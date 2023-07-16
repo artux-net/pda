@@ -17,6 +17,7 @@ import net.artux.pda.map.ecs.characteristics.HealthComponent;
 import net.artux.pda.map.ecs.interactive.PassivityComponent;
 import net.artux.pda.map.ecs.interactive.map.SpawnComponent;
 import net.artux.pda.map.ecs.physics.BodyComponent;
+import net.artux.pda.map.ecs.player.PlayerSystem;
 import net.artux.pda.map.ecs.render.RenderSystem;
 import net.artux.pda.map.managers.notification.NotificationController;
 import net.artux.pda.map.managers.notification.NotificationType;
@@ -26,6 +27,7 @@ import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.model.map.SpawnModel;
 
 import javax.inject.Inject;
+import javax.swing.SpringLayout;
 
 @PerGameMap
 public class EjectionSystem extends EntitySystem {
@@ -41,12 +43,14 @@ public class EjectionSystem extends EntitySystem {
     private final NotificationController notificationController;
     private final LocaleBundle localeBundle;
     private final MapComponent mapComponent;
+    private final PlayerSystem playerSystem;
 
     private static final boolean test = false;
 
     @Inject
     public EjectionSystem(MapComponent mapComponent, RenderSystem renderSystem, NotificationController notificationController,
-                          LocaleBundle localeBundle) {
+                          LocaleBundle localeBundle, PlayerSystem playerSystem) {
+        this.playerSystem = playerSystem;
         this.mapComponent = mapComponent;
         this.renderSystem = renderSystem;
         this.localeBundle = localeBundle;
@@ -94,6 +98,14 @@ public class EjectionSystem extends EntitySystem {
                         hidden = true;
                     }
                 }
+
+                if (entity == playerSystem.getPlayer()){
+                    if (hidden)
+                        notificationController.setTitle("В укрытии");
+                    else
+                        notificationController.setTitle("Вернитесь в укрытие");
+                }
+
                 if (hidden)
                     continue;
 

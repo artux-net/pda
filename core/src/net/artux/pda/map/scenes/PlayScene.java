@@ -96,10 +96,17 @@ public class PlayScene extends Scene {
         sceneManager.addInputProcessor(new GestureDetector(engineManager.getGestureListener()));
     }
 
+    static final float STEP_TIME = 1 / 90f;
+    float accumulator = 0;
+
     @Override
     public void update(float dt) {
         super.update(dt);
-        world.step(1 / 90f, 1, 1);
+        accumulator += Math.min(dt, 0.25f);
+        if (accumulator >= STEP_TIME) {
+            accumulator -= STEP_TIME;
+            world.step(STEP_TIME, 1, 1);
+        }
         engineManager.update(dt);
     }
 

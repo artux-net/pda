@@ -59,12 +59,15 @@ class BackpackWindow @Inject constructor(
 
     fun update(dataModel: StoryDataModel) {
         lastDataModel = dataModel
+        update()
+    }
 
+    fun update() {
         Gdx.app.postRunnable {
-            val models = dataModel.allItems
+            val models = lastDataModel.allItems
             mainItemsView.update(models)
-            infoLabel.setText(localeBundle["user.info", dataModel.money, dataModel.xp])
-            updateWearableInfo(dataModel)
+            infoLabel.setText(localeBundle["user.info", lastDataModel.money, lastDataModel.xp])
+            updateWearableInfo(lastDataModel)
         }
     }
 

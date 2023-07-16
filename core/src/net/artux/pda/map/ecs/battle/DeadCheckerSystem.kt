@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
-import net.artux.pda.map.ecs.ai.StalkerComponent
+import net.artux.pda.map.ecs.ai.EntityComponent
 import net.artux.pda.map.ecs.characteristics.HealthComponent
 import net.artux.pda.map.ecs.physics.BodyComponent
 import net.artux.pda.map.repository.DataRepository
@@ -86,18 +86,18 @@ class DeadCheckerSystem @Inject constructor(
                         )
                     )
                 if (entity !== player) {
-                    val stalkerComponent = entity.getComponent(
-                        StalkerComponent::class.java
+                    val entityComponent = entity.getComponent(
+                        EntityComponent::class.java
                     )
                     deadEntity.add(
                         InteractiveComponent(
-                            "Обыскать: " + stalkerComponent.name,
+                            "Обыскать: " + entityComponent.name,
                             5
                         ) {
                             lootWindow.updateBot(
-                                stalkerComponent.name,
-                                stalkerComponent.getAvatar(),
-                                stalkerComponent.inventory
+                                entityComponent.name,
+                                entityComponent.getAvatar(),
+                                entityComponent.inventory
                             )
                             userInterface.stack.add(lootWindow)
                             engine.removeEntity(deadEntity)
@@ -105,7 +105,7 @@ class DeadCheckerSystem @Inject constructor(
                         .add(TimeComponent(
                             Instant.now().plus(1, ChronoUnit.MINUTES)
                         ) { engine.removeEntity(entity) })
-                        .add(stalkerComponent)
+                        .add(entityComponent)
                 } else {
                     engine.getSystem(InteractionSystem::class.java).setProcessing(false)
                     engine.removeEntity(player)

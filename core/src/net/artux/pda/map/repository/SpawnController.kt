@@ -5,12 +5,11 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.ApplicationLogger
 import com.badlogic.gdx.Gdx
 import com.google.gson.Gson
-import net.artux.pda.map.ecs.ai.StalkerComponent
+import net.artux.pda.map.ecs.ai.EntityComponent
 import net.artux.pda.map.ecs.characteristics.HealthComponent
 import net.artux.pda.map.ecs.creation.EntityProcessorSystem
 import net.artux.pda.map.ecs.interactive.map.SpawnComponent
 import net.artux.pda.map.ecs.takeover.SpawnSystem
-import net.artux.pda.map.utils.PlatformInterface
 import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.map.SpawnModel
@@ -44,12 +43,12 @@ class SpawnController @Inject constructor(
             }
 
             for (stalker in stalkers) {
-                val stalkerComponent = stalker.getComponent(StalkerComponent::class.java)
+                val entityComponent = stalker.getComponent(EntityComponent::class.java)
                 val health = stalker.getComponent(HealthComponent::class.java).health
                 savedStalkers.add(
                     SavedStalker(
-                        stalkerComponent.name,
-                        stalkerComponent.avatar,
+                        entityComponent.name,
+                        entityComponent.avatar,
                         health
                     )
                 )

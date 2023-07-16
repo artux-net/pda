@@ -4,11 +4,15 @@ import static com.badlogic.gdx.math.MathUtils.random;
 
 import net.artux.pda.map.ecs.battle.MoodComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.model.map.GameMap;
+import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.user.Gang;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -32,6 +36,19 @@ public class GangRelations {
 
     public Gang findEnemyByGang(Gang gang) {
         for (Gang potentialEnemy : Gang.values()) {
+            if (getMoodBy(potentialEnemy, Collections.emptySet()).isEnemy(getMoodBy(gang, Collections.emptySet())))
+                return potentialEnemy;
+        }
+        return null;
+    }
+
+    public Gang findEnemyByGangFromCurrentMap(Gang gang, GameMap map) {
+        List<Gang> gangs = map.getSpawns().stream()
+                .map(SpawnModel::getGroup)
+                .filter(g -> g != null)
+                .collect(Collectors.toList());
+
+        for (Gang potentialEnemy : gangs) {
             if (getMoodBy(potentialEnemy, Collections.emptySet()).isEnemy(getMoodBy(gang, Collections.emptySet())))
                 return potentialEnemy;
         }

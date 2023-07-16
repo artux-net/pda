@@ -45,7 +45,7 @@ public class VisionSystem extends BaseSystem implements Drawable {
     private final Bar progressBar;
 
     @Inject
-    public VisionSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem, World world, Skin skin) {
+    public VisionSystem(AssetManager assetManager, MapOrientationSystem mapOrientationSystem, World world) {
         super(Family.all(VisionComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
         this.mapOrientationSystem = mapOrientationSystem;
         this.world = world;

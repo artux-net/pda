@@ -59,13 +59,13 @@ public class RatingFragment extends BaseFragment implements RatingAdapter.OnClic
             if (listResult.size() > 0) {
                 listBinding.list.setVisibility(View.VISIBLE);
                 listBinding.viewMessage.setVisibility(View.GONE);
-                ratingAdapter.setData(listResult);
+                ratingAdapter.addItems(listResult);
             } else {
                 listBinding.list.setVisibility(View.GONE);
                 listBinding.viewMessage.setVisibility(View.VISIBLE);
             }
         });
-        ratingViewModel.updateTop();
+        ratingViewModel.start();
     }
 
     @Override

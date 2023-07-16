@@ -16,7 +16,7 @@ import net.artux.pda.map.content.ContentGenerator;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.ecs.ai.GraphMotionComponent;
 import net.artux.pda.map.ecs.ai.LeaderComponent;
-import net.artux.pda.map.ecs.ai.StalkerComponent;
+import net.artux.pda.map.ecs.ai.EntityComponent;
 import net.artux.pda.map.ecs.ai.StalkerGroup;
 import net.artux.pda.map.ecs.ai.StatesComponent;
 import net.artux.pda.map.ecs.ai.TargetMovingComponent;
@@ -184,7 +184,11 @@ public class EntityBuilder {
                 .add(healthComponent)
                 .add(stalkerGroup)
                 .add(new MoodComponent(stalkerGroup))
-                .add(new StalkerComponent(contentGenerator.generateStalkerName(), contentGenerator.generateStalkerAvatar(), contentGenerator.getRandomItems()))
+                .add(new EntityComponent(
+                        localeBundle.get(stalkerGroup.getGang().getTitleId()),
+                        contentGenerator.generateStalkerName(),
+                        contentGenerator.generateStalkerAvatar(),
+                        contentGenerator.getRandomItems()))
                 .add(statesComponent)
                 .add(new TargetMovingComponent(stalkerGroup))
                 .add(new FogOfWarComponent());
@@ -209,7 +213,7 @@ public class EntityBuilder {
                 .add(statesComponent)
                 .add(new MoodComponent())
                 .add(new TargetMovingComponent(targeting))
-                .add(new StalkerComponent(localeBundle.get(randomType.getTitleId()), randomType.getAvatarId(), new ArrayList<>()))
+                .add(new EntityComponent(localeBundle.get(randomType.getTitleId()), randomType.getAvatarId(), new ArrayList<>()))
                 .add(new SpriteComponent(assetManager.get(randomType.getIconId()), 8, 8));
 
         logger.log("WorldSystem", "Mutant " + randomType + " created.");
@@ -221,4 +225,5 @@ public class EntityBuilder {
         entity.add(new LeaderComponent());
         return entity;
     }
+
 }

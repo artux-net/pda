@@ -3,8 +3,10 @@ package net.artux.pda.map.di.modules.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
+import net.artux.pda.map.view.label.PDALabel;
 import net.artux.pda.map.view.root.UserInterface;
 
 import javax.inject.Named;
@@ -43,6 +45,12 @@ public class RootInterfaceModule {
         gameZone.addActor(hudTable);
 
         return hudTable;
+    }
+
+    @Provides
+    @Named("targetLabel")
+    public PDALabel pdaLabel(Skin skin){
+        return new PDALabel(skin);
     }
 
     @Provides

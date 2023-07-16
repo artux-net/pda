@@ -7,8 +7,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.pda.commands.Commands
 import net.artux.pda.model.StatusModel
+import net.artux.pda.model.mapper.StageMapper
 import net.artux.pda.model.mapper.StoryMapper
 import net.artux.pda.model.quest.NotificationModel
+import net.artux.pda.model.quest.NotificationType
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.ui.viewmodels.event.OpenStageEvent
 import net.artux.pda.ui.viewmodels.event.ScreenDestination
@@ -30,6 +32,7 @@ import javax.inject.Singleton
 class CommandController @Inject constructor(
     val soundManager: QuestSoundManager,
     var mapper: StoryMapper,
+    var stageMapper: StageMapper,
     val repository: QuestRepository
 ) {
 
@@ -68,6 +71,7 @@ class CommandController @Inject constructor(
 
         for (command in commands) {
             when (command.key) {
+                "openNotification" -> openNotification(command.value)
                 "openSeller" -> openSeller(command.value)
                 "openStage" -> openStage(command.value)
                 "loopMusic" -> soundManager.playMusic(command.value.first(), true)
@@ -103,6 +107,11 @@ class CommandController @Inject constructor(
                         "finishStory" -> exitStory()
                     }
             }
+    }
+
+    private fun openNotification(args: List<String>) {
+        if (args.size == 2)
+            notification.postValue(stageMapper.notification(NotificationType.ALERT, "${args[0]}:${args[1]}", storyData.value))
     }
 
     fun clearCache() {

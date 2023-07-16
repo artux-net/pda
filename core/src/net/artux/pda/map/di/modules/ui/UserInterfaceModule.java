@@ -23,21 +23,22 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import net.artux.pda.map.content.assets.AssetsFinder;
-import net.artux.pda.map.engine.data.PlayerData;
-import net.artux.pda.map.ecs.characteristics.HealthComponent;
-import net.artux.pda.map.ecs.interactive.InteractiveComponent;
+import net.artux.pda.map.ecs.ai.EntityComponent;
 import net.artux.pda.map.ecs.battle.MoodComponent;
-import net.artux.pda.map.ecs.vision.VisionComponent;
-import net.artux.pda.map.ecs.battle.WeaponComponent;
-import net.artux.pda.map.ecs.interactive.InteractionSystem;
 import net.artux.pda.map.ecs.battle.PlayerBattleSystem;
+import net.artux.pda.map.ecs.battle.WeaponComponent;
+import net.artux.pda.map.ecs.characteristics.HealthComponent;
+import net.artux.pda.map.ecs.interactive.InteractionSystem;
+import net.artux.pda.map.ecs.interactive.InteractiveComponent;
 import net.artux.pda.map.ecs.physics.PlayerMovingSystem;
 import net.artux.pda.map.ecs.player.PlayerSystem;
-import net.artux.pda.map.view.window.BackpackWindow;
-import net.artux.pda.map.view.root.UserInterface;
+import net.artux.pda.map.ecs.vision.VisionComponent;
 import net.artux.pda.map.view.collection.list.MessagesList;
+import net.artux.pda.map.view.label.PDALabel;
+import net.artux.pda.map.view.root.UserInterface;
 import net.artux.pda.map.view.view.DetailedHUD;
 import net.artux.pda.map.view.view.bars.Slot;
+import net.artux.pda.map.view.window.BackpackWindow;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.Collection;
@@ -167,11 +168,16 @@ public class UserInterfaceModule {
         return assistantBlock;
     }
 
+    private final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    private final ComponentMapper<EntityComponent> scm = ComponentMapper.getFor(EntityComponent.class);
 
     @IntoSet
     @Provides
-    public Actor initHud(BackpackWindow backpackWindow, DetailedHUD hud, Slot weaponSlot, @Named("hudTable") Table hudTable,
-                         UserInterface userInterface, PlayerSystem playerSystem, PlayerBattleSystem playerBattleSystem) {
+    public Actor initHud(BackpackWindow backpackWindow, DetailedHUD hud, Slot weaponSlot,
+                         @Named("hudTable") Table hudTable,
+                         @Named("targetLabel") PDALabel targetLabel,
+                         UserInterface userInterface, PlayerSystem playerSystem,
+                         PlayerBattleSystem playerBattleSystem) {
         hudTable.add(hud);
         hud.addListener(new ActorGestureListener() {
             @Override
@@ -181,7 +187,25 @@ public class UserInterfaceModule {
                     userInterface.getStack().removeActor(backpackWindow);
                 else {
                     userInterface.getStack().add(backpackWindow);
+                    backpackWindow.update();
                 }
+            }
+        });
+
+        targetLabel.setWrap(true);
+        targetLabel.addAction(new Action() {
+            @Override
+            public boolean act(float delta) {
+                Entity player = playerSystem.getPlayer();
+                Entity enemy = mm.get(player).getEnemy();
+                if (enemy == null) {
+                    targetLabel.setText("");
+                    return false;
+                }
+                if (!scm.has(enemy))
+                    return false;
+                targetLabel.setText(scm.get(enemy).getDescription());
+                return false;
             }
         });
 
@@ -194,11 +218,11 @@ public class UserInterfaceModule {
                 WeaponComponent entityWeapon = wm.get(playerSystem.getPlayer());
                 ItemModel resource = entityWeapon.getBulletModel();
                 if (entityWeapon.getSelected() != null) {
-                    PlayerData.selectedWeapon = entityWeapon.getSelected().getTitle();
                     weaponSlot.setText(entityWeapon.getSelected().getTitle());
                     if (resource != null) {
-                        PlayerData.bullet = resource.getTitle();
                         weaponSlot.setLabelText(entityWeapon.getMagazine() + "/" + resource.getQuantity());
+                    } else {
+                        weaponSlot.setLabelText("-");
                     }
                 } else {
                     weaponSlot.setText("Оружие отсутствует");//todo locale
@@ -225,7 +249,8 @@ public class UserInterfaceModule {
             }
         });
         hudTable.add(weaponSlot).padLeft(20);
-
+        hudTable.row();
+        hudTable.add(targetLabel).pad(10).fillX();
         return hudTable;
     }
 

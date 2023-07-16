@@ -63,7 +63,6 @@ class SellerRepository @Inject constructor(
                     override fun onFailure(call: Call<ItemsContainer>, t: Throwable) {
                         it.resume(Result.failure(java.lang.Exception(t)))
                     }
-
                 })
         }
     }

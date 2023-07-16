@@ -55,7 +55,9 @@ class WeaponComponent : Component {
     fun setWeaponModel(weaponModel: WeaponModel?) {
         selected = weaponModel
         if (weaponModel != null) {
-            if (player) setBulletModel(dataModel.getItemByBaseId(weaponModel.bulletId))
+            if (player)
+                setBulletModel(dataModel.getItemByBaseId(weaponModel.bulletId))
+
             var reloadSoundName: String
             var shotSoundName: String
             if (weaponModel.type === ItemType.RIFLE) {
@@ -65,39 +67,37 @@ class WeaponComponent : Component {
                 shotSoundName = pistolDefaultShotSound
                 reloadSoundName = pistolDefaultReloadSound
             }
-            /*val sounds = weaponModel.sounds
-            if (sounds != null) {
-                val type = weaponModel.type.name.lowercase()
-                if (!sounds.reload.isNullOrBlank())
-                    reloadSoundName = prefix + type + "/" + sounds.reload
 
-                if (!sounds.shot.isNullOrBlank())
-                    shotSoundName = prefix + type + "/" + sounds.shot
-            } else*/
-
-
-                var path = prefix + weaponModel.baseId + "/reload.ogg"
-                if (assetManager.contains(path))
-                   reloadSoundName = path
-                path = prefix + weaponModel.baseId + "/shoot.ogg"
-                if (assetManager.contains(path))
-                    shotSoundName = path
+            var path = prefix + weaponModel.baseId + "/reload.ogg"
+            if (assetManager.contains(path))
+                reloadSoundName = path
+            path = prefix + weaponModel.baseId + "/shoot.ogg"
+            if (assetManager.contains(path))
+                shotSoundName = path
 
             shotSound = assetManager.get(shotSoundName)
             reloadSound = assetManager.get(reloadSoundName)
             reload()
             reloading = false
-        }
+        } else if (player)
+            setBulletModel(null)
     }
 
     fun getBulletModel(): ItemModel? {
         return bulletModel
     }
 
-    fun setBulletModel(item: ItemModel?) {
-        if (item != null && selected!!.bulletId == item.baseId) {
-            bulletModel = item
+    private fun setBulletModel(item: ItemModel?) {
+        if (selected == null) {
+            bulletModel = null
+            return
         }
+        if (item == null) {
+            bulletModel = null
+            return
+        }
+        if (item != null && selected!!.bulletId == item.baseId)
+            bulletModel = item
     }
 
     var type = ItemType.RIFLE
@@ -124,13 +124,13 @@ class WeaponComponent : Component {
         }*/
     }
 
-    fun limit(): Int{
+    fun limit(): Int {
         return if (player) selected!!.bulletQuantity else 4
     }
 
     var reloading = false
     fun shoot(): Boolean {
-        if (selected==null)
+        if (selected == null)
             return false
 
         if (timeout <= 0 && (bulletModel != null && bulletModel!!.quantity > 0 || !player)) {
@@ -158,6 +158,7 @@ class WeaponComponent : Component {
 
     fun reload() {
         val weaponModel = selected
+
         if (weaponModel != null) {
             var take = weaponModel.bulletQuantity
             reloading = true
@@ -172,6 +173,9 @@ class WeaponComponent : Component {
             stack = 0
             magazine = take
         }
+
+        if (magazine == 0)
+            setBulletModel(null)
     }
 
     companion object {

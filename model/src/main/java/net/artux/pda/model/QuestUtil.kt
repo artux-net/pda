@@ -7,14 +7,15 @@ import java.util.LinkedList
 import java.util.stream.Collectors
 
 object QuestUtil {
+
     @JvmStatic
-    fun check(
-        conditions: HashMap<String, List<String>>?,
-        storyDataModel: StoryDataModel
-    ): Boolean {
+    fun check(conditions: HashMap<String, List<String>>?, storyDataModel: StoryDataModel): Boolean {
         if (conditions.isNullOrEmpty())
             return true
         val map = storyDataModel.parametersMap
+        map["money"] = storyDataModel.money
+        map["xp"] = storyDataModel.xp
+
         for (key in conditions.keys) {
             if (conditions[key].isNullOrEmpty())
                 continue
@@ -32,19 +33,31 @@ object QuestUtil {
                     ) return false
                 }
 
-                "money>=" -> for (param in conditions[key]!!) {
-                    if (storyDataModel.money < param.toInt()) return false
+                else -> {
+                    // split("<", "<=", ">=", ">", "=", "!=")
+                    val userParam = key.filter { it.isLetter() }
+                    val operation = key.filter { !it.isLetterOrDigit() }
+                    for (param in conditions[key]!!){
+                        if(!checkParam(userParam, operation, param.toInt(), map))
+                            return false
+                    }
+
                 }
-
-                "money<" -> for (param in conditions[key]!!) {
-                    if (storyDataModel.money >= param.toInt()) return false
-                }
-
-                "reachedStage" -> {
-
-                }
-
             }
+        }
+        return true
+    }
+
+    private fun checkParam(param: String, operation: String, conditionValue: Int, parameterMap: Map<String, Int>): Boolean{
+        val currentValue = parameterMap[param] ?: return false
+
+        when (operation){
+            "<" -> if (currentValue >= conditionValue) return false
+            ">" -> if (currentValue <= conditionValue) return false
+            ">=" -> if (currentValue < conditionValue) return false
+            "<=" -> if (currentValue > conditionValue) return false
+            "===","==","=" -> if (currentValue != conditionValue) return false
+            "!=" -> if (currentValue == conditionValue) return false
         }
         return true
     }

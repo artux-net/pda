@@ -12,6 +12,8 @@ import net.artux.pda.model.quest.TransferModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-@Mapper
+@Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_DEFAULT)
 public interface StageMapper {
 
     StageMapper INSTANCE = Mappers.getMapper(StageMapper.class);
@@ -28,7 +30,7 @@ public interface StageMapper {
         StageModel stageModel = new StageModel();
         stageModel.setId(stage.getId());
         stageModel.setTitle(stage.getTitle());
-        switch (stage.getTypeStage()){
+        switch (stage.getTypeStage()) {
             case 1:
                 stageModel.setType(StageType.CHAPTER_OVER);
                 break;
@@ -47,22 +49,23 @@ public interface StageMapper {
 
     default NotificationModel notification(Stage stage, StoryDataModel storyDataModel) {
         if (stage != null && stage.getMessage() != null && !stage.getMessage().trim().equals("")) {
-            String title;
-            String message = formatText(stage.getMessage(), storyDataModel);
-            if (message.contains(":")) {
-                String[] parts = message.split(":", 2);
-                title = parts[0];
-                message = parts[1];
-            } else {
-                title = "Уведомление";
-            }
-            NotificationType type =
-                    stage.getTypeStage() == 0 ? NotificationType.ALERT : NotificationType.MESSAGE;
-            return new NotificationModel(title, message, type);
+            return notification(stage.getTypeStage() == 0 ? NotificationType.ALERT : NotificationType.MESSAGE, stage.getMessage(), storyDataModel);
         }
         return null;
     }
 
+    default NotificationModel notification(NotificationType type, String source, StoryDataModel storyDataModel) {
+        String title;
+        String message = formatText(source, storyDataModel);
+        if (message.contains(":")) {
+            String[] parts = message.split(":", 2);
+            title = parts[0];
+            message = parts[1];
+        } else {
+            title = "Уведомление";
+        }
+        return new NotificationModel(title, message, type);
+    }
 
     default String getText(Stage stage, StoryDataModel dataCompanion) {
         List<Text> contentVariants = new ArrayList<>();

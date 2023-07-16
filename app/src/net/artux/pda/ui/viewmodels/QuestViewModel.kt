@@ -80,7 +80,6 @@ class QuestViewModel @javax.inject.Inject constructor(
     private suspend fun suspendUpdateData() {
         storyData.value = repository.getStoryData()
             .map { mapper.dataModel(it) }
-            .onSuccess { storyData.postValue(it) }
             .getOrThrow()
         sellerRepository.getItems().getOrThrow()
     }
@@ -184,6 +183,8 @@ class QuestViewModel @javax.inject.Inject constructor(
                         status.postValue(StatusModel(Exception("Story Data null")))
                         return@launch
                     }
+                    if (chapterStage.isNeedSync())
+                        syncNow()
                     notification.postValue(stageMapper.notification(chapterStage, storyData.value))
                     stage.postValue(stageMapper.model(chapterStage, storyData.value))
                     transferDisabled = false
@@ -211,7 +212,7 @@ class QuestViewModel @javax.inject.Inject constructor(
     }
 
     private suspend fun syncNow() {
-        Timber.d("Start syncing story")
+        Timber.d("Синхронизация Data с сервером")
         title.postValue("Синхронизация")
         loadingState.postValue(true)
 

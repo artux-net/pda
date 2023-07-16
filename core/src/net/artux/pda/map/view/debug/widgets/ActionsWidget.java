@@ -5,6 +5,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -13,11 +15,19 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import net.artux.engine.scenes.SceneManager;
 import net.artux.pda.commands.Commands;
+import net.artux.pda.map.content.ContentGenerator;
+import net.artux.pda.map.ecs.ai.EntityComponent;
 import net.artux.pda.map.ecs.battle.MoodComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
 import net.artux.pda.map.ecs.characteristics.PlayerComponent;
+import net.artux.pda.map.ecs.creation.EntityProcessorSystem;
+import net.artux.pda.map.ecs.effects.EffectsComponent;
 import net.artux.pda.map.ecs.effects.ejection.EjectionSystem;
 import net.artux.pda.map.ecs.physics.BodyComponent;
+import net.artux.pda.map.ecs.player.PlayerSystem;
+import net.artux.pda.map.ecs.vision.FogOfWarComponent;
+import net.artux.pda.map.ecs.vision.VisionComponent;
+import net.artux.pda.map.engine.entities.Bodies;
 import net.artux.pda.map.managers.ConditionEntityManager;
 import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.repository.EngineSaver;
@@ -27,6 +37,8 @@ import net.artux.pda.map.di.components.CoreComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.view.root.FontManager;
 import net.artux.pda.map.view.Utils;
+import net.artux.pda.model.items.ArmorModel;
+import net.artux.pda.model.user.Gang;
 
 import java.util.Collections;
 
@@ -39,6 +51,10 @@ public class ActionsWidget extends Table {
     public ActionsWidget(Skin skin, ConditionEntityManager conditionEntityManager, Engine engine,
                          EjectionSystem ejectionSystem,
                          EngineSaver saver,
+                         EntityProcessorSystem entityProcessorSystem,
+                         ContentGenerator contentGenerator,
+                         World world,
+                         PlayerSystem playerSystem,
                          DataRepository dataRepository,
                          CoreComponent coreComponent,
                          SceneManager sceneManager,
@@ -118,6 +134,29 @@ public class ActionsWidget extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 dataRepository.applyActions(Collections
                         .singletonMap(Commands.MONEY, Collections.singletonList("50000")));
+            }
+        });
+
+        addLabel("Спавн бота - груши", labelStyle, new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Vector2 pos = playerSystem.getPosition();
+                pos.cpy().add(0, 50);
+
+                Entity entity = new Entity();
+
+                HealthComponent healthComponent = new HealthComponent(new ArmorModel());
+                healthComponent.setImmortal(true);
+
+                entity
+                        .add(new BodyComponent(Bodies.stalker(pos.cpy().add(0, 50), world)))
+                        .add(new EffectsComponent())
+                        .add(healthComponent)
+                        .add(new VisionComponent())
+                        .add(new MoodComponent(Gang.LONERS))
+                        .add(new EntityComponent(contentGenerator.generateStalkerName(), contentGenerator.generateStalkerAvatar(), contentGenerator.getRandomItems()))
+                        .add(new FogOfWarComponent());
+                entityProcessorSystem.addEntity(entity);
             }
         });
     }

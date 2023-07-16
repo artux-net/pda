@@ -186,7 +186,7 @@ class QuestRepository @Inject constructor(
 
     suspend fun syncMember(map: CommandBlock): Result<StoryData> {
         return suspendCoroutine {
-            Timber.tag("Quest Repository").d("Syncing, actions: ${map.actions}")
+            Timber.tag("Quest Repository").d("Синхронизация, команды: ${map.actions}")
             defaultApi.applyCommands(map).enqueue(object : Callback<StoryData> {
                 override fun onResponse(
                     call: Call<StoryData>,
@@ -195,7 +195,7 @@ class QuestRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         storyDataCache.put("story", data)
-                        Timber.d("Repository got storyData: $data")
+                        Timber.d("Синхронизация прошла успешно, ответ: $data")
                         it.resume(Result.success(data))
                     } else
                         it.resume(Result.failure(Exception(response.toString())))

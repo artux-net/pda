@@ -44,9 +44,12 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
         return list.size();
     }
 
-    void setData(List<UserInfo> list) {
-        this.list = list;
-        notifyDataSetChanged();
+    void addItems(List<UserInfo> update) {
+        int oldSize = list.size();
+        list.addAll(update);
+        if (oldSize < 1)
+            oldSize = 1;
+        notifyItemRangeInserted(oldSize, update.size());
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

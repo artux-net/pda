@@ -55,6 +55,13 @@ public class MoodComponent implements Component {
         this.angry = true;
     }
 
+    public MoodComponent(Gang gang) {
+        gandId = gang.getId();
+        this.relations = new Integer[]{5, 5, 5, 5, 5, 5, 5, 5, 5};
+        this.ignorePlayer = true;
+        this.alwaysIgnored = true;
+    }
+
     public MoodComponent(StalkerGroup stalkerGroup) {
         this(stalkerGroup.getGang(), stalkerGroup.getRelations(), stalkerGroup.getParams());
     }

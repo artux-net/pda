@@ -79,7 +79,7 @@ public class BattleSystem extends BaseSystem {
         if (entityPosition.epsilonEquals(bulletBody.getPosition(), 4f)) {
             targetEntityHealth.damage(bulletComponent.getDamage());
             hit = true;
-            if (!targetEntityMood.hasEnemy()) {
+            if (!targetEntityMood.hasEnemy() && !targetEntityMood.alwaysIgnored) {
                 targetEntityMood.setEnemy(bulletComponent.getAuthor());
                 MoodComponent playerMood = mm.get(getPlayer());
                 if (bulletComponent.getAuthor() == getPlayer() && !targetEntityMood.isEnemy(playerMood)) {

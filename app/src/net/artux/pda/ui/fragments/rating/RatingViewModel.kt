@@ -22,7 +22,8 @@ class RatingViewModel @Inject constructor(
     var state: MutableLiveData<Boolean> = MutableLiveData()
     var page: Int = 1
 
-    fun updateTop() {
+    fun start() {
+        page = 1
         state.postValue(true)
         viewModelScope.launch {
             userRepository.getRatingPage(1)
@@ -49,8 +50,7 @@ class RatingViewModel @Inject constructor(
                 }
                 .onSuccess {
                     if (it.size > 0) {
-                        list.value!!.addAll(it)
-                        list.postValue(list.value)
+                        list.postValue(it)
                     }else{
                         status.postValue(StatusModel("There are no more users."))
                     }
@@ -64,12 +64,12 @@ class RatingViewModel @Inject constructor(
 
     fun previousPage() {
         if (page > 2)
-            page--;
+            page--
         updateList()
     }
 
     fun nextPage() {
-        page++;
+        page++
         updateList()
     }
 

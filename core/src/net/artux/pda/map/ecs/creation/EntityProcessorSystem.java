@@ -19,7 +19,7 @@ import net.artux.pda.map.content.ContentGenerator;
 import net.artux.pda.map.content.entities.EntityBuilder;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.ecs.ai.MapOrientationSystem;
-import net.artux.pda.map.ecs.ai.StalkerComponent;
+import net.artux.pda.map.ecs.ai.EntityComponent;
 import net.artux.pda.map.ecs.ai.StalkerGroup;
 import net.artux.pda.map.ecs.global.WorldSystem;
 import net.artux.pda.map.ecs.interactive.ClickComponent;
@@ -34,6 +34,7 @@ import net.artux.pda.map.repository.SavedStalker;
 import net.artux.pda.map.view.root.UserInterface;
 import net.artux.pda.map.view.dialog.ControlPointDialog;
 import net.artux.pda.model.items.WeaponModel;
+import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.map.Strength;
 import net.artux.pda.model.user.Gang;
@@ -61,6 +62,7 @@ public class EntityProcessorSystem {
     private final ControlPointDialog controlPointDialog;
     private final UserInterface userInterface;
     private final WorldSystem worldSystem;
+    private final GameMap gameMap;
     private final ApplicationLogger logger;
 
     @Inject
@@ -69,11 +71,13 @@ public class EntityProcessorSystem {
                                  MapOrientationSystem mapOrientationSystem,
                                  ContentGenerator contentGenerator,
                                  ApplicationLogger logger,
+                                 GameMap gameMap,
                                  Gson gson,
                                  LocaleBundle localeBundle, ControlPointDialog controlPointDialog1, UserInterface userInterface, WorldSystem worldSystem) {
         super();
         this.logger = logger;
         this.world = world;
+        this.gameMap = gameMap;
         builder = entityBuilder;
         this.renderSystem = renderSystem;
         this.assetManager = assetManager;
@@ -130,7 +134,7 @@ public class EntityProcessorSystem {
         for (int i = 0; i < stalkers.size; i++) {
             Entity entity = stalkers.get(i);
             SavedStalker savedStalker = stalkerIterator.next();
-            entity.add(new StalkerComponent(savedStalker.getName(), savedStalker.getAvatar(), contentGenerator.getRandomItems()));
+            entity.add(new EntityComponent(savedStalker.getName(), savedStalker.getAvatar(), contentGenerator.getRandomItems()));
         }
 
         return stalkerGroup;
@@ -192,7 +196,7 @@ public class EntityProcessorSystem {
 
     public void generateAttackSpawnGroup(SpawnComponent spawnComponent) {
         Gang currentGang = spawnComponent.getSpawnModel().getGroup();
-        Gang enemyGang = gangRelations.findEnemyByGang(currentGang);
+        Gang enemyGang = gangRelations.findEnemyByGangFromCurrentMap(currentGang, gameMap);
         if (enemyGang != null) {
             StalkerGroup stalkerGroup = generateNewGroup(enemyGang, random(4, 7));
             stalkerGroup.setTargeting(spawnComponent::getPosition);
