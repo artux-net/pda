@@ -73,6 +73,14 @@
    float   reportRayFixture(long, float, float, float, float, float);
 }
 
+ # Keep generic signature of RxJava3 (R8 full mode strips signatures from non-kept items).
+-keep class retrofit2.** { *; }
+-keepattributes *Annotation*
+-keep class com.squareup.okhttp.** { *; }
+-keep interface com.squareup.okhttp.** { *; }
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn javax.script.AbstractScriptEngine
 -dontwarn javax.script.Bindings
