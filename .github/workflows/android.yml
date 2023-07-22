@@ -77,7 +77,7 @@ jobs:
           path: ${{steps.sign_apk.outputs.signedReleaseFile}}
           
       - name: Send message to Artux channel
-        uses: appleboy/telegram-action@master
+        uses: prygunov/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
