@@ -40,7 +40,7 @@ jobs:
           gradle-version: 8.2.1
           
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+        uses: amyu/setup-android@v2
 
       - name: Build APK
         id: build
