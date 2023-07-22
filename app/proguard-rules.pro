@@ -1,10 +1,3 @@
--keep class net.artux.pda.model.mapper.*
--keep class * extends com.google.gson.TypeAdapter
--keep class * implements com.google.gson.TypeAdapterFactory
--keep class * implements com.google.gson.JsonSerializer
--keep class * implements com.google.gson.JsonDeserializer
-
-
 -keep class org.** { *; }
 -keep class java.** { *; }
 -keep class javax.** { *; }
@@ -42,25 +35,35 @@
 # Required if using Gdx-Controllers extension
 -keep class com.badlogic.gdx.controllers.android.AndroidControllers
 
--keep public class com.badlogic.** {
-   *;
-}
+-keep public class com.badlogic.** { *; }
 
 -keep enum * { *; }
 
--keep public class net.artux.pda.model.** {
-   *;
-}
+-keep public class net.artux.pda.model.** { *; }
+-keep public class net.artux.pdanetwork.** { *; }
+-keep public class net.artux.pda.map.engine.entities.** { *; }
 
--keep public class net.artux.pda.map.engine.entities.** {
-   *;
-}
+##---------------Begin: proguard configuration for Gson  ----------
+# Gson uses generic type information stored in a class file when working with fields. Proguard
+# removes such information by default, so configure it to keep all of it.
+-keepattributes Signature
 
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
 
--keep public class net.artux.pdanetwork.** {
-   *;
-}
+-keep class com.google.gson.** { *; }
+-keep class * extends com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
 
+# Gson specific classes
+-keep class sun.** { *; }
+#-keep class com.google.gson.stream.** { *; }
+
+# Application classes that will be serialized/deserialized over Gson
+-keep class com.google.gson.examples.android.model.** { *; }
+##---------------End: proguard configuration for Gson  ----------
 
 # Required if using Box2D extension
 -keepclassmembers class com.badlogic.gdx.physics.box2d.World {

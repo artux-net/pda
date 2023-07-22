@@ -16,8 +16,6 @@ package net.artux.pda.ui.viewmodels.util;
  *  limitations under the License.
  */
 
-import android.util.Log;
-
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +24,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import timber.log.Timber;
 
 /**
  * A lifecycle-aware observable that sends only new updates after subscription, used for events like
@@ -39,14 +39,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class SingleLiveEvent<T> extends MutableLiveData<T> {
 
-    private static final String TAG = "SingleLiveEvent";
-
     private final AtomicBoolean mPending = new AtomicBoolean(false);
 
     @MainThread
     public void observe(@NonNull LifecycleOwner owner, @NonNull Observer<? super T> observer) {
         if (hasActiveObservers()) {
-            Log.w(TAG, "Multiple observers registered but only one will be notified of changes.");
+            Timber.w("Multiple observers registered but only one will be notified of changes.");
         }
         // Observe the internal MutableLiveData
         super.observe(owner, t -> {
@@ -62,11 +60,11 @@ public class SingleLiveEvent<T> extends MutableLiveData<T> {
         super.setValue(t);
     }
 
-    /**
+
+    /*
      * Used for cases where T is Void, to make calls cleaner.
-     */
     @MainThread
     public void call() {
         setValue(null);
-    }
+    }*/
 }

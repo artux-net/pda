@@ -72,8 +72,6 @@ public interface CoreComponent {
     @Named("testerMode")
     Boolean isTesterMode();
 
-    LuaTable getLuaTable();
-
     ApplicationLogger getLogger();
 
     Gson getGson();

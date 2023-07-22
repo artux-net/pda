@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import timber.log.Timber;
+
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_DEFAULT)
 public interface StageMapper {
 
@@ -87,9 +89,15 @@ public interface StageMapper {
                 transfer.setText(formatText(transfer.getText(), dataCompanion).trim());
                 transfers.add(new TransferModel(transfer.getStage(), transfer.getText()));
             }
-        if (transfers.size() == 0)
-            return Collections.singletonList(new TransferModel(-1, "Недостижимые условия переходов."));
-        else
+
+        if (transfers.size() == 0) {
+            Timber.e("Недостижимые условия переходов. Игнорирование условий. Stage: %s", stage.getId());
+            for (Transfer transfer : stage.getTransfers()) {
+                transfer.setText(formatText(transfer.getText() + " [недостижимо]", dataCompanion).trim());
+                transfers.add(new TransferModel(transfer.getStage(), transfer.getText()));
+            }
+            return transfers;
+        }else
             return transfers;
     }
 

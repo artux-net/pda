@@ -1,5 +1,7 @@
 package net.artux.pda.ui.fragments.profile.adapters;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,19 +9,20 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.app.PDAApplication;
 import net.artux.pda.model.user.Gang;
 import net.artux.pda.model.user.GangRelation;
+import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
-import java.util.LinkedHashMap;
+import java.util.EnumMap;
 
 public class GroupRelationsAdapter extends RecyclerView.Adapter<GroupRelationsAdapter.GroupHolder> {
 
     private GangRelation objectRelation = new GangRelation();
-    LinkedHashMap<Integer, Integer> list = new LinkedHashMap<>();
+    private final EnumMap<Gang, Integer> map = new EnumMap<>(Gang.class);
 
     public GroupRelationsAdapter() {
         updateContent();
@@ -27,7 +30,7 @@ public class GroupRelationsAdapter extends RecyclerView.Adapter<GroupRelationsAd
 
     private void updateContent() {
         for (Gang gang : Gang.values()) {
-            list.put(gang.getId(), (Integer) objectRelation.getFor(gang));
+            map.put(gang, objectRelation.getFor(gang));
         }
     }
 
@@ -40,14 +43,16 @@ public class GroupRelationsAdapter extends RecyclerView.Adapter<GroupRelationsAd
 
     @Override
     public void onBindViewHolder(@NonNull GroupHolder holder, int position) {
-        holder.bind(position, list.get(position));
+        Gang gang = Gang.values()[position];
+        holder.bind(gang, map.get(gang));
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return map.size();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setRelations(GangRelation objectRelation) {
         this.objectRelation = objectRelation;
         updateContent();
@@ -56,8 +61,10 @@ public class GroupRelationsAdapter extends RecyclerView.Adapter<GroupRelationsAd
 
     static class GroupHolder extends RecyclerView.ViewHolder {
 
-        TextView title;
-        ImageView avatar;
+        private final TextView title;
+        private final ImageView avatar;
+        private final Context context;
+        private final View root;
         int[] blocks = {
                 R.id.b1,
                 R.id.b2,
@@ -76,24 +83,26 @@ public class GroupRelationsAdapter extends RecyclerView.Adapter<GroupRelationsAd
             super(itemView);
             title = itemView.findViewById(R.id.group_title);
             avatar = itemView.findViewById(R.id.group_avatar);
+            context = title.getContext();
+            root = title.getRootView();
         }
 
-        void bind(int key, int relation) {
-            title.setText(title.getContext().getResources().getStringArray(R.array.groups)[key]);
-            avatar.setImageDrawable(avatar.getContext().getResources().getDrawable(PDAApplication.group_avatars[key]));
+        void bind(Gang gang, int relation) {
+            title.setText(context.getResources().getStringArray(R.array.groups)[gang.getId()]);
+            ProfileHelper.setGangAvatar(avatar, gang);
 
             if (relation < 0) {
                 if (relation < -5) relation = -5;
                 while (relation != 0) {
-                    ((ImageView) title.getRootView().findViewById(blocks[relation + 5]))
-                            .setImageDrawable(title.getContext().getResources().getDrawable(R.drawable.red_block));
+                    ((ImageView) root.findViewById(blocks[relation + 5]))
+                            .setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.red_block));
                     relation = relation + 1;
                 }
             } else if (relation > 0) {
                 if (relation > 5) relation = 5;
                 while (relation != 0) {
-                    ((ImageView) title.getRootView().findViewById(blocks[relation + 4]))
-                            .setImageDrawable(title.getContext().getResources().getDrawable(R.drawable.green_block));
+                    ((ImageView) root.findViewById(blocks[relation + 4]))
+                            .setImageDrawable(AppCompatResources.getDrawable(context,R.drawable.green_block));
                     relation = relation - 1;
                 }
             }

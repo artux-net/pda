@@ -78,6 +78,8 @@ public class StalkerGroup implements Component {
     }
 
     public Strength getStrength() {
+        if (strength == null)
+            return Strength.WEAK;
         return strength;
     }
 

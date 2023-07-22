@@ -222,7 +222,7 @@ public class UserInterfaceModule {
                     if (resource != null) {
                         weaponSlot.setLabelText(entityWeapon.getMagazine() + "/" + resource.getQuantity());
                     } else {
-                        weaponSlot.setLabelText("-");
+                        weaponSlot.setLabelText("0/0");
                     }
                 } else {
                     weaponSlot.setText("Оружие отсутствует");//todo locale

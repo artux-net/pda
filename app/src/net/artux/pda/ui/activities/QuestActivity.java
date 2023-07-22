@@ -105,18 +105,10 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
                 findViewById(R.id.loadingProgressBar).setVisibility(flag ? View.VISIBLE : View.GONE));
 
         questViewModel.getStatus().observe(this, statusModel -> {
-            if (!statusModel.getSuccess()) {
+            Toast.makeText(this, "Ошибка квеста: " + statusModel.getDescription(), Toast.LENGTH_LONG).show();
+            if (!statusModel.getSuccess())
                 Timber.e(statusModel.getDescription());
-                Intent intent = new Intent(QuestActivity.this, MainActivity.class);
-                intent.putExtra("status", statusModel);
-                startActivity(intent);
-            } else
-                Toast.makeText(QuestActivity.this,
-                                "Can not load stage, error: " + statusModel.getDescription(),
-                                Toast.LENGTH_LONG)
-                        .show();
         });
-
 
         questViewModel.getNotification().observe(this, notificationModel -> {
             if (notificationModel == null)
@@ -189,6 +181,7 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
 
         hideNavBar(getWindow());
 
+        Timber.i("QuestActivity created");
         startLoading();
     }
 
@@ -256,6 +249,8 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
                 intent.putExtra("section", ScreenDestination.STORIES);
                 startActivity(intent);
                 finish();
+                Timber.i("Story ID not specified, closing QuestActivity");
+                return;
             }
             boolean sync = !getIntent().getBooleanExtra("current", false);
             int chapter = getIntent().getIntExtra("chapterId", 1);
@@ -263,9 +258,11 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
 
             // загрузка последней стадии или намеренной
             questViewModel.beginWithStage(storyId, chapter, stage, sync);
-            Timber.i("Quest started with %d,%d,%d", storyId, chapter, stage);
-        } else
+            Timber.i("Story started from args %d, %d, %d", storyId, chapter, stage);
+        } else {
             questViewModel.beginWithStage(keys[0], keys[1], keys[2], true);
+            Timber.i("Story started from keys %d, %d, %d", keys[0], keys[1], keys[2]);
+        }
 
     }
 
@@ -305,7 +302,7 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
 
     @Override
     protected void onDestroy() {
-        Timber.i("Destroyed QuestActivity");
+        Timber.i("QuestActivity destroyed");
         soundManager.stop();
         super.onDestroy();
     }

@@ -1,4 +1,4 @@
-package net.artux.pda.map.repository
+package net.artux.pda.model
 
 import net.artux.pda.model.map.Strength
 import net.artux.pda.model.user.Gang

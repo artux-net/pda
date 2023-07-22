@@ -25,7 +25,6 @@ class DataRepository(
     val items: ItemsContainerModel,
     val storyModel: StoryModel,
     val properties: Properties,
-    val luaTable: LuaTable,
     val applicationLogger: ApplicationLogger
 ) {
     val TAG = "Data Repository"
@@ -59,7 +58,7 @@ class DataRepository(
             items!!,
             storyModel!!,
             properties!!,
-            luaTable!!,
+            //luaTable!!,
             applicationLogger!!
         )
     }
@@ -71,7 +70,6 @@ class DataRepository(
     )
     val storyDataModelFlow: SharedFlow<StoryDataModel> = dataModelFlow
 
-    val gson = Gson()
     var updated: Boolean = true
 
     init {
@@ -86,7 +84,7 @@ class DataRepository(
     }
 
     fun sendData(map: Map<String, String>) {
-        applyActions(emptyMap())
+        applyActions(LinkedHashMap())
         platformInterface.send(map)
     }
 

@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidAudio;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
-import com.badlogic.gdx.backends.android.AsynchronousAndroidAudio;
 
 import net.artux.pda.app.PDAApplication;
 import net.artux.pda.map.GdxAdapter;
@@ -30,6 +29,7 @@ import net.artux.pda.ui.viewmodels.CommandViewModel;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.utils.GDXTimberLogger;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,6 +125,8 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             if (data != null) {
                 Timber.tag("Core Fragment").d("Got data - command: %s", data.toString());
                 Intent intent = null;
+                DataRepository dataRepository = gdxAdapter.getDataRepository();
+                dataRepository.applyActions(Collections.emptyMap(), true); // apply all changes
                 questViewModel.processData(data);
                 if (data.containsKey("openPda")) {
                     Timber.d("Start MainActivity");

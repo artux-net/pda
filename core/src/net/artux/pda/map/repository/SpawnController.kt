@@ -11,6 +11,9 @@ import net.artux.pda.map.ecs.creation.EntityProcessorSystem
 import net.artux.pda.map.ecs.interactive.map.SpawnComponent
 import net.artux.pda.map.ecs.takeover.SpawnSystem
 import net.artux.pda.map.di.scope.PerGameMap
+import net.artux.pda.model.SavedMap
+import net.artux.pda.model.SavedSpawn
+import net.artux.pda.model.SavedStalker
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.map.SpawnModel
 import net.artux.pda.model.map.Strength
@@ -55,10 +58,7 @@ class SpawnController @Inject constructor(
             }
             if (gang != null && !spawnComponent.title.isNullOrBlank()) {
                 spawns.add(SavedSpawn(spawnComponent.title, gang, strength, savedStalkers))
-                logger.log(
-                    tag,
-                    "${spawnComponent.title}: Saved $gang with ${savedStalkers.size} stalkers"
-                )
+                logger.log(tag, "${spawnComponent.title}: Saved $gang with ${savedStalkers.size} stalkers")
             }
         }
         val savedGame = SavedMap(gameMap.id, spawns)

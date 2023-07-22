@@ -32,18 +32,6 @@ public class PDAApplication extends Application {
     @Inject
     protected MediaPlayer mediaPlayer;
 
-    public static int[] group_avatars = {
-            R.drawable.g0,
-            R.drawable.g1,
-            R.drawable.g2,
-            R.drawable.g3,
-            R.drawable.g4,
-            R.drawable.g5,
-            R.drawable.g6,
-            R.drawable.g7,
-            R.drawable.g8
-    };
-
     @Override
     public void onCreate() {
         FirebaseApp.initializeApp(this);
@@ -53,7 +41,7 @@ public class PDAApplication extends Application {
             Timber.i("%s - логирование включено", tree.getClass().getSimpleName());
         }
         Timber.i(getString(R.string.hello_message));
-        Timber.i("Сталкерский ПДА запущен, версия: " + BuildConfig.VERSION_NAME  + " (" + BuildConfig.VERSION_CODE + "), тип: " + BuildConfig.BUILD_TYPE);
+        Timber.i("Сталкерский ПДА запущен, версия: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + "), тип: " + BuildConfig.BUILD_TYPE);
         Timber.i("Режим тестирования: %s", isTesterMode());
         MobileAds.initialize(this, () -> Timber.i("Инициализирован Yandex ADS SDK"));
         URLHelper.init(properties);
@@ -64,7 +52,11 @@ public class PDAApplication extends Application {
     }
 
     public boolean isTesterMode() {
-        return properties.get(PropertyFields.TESTER_MODE).equals(true);
+        Object testerMode = properties.get(PropertyFields.TESTER_MODE);
+        if (testerMode == null)
+            return false;
+        else
+            return testerMode.equals(true);
     }
 
     @Override

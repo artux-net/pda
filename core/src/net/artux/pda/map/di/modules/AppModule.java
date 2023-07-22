@@ -38,11 +38,6 @@ public class AppModule {
     }
 
     @Provides
-    public LuaTable getLuaTable() {
-        return dataRepository.getLuaTable();
-    }
-
-    @Provides
     @Named("testerMode")
     public boolean isInTesterMode() {
         return getProperties()

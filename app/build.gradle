@@ -58,9 +58,9 @@ android {
         }
 
     }
-    packagingOptions {
+    packaging {
         resources {
-            excludes += ["META-INF/robovm/ios/robovm.xml", "META-INF/NOTICE.md"]
+            excludes.add("META-INF/*")
         }
     }
 

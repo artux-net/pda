@@ -39,6 +39,8 @@ public class FogSystem extends BaseSystem {
     public void update(float deltaTime) {
         super.update(deltaTime);
         ImmutableArray<Entity> entities = getEntities();
+        if (!isPlayerActive())
+            return;
         Entity player = getPlayer();
         BodyComponent playerBodyComponent = pm.get(player);
 

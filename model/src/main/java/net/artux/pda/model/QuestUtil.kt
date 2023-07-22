@@ -9,7 +9,7 @@ import java.util.stream.Collectors
 object QuestUtil {
 
     @JvmStatic
-    fun check(conditions: HashMap<String, List<String>>?, storyDataModel: StoryDataModel): Boolean {
+    fun check(conditions: Map<String, List<String>>?, storyDataModel: StoryDataModel): Boolean {
         if (conditions.isNullOrEmpty())
             return true
         val map = storyDataModel.parametersMap
@@ -50,7 +50,7 @@ object QuestUtil {
 
     private fun checkParam(param: String, operation: String, conditionValue: Int, parameterMap: Map<String, Int>): Boolean{
         val currentValue = parameterMap[param] ?: return false
-
+        println("$param - ${currentValue} $operation $conditionValue")
         when (operation){
             "<" -> if (currentValue >= conditionValue) return false
             ">" -> if (currentValue <= conditionValue) return false

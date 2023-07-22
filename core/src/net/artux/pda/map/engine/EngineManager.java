@@ -51,8 +51,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
 
     @Inject
     public EngineManager(MapComponent mapComponent, MissionsSystem missionsSystem,
-                         EngineSaver engineSaver, LuaTable luaTable,
-                         ConditionEntityManager conditionEntityManager) {
+                         EngineSaver engineSaver, ConditionEntityManager conditionEntityManager) {
         this.dataRepository = mapComponent.getDataRepository();
         this.map = dataRepository.getGameMap();
         this.engine = mapComponent.getEngine();
@@ -77,7 +76,7 @@ public class EngineManager extends InputListener implements Drawable, Disposable
         RandomSpawnerHelper.init(mapComponent);
 
         missionsSystem.setActiveMission(missionsSystem.getActiveMission()); // finds points
-        initLuaTable(luaTable);
+        //initLuaTable(luaTable);
         stage.addListener(this);
         syncCameraPosition(stage);
         Gdx.app.getApplicationLogger().log("Engine", "Engine loading took " + (TimeUtils.millis() - loadTime) + " ms.");

@@ -2,8 +2,6 @@ package net.artux.pda.di;
 
 import static okhttp3.Protocol.HTTP_2;
 
-import android.content.ContentResolver;
-
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.gson.Gson;
@@ -61,13 +59,13 @@ public class NetworkModule {
 
             try {
                 return chain.proceed(requestBuilder.build());
-            }catch (Exception e){
-                Timber.e(e.getMessage());
+            } catch (Exception e) {
+                Timber.e(e);
                 return new Response.Builder()
                         .protocol(HTTP_2)
                         .request(requestBuilder.build())
                         .code(503)
-                        .message(e.getMessage())
+                        .message(e.getMessage() == null ? "Service Unavailable" : e.getMessage())
                         .body(ResponseBody.create(MediaType.get("application/json"), "{}"))
                         .build();
             }

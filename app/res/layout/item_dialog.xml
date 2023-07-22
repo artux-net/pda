@@ -7,7 +7,6 @@
         android:id="@+id/avatarDialog"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:src="@drawable/a2"
         android:layout_weight="3"/>
 
     <RelativeLayout

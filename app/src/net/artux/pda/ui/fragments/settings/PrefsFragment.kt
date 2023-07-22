@@ -54,11 +54,9 @@ class PrefsFragment : PreferenceFragmentCompat() {
                 val takeFlags =
                     Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 requireContext().contentResolver.takePersistableUriPermission(
-                    it.data?.data!!,
-                    takeFlags
-                )
+                    it.data?.data!!, takeFlags)
 
-                writeFile("pda_log", settingsViewModel.getLog())
+                writeFile("pda_log", settingsViewModel.getLogInString())
             } else {
                 Timber.e("Получен неуспешный код: $it")
             }
@@ -115,7 +113,6 @@ class PrefsFragment : PreferenceFragmentCompat() {
 
         settingsViewModel.log.observe(viewLifecycleOwner) {
             val intent = Intent(requireContext(), LogActivity::class.java)
-            intent.putExtra("text", it)
             requireContext().startActivity(intent)
         }
 
@@ -132,25 +129,23 @@ class PrefsFragment : PreferenceFragmentCompat() {
             true
         }
 
-
         questViewModel.status.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it.description, Toast.LENGTH_SHORT).show()
         }
-
     }
 
     private fun writeFile(fileName: String, content: String) {
         try{
-            var content = "<html><head><meta charset=\"UTF-8\"/></head><body>$content</body></html>"
-            content = content.replace(System.lineSeparator(), "<br>")
+            var result =
+                "<html><head><meta charset=\"UTF-8\"/></head><body>$content</body></html>"
+            result = result.replace(System.lineSeparator(), "<br>")
             val directory = DocumentFile.fromTreeUri(requireContext(), baseDocumentTreeUri!!)!!
             val file = directory.createFile("text/html", fileName)
             val pfd = requireContext().contentResolver.openFileDescriptor(file!!.uri, "w")
             val fos = FileOutputStream(pfd!!.fileDescriptor)
-            fos.write(content.toByteArray(StandardCharsets.UTF_8))
+            fos.write(result.toByteArray(StandardCharsets.UTF_8))
             fos.close()
-        } catch (e: IOException) {
-        }
+        } catch (_: IOException) {}
     }
 
     private fun clearSharedPreferences(ctx: Context) {

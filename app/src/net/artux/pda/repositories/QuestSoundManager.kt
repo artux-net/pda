@@ -68,6 +68,7 @@ class QuestSoundManager(
                 descriptor.startOffset,
                 descriptor.length
             )
+            Timber.i("Music $path played from local file")
             mediaPlayer.prepare()
         } catch (_: Exception) {
             loadOnlineResource(path)
@@ -77,6 +78,7 @@ class QuestSoundManager(
 
     private fun loadOnlineResource(path: String) {
         try {
+            Timber.i("Try to load $path from net")
             mediaPlayer.setDataSource(URLHelper.getResourceURL(path))
             mediaPlayer.prepareAsync()
         } catch (_: Exception) {
@@ -96,6 +98,7 @@ class QuestSoundManager(
     }
 
     fun pause() {
+        Timber.i("Pause audio")
         soundPool.autoPause()
         wasPlaying = mediaPlayer.isPlaying
         if (wasPlaying)
@@ -103,6 +106,7 @@ class QuestSoundManager(
     }
 
     fun resume() {
+        Timber.i("Resume audio")
         soundPool.autoResume()
         if (wasPlaying)
             mediaPlayer.start()
@@ -118,6 +122,7 @@ class QuestSoundManager(
             resume()
         }
         muted = !muted
+        Timber.i("Muted = $muted")
     }
 
 }

@@ -50,9 +50,16 @@ public class ProfileHelper {
         return true;
     }
 
+    public static void setGangAvatar(ImageView imageView, Gang gang) {
+        Context context = imageView.getContext();
+        Glide.with(context)
+                    .load(Uri.parse("file:///android_asset/textures/avatars/gangs/g" + (gang.getId() + 1) + ".png"))
+                    .into(imageView);
+    }
+
     public static void setAvatar(ImageView imageView, String avatar) {
         Context context = imageView.getContext();
-        if (avatar == null)
+        if (avatar == null || avatar.isBlank())
             Glide.with(context)
                     .asDrawable()
                     .load(AppCompatResources.getDrawable(context, R.mipmap.ic_launcher))

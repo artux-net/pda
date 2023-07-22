@@ -90,8 +90,8 @@ class QuestViewModel @javax.inject.Inject constructor(
         stageId: Long,
         sync: Boolean = true
     ) {
-        if (storyId == -1)
-            throw Exception("Negative storyId")
+        if (storyId < 0)
+            exitStory()
         viewModelScope.launch {
             currentStoryId = storyId
             currentChapterId = chapterId
@@ -204,7 +204,7 @@ class QuestViewModel @javax.inject.Inject constructor(
             prepareSync(chapterStage)
             setStage(chapterStage)
         } else
-            status.postValue(StatusModel(Exception("Can not find stage with id: ${transfer.stageId} in chapter: $currentChapterId")))
+            status.postValue(StatusModel(Exception("Не удалось найти стадию ${transfer.stageId} в главе: $currentChapterId")))
     }
 
     fun getCurrentStage(): Stage? {
