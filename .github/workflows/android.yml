@@ -39,9 +39,6 @@ jobs:
         with:
           gradle-version: 8.2.1
           
-      - name: Setup Android SDK
-        uses: amyu/setup-android@v2
-
       - name: Build APK
         id: build
         run: ./gradlew clean assembleRelease  
