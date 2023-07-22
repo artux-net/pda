@@ -8,7 +8,7 @@ on:
 jobs:
   assemble_job:
     name: Assemble
-    runs-on: self-hosted
+    runs-on: oracle
     steps:
 
       - name: Checkout
