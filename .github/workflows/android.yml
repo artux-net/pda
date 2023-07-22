@@ -5,6 +5,9 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
+env:
+  ANDROID_HOME: /usr/lib/android-sdk
+
 jobs:
   assemble_job:
     name: Assemble
