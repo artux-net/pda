@@ -29,7 +29,6 @@ jobs:
       - name: Setup Android SDK
         uses: amyu/setup-android@v2
         with:
-          cache-disabled: true
           sdk-version: '33'
           build-tools-version: '30.0.3'
           
