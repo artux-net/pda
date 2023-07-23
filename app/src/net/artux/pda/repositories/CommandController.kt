@@ -142,8 +142,16 @@ class CommandController @Inject constructor(
         if (list.size > 2)
             return
         else if (list.size == 1) {
-            stageId = list[0].toLong()
-            stageEvent.postValue(Event.ofData(OpenStageEvent(stageId)))
+            val value = list.first()
+            if (value.contains(":")){
+                val args = value.split(":")
+                chapterId = args.first().toInt()
+                stageId = args[1].toLong()
+                stageEvent.postValue(Event.ofData(OpenStageEvent(stageId, chapterId)))
+            }else {
+                stageId = list[0].toLong()
+                stageEvent.postValue(Event.ofData(OpenStageEvent(stageId)))
+            }
         } else {
             chapterId = list[0].toInt()
             stageId = list[1].toLong()
@@ -152,7 +160,7 @@ class CommandController @Inject constructor(
     }
 
     private fun exitStory() {
-        exitEvent.postValue(ScreenDestination.STORIES)
+        exitEvent.postValue(ScreenDestination(ScreenDestination.STORIES))
     }
 
     fun checkStage(currentStoryId: Int, currentChapterId: Int, currentStageId: Long) {

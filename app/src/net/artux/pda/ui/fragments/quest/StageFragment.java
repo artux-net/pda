@@ -106,9 +106,12 @@ public class StageFragment extends Fragment {
     }
 
     private void setSceneResponses(List<TransferModel> transferModels) {
+        Context context = getContext();
+        if (context == null)
+            return;
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         for (TransferModel transfer : transferModels) {
-            Button button = new Button(requireContext());
+            Button button = new Button(context);
             button.setLayoutParams(layoutParams);
             button.setPadding(10, 10, 10, 10);
             button.setGravity(Gravity.CENTER_VERTICAL);

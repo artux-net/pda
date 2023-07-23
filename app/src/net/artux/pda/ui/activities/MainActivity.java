@@ -86,27 +86,19 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
 
         Intent intent = getIntent();
         if (intent != null) {
-            if (intent.hasExtra("section")) {
-                ScreenDestination screenDestination = (ScreenDestination) intent.getSerializableExtra("section");
-                switch (screenDestination) {
-                    case STORIES: {
+            int destination = intent.getIntExtra("section", ScreenDestination.NEWS);
+            switch (destination) {
+                case ScreenDestination.STORIES ->
                         presenter.addFragment(new StoriesFragment(), false);
-                        break;
-                    }
-                    case PROFILE:
+                case ScreenDestination.PROFILE ->
                         presenter.addFragment(new UserProfileFragment(), false);
-                        break;
-                    default:
-                        presenter.addFragment(new NewsFragment(), false);
-                        break;
-                }
-            } else
-                presenter.addFragment(new NewsFragment(), false);
+                default -> presenter.addFragment(new NewsFragment(), false);
+            }
+
             if (intent.hasExtra("status")) {
                 StatusModel statusModel = (StatusModel) intent.getSerializableExtra("status");
                 Snackbar.make(binding.getRoot(), statusModel.getDescription(), Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Ok", view -> {
-                        })
+                        .setAction("Ok", view -> {})
                         .show();
                 if (!statusModel.getSuccess())
                     Timber.e(statusModel.getDescription());

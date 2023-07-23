@@ -146,10 +146,10 @@ public class QuestActivity extends FragmentActivity implements AndroidFragmentAp
         });
 
         commandViewModel.getExitEvent().observe(this, data -> {
-            if (data == ScreenDestination.NONE)
+            if (data.getDestination() == ScreenDestination.NONE)
                 return;
             Intent intent = new Intent(QuestActivity.this, MainActivity.class);
-            intent.putExtra("section", data);
+            intent.putExtra("section", data.getDestination());
             startActivity(intent);
             finish();
         });

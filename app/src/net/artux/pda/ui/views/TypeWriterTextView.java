@@ -56,8 +56,8 @@ public class TypeWriterTextView extends androidx.appcompat.widget.AppCompatTextV
         mDelay = m;
     }
 
-    private Handler mHandler = new Handler();
-    private Runnable characterAdder = new Runnable() {
+    private final Handler mHandler = new Handler();
+    private final Runnable characterAdder = new Runnable() {
         @Override
         public void run() {
             setText(mText.subSequence(0, mIndex++));

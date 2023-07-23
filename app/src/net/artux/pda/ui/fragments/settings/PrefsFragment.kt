@@ -21,6 +21,7 @@ import net.artux.pda.ui.activities.LogActivity
 import net.artux.pda.ui.activities.LoginActivity
 import net.artux.pda.ui.activities.MainActivity
 import net.artux.pda.ui.activities.hierarhy.FragmentNavigation
+import net.artux.pda.ui.viewmodels.CommandViewModel
 import net.artux.pda.ui.viewmodels.QuestViewModel
 import net.artux.pda.ui.viewmodels.SettingsViewModel
 import net.artux.pda.ui.viewmodels.UserViewModel
@@ -37,6 +38,8 @@ class PrefsFragment : PreferenceFragmentCompat() {
     private val questViewModel: QuestViewModel by viewModels()
     private val viewModel: UserViewModel by viewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
+    private val commandViewModel: CommandViewModel by viewModels()
+
     private lateinit var navigationPresenter: FragmentNavigation.Presenter
 
     private lateinit var launcher: ActivityResultLauncher<Intent>
@@ -51,10 +54,8 @@ class PrefsFragment : PreferenceFragmentCompat() {
         launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
                 baseDocumentTreeUri = it.data?.data
-                val takeFlags =
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                requireContext().contentResolver.takePersistableUriPermission(
-                    it.data?.data!!, takeFlags)
+                val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                requireContext().contentResolver.takePersistableUriPermission(it.data?.data!!, takeFlags)
 
                 writeFile("pda_log", settingsViewModel.getLogInString())
             } else {
@@ -91,12 +92,16 @@ class PrefsFragment : PreferenceFragmentCompat() {
             true
         }
 
-
         val exitStoryPreference = findPreference<Preference>("exit_story")
         exitStoryPreference?.setOnPreferenceClickListener {
             questViewModel.exitStory()
             true
         }
+
+        commandViewModel.exitEvent.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), "Ok!", Toast.LENGTH_SHORT).show()
+        }
+
 
         val resetDataPreference = findPreference<Preference>("reset_data")
         resetDataPreference?.setOnPreferenceClickListener {
@@ -153,8 +158,10 @@ class PrefsFragment : PreferenceFragmentCompat() {
         val children = dir.list()
         for (child in children!!) {
             if (child != "prefs.xml") {
-                ctx.getSharedPreferences(child.replace(".xml", ""), Context.MODE_PRIVATE).edit()
-                    .clear().apply()
+                ctx.getSharedPreferences(child.replace(".xml", ""), Context.MODE_PRIVATE)
+                    .edit()
+                    .clear()
+                    .apply()
                 //delete the file
                 File(dir, child).delete()
             }
