@@ -23,7 +23,7 @@ class NewsViewModel @Inject constructor(
     fun update() {
         viewModelScope.launch {
             repository.getArticles()
-                .map { articleMapper.model(it) }
+                .map { articleMapper.models(it) }
                 .onSuccess { it ->
                     it.sortBy { it.published }
                     it.reverse()
@@ -36,7 +36,7 @@ class NewsViewModel @Inject constructor(
     fun updateFromCache() {
         articles.postValue(
             repository.getCachedArticles()
-                .map { articleMapper.model(it) }
+                .map { articleMapper.models(it) }
                 .getOrDefault(Collections.emptyList()))
     }
 

@@ -1,4 +1,4 @@
-package net.artux.pda.ui.main;
+package net.artux.pda.ui.activities.intro;
 
 import android.content.Context;
 

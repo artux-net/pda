@@ -10,5 +10,6 @@ data class Point(
     var pos: String = "500:500",
 ) : Serializable {
     var data: HashMap<String, String> = HashMap()
+    var actions: HashMap<String, List<String>> = HashMap()
     var condition: HashMap<String, List<String>> = HashMap()
 }

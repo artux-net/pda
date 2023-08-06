@@ -60,12 +60,12 @@ public class NetworkModule {
             try {
                 return chain.proceed(requestBuilder.build());
             } catch (Exception e) {
-                Timber.e(e);
+                Timber.w(e);
                 return new Response.Builder()
                         .protocol(HTTP_2)
                         .request(requestBuilder.build())
                         .code(503)
-                        .message(e.getMessage() == null ? "Service Unavailable" : e.getMessage())
+                        .message(e.getMessage() == null ? "PDANET Unavailable" : e.getMessage())
                         .body(ResponseBody.create(MediaType.get("application/json"), "{}"))
                         .build();
             }

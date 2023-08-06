@@ -66,6 +66,10 @@ public class PlayScene extends Scene {
         postProcessing = mapComponent.getPostProcessing();
         tiledMap = mapComponent.getTiledMap();
 
+        dataRepository.putObjectToLuaContext("gameMap", gameMap);
+        dataRepository.putObjectToLuaContext("engineManager", engineManager);
+        dataRepository.putObjectToLuaContext("mapComponent", mapComponent);
+
         mapComponent.getUserInterface();
         mapComponent.initInterface();
         addStage(stage);

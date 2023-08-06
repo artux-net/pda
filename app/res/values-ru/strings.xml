@@ -152,4 +152,5 @@
     <string name="online">В сети</string>
     <string name="offline">Не в сети</string>
     <string name="position_p">Позиция в рейтинге: %1$s</string>
+    <string name="complete_story_alert">История уже пройдена, приступайте к прохождению других. При сбросе прохождения этой истории другие истории могут оказаться недоступны.</string>
 </resources>

@@ -3,11 +3,11 @@ package net.artux.pda.repositories
 import android.content.Context
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.media.MediaPlayer.OnPreparedListener
 import android.media.SoundPool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.artux.pda.scripting.IQuestSoundManager
 import net.artux.pda.utils.URLHelper
 import timber.log.Timber
 import javax.inject.Singleton
@@ -15,11 +15,11 @@ import javax.inject.Singleton
 
 @Singleton
 class QuestSoundManager(
-    val mediaPlayer: MediaPlayer,
-    val soundPool: SoundPool,
+    override val mediaPlayer: MediaPlayer,
+    override val soundPool: SoundPool,
     val context: Context
 ) :
-    OnPreparedListener {
+    IQuestSoundManager {
 
     private val mediaScope = CoroutineScope(Dispatchers.Main)
     var audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -27,7 +27,7 @@ class QuestSoundManager(
     var maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat()
     var leftVolume = curVolume / maxVolume
     var rightVolume = curVolume / maxVolume
-    var muted = false
+    override var muted = false
 
     init {
         soundPool.setOnLoadCompleteListener { soundPool, sampleId, _ ->
@@ -40,7 +40,7 @@ class QuestSoundManager(
 
     val loadedSounds: MutableMap<String, Int> = linkedMapOf()
 
-    fun playSound(path: String) {
+    override fun playSound(path: String) {
         val id = if (loadedSounds.containsKey(path))
             loadedSounds[path]
         else {
@@ -51,16 +51,16 @@ class QuestSoundManager(
         Timber.i("Sound $path loaded as $id")
     }
 
-    fun pauseSound(path: String) {
+    override fun pauseSound(path: String) {
         val id = loadedSounds[path]
         if (id != null) {
             soundPool.pause(id)
         }
     }
 
-    fun playMusic(path: String, b: Boolean) = mediaScope.launch {
+    override fun playMusic(path: String, loop: Boolean) = mediaScope.launch {
         mediaPlayer.stop()
-        mediaPlayer.isLooping = b
+        mediaPlayer.isLooping = loop
         try {
             val descriptor = context.assets.openFd(path)
             mediaPlayer.setDataSource(
@@ -76,7 +76,7 @@ class QuestSoundManager(
 
     }
 
-    private fun loadOnlineResource(path: String) {
+    override fun loadOnlineResource(path: String) {
         try {
             Timber.i("Try to load $path from net")
             mediaPlayer.setDataSource(URLHelper.getResourceURL(path))
@@ -90,14 +90,14 @@ class QuestSoundManager(
         mediaPlayer.start()
     }
 
-    var wasPlaying = false
+    override var wasPlaying = false
 
-    fun stop() {
+    override fun stop() {
         pause()
         mediaPlayer.stop()
     }
 
-    fun pause() {
+    override fun pause() {
         Timber.i("Pause audio")
         soundPool.autoPause()
         wasPlaying = mediaPlayer.isPlaying
@@ -105,7 +105,7 @@ class QuestSoundManager(
             mediaPlayer.pause()
     }
 
-    fun resume() {
+    override fun resume() {
         Timber.i("Resume audio")
         soundPool.autoResume()
         if (wasPlaying)
@@ -113,7 +113,7 @@ class QuestSoundManager(
     }
 
 
-    fun mute() {
+    override fun mute() {
         if (!muted) {
             mediaPlayer.setVolume(0f, 0f)
             pause()

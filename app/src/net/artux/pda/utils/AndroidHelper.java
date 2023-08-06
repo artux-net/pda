@@ -1,4 +1,4 @@
-package net.artux.pda.ui.util;
+package net.artux.pda.utils;
 
 import android.view.View;
 import android.view.Window;

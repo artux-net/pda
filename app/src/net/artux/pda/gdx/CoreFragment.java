@@ -109,34 +109,29 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             commandViewModel
                     .getCommandController()
                     .putObjectToScriptContext("adapter", gdxAdapter)
-                    .putObjectToScriptContext("dataRepository", dataRepository)
-                    .putObjectToScriptContext("sceneManager", gdxAdapter.getSceneManager())
-                    .putObjectToScriptContext("core", gdxAdapter.getCoreComponent())
-                    .putObjectToScriptContext("assetManager",
-                            gdxAdapter.getCoreComponent().getAssetsManager());
+                    .putObjectToScriptContext("dataRepository", dataRepository);
         }
         setApplicationLogger(gdxTimberLogger);
         super.onResume();
     }
 
     @Override
+    public void putObjectToLuaContext(String key, Object value) {
+        commandViewModel.getCommandController().putObjectToScriptContext(key, value);
+    }
+
+    @Override
     public void send(final Map<String, String> data) {
         runOnUiThread(() -> {
-            if (data != null) {
-                Timber.tag("Core Fragment").d("Got data - command: %s", data.toString());
-                Intent intent = null;
-                DataRepository dataRepository = gdxAdapter.getDataRepository();
-                dataRepository.applyActions(Collections.emptyMap(), true); // apply all changes
-                questViewModel.processData(data);
+            if (data != null && !data.isEmpty()) {
+                Timber.i("Got data - command: %s", data.toString());
+                questViewModel.processDataWithActions(data, gdxAdapter.getDataRepository().getDifferenceActions());
                 if (data.containsKey("openPda")) {
                     Timber.d("Start MainActivity");
-                    intent = new Intent(getActivity(), MainActivity.class);
+                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                    requireActivity().finish();
+                    startActivity(intent);
                 }
-                if (intent == null)
-                    return;
-
-                requireActivity().finish();
-                startActivity(intent);
             }
         });
     }
@@ -155,6 +150,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     @Override
     public void restart() {
+        Timber.i("Core restart");
         gdxAdapter.create();
     }
 

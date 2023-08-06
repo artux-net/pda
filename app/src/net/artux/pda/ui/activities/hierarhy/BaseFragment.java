@@ -26,7 +26,7 @@ public abstract class BaseFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navigationPresenter = ((MainActivity) requireActivity()).getPresenter();
-        Timber.d("Fragment %s created", getClass().getName());
+        Timber.d("Fragment %s created", getClass().getSimpleName());
         if (viewModel == null)
             viewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
     }
@@ -34,7 +34,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        Timber.d("Fragment %s stopped.", getClass().getName());
+        Timber.d("Fragment %s stopped.", getClass().getSimpleName());
     }
 
     public Class<? extends AdditionalBaseFragment> getDefaultAdditionalFragment() {

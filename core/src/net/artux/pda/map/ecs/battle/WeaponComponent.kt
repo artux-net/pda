@@ -135,25 +135,28 @@ class WeaponComponent : Component {
 
         if (timeout <= 0 && (bulletModel != null && bulletModel!!.quantity > 0 || !player)) {
             val weaponModel = selected
-            val magazine = magazine
+            val magazine = magazine // кол-во патрон в магазине
             if (stack < limit() && magazine > 0) {
                 this.magazine--
+                //выстрел, текущая очередь (stack) не кончилась
                 timeout += 1 / weaponModel!!.speed
                 if (player)
                     bulletModel!!.quantity = bulletModel!!.quantity - 1
                 stack++
                 shootLastFrame = true
             } else if (magazine == 0) {
+                //патрон в магазине нет
                 reload()
                 timeout += 5 / weaponModel!!.speed // перезарядка
                 shootLastFrame = false
             } else {
+                // магазин не пуст, очередь кончилась, моб "ждет"
                 stack = 0
                 timeout += 20 / weaponModel!!.speed
                 shootLastFrame = false
             }
         } else shootLastFrame = false
-        return shootLastFrame
+        return shootLastFrame // показывает, произошел выстрел или нет
     }
 
     fun reload() {

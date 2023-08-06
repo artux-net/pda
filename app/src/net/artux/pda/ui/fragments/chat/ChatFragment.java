@@ -29,7 +29,7 @@ import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
 import net.artux.pda.ui.fragments.news.WebFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.stories.StoriesFragment;
-import net.artux.pda.ui.util.ObjectWebSocketListener;
+import net.artux.pda.utils.ObjectWebSocketListener;
 
 import java.util.Timer;
 import java.util.TimerTask;

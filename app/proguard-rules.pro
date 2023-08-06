@@ -3,6 +3,15 @@
 -keep class javax.** { *; }
 -keep class com.badlogic.** { *; }
 
+# required for lua scripting
+-keep class net.artux.pda.map.di.components.** { *; }
+-keep class net.artux.pda.scripting.** { *; }
+-keep class net.artux.pda.map.managers.** { *; }
+-keep class net.artux.pda.map.ecs.** { *; }
+-keep class net.artux.pda.map.scenes.** { *; }
+-keep class net.artux.pda.map.content.** { *; }
+
+
 -verbose
 
 -dontwarn android.support.**

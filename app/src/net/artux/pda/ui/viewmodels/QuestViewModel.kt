@@ -3,7 +3,6 @@ package net.artux.pda.ui.viewmodels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.datatransport.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.model.StatusModel
@@ -12,10 +11,19 @@ import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.mapper.StageMapper
 import net.artux.pda.model.mapper.StatusMapper
 import net.artux.pda.model.mapper.StoryMapper
-import net.artux.pda.model.quest.*
+import net.artux.pda.model.quest.ChapterModel
+import net.artux.pda.model.quest.NotificationModel
+import net.artux.pda.model.quest.Stage
+import net.artux.pda.model.quest.StageModel
+import net.artux.pda.model.quest.StoryModel
+import net.artux.pda.model.quest.TransferModel
 import net.artux.pda.model.quest.story.StoryDataModel
-import net.artux.pda.repositories.*
-import net.artux.pda.ui.viewmodels.event.ScreenDestination
+import net.artux.pda.repositories.CommandController
+import net.artux.pda.repositories.MissionController
+import net.artux.pda.repositories.QuestRepository
+import net.artux.pda.repositories.SellerRepository
+import net.artux.pda.repositories.SummaryRepository
+import net.artux.pda.repositories.UserRepository
 import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
 import timber.log.Timber
 
@@ -249,15 +257,28 @@ class QuestViewModel @javax.inject.Inject constructor(
         repository.clearCache()
     }
 
-    fun processData(data: Map<String, String>?) {
+    fun processDataWithActions(data: Map<String, String>?, actions: Map<String, MutableList<String>>) {
+        loadingState.postValue(true)
+        viewModelScope.launch {
+            commandController.syncNow(actions)
+                .onSuccess {
+                    processData(data)
+                }.onFailure {
+                    loadingState.postValue(false)
+                }
+        }
+    }
+
+    private fun processData(data: Map<String, String>?) {
         if (data == null)
             return
         loadingState.postValue(true)
+        Timber.i("Processing data - commands: ${data}")
         if (data.containsKey("chapter")) {
             val chapterId: String? = data["chapter"]
             val stageId: String? = data["stage"]
             if (chapterId != null && stageId != null) {
-                beginWithStage(chapterId = chapterId.toInt(), stageId = stageId.toLong())
+                beginWithStage(chapterId = chapterId.toInt(), stageId = stageId.toLong(), sync = false)
             }
         } else if (data.containsKey("seller")) {
             val sellerId: String? = data["seller"]
@@ -265,7 +286,6 @@ class QuestViewModel @javax.inject.Inject constructor(
                 this.data.postValue(data)
             }
         }
-
     }
 
 }

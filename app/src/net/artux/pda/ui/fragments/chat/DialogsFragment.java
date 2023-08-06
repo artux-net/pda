@@ -18,7 +18,7 @@ import net.artux.pda.databinding.FragmentListBinding;
 import net.artux.pda.model.ConversationModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.DialogsAdapter;
-import net.artux.pda.ui.util.ObjectWebSocketListener;
+import net.artux.pda.utils.ObjectWebSocketListener;
 
 import javax.inject.Inject;
 

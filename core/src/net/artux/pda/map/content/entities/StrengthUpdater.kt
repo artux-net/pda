@@ -19,7 +19,6 @@ import javax.inject.Inject
  */
 @PerGameMap
 class StrengthUpdater @Inject constructor(
-    private val logger: ApplicationLogger,
     private val itemsContainerModel: ItemsContainerModel,
     private val itemsGenerator: ItemsGenerator, private val assetManager: AssetManager
 ) {

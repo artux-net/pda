@@ -11,6 +11,7 @@ import net.artux.pda.model.quest.StoryItem;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.ParameterModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
+import net.artux.pda.model.quest.story.StoryStateModel;
 import net.artux.pdanetwork.model.ChapterDto;
 import net.artux.pdanetwork.model.ParameterDto;
 import net.artux.pdanetwork.model.Spawn;
@@ -20,6 +21,7 @@ import net.artux.pdanetwork.model.StoryInfo;
 import net.artux.pdanetwork.model.Text;
 import net.artux.pdanetwork.model.Transfer;
 
+import org.mapstruct.CollectionMappingStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -31,9 +33,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-@Mapper(uses = {ItemMapper.class, UserMapper.class},
+@Mapper(uses = {ItemMapper.class, UserMapper.class}, imports = LinkedList.class,
+        collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED,
         nullValueMappingStrategy = RETURN_DEFAULT,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_DEFAULT,
+        nullValueIterableMappingStrategy = RETURN_DEFAULT,
+        nullValueMapMappingStrategy = RETURN_DEFAULT,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface StoryMapper {
 
@@ -48,10 +53,23 @@ public interface StoryMapper {
 
     ParameterModel paramModel(ParameterDto dto);
 
-    @Mapping(target = "complete", ignore = true)
-    StoryItem storyItem(StoryInfo value);
+    @Mapping(target = "needs", defaultExpression = "java(new LinkedList<Integer>())")
+    @Mapping(target = "complete", expression = "java(isStoryComplete(value.getId().intValue(), dataModel))")
+    StoryItem storyItem(StoryInfo value, StoryDataModel dataModel);
 
-    List<StoryItem> storyItem(List<StoryInfo> dtos);
+    default List<StoryItem> storyItem(List<StoryInfo> value, StoryDataModel dataModel){
+        LinkedList<StoryItem> result = new LinkedList<>();
+        for (StoryInfo item : value)
+            result.add(storyItem(item, dataModel));
+        return result;
+    }
+
+    default boolean isStoryComplete(int id, StoryDataModel dataModel){
+        StoryStateModel stateModel = dataModel.getStateByStoryId(id);
+        if (stateModel == null)
+            return false;
+        return stateModel.getOver();
+    }
 
     GameMap map(net.artux.pdanetwork.model.GameMap map);
 
@@ -64,9 +82,10 @@ public interface StoryMapper {
 
     List<SpawnModel> spawns(List<Spawn> spawn);
 
+    @Mapping(target = "title", ignore = true)
     ChapterModel chapter(ChapterDto chapter);
 
-    default Map<Long, Stage> stagesMap(Map<String, net.artux.pdanetwork.model.Stage> stageMap){
+    default Map<Long, Stage> stagesMap(Map<String, net.artux.pdanetwork.model.Stage> stageMap) {
         Map<Long, Stage> result = new HashMap<>();
         for (Map.Entry<String, net.artux.pdanetwork.model.Stage> entry : stageMap.entrySet()) {
             result.put(entry.getValue().getId(), stage(entry.getValue()));

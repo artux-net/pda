@@ -1,6 +1,6 @@
 package net.artux.pda.ui.activities;
 
-import static net.artux.pda.ui.util.AndroidHelper.hideNavBar;
+import static net.artux.pda.utils.AndroidHelper.hideNavBar;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;

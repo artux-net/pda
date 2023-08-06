@@ -108,7 +108,8 @@ object QuestUtil {
             .filter { itemModel: ItemModel -> itemModel.id == null }
             .map { itemModel: ItemModel -> itemModel.baseId.toString() + ":" + itemModel.quantity }
             .collect(Collectors.toList())
-        response["item"] = newItems
+        itemDifferences.addAll(newItems)
+
 
         // quantity and quality difference
         for (newItem in newData.allItems) {
@@ -124,10 +125,10 @@ object QuestUtil {
         response["item"] = itemDifferences
 
         // money difference
-        response["money"] = listOf((newData.money - oldData.money).toString())
+        response["money"] = mutableListOf((newData.money - oldData.money).toString())
 
         //xp difference
-        response["xp"] = listOf((newData.xp - oldData.xp).toString())
+        response["xp"] = mutableListOf((newData.xp - oldData.xp).toString())
 
         // wearable difference
         val wearableItems = mutableListOf<String>()

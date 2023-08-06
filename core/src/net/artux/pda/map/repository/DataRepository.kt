@@ -40,7 +40,6 @@ class DataRepository(
         var applicationLogger: ApplicationLogger? = null
     ) {
 
-
         fun platformInterface(platformInterface: PlatformInterface) =
             apply { this.platformInterface = platformInterface }
 
@@ -74,6 +73,8 @@ class DataRepository(
 
     init {
         dataModelFlow.tryEmit(initDataModel)
+        putObjectToLuaContext("story", storyModel)
+        putObjectToLuaContext("user", currentStoryDataModel)
     }
 
     fun setUserData(storyDataModel: StoryDataModel) {
@@ -84,7 +85,6 @@ class DataRepository(
     }
 
     fun sendData(map: Map<String, String>) {
-        applyActions(LinkedHashMap())
         platformInterface.send(map)
     }
 
@@ -106,5 +106,15 @@ class DataRepository(
 
     fun applyActions(actions: Map<String, List<String>>?) {
         applyActions(actions, true)
+    }
+
+    fun getDifferenceActions(): Map<String, List<String>> {
+        val summaryMap = QuestUtil.calculateDifference(initDataModel, currentStoryDataModel)
+        summaryMap["syncNow"] = emptyList()
+        return summaryMap
+    }
+
+    fun putObjectToLuaContext(key: String, value: Any) {
+        platformInterface.putObjectToLuaContext(key, value)
     }
 }

@@ -16,7 +16,7 @@ class Stage : Serializable {
 
     fun isNeedSync(): Boolean{
         for (text in texts){
-            if (!text.condition.isNullOrEmpty())
+            if (text.condition.isNotEmpty())
                 return true
         }
         for (transfer in transfers){

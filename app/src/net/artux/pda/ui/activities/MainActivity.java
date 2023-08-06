@@ -1,6 +1,6 @@
 package net.artux.pda.ui.activities;
 
-import static net.artux.pda.ui.util.AndroidHelper.hideNavBar;
+import static net.artux.pda.utils.AndroidHelper.hideNavBar;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -166,7 +166,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         FragmentManager fragmentManager = getSupportFragmentManager();
         List<Fragment> fragments = fragmentManager.getFragments();
         for (Fragment fragment : fragments) {
-            if (fragment != null && fragment.isVisible() && !(fragment instanceof AdditionalBaseFragment))
+            if (fragment != null && fragment.isVisible() && fragment instanceof BaseFragment)
                 return fragment;
         }
         return null;

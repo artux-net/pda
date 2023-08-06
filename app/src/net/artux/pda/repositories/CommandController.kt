@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.pda.commands.Commands
+import net.artux.pda.scripting.ICommandController
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.mapper.StageMapper
 import net.artux.pda.model.mapper.StoryMapper
@@ -17,6 +18,7 @@ import net.artux.pda.ui.viewmodels.event.ScreenDestination
 import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
 import net.artux.pda.utils.AdType
 import net.artux.pdanetwork.model.CommandBlock
+import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
 import org.luaj.vm2.WeakTable
 import org.luaj.vm2.lib.DebugLib
@@ -34,7 +36,7 @@ class CommandController @Inject constructor(
     var mapper: StoryMapper,
     var stageMapper: StageMapper,
     val repository: QuestRepository
-) {
+) : ICommandController {
 
     val sellerEvent: SingleLiveEvent<Event<Int>> = SingleLiveEvent()
     val stageEvent: SingleLiveEvent<Event<OpenStageEvent>> = SingleLiveEvent()
@@ -42,9 +44,11 @@ class CommandController @Inject constructor(
     val adEvent: SingleLiveEvent<AdType> = SingleLiveEvent()
     var notification: SingleLiveEvent<NotificationModel> = SingleLiveEvent()
 
+    override fun getLuaGlobals(): Globals = globals
     val globals = JsePlatform.standardGlobals()
         @JvmName("getLuaTable")
         get
+
     private val scope = CoroutineScope(Dispatchers.Default)
     private var cacheCommands: MutableMap<String, MutableList<String>> = LinkedHashMap()
 
@@ -54,9 +58,13 @@ class CommandController @Inject constructor(
     var needSync = false
 
     init {
+        Timber.tag("LUA Script").i("CommandController and Lua init")
         globals.setmetatable(WeakTable.make(false, true))
         globals.load(DebugLib())
         globals.useWeakKeys()
+
+        putObjectToScriptContext("controller", this)
+        putObjectToScriptContext("soundManager", soundManager)
     }
 
     fun processWithServer(actions: Map<String, List<String>>) = scope.launch {
@@ -71,7 +79,7 @@ class CommandController @Inject constructor(
 
         for (command in commands) {
             when (command.key) {
-                "openNotification" -> openNotification(command.value)
+                "showNotification", "openNotification" -> openNotification(command.value)
                 "openSeller" -> openSeller(command.value)
                 "openStage" -> openStage(command.value)
                 "loopMusic" -> soundManager.playMusic(command.value.first(), true)
@@ -109,34 +117,33 @@ class CommandController @Inject constructor(
             }
     }
 
-    private fun openNotification(args: List<String>) {
+    override fun openNotification(args: List<String>) {
         if (args.size == 2)
             notification.postValue(stageMapper.notification(NotificationType.ALERT, "${args[0]}:${args[1]}", storyData.value))
     }
 
-    fun clearCache() {
+    override fun clearCache() {
         cacheCommands.clear()
     }
 
-    fun cacheCommands(commands: Map<String, List<String>>) {
+    override fun cacheCommands(commands: Map<String, List<String>>) {
         for (command in commands) {
             if (command.key in Commands.serverCommands)
                 cacheCommand(command.key, command.value)
         }
     }
 
-    private fun cacheCommand(key: String, params: List<String>) {
+    override fun cacheCommand(key: String, params: List<String>) {
         val current = cacheCommands.getOrDefault(key, mutableListOf())
         current.addAll(params)
         cacheCommands[key] = current
     }
 
-
-    private fun openSeller(args: List<String>) {
+    override fun openSeller(args: List<String>) {
         sellerEvent.postValue(Event.ofData(args.first().toInt()))
     }
 
-    private fun openStage(list: List<String>) {
+    override fun openStage(list: List<String>) {
         val stageId: Long
         val chapterId: Int
         if (list.size > 2)
@@ -159,7 +166,7 @@ class CommandController @Inject constructor(
         }
     }
 
-    private fun exitStory() {
+    override fun exitStory() {
         exitEvent.postValue(ScreenDestination(ScreenDestination.STORIES))
     }
 
@@ -196,14 +203,14 @@ class CommandController @Inject constructor(
             .onFailure { status.postValue(StatusModel(it)) }
     }
 
-    fun showAd(types: List<String>) {
+    override fun showAd(types: List<String>) {
         if (types.isEmpty())
             adEvent.postValue(AdType.USUAL)
         else
             showAd(types.first())
     }
 
-    fun showAd(type: String) {
+    override fun showAd(type: String) {
         when (type) {
             "video" -> adEvent.postValue(AdType.VIDEO)
             "usual" -> adEvent.postValue(AdType.USUAL)
@@ -211,27 +218,24 @@ class CommandController @Inject constructor(
         }
     }
 
-
     fun putObjectToScriptContext(name: String, o: Any?): CommandController {
-        if(o != null)
+        if(o != null) {
             globals.set(name, CoerceJavaToLua.coerce(o))
+            Timber.i("Object was putted to Lua Context: $name (${o.javaClass.simpleName})")
+        }
         else
             Timber.e("Object is not putted to Lua Context: $name")
 
         return this
     }
 
-    private fun runLua(scripts: List<String>) {
-        globals.set("controller", CoerceJavaToLua.coerce(this))
-        globals.set("soundManager", CoerceJavaToLua.coerce(soundManager))
-
+    override fun runLua(scripts: List<String>) {
         for (script in scripts) {
             try {
                 val chunk = globals.load(script)
                 chunk.call()
             } catch (e: LuaError) {
                 Timber.tag("LUA Script").e(e)
-                //notificationController.addMessage("Script error ${e.message}")
             }
         }
     }

@@ -195,7 +195,7 @@ class QuestRepository @Inject constructor(
                     val data = response.body()
                     if (data != null) {
                         storyDataCache.put("story", data)
-                        Timber.d("Синхронизация прошла успешно, ответ: $data")
+                        Timber.i("Синхронизация прошла успешно, ответ: $data")
                         it.resume(Result.success(data))
                     } else
                         it.resume(Result.failure(Exception(response.toString())))

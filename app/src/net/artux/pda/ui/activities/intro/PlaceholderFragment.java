@@ -1,4 +1,4 @@
-package net.artux.pda.ui.main;
+package net.artux.pda.ui.activities.intro;
 
 import android.os.Bundle;
 import android.text.Html;
@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import net.artux.pda.databinding.FragmentHelpBinding;
 

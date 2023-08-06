@@ -1,172 +1,127 @@
-package net.artux.pda.ui.fragments.stories;
+package net.artux.pda.ui.fragments.stories
 
-import android.app.AlertDialog;
-import android.content.Intent;
-import android.os.Bundle;
-import android.text.InputType;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-
-import net.artux.pda.R;
-import net.artux.pda.common.PropertyFields;
-import net.artux.pda.databinding.FragmentListBinding;
-import net.artux.pda.model.quest.StoryItem;
-import net.artux.pda.model.quest.story.StoryDataModel;
-import net.artux.pda.model.quest.story.StoryStateModel;
-import net.artux.pda.ui.activities.QuestActivity;
-import net.artux.pda.ui.activities.hierarhy.BaseFragment;
-import net.artux.pda.ui.viewmodels.StoriesViewModel;
-
-import java.util.Optional;
-import java.util.Properties;
-
-import javax.inject.Inject;
-
-import dagger.hilt.android.AndroidEntryPoint;
+import android.app.AlertDialog
+import android.content.DialogInterface
+import android.content.Intent
+import android.os.Bundle
+import android.text.InputType
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.Toast
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
+import net.artux.pda.R
+import net.artux.pda.databinding.FragmentListBinding
+import net.artux.pda.model.StatusModel
+import net.artux.pda.model.StoryAlert
+import net.artux.pda.model.StorySelector
+import net.artux.pda.model.quest.StoryItem
+import net.artux.pda.model.quest.story.StoryDataModel
+import net.artux.pda.ui.activities.QuestActivity
+import net.artux.pda.ui.activities.hierarhy.BaseFragment
+import net.artux.pda.ui.fragments.stories.StoriesAdapter.OnStoryClickListener
+import net.artux.pda.ui.viewmodels.StoriesViewModel
 
 @AndroidEntryPoint
-public class StoriesFragment extends BaseFragment implements StoriesAdapter.OnStoryClickListener {
+class StoriesFragment : BaseFragment(), OnStoryClickListener {
+    private lateinit var binding: FragmentListBinding
+    private val storiesViewModel: StoriesViewModel by viewModels()
 
-    private FragmentListBinding binding;
-    private StoriesViewModel storiesViewModel;
-    @Inject
-    protected Properties properties;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentListBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentListBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        navigationPresenter.setTitle(getResources().getString(R.string.map));
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        navigationPresenter.setTitle(resources.getString(R.string.map))
+        val adapter = StoriesAdapter(this)
+        binding.list.layoutManager = LinearLayoutManager(context)
+        binding.list.adapter = adapter
 
-        StoriesAdapter adapter = new StoriesAdapter(StoriesFragment.this);
-        binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.list.setAdapter(adapter);
-
-        storiesViewModel = new ViewModelProvider(requireActivity()).get(StoriesViewModel.class);
-        storiesViewModel.getStories().observe(getViewLifecycleOwner(), stories -> {
-            navigationPresenter.setLoadingState(false);
-            if (stories.size() > 0) {
-                binding.list.setVisibility(View.VISIBLE);
-                binding.viewMessage.setVisibility(View.GONE);
-                adapter.setStories(stories);
+        storiesViewModel.stories.observe(viewLifecycleOwner) { stories: List<StoryItem?> ->
+            navigationPresenter.setLoadingState(false)
+            if (stories.isNotEmpty()) {
+                binding.list.visibility = View.VISIBLE
+                binding.viewMessage.visibility = View.GONE
+                adapter.setStories(stories)
             } else {
-                binding.list.setVisibility(View.GONE);
-                binding.viewMessage.setVisibility(View.VISIBLE);
-            }
-        });
-        storiesViewModel.getStatus().observe(getViewLifecycleOwner(), statusModel ->
-                Toast.makeText(requireContext(), statusModel.getDescription(), Toast.LENGTH_SHORT).show());
-
-        navigationPresenter.setLoadingState(true);
-
-        storiesViewModel.getStoryData().observe(getViewLifecycleOwner(), memberResult -> {
-            if (memberResult.getCurrentState() != null) {
-                StoryStateModel storyState = memberResult.getCurrentState();
-                Intent intent = new Intent(getActivity(), QuestActivity.class);
-                intent.putExtra("current", true);
-                intent.putExtra("storyId", storyState.getStoryId());
-                intent.putExtra("chapterId", storyState.getChapterId());
-                intent.putExtra("stageId", storyState.getStageId());
-                requireActivity().startActivity(intent);
-                requireActivity().finish();
-            } else
-                storiesViewModel.updateStories();
-        });
-        storiesViewModel.updateData();
-    }
-
-
-    @Override
-    public void onClick(StoryItem storyItem) {
-        int id = storyItem.getId();
-        if (id == -1) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.PDADialogStyle);
-            builder.setTitle("Формат ввода {storyId}:{chapterId}:{stageId}");
-
-            EditText input = new EditText(getActivity());
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(input);
-            builder.setPositiveButton("Загрузить", (dialog, which) -> {
-                String[] keys = input.getText().toString().replaceAll("[^0-9]+", ":").split(":");
-                if (keys.length == 3) {
-                    try {
-                        Intent intent = new Intent(getActivity(), QuestActivity.class);
-                        int[] scs = {Integer.parseInt(keys[0]), Integer.parseInt(keys[1]), Integer.parseInt(keys[2])};
-                        intent.putExtra("keys", scs);
-                        if (getActivity() != null)
-                            getActivity().startActivity(intent);
-                    } catch (NumberFormatException e) {
-                        Toast.makeText(getActivity(), "Error, not numbers", Toast.LENGTH_SHORT).show();
-                    }
-                } else
-                    Toast.makeText(getActivity(), "Error, must be 3 keys", Toast.LENGTH_SHORT).show();
-
-            });
-            builder.setNegativeButton("Закрыть", (dialog, which) -> dialog.cancel());
-            builder.show();
-        } else if (id > -1) {
-            Intent intent = new Intent(requireContext(), QuestActivity.class);
-            StoryDataModel dataModel = storiesViewModel.getStoryData().getValue();
-            if (dataModel != null) {
-                boolean sequenceWalkthrough = true;
-
-                Object testMode = properties.get(PropertyFields.TESTER_MODE);
-                if (testMode != null && testMode.equals(true))
-                    sequenceWalkthrough = false;
-
-                Optional<StoryItem> firstStory = storiesViewModel.getStories().getValue().stream().findFirst();
-
-                if (firstStory.isPresent() && firstStory.get() != storyItem && sequenceWalkthrough) {
-                    StoryStateModel stateModel = dataModel.getStateByStoryId(id - 1);
-                    if (stateModel == null || !stateModel.getOver()) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.PDADialogStyle);
-                        builder.setTitle("Нет доступа");
-                        builder.setMessage("Прохождение этой истории недоступно пока не пройдены предыдущие");
-                        builder.setNegativeButton(R.string.okay, (dialog, which) -> dialog.cancel());
-                        builder.show();
-                        return;
-                    }
-                }
-
-                StoryStateModel storyStateModel = dataModel.getStateByStoryId(id);
-                if (storyStateModel != null && storyStateModel.getOver()) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.PDADialogStyle);
-                    builder.setTitle("Нет доступа");
-                    builder.setMessage("История уже пройдена, приступайте к прохождению других. " +
-                            "При сбросе прохождения этой истории другие истории могут оказаться недоступны.");
-                    builder.setNeutralButton(R.string.okay, (dialog, which) -> dialog.cancel());
-                    builder.setNegativeButton("Сбросить прохождение", (dialog, which) ->
-                            storiesViewModel.resetSingleStory(id));
-                    builder.show();
-                    return;
-                } else if (storyStateModel != null) {
-                    intent.putExtra("chapterId", storyStateModel.getChapterId());
-                    intent.putExtra("stageId", storyStateModel.getStageId());
-                }
-                intent.putExtra("storyId", id);
-                requireActivity().startActivity(intent);
-                requireActivity().finish();
+                binding.list.visibility = View.GONE
+                binding.viewMessage.visibility = View.VISIBLE
             }
         }
+        storiesViewModel.status.observe(viewLifecycleOwner) { statusModel: StatusModel ->
+            Toast.makeText(requireContext(), statusModel.description, Toast.LENGTH_SHORT)
+                .show()
+        }
+        navigationPresenter.setLoadingState(true)
+        storiesViewModel.storyData.observe(viewLifecycleOwner) { memberResult: StoryDataModel ->
+            val state = memberResult.currentState
+            if (state == null) {
+                storiesViewModel.updateStories()
+                return@observe
+            }
+
+            state.let {
+                storiesViewModel.selectStory(it.storyId, it.chapterId, it.stageId, it.current)
+            }
+        }
+        storiesViewModel.storyAlert.observe(viewLifecycleOwner) { storyAlert: StoryAlert ->
+            val builder = AlertDialog.Builder(activity, R.style.PDADialogStyle)
+            builder.setTitle(storyAlert.titleId)
+            builder.setMessage(storyAlert.messageId)
+            builder.setNeutralButton(R.string.okay) { dialog: DialogInterface, _: Int -> dialog.cancel() }
+            if (storyAlert === StoryAlert.ALREADY_COMPLETE)
+                builder.setNegativeButton(R.string.reset_story) { _: DialogInterface?, _: Int ->
+                    storiesViewModel.resetSingleStory(storiesViewModel.selectedStoryId)
+                }
+            builder.show()
+        }
+        storiesViewModel.storySelector.observe(viewLifecycleOwner) { (storyId, chapterId, stageId, isCurrent): StorySelector ->
+            val intent = Intent(activity, QuestActivity::class.java)
+            intent.putExtra("current", isCurrent)
+            intent.putExtra("storyId", storyId)
+            intent.putExtra("chapterId", chapterId)
+            intent.putExtra("stageId", stageId)
+            requireActivity().startActivity(intent)
+            requireActivity().finish()
+        }
+        storiesViewModel.updateData()
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
+    override fun onClick(storyItem: StoryItem) {
+        val id = storyItem.id
+        if (id == -1) {
+            val builder = AlertDialog.Builder(activity, R.style.PDADialogStyle)
+            builder.setTitle(R.string.inputFormatToLoadStory)
+            val input = EditText(activity)
+            input.inputType = InputType.TYPE_CLASS_TEXT
+            builder.setView(input)
+            builder.setPositiveButton(R.string.load) { _: DialogInterface?, _: Int ->
+                val keys = input.text.toString().replace("[^0-9]+".toRegex(), ":").split(":".toRegex())
+                        .dropLastWhile { it.isEmpty() }
+                        .toTypedArray()
+
+                if (keys.size != 3) {
+                    Toast.makeText(activity, getString(R.string.enterNotThreeValues), Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                try {
+                    val scs = intArrayOf(keys[0].toInt(), keys[1].toInt(), keys[2].toInt())
+                    storiesViewModel.selectStory(scs[0], scs[1], scs[2])
+                } catch (e: NumberFormatException) {
+                    Toast.makeText(activity, getString(R.string.enterNotNumber), Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+            builder.setNegativeButton(R.string.cancel) { dialog: DialogInterface, _: Int -> dialog.cancel() }
+            builder.show()
+        } else if (id > -1) {
+            storiesViewModel.selectStory(storyItem)
+        }
     }
 }

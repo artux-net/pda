@@ -49,6 +49,10 @@ public class GdxAdapter extends ApplicationAdapter {
         sceneManager = coreComponent.getSceneManager();
         assetManager = coreComponent.getAssetsManager();
         sceneManager.clear();
+
+        dataRepository.putObjectToLuaContext("coreComponent", coreComponent);
+        dataRepository.putObjectToLuaContext("sceneManager", sceneManager);
+        dataRepository.putObjectToLuaContext("assetManager", assetManager);
     }
 
     @Override

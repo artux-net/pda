@@ -8,18 +8,18 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.World;
 
-import net.artux.pda.map.repository.DataRepository;
-import net.artux.pda.map.ecs.physics.BodyComponent;
+import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.map.ecs.interactive.ClickComponent;
 import net.artux.pda.map.ecs.interactive.InteractiveComponent;
-import net.artux.pda.map.ecs.render.SpriteComponent;
 import net.artux.pda.map.ecs.interactive.map.ConditionComponent;
 import net.artux.pda.map.ecs.interactive.map.PointComponent;
 import net.artux.pda.map.ecs.interactive.map.QuestComponent;
 import net.artux.pda.map.ecs.interactive.map.TransferComponent;
+import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.render.RenderSystem;
+import net.artux.pda.map.ecs.render.SpriteComponent;
+import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.utils.Mappers;
-import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.Point;
 
@@ -45,8 +45,11 @@ public class QuestPointsHelper {
 
         Entity entity = new Entity()
                 .add(new BodyComponent(Mappers.vector2(point.getPos()), world))
-                .add(new InteractiveComponent(point.getName(), point.getType(), () ->
-                        dataRepository.sendData(point.getData())))
+                .add(new InteractiveComponent(point.getName(), point.getType(), () -> {
+                    if (point.getActions() != null)
+                        dataRepository.applyActions(point.getActions());
+                    dataRepository.sendData(point.getData());
+                }))
                 .add(new ClickComponent(23, () -> engine.getSystem(RenderSystem.class)
                         .showText(point.getName(), Mappers.vector2(point.getPos()))));
         bcm.get(entity).body.setTransform(Mappers.vector2(point.getPos()), 0);

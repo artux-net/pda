@@ -1,5 +1,6 @@
-package net.artux.pda.repositories
+package net.artux.pda.scripting
 
+import net.artux.pda.repositories.CommandController
 import javax.inject.Inject
 import javax.inject.Singleton
 
