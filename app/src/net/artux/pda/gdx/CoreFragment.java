@@ -69,7 +69,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
         gdxAdapter = (GdxAdapter) new GdxAdapter.Builder(this)
                 .map(map)
-                .luaTable(commandController.getLuaTable())
+                .luaTable(commandController.getLuaGlobals())
                 .story(storyModel)
                 .storyData(dataModel)
                 .items(items)
@@ -107,7 +107,7 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
             dataRepository.setUpdated(updated);
             setArguments(args);
             commandViewModel
-                    .getCommandController()
+                    .getCommandController().getLuaController()
                     .putObjectToScriptContext("adapter", gdxAdapter)
                     .putObjectToScriptContext("dataRepository", dataRepository);
         }
@@ -117,7 +117,9 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
 
     @Override
     public void putObjectToLuaContext(String key, Object value) {
-        commandViewModel.getCommandController().putObjectToScriptContext(key, value);
+        commandViewModel.getCommandController()
+                .getLuaController()
+                .putObjectToScriptContext(key, value);
     }
 
     @Override

@@ -20,6 +20,7 @@ object PluginsVersions {
 }
 
 dependencies {
+    //classpath
     implementation("com.squareup:javapoet:1.13.0")
     implementation("com.android.tools.build:gradle:8.0.2")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${PluginsVersions.KOTLIN}")
@@ -29,4 +30,12 @@ dependencies {
 
     implementation("com.google.gms:google-services:4.3.13")
     implementation("com.google.firebase:firebase-crashlytics-gradle:2.9.5")
+
+    implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.8.20")
 }
+
+/*
+tasks.dokkaHtmlMultiModule.configure {
+    outputDirectory.set(buildDir.resolve("dokkaCustomMultiModuleOutput"))
+    documentationFileName.set("README.md")
+}*/

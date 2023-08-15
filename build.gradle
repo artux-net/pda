@@ -1,3 +1,11 @@
+plugins{
+    id "org.jetbrains.dokka"
+}
+
+subprojects {
+    apply plugin: 'org.jetbrains.dokka'
+}
+
 ext {
     kotlin_version = Versions.KOTLIN
     gdxVersion = Versions.GDX
@@ -109,4 +117,8 @@ project(":core") {
         implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     }
 }*/
+
+tasks.named("dokkaHtmlMultiModule") {
+    outputDirectory.set(file("$rootDir/docs"))
+}
 

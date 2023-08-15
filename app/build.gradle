@@ -218,6 +218,8 @@ dependencies {
 
     //ads
     implementation 'com.yandex.android:mobileads:5.8.0'
+
+    dokkaPlugin 'org.jetbrains.dokka:android-documentation-plugin:1.8.20'
 }
 
 task copyAndroidNatives {
@@ -251,3 +253,4 @@ tasks.whenTaskAdded { packageTask ->
         packageTask.dependsOn "copyAndroidNatives"
     }
 }
+
