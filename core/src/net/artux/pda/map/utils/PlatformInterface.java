@@ -15,4 +15,5 @@ public interface PlatformInterface {
 
     void exit();
 
+    void openLogs();
 }

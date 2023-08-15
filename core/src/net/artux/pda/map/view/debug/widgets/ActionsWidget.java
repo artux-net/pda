@@ -159,6 +159,13 @@ public class ActionsWidget extends Table {
                 entityProcessorSystem.addEntity(entity);
             }
         });
+
+        addLabel("Открыть лог", labelStyle, new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                dataRepository.getPlatformInterface().openLogs();
+            }
+        });
     }
 
     private void addLabel(String title, Label.LabelStyle labelStyle, ClickListener clickListener) {

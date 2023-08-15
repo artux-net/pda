@@ -277,14 +277,13 @@ class QuestViewModel @javax.inject.Inject constructor(
         if (data.containsKey("chapter")) {
             val chapterId: String? = data["chapter"]
             val stageId: String? = data["stage"]
-            if (chapterId != null && stageId != null) {
+            if (!chapterId.isNullOrBlank() && !stageId.isNullOrBlank())
                 beginWithStage(chapterId = chapterId.toInt(), stageId = stageId.toLong(), sync = false)
-            }
+
         } else if (data.containsKey("seller")) {
             val sellerId: String? = data["seller"]
-            if (sellerId != null) {
+            if (!sellerId.isNullOrBlank())
                 this.data.postValue(data)
-            }
         }
     }
 

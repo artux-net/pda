@@ -24,12 +24,12 @@ import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.quest.StoryModel;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.repositories.CommandController;
+import net.artux.pda.ui.activities.LogActivity;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.viewmodels.CommandViewModel;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 import net.artux.pda.utils.GDXTimberLogger;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,6 +143,13 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
         Map<String, String> data = new HashMap<>();
         data.put("openPda", "");
         send(data);
+    }
+
+    @Override
+    public void openLogs() {
+        Timber.i("Open logs from core");
+        Intent intent = new Intent(requireContext(), LogActivity.class);
+        requireContext().startActivity(intent);
     }
 
     @Override

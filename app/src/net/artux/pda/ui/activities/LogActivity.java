@@ -2,9 +2,13 @@ package net.artux.pda.ui.activities;
 
 import android.os.Bundle;
 import android.text.Html;
+import android.text.Layout;
+import android.text.method.ScrollingMovementMethod;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.ViewModelProvider;
 
 import net.artux.pda.R;
@@ -25,5 +29,7 @@ public class LogActivity extends AppCompatActivity {
         settingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
         String text = settingsViewModel.getLogInString().replaceAll("\n", "<br>");
         textView.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT));
+        NestedScrollView scrollView = (NestedScrollView) textView.getParent();
+        scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
     }
 }

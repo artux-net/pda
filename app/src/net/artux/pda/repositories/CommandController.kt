@@ -53,7 +53,7 @@ class CommandController @Inject constructor(
         luaController.putObjectToScriptContext("soundManager", soundManager)
     }
 
-    override fun processWithServer(actions: Map<String, List<String>>) = scope.launch {
+    override fun processWithServer(actions: Map<String, List<String>>){
         needSync = true
         cacheCommands(actions)
         process(actions)
@@ -61,6 +61,12 @@ class CommandController @Inject constructor(
 
     override fun process(commands: Map<String, List<String>>?) {
         if (commands.isNullOrEmpty()) return
+
+        for (command in commands){
+            when (command.key){
+                "script", "lua" -> luaController.runLua(command.value)
+            }
+        }
 
         scope.launch {
             for (command in commands) {
@@ -76,7 +82,7 @@ class CommandController @Inject constructor(
                     "pauseAllSound" -> soundManager.pause()
                     "resumeAllSound" -> soundManager.resume()
                     "showAd" -> showAd(command.value)
-                    "script", "lua" -> luaController.runLua(command.value) // ignore lua
+                    "asyncScript", "asyncLua" -> luaController.runLua(command.value) // ignore lua
 
                     else -> {
                         // * commands for server * //

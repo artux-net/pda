@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.ApplicationLogger;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -14,26 +15,25 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.content.AnomalyHelper;
 import net.artux.pda.map.content.QuestPointsHelper;
 import net.artux.pda.map.content.RandomSpawnerHelper;
 import net.artux.pda.map.content.SecretHelper;
 import net.artux.pda.map.content.entities.EntityBuilder;
-import net.artux.pda.map.ecs.render.Drawable;
-import net.artux.pda.map.ecs.camera.CameraSystem;
-import net.artux.pda.map.ecs.interactive.InteractionSystem;
-import net.artux.pda.map.ecs.player.MissionsSystem;
-import net.artux.pda.map.ecs.physics.PlayerMovingSystem;
-import net.artux.pda.map.managers.ConditionEntityManager;
-import net.artux.pda.map.repository.EngineSaver;
-import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.ecs.camera.CameraSystem;
+import net.artux.pda.map.ecs.interactive.InteractionSystem;
+import net.artux.pda.map.ecs.physics.PlayerMovingSystem;
+import net.artux.pda.map.ecs.player.MissionsSystem;
+import net.artux.pda.map.ecs.render.Drawable;
+import net.artux.pda.map.managers.ConditionEntityManager;
+import net.artux.pda.map.repository.DataRepository;
+import net.artux.pda.map.repository.EngineSaver;
+import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.model.map.GameMap;
 
 import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 
 import javax.inject.Inject;
 
@@ -45,14 +45,16 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     private final Entity player;
     private final DataRepository dataRepository;
     private final EngineSaver engineSaver;
+    private final ApplicationLogger logger;
 
     private final boolean questPoints = true;
     private final boolean anomalies = true;
 
     @Inject
     public EngineManager(MapComponent mapComponent, MissionsSystem missionsSystem,
-                         EngineSaver engineSaver, ConditionEntityManager conditionEntityManager) {
+                         EngineSaver engineSaver, ConditionEntityManager conditionEntityManager, ApplicationLogger logger) {
         this.dataRepository = mapComponent.getDataRepository();
+        this.logger = logger;
         this.map = dataRepository.getGameMap();
         this.engine = mapComponent.getEngine();
         this.engineSaver = engineSaver;
@@ -83,11 +85,12 @@ public class EngineManager extends InputListener implements Drawable, Disposable
     }
 
     private void initLuaTable(LuaTable luaTable) {
-        luaTable.set("engine", CoerceJavaToLua.coerce(engine));
-        luaTable.set("player", CoerceJavaToLua.coerce(player));
+        dataRepository.putObjectToLuaContext("player", player);
+        dataRepository.putObjectToLuaContext("engine", engine);
         ImmutableArray<EntitySystem> systems = engine.getSystems();
+        logger.log("Engine", "Start to put ECS "+ systems.size() +" systems to Lua context.");
         for (int i = 0; i < systems.size(); i++) {
-            luaTable.set(systems.getClass().getSimpleName(), CoerceJavaToLua.coerce(systems.get(i)));
+            dataRepository.putObjectToLuaContext(systems.getClass().getSimpleName(), systems.get(i));
         }
     }
 

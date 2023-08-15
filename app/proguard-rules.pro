@@ -6,7 +6,9 @@
 # required for lua scripting
 -keep class net.artux.pda.map.di.components.** { *; }
 -keep class net.artux.pda.scripting.** { *; }
+-keep class net.artux.pda.map.engine.** { *; }
 -keep class net.artux.pda.map.managers.** { *; }
+-keep class net.artux.pda.map.repository.** { *; }
 -keep class net.artux.pda.map.ecs.** { *; }
 -keep class net.artux.pda.map.scenes.** { *; }
 -keep class net.artux.pda.map.content.** { *; }

@@ -69,6 +69,7 @@ public class PlayScene extends Scene {
         dataRepository.putObjectToLuaContext("gameMap", gameMap);
         dataRepository.putObjectToLuaContext("engineManager", engineManager);
         dataRepository.putObjectToLuaContext("mapComponent", mapComponent);
+        dataRepository.putObjectToLuaContext("notificationController", mapComponent.getNotificationController());
 
         mapComponent.getUserInterface();
         mapComponent.initInterface();

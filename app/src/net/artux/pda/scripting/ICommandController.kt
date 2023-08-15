@@ -36,7 +36,7 @@ interface ICommandController {
     /**
      * Выполняет команды на сервере без команды-триггера
      */
-    fun processWithServer(actions: Map<String, List<String>>): Job
+    fun processWithServer(actions: Map<String, List<String>>)
 
     /**
      * Кэширует команды, они выполнятся при следующей команде-триггер (syncNow, exitStory, finishStory)

@@ -42,21 +42,13 @@ public class PDAApplication extends Application {
         }
         Timber.i(getString(R.string.hello_message));
         Timber.i("Сталкерский ПДА запущен, версия: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + "), тип: " + BuildConfig.BUILD_TYPE);
-        Timber.i("Режим тестирования: %s", isTesterMode());
+        Timber.i("Режим тестирования: %s", properties.get(PropertyFields.TESTER_MODE));
         MobileAds.initialize(this, () -> Timber.i("Инициализирован Yandex ADS SDK"));
         URLHelper.init(properties);
     }
 
     public Properties getProperties() {
         return properties;
-    }
-
-    public boolean isTesterMode() {
-        Object testerMode = properties.get(PropertyFields.TESTER_MODE);
-        if (testerMode == null)
-            return false;
-        else
-            return testerMode.equals(true);
     }
 
     @Override

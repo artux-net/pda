@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import net.artux.pda.R;
 import net.artux.pda.app.PDAApplication;
+import net.artux.pda.common.PropertyFields;
 import net.artux.pda.ui.activities.hierarhy.AdditionalBaseFragment;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
 
@@ -44,7 +45,7 @@ public class InfoFragment extends AdditionalBaseFragment {
 
         viewModel.getMember().observe(getViewLifecycleOwner(), memberResult -> {
             String infoTitle = "PDA #" + memberResult.getPdaId();
-            if (((PDAApplication) requireActivity().getApplication()).isTesterMode()) {
+            if (((PDAApplication) requireActivity().getApplication()).getProperties().get(PropertyFields.TESTER_MODE).equals(true)) {
                 infoTitle += " TESTER MODE";
             }
             navigationPresenter.setAdditionalTitle(infoTitle);
