@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>UserInterfaceModule</title>
+<link href="../../../images/logo-icon.svg" rel="icon" type="image/svg"><script>var pathToRoot = "../../../";</script>    <script>const storage = localStorage.getItem("dokka-dark-mode")
+    if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    } else {
+        const savedDarkMode = JSON.parse(storage)
+        if(savedDarkMode === true) {
+            document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+    }
+    </script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/clipboard.js" async></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async></script>
+<script type="text/javascript" src="../../../scripts/symbol-parameters-wrapper_deferred.js" defer></script></head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+<a href="../../../index.html">
+<span>pda</span>            </a>    </div>
+    <div>
+    </div>
+    <div class="pull-right d-flex">
+        <div class="filter-section" id="filter-section">
+                <button class="platform-tag platform-selector jvm-like" data-active="" data-filter=":core:dokkaHtmlPartial/main">jvm</button>
+        </div>
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" data-page-type="classlike" id="content" pageids="core::net.artux.pda.map.di.modules.ui/UserInterfaceModule///PointingToDeclaration//537371977">
+  <div class="breadcrumbs"><a href="../../index.html">core</a><span class="delimiter">/</span><a href="../index.html">net.artux.pda.map.di.modules.ui</a><span class="delimiter">/</span><span class="current">UserInterfaceModule</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>User</span><wbr><span>Interface</span><wbr><span><span>Module</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="dagger/Module///PointingToDeclaration/"><span class="token annotation builtin">Module</span></span><span class="token punctuation">(</span><span>includes<span class="token operator"> = </span><a href="../-header-interface-module/index.html">HeaderInterfaceModule::class</a></span><wbr><span class="token punctuation">)</span></div></div><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">UserInterfaceModule</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="">Constructors</h2>
+        <div class="table"><a data-name="-2066509361%2FConstructors%2F537371977" anchor-label="UserInterfaceModule" id="-2066509361%2FConstructors%2F537371977" data-filterable-set=":core:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current=":core:dokkaHtmlPartial/main" data-filterable-set=":core:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-user-interface-module.html"><span>User</span><wbr><span>Interface</span><wbr><span><span>Module</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2066509361%2FConstructors%2F537371977"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core:dokkaHtmlPartial/main"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="">Functions</h2>
+        <div class="table"><a data-name="1247791732%2FFunctions%2F537371977" anchor-label="initAssistant" id="1247791732%2FFunctions%2F537371977" data-filterable-set=":core:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":core:dokkaHtmlPartial/main" data-filterable-set=":core:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="init-assistant.html"><span>init</span><wbr><span><span>Assistant</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1247791732%2FFunctions%2F537371977"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="dagger.multibindings/IntoSet///PointingToDeclaration/"><span class="token annotation builtin">IntoSet</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="dagger/Provides///PointingToDeclaration/"><span class="token annotation builtin">Provides</span></span></div></div><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="init-assistant.html"><span class="token function">initAssistant</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Named///PointingToDeclaration/"><span class="token annotation builtin">Named</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"assistantTable"</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>assistantBlock<span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.scenes.scene2d.ui/Table///PointingToDeclaration/">Table</span><span class="token punctuation">, </span></span><span class="parameter ">interactionSystem<span class="token operator">: </span><a href="../../net.artux.pda.map.ecs.interactive/-interaction-system/index.html">InteractionSystem</a><span class="token punctuation">, </span></span><span class="parameter ">assetManager<span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.assets/AssetManager///PointingToDeclaration/">AssetManager</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.scenes.scene2d/Actor///PointingToDeclaration/">Actor</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-407259912%2FFunctions%2F537371977" anchor-label="initControlTable" id="-407259912%2FFunctions%2F537371977" data-filterable-set=":core:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":core:dokkaHtmlPartial/main" data-filterable-set=":core:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="init-control-table.html"><span>init</span><wbr><span>Control</span><wbr><span><span>Table</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-407259912%2FFunctions%2F537371977"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="dagger.multibindings/IntoSet///PointingToDeclaration/"><span class="token annotation builtin">IntoSet</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="dagger/Provides///PointingToDeclaration/"><span class="token annotation builtin">Provides</span></span></div></div><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="init-control-table.html"><span class="token function">initControlTable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Named///PointingToDeclaration/"><span class="token annotation builtin">Named</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"controlTable"</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>controlTable<span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.scenes.scene2d.ui/Table///PointingToDeclaration/">Table</span><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Named///PointingToDeclaration/"><span class="token annotation builtin">Named</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"gameZone"</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>gameZone<span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.scenes.scene2d/Group///PointingToDeclaration/">Group</span><span class="token punctuation">, </span></span><span class="parameter ">playerSystem<span class="token operator">: </span><a href="../../net.artux.pda.map.ecs.player/-player-system/index.html">PlayerSystem</a><span class="token punctuation">, </span></span><span class="parameter ">battleSystem<span class="token operator">: </span><a href="../../net.artux.pda.map.ecs.battle/-player-battle-system/index.html">PlayerBattleSystem</a><span class="token punctuation">, </span></span><span class="parameter ">assetManager<span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.assets/AssetManager///PointingToDeclaration/">AssetManager</span><span class="token punctuation">, </span></span><span class="parameter ">playerMovingSystem<span class="token operator">: </span><a href="../../net.artux.pda.map.ecs.physics/-player-moving-system/index.html">PlayerMovingSystem</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.scenes.scene2d/Actor///PointingToDeclaration/">Actor</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1851870991%2FFunctions%2F537371977" anchor-label="initHud" id="-1851870991%2FFunctions%2F537371977" data-filterable-set=":core:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":core:dokkaHtmlPartial/main" data-filterable-set=":core:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="init-hud.html"><span>init</span><wbr><span><span>Hud</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1851870991%2FFunctions%2F537371977"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="dagger.multibindings/IntoSet///PointingToDeclaration/"><span class="token annotation builtin">IntoSet</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="dagger/Provides///PointingToDeclaration/"><span class="token annotation builtin">Provides</span></span></div></div><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="init-hud.html"><span class="token function">initHud</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">backpackWindow<span class="token operator">: </span><a href="../../net.artux.pda.map.view.window/-backpack-window/index.html">BackpackWindow</a><span class="token punctuation">, </span></span><span class="parameter ">hud<span class="token operator">: </span><a href="../../net.artux.pda.map.view.view/-detailed-h-u-d/index.html">DetailedHUD</a><span class="token punctuation">, </span></span><span class="parameter ">weaponSlot<span class="token operator">: </span><a href="../../net.artux.pda.map.view.view.bars/-slot/index.html">Slot</a><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Named///PointingToDeclaration/"><span class="token annotation builtin">Named</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"hudTable"</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>hudTable<span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.scenes.scene2d.ui/Table///PointingToDeclaration/">Table</span><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Named///PointingToDeclaration/"><span class="token annotation builtin">Named</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"targetLabel"</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>targetLabel<span class="token operator">: </span><a href="../../net.artux.pda.map.view.label/-p-d-a-label/index.html">PDALabel</a><span class="token punctuation">, </span></span><span class="parameter ">userInterface<span class="token operator">: </span><a href="../../net.artux.pda.map.view.root/-user-interface/index.html">UserInterface</a><span class="token punctuation">, </span></span><span class="parameter ">playerSystem<span class="token operator">: </span><a href="../../net.artux.pda.map.ecs.player/-player-system/index.html">PlayerSystem</a><span class="token punctuation">, </span></span><span class="parameter ">playerBattleSystem<span class="token operator">: </span><a href="../../net.artux.pda.map.ecs.battle/-player-battle-system/index.html">PlayerBattleSystem</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.scenes.scene2d/Actor///PointingToDeclaration/">Actor</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-567453014%2FFunctions%2F537371977" anchor-label="initJoyTable" id="-567453014%2FFunctions%2F537371977" data-filterable-set=":core:dokkaHtmlPartial/main"></a>
+          <div class="table-row" data-filterable-current=":core:dokkaHtmlPartial/main" data-filterable-set=":core:dokkaHtmlPartial/main">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="init-joy-table.html"><span>init</span><wbr><span>Joy</span><wbr><span><span>Table</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-567453014%2FFunctions%2F537371977"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":core:dokkaHtmlPartial/main"><div class="symbol monospace"><div class="block"><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="dagger.multibindings/IntoSet///PointingToDeclaration/"><span class="token annotation builtin">IntoSet</span></span></div><div class="block"><span class="token annotation builtin">@</span><span data-unresolved-link="dagger/Provides///PointingToDeclaration/"><span class="token annotation builtin">Provides</span></span></div></div><span class="token keyword">open </span><span class="token keyword"></span><span class="token keyword">fun </span><a href="init-joy-table.html"><span class="token function">initJoyTable</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">messagesList<span class="token operator">: </span><a href="../../net.artux.pda.map.view.collection.list/-messages-list/index.html">MessagesList</a><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Named///PointingToDeclaration/"><span class="token annotation builtin">Named</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"joyTable"</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>joyTable<span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.scenes.scene2d.ui/Table///PointingToDeclaration/">Table</span><span class="token punctuation">, </span></span><span class="parameter "><span><span class="token annotation builtin">@</span><span data-unresolved-link="javax.inject/Named///PointingToDeclaration/"><span class="token annotation builtin">Named</span></span><span class="token punctuation">(</span><span>value<span class="token operator"> = </span><span class="breakable-word"><span class="token string">"gameZone"</span></span></span><wbr><span class="token punctuation">)</span>&nbsp;</span>gameZone<span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.scenes.scene2d/Group///PointingToDeclaration/">Group</span><span class="token punctuation">, </span></span><span class="parameter ">assetsFinder<span class="token operator">: </span><a href="../../net.artux.pda.map.content.assets/-assets-finder/index.html">AssetsFinder</a><span class="token punctuation">, </span></span><span class="parameter ">playerMovingSystem<span class="token operator">: </span><a href="../../net.artux.pda.map.ecs.physics/-player-moving-system/index.html">PlayerMovingSystem</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="com.badlogic.gdx.scenes.scene2d/Actor///PointingToDeclaration/">Actor</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <div class="footer">
+        <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2023 Copyright</span><span class="pull-right"><span>Generated by </span><a href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+      </div>
+    </div>
+</div>
+</body>
+</html>
+
