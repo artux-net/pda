@@ -140,7 +140,7 @@
         <item>Рюкзак</item>
         <item>Энциклопедия</item>
         <item>Рейтинг сталкеров</item>
-        <item>Достижения</item>
+        <!--<item>Достижения</item>-->
         <item>Сводка</item>
         <item>Настройки</item>
     </string-array>

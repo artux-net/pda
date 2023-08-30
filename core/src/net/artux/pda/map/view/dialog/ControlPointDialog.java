@@ -113,7 +113,7 @@ public class ControlPointDialog extends PDADialog {
 
         manageTable = new Table();
         manageTable.defaults().pad(10);
-        manageTable.add(stalkersButton);
+        //manageTable.add(stalkersButton);
         manageTable.add(updateLevelButton);
         updateLevelButton.addListener(new ClickListener() {
             @Override

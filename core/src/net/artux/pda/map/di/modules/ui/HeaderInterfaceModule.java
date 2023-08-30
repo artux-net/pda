@@ -89,7 +89,7 @@ public class HeaderInterfaceModule {
 
         Label missionsButton = new Label("Задачи", userInterface.getLabelStyle());
         Label navigationButton = new Label("Навигация", userInterface.getLabelStyle());
-        Label statisticButton = new Label("Статистика", userInterface.getLabelStyle());
+        //Label statisticButton = new Label("Статистика", userInterface.getLabelStyle());
 
         missionsButton.addListener(new ClickListener() {
             @Override
@@ -115,7 +115,7 @@ public class HeaderInterfaceModule {
             }
         });
 
-        statisticButton.addListener(new ClickListener() {
+        /*statisticButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
@@ -125,7 +125,7 @@ public class HeaderInterfaceModule {
                     stack.addActor(statisticWindow);
                 }
             }
-        });
+        });*/
 
         Label timeLabel = new Label("00:00", labelStyle);
         uiFrame.getMenu()
@@ -151,9 +151,10 @@ public class HeaderInterfaceModule {
                 .add(navigationButton, true)
                 .uniform();
 
-        uiFrame.getMenu()
+        /*uiFrame.getMenu()
                 .add(statisticButton, true)
-                .uniform();
+                .uniform();*/
+
         uiFrame.getRightHeaderTable().add(pauseButton).uniform();
 
         return missionsButton;

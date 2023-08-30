@@ -93,6 +93,18 @@ android {
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
             buildConfigField("String", "URL", "\"cdn.artux.net/static/\"")
+            buildConfigField("String", "URL_API", "\"app.artux.net/pdanetwork/\"")
+            buildConfigField("String", "QuestAdId", "\"ca-app-pub-4707001480680280/1079779549\"")
+            buildConfigField("String", "NewsAdId", "\"ca-app-pub-4707001480680280/2723145658\"")
+        }
+
+        dev {
+            minifyEnabled true
+            shrinkResources false
+
+            buildConfigField("String", "PROTOCOL", "\"https\"")
+            buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
+            buildConfigField("String", "URL", "\"cdn.artux.net/static/\"")
             buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-4707001480680280/1079779549\"")
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-4707001480680280/2723145658\"")

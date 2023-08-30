@@ -102,10 +102,11 @@ class QuestRepository @Inject constructor(
 
     private suspend fun getStory(storyId: Int): Result<StoryDto> {
         return suspendCoroutine {
-            val story = questCache.get(storyId.toString())
+            //todo CACHE
+            /*val story = questCache.get(storyId.toString())
             if (story != null)
                 it.resume(Result.success(story))
-            else {
+            else {*/
                 defaultApi.getStory(storyId.toLong())
                     .enqueue(object : Callback<StoryDto> {
                         override fun onResponse(
@@ -125,7 +126,7 @@ class QuestRepository @Inject constructor(
                             it.resume(Result.failure(java.lang.Exception(t)))
                         }
                     })
-            }
+            //}
         }
     }
 

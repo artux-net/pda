@@ -29,7 +29,7 @@ public class AdditionalFragment extends AdditionalBaseFragment implements String
 
     private FragmentListBinding binding;
     private StringAdapter adapter;
-    private List<Class<? extends Fragment>> fragmentClasses = new ArrayList<>();
+    private final List<Class<? extends Fragment>> fragmentClasses = new ArrayList<>();
 
     {
         fragmentClasses.add(EquipmentFragment.class);
@@ -37,7 +37,7 @@ public class AdditionalFragment extends AdditionalBaseFragment implements String
         fragmentClasses.add(BackpackFragment.class);
         fragmentClasses.add(EncyclopediaFragment.class);
         fragmentClasses.add(RatingFragment.class);
-        fragmentClasses.add(null);
+        //fragmentClasses.add(null);
         fragmentClasses.add(SummaryFragment.class);
         fragmentClasses.add(PrefsFragment.class);
     }
