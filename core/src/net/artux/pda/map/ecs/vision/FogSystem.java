@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Frustum;
 
 import net.artux.pda.map.ecs.camera.CameraSystem;
 import net.artux.pda.map.ecs.sound.AudioSystem;
-import net.artux.pda.map.engine.data.PlayerData;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.interactive.PassivityComponent;
 import net.artux.pda.map.ecs.systems.BaseSystem;
@@ -25,6 +24,9 @@ public class FogSystem extends BaseSystem {
     private final AudioSystem audioSystem;
     private final CameraSystem cameraSystem;
     private final Frustum frustum;
+
+    public int resource;
+    public int visibleEntities;
 
     @Inject
     public FogSystem(AudioSystem audioSystem, CameraSystem cameraSystem) {
@@ -74,9 +76,9 @@ public class FogSystem extends BaseSystem {
         }
 
         if (isPlayerActive())
-            PlayerData.visibleEntities = entitiesVisibleByPlayer + 1;
+            visibleEntities = entitiesVisibleByPlayer + 1;
         else
-            PlayerData.visibleEntities = entitiesVisibleByPlayer;
+            visibleEntities = entitiesVisibleByPlayer;
     }
 
     @Override

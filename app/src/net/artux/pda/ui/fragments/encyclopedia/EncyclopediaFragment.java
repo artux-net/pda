@@ -110,7 +110,8 @@ public class EncyclopediaFragment extends BaseFragment {
 
     @Override
     public void onDestroy() {
-        webView.destroy();
+        if (webView != null)
+            webView.destroy();
         super.onDestroy();
     }
 }

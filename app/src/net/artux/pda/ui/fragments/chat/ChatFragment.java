@@ -212,9 +212,11 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
 
     @Override
     public void onDestroy() {
+        if (mRecyclerView != null)
+            mRecyclerView.setAdapter(null);
+        if (ws != null)
+            ws.close(1000, "Closed by user");
         super.onDestroy();
-        mRecyclerView.setAdapter(null);
-        ws.close(1000, "Closed by user");
     }
 
     @Override

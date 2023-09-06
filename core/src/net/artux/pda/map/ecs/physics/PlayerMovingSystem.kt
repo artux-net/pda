@@ -29,8 +29,8 @@ class PlayerMovingSystem @Inject constructor(
     private val pm = ComponentMapper.getFor(BodyComponent::class.java)
     private val hm = ComponentMapper.getFor(HealthComponent::class.java)
 
-    private val MOVEMENT_FORCE = 33f // H per step
-    private val RUN_MOVEMENT = MOVEMENT_FORCE * 2
+    private val MOVEMENT_FORCE = 37f // H per step
+    private val RUN_MOVEMENT = MOVEMENT_FORCE * 2.3f
     private val PLAYER_MULTIPLICATION = 6f
 
     private var stepSounds: EnumMap<TileType, ImmutablePair<Sound, Sound>>
@@ -66,7 +66,7 @@ class PlayerMovingSystem @Inject constructor(
         if (isRunning && healthComponent.stamina > 0) {
             stepVector = operationalVelocity.scl(deltaTime).scl(RUN_MOVEMENT)
             if (!alwaysRun && entity === player)
-                staminaDifference = -0.1f
+                staminaDifference = -0.03f
         } else {
             if (healthComponent.stamina < 100)
                 staminaDifference = 0.06f

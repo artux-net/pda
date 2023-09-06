@@ -38,7 +38,7 @@ import net.artux.pda.map.view.label.PDALabel;
 import net.artux.pda.map.view.root.UserInterface;
 import net.artux.pda.map.view.view.DetailedHUD;
 import net.artux.pda.map.view.view.bars.Slot;
-import net.artux.pda.map.view.window.BackpackWindow;
+import net.artux.pda.map.view.view.window.BackpackWindow;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.Collection;

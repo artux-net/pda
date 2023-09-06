@@ -29,7 +29,7 @@ import net.artux.pda.map.view.sidebar.MissionList;
 import net.artux.pda.map.view.root.UIFrame;
 import net.artux.pda.map.view.root.UserInterface;
 import net.artux.pda.map.view.debug.widgets.CheckBoxWidget;
-import net.artux.pda.map.view.window.StatisticWindow;
+import net.artux.pda.map.view.view.window.StatisticWindow;
 import net.artux.pda.model.map.GameMap;
 
 import java.time.Instant;

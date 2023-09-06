@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.Align;
 
 import net.artux.engine.pathfinding.TiledNavigator;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.engine.data.PlayerData;
+import net.artux.pda.map.ecs.vision.FogSystem;
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.utils.MapInfo;
 import net.artux.pda.map.view.Utils;
@@ -45,13 +45,16 @@ public class UIFrame extends WidgetGroup {
     private final TopSelectorMenu topSelectorMenu;
     private final Table rightGroup;
     private final MapInfo mapInfo;
+    private final FogSystem fogSystem;
 
     @Inject
     public UIFrame(AssetManager assetManager,
+                   FogSystem fogSystem,
                    Camera usualCamera, @Named("uiCamera") Camera uiCamera,
                    TiledNavigator tiledNavigator,
                    BitmapFont font, MapInfo mapInfo, TopSelectorMenu topSelectorMenu) {
         super();
+        this.fogSystem = fogSystem;
         this.camera = usualCamera;
         this.topSelectorMenu = topSelectorMenu;
 
@@ -169,7 +172,7 @@ public class UIFrame extends WidgetGroup {
     @Override
     public void act(float delta) {
         super.act(delta);
-        counter.setText(String.valueOf(PlayerData.visibleEntities));
+        counter.setText(String.valueOf(fogSystem.visibleEntities));
         horizontalSlider.setValue(camera.position.x);
         Vector3[] visibleCameraCorners = camera.frustum.planePoints;
 

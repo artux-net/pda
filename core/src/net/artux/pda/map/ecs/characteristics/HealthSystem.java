@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Family;
 
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.interactive.PassivityComponent;
+import net.artux.pda.map.ecs.player.PlayerSystem;
 import net.artux.pda.map.ecs.render.RenderSystem;
 import net.artux.pda.map.ecs.systems.BaseSystem;
 import net.artux.pda.map.di.scope.PerGameMap;
@@ -18,11 +19,13 @@ public class HealthSystem extends BaseSystem {
     private final ComponentMapper<HealthComponent> hm = ComponentMapper.getFor(HealthComponent.class);
 
     private final RenderSystem renderSystem;
+    private final PlayerSystem playerSystem;
 
     @Inject
-    public HealthSystem(RenderSystem renderSystem) {
+    public HealthSystem(RenderSystem renderSystem, PlayerSystem playerSystem) {
         super(Family.all(HealthComponent.class, BodyComponent.class).exclude(PassivityComponent.class).get());
         this.renderSystem = renderSystem;
+        this.playerSystem = playerSystem;
     }
 
     @Override
@@ -45,7 +48,11 @@ public class HealthSystem extends BaseSystem {
         HealthComponent healthComponent = hm.get(entity);
         healthComponent.setDamaged(0);
         if (healthComponent.getRadiation() > 0) {
-            healthComponent.damage(0.001f * healthComponent.getRadiation());
+            boolean killed = healthComponent.radiationDamage(0.001f * healthComponent.getRadiation());
+            if (killed){
+                playerSystem.clearPreferences();
+                //если умер от рады то сброс всех сохранений хп
+            }
         }
     }
 }

@@ -27,10 +27,15 @@ object QuestPointsHelper {
     @JvmStatic
     fun createQuestPointsEntities(coreComponent: MapComponent) {
         val engine = coreComponent.engine
-        val (_, _, _, _, points) = coreComponent.dataRepository.gameMap
+
+        val points = coreComponent.dataRepository.gameMap.points
         for (point in points) {
-            engine.addEntity(pointEntity(coreComponent, point, coreComponent.world))
+            val entity = pointEntity(coreComponent, point, coreComponent.world)
+            coreComponent.logger.log("QuestPoints", "Adding point ${point.name}")
+            engine.addEntity(entity)
         }
+        coreComponent.logger.log("QuestPoints", "Total: ${points.size}")
+
     }
 
     private fun pointEntity(coreComponent: MapComponent, point: Point, world: World): Entity {
@@ -49,12 +54,15 @@ object QuestPointsHelper {
                 )
                     .showText(point.name, Mappers.vector2(point.pos))
             })
+            .add(ConditionComponent(point.condition))
 
         bcm[entity].body.setTransform(Mappers.vector2(point.pos), 0f)
-        entity.add(ConditionComponent(point.condition))
 
         val pointComponent = PointComponent(point)
-        if (pointComponent.type == PointComponent.Type.TRANSFER) entity.add(TransferComponent())
+
+        if (pointComponent.type == PointComponent.Type.TRANSFER)
+            entity.add(TransferComponent())
+
         val texture = getPointTexture(assetManager, pointComponent.type)
         val size = 23
         if (texture != null) {

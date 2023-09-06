@@ -1,4 +1,4 @@
-package net.artux.pda.map.view.window;
+package net.artux.pda.map.view.view.window;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;

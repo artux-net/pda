@@ -43,21 +43,24 @@ class HealthComponent : Component {
         return health < 1
     }
 
-    fun psy(damage: Float) {
+    fun psyDamage(damage: Float): Boolean =
         health(calculateDamage(-damage, armorModel.psyProtection))
-    }
 
-    fun thermal(damage: Float) {
+    fun thermalDamage(damage: Float): Boolean =
         health(calculateDamage(-damage, armorModel.thermalProtection))
-    }
 
-    fun electric(damage: Float) {
+
+    fun electricDamage(damage: Float): Boolean =
         health(calculateDamage(-damage, armorModel.electricProtection))
-    }
 
-    fun chemical(damage: Float) {
+    fun chemicalDamage(damage: Float): Boolean =
         health(calculateDamage(-damage, armorModel.chemicalProtection))
-    }
+
+    fun radiationDamage(damage: Float): Boolean =
+        health(calculateDamage(-damage, armorModel.radioProtection))
+
+    fun damage(damage: Float): Boolean =
+        health(calculateDamage(-damage, armorModel.damageProtection))
 
     private fun calculateDamage(damage: Float, inputProtection: Float): Float {
         val protection = inputProtection * armorModel.condition / 100
@@ -79,14 +82,16 @@ class HealthComponent : Component {
         return damage * ((100 - protection) / 100)
     }
 
-    fun damage(damage: Float) {
-        health(calculateDamage(-damage, armorModel.damageProtection))
-    }
-
-    fun health(value: Float) {
-        if (immortal) return
+    fun health(value: Float): Boolean {
+        if (immortal) return false
         val result = health + value
-        health = if (result > 0) if (result > 100) 100f else result else 0f
+        health =
+            if (result > 0)
+                if (result > 100)
+                    100f
+                else result
+            else 0f
+        return isDead()
     }
 
     fun stamina(value: Float) {

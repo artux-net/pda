@@ -1,4 +1,4 @@
-package net.artux.pda.map.view.window
+package net.artux.pda.map.view.view.window
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager

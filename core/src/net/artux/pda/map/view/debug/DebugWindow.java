@@ -18,7 +18,7 @@ import net.artux.pda.map.view.debug.widgets.MapsWidget;
 import net.artux.pda.map.view.debug.widgets.MusicWidget;
 import net.artux.pda.map.view.debug.widgets.SoundsWidget;
 import net.artux.pda.map.view.Utils;
-import net.artux.pda.map.view.window.PDAWindow;
+import net.artux.pda.map.view.view.window.PDAWindow;
 
 import javax.inject.Inject;
 

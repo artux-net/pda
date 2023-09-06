@@ -16,7 +16,7 @@ import net.artux.pda.map.ecs.systems.BaseSystem;
 import net.artux.pda.map.managers.notification.NotificationController;
 import net.artux.pda.map.managers.notification.NotificationType;
 import net.artux.pda.map.di.scope.PerGameMap;
-import net.artux.pda.map.view.window.LootWindow;
+import net.artux.pda.map.view.view.window.LootWindow;
 import net.artux.pda.map.view.root.UserInterface;
 
 import javax.inject.Inject;

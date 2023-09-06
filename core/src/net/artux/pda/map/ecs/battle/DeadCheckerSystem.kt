@@ -24,7 +24,7 @@ import net.artux.pda.map.ecs.interactive.TimeComponent
 import net.artux.pda.map.ecs.render.SpriteComponent
 import net.artux.pda.map.ecs.systems.BaseSystem
 import net.artux.pda.map.di.scope.PerGameMap
-import net.artux.pda.map.view.window.LootWindow
+import net.artux.pda.map.view.view.window.LootWindow
 import net.artux.pda.map.view.root.UserInterface
 import java.time.Instant
 import java.time.temporal.ChronoUnit

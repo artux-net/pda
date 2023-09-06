@@ -1,8 +1,10 @@
 package net.artux.pda.map.view.sidebar;
 
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -27,6 +29,8 @@ import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.player.MissionsSystem;
 import net.artux.pda.map.ecs.player.PlayerSystem;
 import net.artux.pda.map.view.button.ImageTextButton;
+
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -63,9 +67,12 @@ public class NavigationBar extends Sidebar {
         VerticalGroup content = getContent();
         content.clear();
 
+        Engine engine = missionsSystem.getEngine();
+
+        ImmutableArray<Entity> points = engine.getEntitiesFor(Family.all(PointComponent.class, ConditionComponent.class).exclude(PassivityComponent.class).get());
+
         Label.LabelStyle labelStyle = assetsFinder.getFontManager().getLabelStyle(32, Color.WHITE);
-        for (final Entity pointEntity : missionsSystem.getEngine()
-                .getEntitiesFor(Family.all(PointComponent.class, PointComponent.class, ConditionComponent.class).exclude(PassivityComponent.class).get())) {
+        for (final Entity pointEntity : points) {
             Vector2 position = pm.get(pointEntity).getPosition();
             PointComponent point = pcm.get(pointEntity);
 

@@ -138,4 +138,8 @@ class PlayerSystem @Inject constructor(
             healthComponent.radiation = preferences.getFloat("radiation", 0f)
         }
     }
+
+    fun clearPreferences(){
+        Gdx.app.getPreferences("player").clear()
+    }
 }

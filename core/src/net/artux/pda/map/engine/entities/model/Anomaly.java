@@ -30,7 +30,7 @@ public enum Anomaly {
     ELECTRA("Электра", "audio/sounds/anomalies/electra/work.ogg") {
         @Override
         public void interact(Engine engine, Entity entity) {
-            hcm.get(entity).electric(random(10, 30));
+            hcm.get(entity).electricDamage(random(10, 30));
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.STUCK, 5);
         }
     },
@@ -38,7 +38,7 @@ public enum Anomaly {
         @Override
         public void interact(Engine engine, Entity entity) {
             Vector2 nextPosition = engine.getSystem(MapOrientationSystem.class).getRandomFreePoint();
-            hcm.get(entity).psy(random(10, 30));
+            hcm.get(entity).psyDamage(random(10, 30));
             pm.get(entity).body.setTransform(nextPosition, 0);
             pm.get(entity).body.setLinearVelocity(random(-600000, 600000), random(-600000, 600000));
             if (engine.getSystem(PlayerSystem.class).getPlayer() == entity)
