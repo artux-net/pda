@@ -1,15 +1,19 @@
 package net.artux.pda.repositories
 
-import net.artux.pda.common.PropertyFields
-import net.artux.pda.model.mapper.UserMapper
 import net.artux.pda.model.user.UserRelation
 import net.artux.pdanetwork.api.DefaultApi
-import net.artux.pdanetwork.model.*
+import net.artux.pdanetwork.model.Profile
+import net.artux.pdanetwork.model.RegisterUserDto
+import net.artux.pdanetwork.model.ResponsePageSimpleUserDto
+import net.artux.pdanetwork.model.SimpleUserDto
+import net.artux.pdanetwork.model.Status
+import net.artux.pdanetwork.model.StoryData
+import net.artux.pdanetwork.model.UserDto
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -22,6 +26,13 @@ class UserRepository @Inject constructor(
     private val dataCache: Cache<StoryData>,
     private val memberCache: Cache<UserDto>
 ) {
+
+    fun isModerator(): Boolean {
+        return getCachedMember()
+            .map { it.role }
+            .map { it == UserDto.RoleEnum.MODERATOR }
+            .getOrElse { false }
+    }
 
     fun clearMemberCache() {
         memberCache.clear()
@@ -66,7 +77,7 @@ class UserRepository @Inject constructor(
 
     suspend fun resetPassword(email: String): Result<Status> {
         return suspendCoroutine {
-            webservice.sendLetter(email).enqueue(object : Callback<Status> {
+            webservice.sendResetPasswordLetter(email).enqueue(object : Callback<Status> {
                 override fun onResponse(
                     call: Call<Status>,
                     response: Response<Status>
@@ -75,7 +86,7 @@ class UserRepository @Inject constructor(
                     if (data != null) {
                         it.resume(Result.success(data))
                     } else
-                        it.resume(Result.failure(Exception("Profile null")))
+                        it.resume(Result.failure(Exception("Не удалось отправить запрос")))
                 }
 
                 override fun onFailure(call: Call<Status>, t: Throwable) {
@@ -93,22 +104,19 @@ class UserRepository @Inject constructor(
         else Result.failure(java.lang.Exception("Cache isn't found"))
     }
 
-    fun isUserTester():Boolean{
-        return getCachedMember().map { it.role }.map {
-            it != UserDto.RoleEnum.USER
-        }.getOrElse { false }
+    fun isUserTester(): Boolean {
+        return getCachedMember()
+            .map { it.role }
+            .map {
+                it != UserDto.RoleEnum.USER
+            }.getOrElse { false }
     }
 
     suspend fun getMember(): Result<UserDto> {
         return suspendCoroutine {
-            Timber.i("Request server for userDto")
             webservice.loginUser().enqueue(object : Callback<UserDto> {
-                override fun onResponse(
-                    call: Call<UserDto>,
-                    response: Response<UserDto>
-                ) {
+                override fun onResponse(call: Call<UserDto>, response: Response<UserDto>) {
                     val data = response.body()
-                    Timber.i("Got response")
                     if (data != null) {
                         memberCache.put("user", data)
 

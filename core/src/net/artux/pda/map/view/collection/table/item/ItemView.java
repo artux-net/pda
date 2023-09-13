@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
+import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.image.LazyImage;
 import net.artux.pda.map.view.Utils;
 import net.artux.pda.model.items.ArmorModel;
@@ -36,8 +37,11 @@ public class ItemView extends Table {
                 condition = ((WeaponModel) itemModel).getCondition();
             else if (itemModel instanceof ArmorModel)
                 condition = ((ArmorModel) itemModel).getCondition();
-            if (((WearableModel) itemModel).isEquipped())
+            if (((WearableModel) itemModel).isEquipped()) {
                 quantityLabel.setText("<!>");
+                quantityLabel.setColor(Color.RED);
+            }else quantityLabel.setColor(Colors.primaryColor);
+
 
             Color baseColor = new Color(1, 1, 0, 1);
             float k = (condition - 75f) / 25f;

@@ -20,6 +20,7 @@ import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
 import net.artux.pda.utils.AdType
 import net.artux.pdanetwork.model.CommandBlock
 import org.luaj.vm2.Globals
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -82,7 +83,7 @@ class CommandController @Inject constructor(
                     "pauseAllSound" -> soundManager.pause()
                     "resumeAllSound" -> soundManager.resume()
                     "showAd" -> showAd(command.value)
-                    "asyncScript", "asyncLua" -> luaController.runLua(command.value) // ignore lua
+                    "asyncScript", "asyncLua" -> luaController.runLua(command.value)
 
                     else -> {
                         // * commands for server * //
@@ -206,20 +207,33 @@ class CommandController @Inject constructor(
         cacheCommands["state"] = states
     }
 
+    var syncTries = 0
     suspend fun syncNow(commands: Map<String, List<String>>): Result<StoryDataModel> =
         repository.syncMember(CommandBlock().actions(commands))
+            .also { syncTries++ }
             .map { mapper.dataModel(it) }
             .onSuccess {
                 needSync = false
                 storyData.postValue(it)
+                syncTries = 0
             }
-            .onFailure { status.postValue(StatusModel(it)) }
+            .onFailure {
+                if (syncTries > 5) {
+                    status.postValue(StatusModel("Невозможно синхронизировать, перезапустите ПДА или установите стабильное интернет-соединение"))
+                    return@onFailure
+                }
+                status.postValue(StatusModel("Ошибка синхронизации, повтор..."))
+                Timber.w(it, "Ошибка синхронизации, повтор попытки через 5 секунд")
+                Thread.sleep(1000 * 3)
+                syncNow(commands)
+            }
 
     suspend fun syncNow(): Result<StoryDataModel> =
         syncNow(cacheCommands)
             .onSuccess {
                 cacheCommands = LinkedHashMap()// reset sync map
             }
+            .onFailure {}
 
     fun resetData() = scope.launch {
         repository.resetData()

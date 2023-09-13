@@ -10,6 +10,7 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
+import net.artux.pda.map.ecs.battle.MoodComponent;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.systems.BaseSystem;
 import net.artux.pda.map.ecs.interactive.ClicksSystem;
@@ -217,6 +218,9 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     @Override
     public boolean touchDown(float x, float y, int pointer, int button) {
         cameraSpeed.set(0, 0);
+        // сброс прицеливания
+        if (isPlayerActive())
+            getPlayer().getComponent(MoodComponent.class).setEnemy(null);
         return true;
     }
 

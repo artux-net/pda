@@ -69,4 +69,9 @@ class AuthViewModel @Inject constructor(
                 }
         }
     }
+
+    fun logout() {
+        dataManager.removeAllData()
+        userRepository.clearMemberCache()
+    }
 }

@@ -16,8 +16,8 @@ import com.badlogic.gdx.utils.Align;
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.utils.Colors;
-import net.artux.pda.map.view.root.FontManager;
 import net.artux.pda.map.view.collection.table.item.ItemView;
+import net.artux.pda.map.view.root.FontManager;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.List;
@@ -89,42 +89,47 @@ public class ItemsTableView extends Table {
     public void update(List<ItemModel> items) {
         weightSum = 0;
         itemsTable.clear();
-        if (items.size() > 0)
-            for (ItemModel itemModel : items) {
-                if (itemModel.getQuantity() > 0) {
-                    weightSum += itemModel.getQuantity() * itemModel.getWeight();
-                    Container<ItemView> container = new Container<>();
-                    ItemView itemView = new ItemView(itemModel, titleStyle, subtitleStyle, assetManager);
-                    container.setActor(itemView);
-                    container.fill();
-
-                    itemView.addListener(new ActorGestureListener() {
-
-                        @Override
-                        public void tap(InputEvent event, float x, float y, int count, int button) {
-                            super.tap(event, x, y, count, button);
-                            if (onItemClickListener != null)
-                                onItemClickListener.onTap(itemModel);
-                        }
-
-                        @Override
-                        public boolean longPress(Actor actor, float x, float y) {
-                            if (onItemClickListener != null)
-                                onItemClickListener.onLongPress(itemModel);
-                            return true;
-                        }
-
-                    });
-
-                    container.width(230);
-                    container.minHeight(140);
-
-                    itemsTable.addActor(container);
-                }
-            }
-        else
+        if (items.size() == 0) {
             itemsTable.addActor(new Label(localeBundle.get("main.empty"), descLabel.getStyle()));
-        descLabel.setText(localeBundle.get("user.info.weight", weightSum));
+            descLabel.setText(localeBundle.get("user.info.weight", weightSum));
+            return;
+        }
+
+        for (ItemModel itemModel : items) {
+            if (itemModel.getQuantity() <= 0)
+                continue;
+
+            weightSum += itemModel.getQuantity() * itemModel.getWeight();
+            Container<ItemView> container = new Container<>();
+            ItemView itemView = new ItemView(itemModel, titleStyle, subtitleStyle, assetManager);
+            container
+                    .fill()
+                    .minHeight(140)
+                    .prefHeight(300)
+                    .minWidth(100)
+                    .width(230)
+                    .maxWidth(230)
+                    .setActor(itemView);
+
+            itemView.addListener(new ActorGestureListener() {
+                @Override
+                public void tap(InputEvent event, float x, float y, int count, int button) {
+                    super.tap(event, x, y, count, button);
+                    if (onItemClickListener != null)
+                        onItemClickListener.onTap(itemModel);
+                }
+
+                @Override
+                public boolean longPress(Actor actor, float x, float y) {
+                    if (onItemClickListener != null)
+                        onItemClickListener.onLongPress(itemModel);
+                    return true;
+                }
+            });
+
+            itemsTable.addActor(container);
+        }
+        descLabel.setText(localeBundle.get("user.info.weight", getWeightSum()));
     }
 
     public void disableDesc() {

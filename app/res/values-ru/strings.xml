@@ -152,5 +152,17 @@
     <string name="online">В сети</string>
     <string name="offline">Не в сети</string>
     <string name="position_p">Позиция в рейтинге: %1$s</string>
+    <string name="show_logs">Показать логи</string>
+    <string name="save_logs">Сохранить логи в файл</string>
+    <string name="reset_logs">Сбросить логи</string>
+    <string name="no_access">Нет доступа</string>
+    <string name="cancel">Закрыть</string>
+    <string name="load">Загрузить</string>
     <string name="complete_story_alert">История уже пройдена, приступайте к прохождению других. При сбросе прохождения этой истории другие истории могут оказаться недоступны.</string>
+    <string name="update">Обновить</string>
+    <string name="need_update_message">Эта версия ПДА более не поддерживается. Для  новых фишек  и стабильной работы приложении нужно обновление</string>
+    <string name="need_update">Нужно обновление</string>
+    <string name="iwait">Я подожду</string>
+    <string name="need_wait_message">Мы обновляем наши системы, сервер временно недоступен, зайдите чуть позже...</string>
+    <string name="need_wait">Нам нужно время</string>
 </resources>

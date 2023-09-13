@@ -60,8 +60,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         ImageView imageView;
         TextView titleView;
         TextView contentView;
-        TextView dateView;
-
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -69,7 +67,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             imageView = itemView.findViewById(R.id.image);
             titleView = itemView.findViewById(R.id.title);
             contentView = itemView.findViewById(R.id.content);
-            dateView = itemView.findViewById(R.id.date);
         }
 
         @SuppressLint("SetTextI18n")
@@ -77,7 +74,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             titleView.setText(Html.fromHtml(articleModel.getTitle()));
             contentView.setText(Html.fromHtml(articleModel.getDescription()));
 
-            dateView.setText(dateTimeFormatter.format(articleModel.getPublished()));
             mainView.setOnClickListener(v -> clickListener.onClick(articleModel));
             Glide
                     .with(imageView.getContext())

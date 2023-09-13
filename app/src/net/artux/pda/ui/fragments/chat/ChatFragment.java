@@ -26,7 +26,7 @@ import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
-import net.artux.pda.ui.fragments.news.WebFragment;
+import net.artux.pda.ui.fragments.news.ArticleFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.stories.StoriesFragment;
 import net.artux.pda.utils.ObjectWebSocketListener;
@@ -221,31 +221,51 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
 
     @Override
     public void onClick(UserMessage message) {
-        if (navigationPresenter != null && message.getAuthor().getId() != null)
+        if (navigationPresenter != null
+                && message.getAuthor().getId() != null)
             navigationPresenter.addFragment(UserProfileFragment
                     .of(message.getAuthor().getId()), true);
     }
 
     @Override
     public void onLongClick(UserMessage message) {
-        if (message.getAuthor().getId() != null) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.PDADialogStyle);
-            builder.setTitle(getString(R.string.any_select_action));
-            builder.setItems(getResources().getStringArray(R.array.message_actions), (dialogInterface, i) -> {
-                switch (i) {
-                    default:
-                        navigationPresenter.addFragment(ChatFragment.with(message.getAuthor()), true);
-                    case 1:
-                        navigationPresenter.addFragment(UserProfileFragment.of(message.getAuthor().getId()), true);
-                }
-            });
-            builder.create().show();
-        }
+        if (message.getAuthor().getId() == null)
+            return;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), R.style.PDADialogStyle);
+        builder.setTitle(getString(R.string.any_select_action));
+        builder.setItems(getResources().getStringArray(R.array.message_actions), (dialogInterface, i) -> {
+            switch (i) {
+                default:
+                    String login = "@" + message.getAuthor().getLogin() + ", ";
+                    String input = mInputEditText.getText().toString();
+                    if (!input.startsWith("@")) {
+                        mInputEditText.getText().insert(0, login);
+                        return;
+                    }
+
+                    String textToReplace = input;
+                    for (int j = 0; j < input.length(); j++) {
+                        if (Character.isSpaceChar(input.charAt(j))) {
+                            textToReplace = input.substring(0, j);
+                            break;
+                        }
+                    }
+                    input = input.replaceFirst(textToReplace, "@" + message.getAuthor().getLogin() + ", ");
+                    mInputEditText.setText(input);
+                case 1:
+                    navigationPresenter.addFragment(ChatFragment.with(message.getAuthor()), true);
+                case 2:
+                    navigationPresenter.addFragment(UserProfileFragment.of(message.getAuthor().getId()), true);
+            }
+        });
+        builder.create().show();
+
     }
 
     @Override
     public void onLinkClick(String url) {
-        navigationPresenter.addFragment(WebFragment.of("Переход по ссылке", url), true);
+        navigationPresenter.addFragment(ArticleFragment.of("Переход по ссылке", url), true);
     }
 
 }

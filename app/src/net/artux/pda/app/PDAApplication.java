@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.media.SoundPool;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.yandex.mobile.ads.common.MobileAds;
 
 import net.artux.pda.BuildConfig;
@@ -56,5 +57,9 @@ public class PDAApplication extends Application {
         super.onTerminate();
         soundPool.release();
         mediaPlayer.release();
+    }
+
+    public long getVersionCode() {
+        return BuildConfig.VERSION_CODE;
     }
 }

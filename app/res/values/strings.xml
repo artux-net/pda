@@ -157,6 +157,7 @@
     </string-array>
 
     <string-array name="message_actions">
+        <item>Ответить</item>
         <item>Перейти к диалогу</item>
         <item>Посмотреть профиль</item>
     </string-array>
@@ -256,12 +257,18 @@
     <string name="save_logs">Save logs to file</string>
     <string name="reset_logs">Reset logs</string>
     <string name="reset_story">Сбросить прохождение</string>
-    <string name="no_access">Нет доступа</string>
+    <string name="no_access">No access</string>
     <string name="early_story_alert">Прохождение этой истории недоступно пока не пройдены предыдущие</string>
-    <string name="cancel">Закрыть</string>
     <string name="enterNotNumber">Введены не числа</string>
     <string name="enterNotThreeValues">Введено не 3 значения.</string>
-    <string name="load">Загрузить</string>
     <string name="inputFormatToLoadStory">Формат ввода {storyId}:{chapterId}:{stageId}</string>
     <string name="complete_story_alert">История уже пройдена, приступайте к прохождению других. При сбросе прохождения этой истории другие истории могут оказаться недоступны.</string>
+    <string name="update">Update</string>
+    <string name="need_update_message">Your version is unsupported, for new features and stable work of app you need to update it.</string>
+    <string name="need_update">Need update</string>
+    <string name="load">Load</string>
+    <string name="cancel">Close</string>
+    <string name="iwait">I\'m gonna wait</string>
+    <string name="need_wait_message">We\'re updating our services, please wait some time...</string>
+    <string name="need_wait">We need time\n</string>
 </resources>

@@ -1,4 +1,4 @@
-package net.artux.pda.ui.fragments.news;
+package net.artux.pda.ui.fragments.web;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -18,22 +18,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import net.artux.pda.R;
-import net.artux.pda.model.news.ArticleModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 
 public class WebFragment extends BaseFragment {
 
-    private WebView content;
-
-    public static WebFragment of(ArticleModel articleModel) {
-        WebFragment webFragment = new WebFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("id", articleModel.getId());
-        bundle.putString("title", articleModel.getTitle());
-        bundle.putString("url", articleModel.getUrl());
-        webFragment.setArguments(bundle);
-        return webFragment;
-    }
+    protected WebView content;
 
     public static WebFragment of(String title, String url) {
         WebFragment webFragment = new WebFragment();
@@ -41,13 +30,14 @@ public class WebFragment extends BaseFragment {
         bundle.putString("title", title);
         bundle.putString("url", url);
         webFragment.setArguments(bundle);
+
         return webFragment;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_open_news, container, false);
+        return inflater.inflate(R.layout.fragment_web, container, false);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -56,9 +46,8 @@ public class WebFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
 
         String url = null;
-        if (getArguments() != null) {
+        if (getArguments() != null)
             url = getArguments().getString("url");
-        }
 
         content = view.findViewById(R.id.content);
 
@@ -73,17 +62,14 @@ public class WebFragment extends BaseFragment {
 
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                if (request != null) {
-                    String url = request.getUrl().toString();
-                    if (!url.startsWith("http")) {
-                        return false;
-                    } else {
-                        view.getContext().startActivity(
-                                new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-                        return true;
-                    }
-                }
-                return false;
+                if (request == null)
+                    return false;
+                String url = request.getUrl().toString();
+                if (!url.startsWith("http"))
+                    return false;
+                else
+                    view.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                return true;
             }
 
             @Override

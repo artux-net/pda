@@ -5,6 +5,8 @@ public abstract class PropertyFields {
     public static final String API_URL = "baseUrl";
     public static final String RESOURCE_URL = "resourceUrl";
     public static final String XP_CHAT_LIMIT = "xpChatLimit";
+    public static final String MINIMUM_VERSION = "minimalVersion";
+    public static final String SERVER_UPDATING = "isServerUpdating";
 
     public static final String TESTER_MODE = "testMode";
 

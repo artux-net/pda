@@ -75,6 +75,6 @@ public class NewsFragment extends BaseFragment implements NewsAdapter.OnClickLis
 
     @Override
     public void onClick(ArticleModel articleModel) {
-        navigationPresenter.addFragment(WebFragment.of(articleModel), true);
+        navigationPresenter.addFragment(ArticleFragment.of(articleModel), true);
     }
 }

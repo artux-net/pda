@@ -220,24 +220,16 @@ class QuestViewModel @javax.inject.Inject constructor(
     }
 
     private suspend fun syncNow() {
-        Timber.d("Синхронизация Data с сервером")
         title.postValue("Синхронизация")
         loadingState.postValue(true)
 
         commandController.syncNow()
             .onSuccess {
                 summaryRepository.updateSummary()//save summary
-                Timber.d("Successful sync, data: ${storyData.value}")
             }.onFailure {
                 status.postValue(StatusModel(it))
             }
         loadingState.postValue(false)
-    }
-
-    fun syncNow(map: Map<String, MutableList<String>>) {
-        viewModelScope.launch {
-            commandController.syncNow(map)
-        }
     }
 
     fun exitStory() {
@@ -264,8 +256,9 @@ class QuestViewModel @javax.inject.Inject constructor(
                 .onSuccess {
                     processData(data)
                 }.onFailure {
-                    loadingState.postValue(false)
+                    status.postValue(StatusModel(it))
                 }
+            loadingState.postValue(false)
         }
     }
 

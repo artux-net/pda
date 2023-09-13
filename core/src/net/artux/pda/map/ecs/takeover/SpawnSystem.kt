@@ -11,7 +11,7 @@ import net.artux.pda.map.ecs.vision.VisionComponent
 import net.artux.pda.map.ecs.interactive.map.SpawnComponent
 import net.artux.pda.map.ecs.systems.BaseSystem
 import net.artux.pda.map.ecs.creation.EntityProcessorSystem
-import net.artux.pda.map.managers.notification.NotificationController
+import net.artux.pda.map.controller.notification.NotificationController
 import net.artux.pda.map.di.scope.PerGameMap
 import javax.inject.Inject
 

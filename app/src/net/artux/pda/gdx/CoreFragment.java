@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.badlogic.gdx.Net;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidAudio;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
@@ -48,6 +49,11 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
     @Override
     public AndroidAudio createAudio(Context context, AndroidApplicationConfiguration config) {
         return new OboeAudio(context.getAssets());
+    }
+
+    @Override
+    public Net getNet() {
+        return super.getNet();
     }
 
     @Nullable

@@ -187,7 +187,7 @@ class QuestRepository @Inject constructor(
 
     suspend fun syncMember(map: CommandBlock): Result<StoryData> {
         return suspendCoroutine {
-            Timber.tag("Quest Repository").d("Синхронизация, команды: ${map.actions}")
+            Timber.i("Синхронизация, команды: ${map.actions}")
             defaultApi.applyCommands(map).enqueue(object : Callback<StoryData> {
                 override fun onResponse(
                     call: Call<StoryData>,
@@ -198,11 +198,14 @@ class QuestRepository @Inject constructor(
                         storyDataCache.put("story", data)
                         Timber.i("Синхронизация прошла успешно, ответ: $data")
                         it.resume(Result.success(data))
-                    } else
+                    } else {
+                        Timber.i("Синхронизация не прошла")
                         it.resume(Result.failure(Exception(response.toString())))
+                    }
                 }
 
                 override fun onFailure(call: Call<StoryData>, t: Throwable) {
+                    Timber.i("Синхронизация не прошла")
                     it.resume(Result.failure(java.lang.Exception(t)))
                 }
             })

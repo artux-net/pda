@@ -3,8 +3,10 @@ package net.artux.pda.map.view.view.window
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
+import com.badlogic.gdx.scenes.scene2d.ui.Container
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -13,21 +15,26 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.artux.engine.utils.LocaleBundle
-import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.content.assets.AssetsFinder
-import net.artux.pda.map.ecs.sound.AudioSystem
-import net.artux.pda.map.ecs.player.PlayerSystem
 import net.artux.pda.map.di.scope.PerGameMap
-import net.artux.pda.map.view.root.FontManager
-import net.artux.pda.map.view.root.UserInterface
+import net.artux.pda.map.ecs.player.PlayerSystem
+import net.artux.pda.map.ecs.sound.AudioSystem
+import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.view.button.PDAButton
+import net.artux.pda.map.view.collection.table.OnItemClickListener
+import net.artux.pda.map.view.collection.table.ScrollItemsTableView
 import net.artux.pda.map.view.dialog.AdsDialog
 import net.artux.pda.map.view.dialog.ThrowItemDialog
+import net.artux.pda.map.view.root.FontManager
+import net.artux.pda.map.view.root.UserInterface
 import net.artux.pda.map.view.view.DetailItemView
 import net.artux.pda.map.view.view.HUD
-import net.artux.pda.map.view.collection.table.ScrollItemsTableView
-import net.artux.pda.map.view.collection.table.OnItemClickListener
-import net.artux.pda.model.items.*
+import net.artux.pda.model.items.ArmorModel
+import net.artux.pda.model.items.ItemModel
+import net.artux.pda.model.items.ItemType
+import net.artux.pda.model.items.MedicineModel
+import net.artux.pda.model.items.WeaponModel
+import net.artux.pda.model.items.WearableModel
 import net.artux.pda.model.quest.story.StoryDataModel
 import javax.inject.Inject
 
@@ -100,11 +107,16 @@ class BackpackWindow @Inject constructor(
 
         infoLabel = Label("", subtitleStyle)
         leftTable.add(hud)
+        leftTable.top()
         leftTable.add(infoLabel)
         leftTable.row()
 
         armorView.skin = userInterface.skin
-        leftTable.add(armorView)
+        val armorContainer = Container<Actor>(armorView)
+        armorContainer
+            .fill()
+            .height(400f)
+        leftTable.add(armorContainer)
             .grow()
 
         val verticalGroup = Table()
@@ -114,15 +126,37 @@ class BackpackWindow @Inject constructor(
         rifleView.disableDesc()
         armorView.disableDesc()
 
-        verticalGroup.add(rifleView).fill().uniform()
+        val rifleContainer = Container<Actor>(rifleView)
+        val pistolContainer = Container<Actor>(pistolView)
+
+        rifleContainer
+            .fill()
+            .height(200f)
+            .width(220f)
+        pistolContainer
+            .fill()
+            .height(200f)
+            .width(220f)
+
+        verticalGroup.add(rifleContainer)
+            .fill()
+            .uniform()
         verticalGroup.row()
-        verticalGroup.add(pistolView).fill().uniform()
-        leftTable.add(verticalGroup).grow()
-        leftTable.row()
+        verticalGroup.add(pistolContainer)
+            .fill()
+            .uniform()
+        leftTable.add(verticalGroup)
+            .grow()
+
+        leftTable.row().space(10f)
+        leftTable.add(textButton).uniformX()
+        leftTable.add(adButton).uniformX()
+
         add(leftTable)
             .colspan(1)
             .left()
-            .uniformX().fill()
+            .fill()
+
         mainItemsView.setTitle(localeBundle["main.inventory"])
         add(mainItemsView)
             .left()
@@ -132,13 +166,15 @@ class BackpackWindow @Inject constructor(
         val onItemClickListener = object : OnItemClickListener {
             override fun onTap(itemModel: ItemModel) {
                 if (itemModel is MedicineModel) {
-                    if (itemModel.quantity > 0) {
-                        itemModel.quantity = itemModel.quantity - 1
-                        playerSystem.healthComponent.treat(itemModel)
-                        soundsSystem.playBySoundId("audio/sounds/person/medicine.ogg")
-                    }
+                    if (itemModel.quantity <= 0)
+                        return
+
+                    itemModel.quantity = itemModel.quantity - 1
+                    playerSystem.healthComponent.treat(itemModel)
+                    soundsSystem.playBySoundId("audio/sounds/person/medicine.ogg")
                     dataRepository.update()
-                } else if (itemModel is WearableModel) {
+                }
+                if (itemModel is WearableModel) {
                     lastDataModel.setCurrentWearable(itemModel as WearableModel?)
                     soundsSystem.playBySoundId("audio/sounds/person/equip.ogg")
                     dataRepository.update()
@@ -172,12 +208,6 @@ class BackpackWindow @Inject constructor(
                 remove()
             }
         })
-
-        //buttonsTable.defaults().center().space(20f)
-        leftTable.row().space(10f)
-        leftTable.add(textButton).uniformX()
-        leftTable.add(adButton).uniformX()
-
 
         mainItemsView.setOnClickListener(onItemClickListener)
         touchable = Touchable.enabled

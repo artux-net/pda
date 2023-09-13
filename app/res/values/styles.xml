@@ -7,7 +7,7 @@
         <item name="android:dialogTheme">@style/PDADialogStyle</item>
     </style>
 
-    <style name="PDADialogStyle" parent="Theme.AppCompat.Light.Dialog">
+    <style name="PDADialogStyle" parent="Theme.AppCompat.DayNight.Dialog">
         <item name="android:dialogTheme">@style/PDADialogStyle</item>
         <item name="android:windowBackground">@drawable/border_background_black</item>
         <item name="android:colorAccent">#f3f3f3</item>

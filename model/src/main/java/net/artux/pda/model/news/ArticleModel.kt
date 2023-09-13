@@ -10,4 +10,6 @@ class ArticleModel {
     var tags: List<String>? = null
     var description: String? = null
     var published: Instant? = null
+    var likes: Int = 0
+    var comments: Int = 0
 }

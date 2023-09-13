@@ -40,4 +40,13 @@ class NewsViewModel @Inject constructor(
                 .getOrDefault(Collections.emptyList()))
     }
 
+    fun likeArticle(uuid: UUID){
+        viewModelScope.launch {
+            repository.likeArticle(uuid)
+                .onSuccess { status.postValue(StatusModel("$it")) }
+                .onFailure { status.postValue(StatusModel(it)) }
+        }
+    }
+
+
 }

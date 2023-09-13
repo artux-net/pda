@@ -23,8 +23,8 @@ import net.artux.pda.map.ecs.camera.CameraSystem;
 import net.artux.pda.map.ecs.render.RenderSystem;
 import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.engine.entities.model.Anomaly;
-import net.artux.pda.map.managers.notification.NotificationController;
-import net.artux.pda.map.managers.notification.NotificationType;
+import net.artux.pda.map.controller.notification.NotificationController;
+import net.artux.pda.map.controller.notification.NotificationType;
 import net.artux.pda.map.di.scope.PerGameMap;
 
 import java.util.EnumMap;

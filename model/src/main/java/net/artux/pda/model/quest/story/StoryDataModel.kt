@@ -35,7 +35,6 @@ class StoryDataModel : Serializable {
     var bullets: MutableList<ItemModel> = mutableListOf()
     var items: MutableList<ItemModel> = mutableListOf()
 
-
     fun containsCurrent(): Boolean {
         return currentState != null
     }

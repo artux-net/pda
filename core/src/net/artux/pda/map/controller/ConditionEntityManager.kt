@@ -1,4 +1,4 @@
-package net.artux.pda.map.managers
+package net.artux.pda.map.controller
 
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Engine

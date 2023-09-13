@@ -28,7 +28,7 @@ import net.artux.pda.map.ecs.player.PlayerSystem;
 import net.artux.pda.map.ecs.vision.FogOfWarComponent;
 import net.artux.pda.map.ecs.vision.VisionComponent;
 import net.artux.pda.map.engine.entities.Bodies;
-import net.artux.pda.map.managers.ConditionEntityManager;
+import net.artux.pda.map.controller.ConditionEntityManager;
 import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.repository.EngineSaver;
 import net.artux.pda.map.utils.Colors;

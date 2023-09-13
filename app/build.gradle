@@ -89,6 +89,7 @@ android {
         release {
             minifyEnabled true
             shrinkResources false
+            signingConfig signingConfigs.release
 
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
@@ -98,31 +99,9 @@ android {
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-4707001480680280/2723145658\"")
         }
 
-        dev {
-            minifyEnabled true
-            shrinkResources false
-
-            buildConfigField("String", "PROTOCOL", "\"https\"")
-            buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
-            buildConfigField("String", "URL", "\"cdn.artux.net/static/\"")
-            buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
-            buildConfigField("String", "QuestAdId", "\"ca-app-pub-4707001480680280/1079779549\"")
-            buildConfigField("String", "NewsAdId", "\"ca-app-pub-4707001480680280/2723145658\"")
-        }
-
         debug {
             debuggable true
-
-            buildConfigField("String", "PROTOCOL", "\"https\"")
-            buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
-            buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
-            buildConfigField("String", "URL", "\"cdn.artux.net/static/\"")
-            buildConfigField("String", "QuestAdId", "\"ca-app-pub-3940256099942544/1033173712\"")
-            buildConfigField("String", "NewsAdId", "\"ca-app-pub-3940256099942544/2247696110\"")
-        }
-
-        debugRelease {
-            debuggable true
+            signingConfig signingConfigs.release
 
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")

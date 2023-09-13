@@ -61,7 +61,6 @@ class PlayerSystem @Inject constructor(
                 override fun entityRemoved(entity: Entity?) {
 
                 }
-
             })
     }
 

@@ -1,4 +1,4 @@
-package net.artux.pda.map.managers.notification;
+package net.artux.pda.map.controller.notification;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Sound;

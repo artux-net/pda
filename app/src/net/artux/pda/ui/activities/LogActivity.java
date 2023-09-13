@@ -11,8 +11,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+
 import net.artux.pda.R;
+import net.artux.pda.common.PropertyFields;
 import net.artux.pda.ui.viewmodels.SettingsViewModel;
+
+import java.util.Properties;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -20,11 +25,13 @@ import dagger.hilt.android.AndroidEntryPoint;
 public class LogActivity extends AppCompatActivity {
 
     protected SettingsViewModel settingsViewModel;
+    protected Properties properties;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log);
+
         TextView textView = findViewById(R.id.logText);
         settingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
         String text = settingsViewModel.getLogInString().replaceAll("\n", "<br>");

@@ -7,6 +7,7 @@ import net.artux.pdanetwork.model.ResponsePageArticleSimpleDto
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -58,5 +59,37 @@ class NewsRepository @Inject constructor(
                 })
         }
     }
+
+    suspend fun likeArticle(articleId: UUID): Result<Boolean> {
+        return suspendCoroutine {
+            webservice.likeArticle(articleId).enqueue(object : Callback<Boolean> {
+                override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                    val data = response.body()
+                    if (data != null) {
+                        it.resume(Result.success(data))
+                    } else
+                        it.resume(Result.failure(Exception("Feed null")))
+                }
+
+                override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                    it.resume(Result.failure(t))
+                }
+            })
+        }
+    }
+
+    /*suspend fun getComments(articleId: UUID): Result<List<ArticleSimpleDto>> {
+        return suspendCoroutine {
+            webservice.getComments("ARTICLE", articleId, ).enqueue(object : Callback<List<ArticleSimpleDto>> {
+                override fun onResponse(
+                    call: Call<List<ArticleSimpleDto>>,
+                    response: Response<List<ArticleSimpleDto>>
+                ) {
+                    val data = response.body()
+                    if (data != null) {
+                        it.resume(Result.success(data))
+                    } else
+                        it.resume(Result.failure(Exception("Feed null")))
+                }*/
 
 }

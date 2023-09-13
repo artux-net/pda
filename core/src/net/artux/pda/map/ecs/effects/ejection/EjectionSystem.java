@@ -19,15 +19,14 @@ import net.artux.pda.map.ecs.interactive.map.SpawnComponent;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.player.PlayerSystem;
 import net.artux.pda.map.ecs.render.RenderSystem;
-import net.artux.pda.map.managers.notification.NotificationController;
-import net.artux.pda.map.managers.notification.NotificationType;
+import net.artux.pda.map.controller.notification.NotificationController;
+import net.artux.pda.map.controller.notification.NotificationType;
 import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.model.map.SpawnModel;
 
 import javax.inject.Inject;
-import javax.swing.SpringLayout;
 
 @PerGameMap
 public class EjectionSystem extends EntitySystem {

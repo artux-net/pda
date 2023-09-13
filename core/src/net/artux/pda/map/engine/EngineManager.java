@@ -27,7 +27,7 @@ import net.artux.pda.map.ecs.interactive.InteractionSystem;
 import net.artux.pda.map.ecs.physics.PlayerMovingSystem;
 import net.artux.pda.map.ecs.player.MissionsSystem;
 import net.artux.pda.map.ecs.render.Drawable;
-import net.artux.pda.map.managers.ConditionEntityManager;
+import net.artux.pda.map.controller.ConditionEntityManager;
 import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.repository.EngineSaver;
 import net.artux.pda.map.utils.Mappers;
