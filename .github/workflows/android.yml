@@ -1,8 +1,8 @@
 name: Android Build
 
 on:
-  pull_request:
-    branches: [ master ]
+  push:
+    branches: [ "master", "dev" ]
   workflow_dispatch:
 
 jobs:
@@ -19,7 +19,16 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y.%m')"
       
-      - name: Bump version
+      - name: Bump dev version
+        if: ${{ github.ref == 'refs/heads/dev' }}
+        uses: chkfung/android-version-actions@v1.2.1
+        with:
+          gradlePath: app/build.gradle
+          versionCode: ${{github.run_number}}
+          versionName: ${{ steps.date.outputs.date }} Dev
+
+      - name: Bump master version
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: chkfung/android-version-actions@v1.2.1
         with:
           gradlePath: app/build.gradle
@@ -47,6 +56,7 @@ jobs:
         name: Sign APK
         id: sign_apk
         with:
+          whatsNewDirectory: ./releaseNotes
           releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.key_alias }}
@@ -54,21 +64,29 @@ jobs:
           keyPassword: ${{ secrets.KEY_PASSWORD }}   
           
       - uses: r0adkll/upload-google-play@v1
-        name: Upload to Google Play Console
+        name: Upload to Internal Sharing
         id: upload
+        if: ${{ github.ref == 'refs/heads/dev' }}
         with:
+          whatsNewDirectory: ./releaseNotes
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
           releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
           track: internalsharing
       
       - uses: r0adkll/upload-google-play@v1
+        name: Upload to Beta channel
         id: uploadPlay
+        if: ${{ github.ref == 'refs/heads/master' }}
         with:
+          status: inProgress
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
+          debugSymbols: app/intermediates/merged_native_libs/release/out/lib
+          whatsNewDirectory: ./releaseNotes
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
           releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
-          track: internal          
+          track: beta          
           
       - uses: actions/upload-artifact@v3
         with:
@@ -77,6 +95,7 @@ jobs:
           
       - name: Send message to Artux channel
         uses: prygunov/telegram-action@master
+        if: ${{ github.ref == 'refs/heads/dev' }}
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
@@ -84,3 +103,14 @@ jobs:
             Сборка ${{github.run_number}}, версия ${{ steps.date.outputs.date }}
             
             Ссылка для скачивания: ${{steps.upload.outputs.internalSharingDownloadUrl}}
+            
+      - name: Send message to Artux channel
+        uses: prygunov/telegram-action@master
+        if: ${{ github.ref == 'refs/heads/master' }}
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            Master-сборка ${{github.run_number}}, версия ${{ steps.date.outputs.date }}
+            
+            Ожидает публикации в beta-канале Google Play
