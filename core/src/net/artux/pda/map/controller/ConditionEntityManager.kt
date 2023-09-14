@@ -12,6 +12,7 @@ import net.artux.pda.map.ecs.interactive.PassivityComponent
 import net.artux.pda.map.ecs.interactive.map.ConditionComponent
 import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.di.scope.PerGameMap
+import net.artux.pda.map.ecs.player.MissionsSystem
 import net.artux.pda.model.QuestUtil
 import net.artux.pda.model.quest.story.StoryDataModel
 import javax.inject.Inject
@@ -19,6 +20,7 @@ import javax.inject.Inject
 @PerGameMap
 class ConditionEntityManager @Inject constructor(
     private val engine: Engine,
+    val missionsSystems: MissionsSystem,
     val dataRepository: DataRepository,
     val logger: ApplicationLogger
 ) {
@@ -42,6 +44,7 @@ class ConditionEntityManager @Inject constructor(
                 if (!pcm.has(e))
                     e.add(PassivityComponent())
         }
+        missionsSystems.updatePoints()
     }
 
     fun disableConditions() {

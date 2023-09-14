@@ -169,7 +169,9 @@ public class AnomalySystem extends EntitySystem {
         }
 
 
-        cameraSystem.setSpecialZoom(playerIsInAnomaly);
+        if (playerIsInAnomaly)
+            cameraSystem.setSpecialZoom(true);
+
         if (playerIsInAnomaly) {
             timeToPlay -= deltaTime;
             if (timeToPlay < 0) {

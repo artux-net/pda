@@ -3,6 +3,7 @@ package net.artux.pda.map.view.dialog;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Timer;
 
 import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.repository.DataRepository;
@@ -28,6 +29,7 @@ public class AdsDialog extends PDADialog {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 dataRepository.applyActions(Collections.singletonMap("showAd", Collections.singletonList("usual")), true);
+                disableView(usualAd, 120);
             }
         });
 
@@ -37,6 +39,7 @@ public class AdsDialog extends PDADialog {
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
                 dataRepository.applyActions(Collections.singletonMap("showAd", Collections.singletonList("video")), true);
+                disableView(videoAd, 300);
             }
         });
 
@@ -47,5 +50,16 @@ public class AdsDialog extends PDADialog {
         horizontalGroup.addActor(videoAd);
         add(horizontalGroup);
     }
+
+    private void disableView(PDAButton button, int seconds){
+        button.setDisabled(true);
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                button.setDisabled(false);
+            }
+        }, seconds);
+    }
+
 
 }

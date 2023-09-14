@@ -28,12 +28,13 @@ import javax.inject.Inject
 
 @PerGameMap
 class LootWindow @Inject constructor(
-    assetsFinder: AssetsFinder,
-    private val skin: Skin,
-    private val localeBundle: LocaleBundle,
     private val dataRepository: DataRepository,
     private var mainItemsView: ScrollItemsTableView,
     private var botItemsView: ScrollItemsTableView,
+
+    assetsFinder: AssetsFinder,
+    skin: Skin,
+    localeBundle: LocaleBundle
 ) : PDAWindow(skin) {
 
     private var assetManager: AssetManager
@@ -45,7 +46,10 @@ class LootWindow @Inject constructor(
     private var lastDataModel: StoryDataModel
     private var lastBotItems: MutableList<ItemModel> = mutableListOf()
 
+    private var isItemsUpdating = false
+
     fun update(dataModel: StoryDataModel) {
+        isItemsUpdating = false
         lastDataModel = dataModel
 
         Gdx.app.postRunnable {
@@ -122,6 +126,9 @@ class LootWindow @Inject constructor(
 
         val stalkerItemClickListener = object : OnItemClickListener {
             override fun onTap(itemModel: ItemModel) {
+                if (isItemsUpdating)
+                    return
+                isItemsUpdating = true
                 lastBotItems.remove(itemModel)
                 lastDataModel.addItem(itemModel)
                 dataRepository.update()
@@ -134,6 +141,9 @@ class LootWindow @Inject constructor(
 
         val playerItemClickListener = object : OnItemClickListener {
             override fun onTap(itemModel: ItemModel) {
+                if (isItemsUpdating)
+                    return
+                isItemsUpdating = true
                 ItemsHelper.add(lastBotItems, SerializationUtils.clone(itemModel))
                 itemModel.quantity = 0
                 dataRepository.update()
@@ -143,11 +153,13 @@ class LootWindow @Inject constructor(
 
             }
         }
-        mainItemsView.setOnClickListener(playerItemClickListener)
 
+        mainItemsView.setOnClickListener(playerItemClickListener)
         botItemsView.setOnClickListener(stalkerItemClickListener)
+
         background = Utils.getColoredDrawable(1, 1, Colors.backgroundColor)
         touchable = Touchable.enabled
+
         CoroutineScope(Dispatchers.Main).launch {
             dataRepository.storyDataModelFlow.collect {
                 update(it)

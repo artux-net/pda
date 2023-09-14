@@ -41,6 +41,7 @@ import javax.inject.Inject
 
 @PerGameMap
 class BackpackWindow @Inject constructor(
+    private var mainItemsView: ScrollItemsTableView,
     private val localeBundle: LocaleBundle,
     private val dataRepository: DataRepository,
     private val armorView: DetailItemView,
@@ -56,7 +57,6 @@ class BackpackWindow @Inject constructor(
     soundsSystem: AudioSystem,
     throwItemDialog: ThrowItemDialog,
     adsDialog: AdsDialog,
-    var mainItemsView: ScrollItemsTableView,
     hud: HUD
 ) : PDAWindow(skin) {
     private var assetManager: AssetManager

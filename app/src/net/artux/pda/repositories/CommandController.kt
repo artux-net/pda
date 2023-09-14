@@ -21,7 +21,7 @@ import net.artux.pda.utils.AdType
 import net.artux.pdanetwork.model.CommandBlock
 import org.luaj.vm2.Globals
 import timber.log.Timber
-import java.util.*
+import java.util.LinkedList
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -54,7 +54,7 @@ class CommandController @Inject constructor(
         luaController.putObjectToScriptContext("soundManager", soundManager)
     }
 
-    override fun processWithServer(actions: Map<String, List<String>>){
+    override fun processWithServer(actions: Map<String, List<String>>) {
         needSync = true
         cacheCommands(actions)
         process(actions)
@@ -63,8 +63,8 @@ class CommandController @Inject constructor(
     override fun process(commands: Map<String, List<String>>?) {
         if (commands.isNullOrEmpty()) return
 
-        for (command in commands){
-            when (command.key){
+        for (command in commands) {
+            when (command.key) {
                 "script", "lua" -> luaController.runLua(command.value)
             }
         }
@@ -115,10 +115,13 @@ class CommandController @Inject constructor(
 
     override fun openNotification(args: List<String>) {
         if (args.size == 2)
+            openNotification(args[0], args[1])
+
+        if (args.size == 3)
             notification.postValue(
                 stageMapper.notification(
-                    NotificationType.ALERT,
-                    "${args[0]}:${args[1]}",
+                    NotificationType.valueOf(args[0]),
+                    "${args[1]}:${args[2]}",
                     storyData.value
                 )
             )
@@ -170,7 +173,7 @@ class CommandController @Inject constructor(
         else {
             chapterId = list[0].toInt()
             stageId = list[1].toInt()
-            openStage(chapterId,stageId)
+            openStage(chapterId, stageId)
         }
     }
 
@@ -179,7 +182,7 @@ class CommandController @Inject constructor(
             val args = arg.split(":")
             val chapterId = args.first().toInt()
             val stageId = args[1].toInt()
-            openStage(chapterId,stageId)
+            openStage(chapterId, stageId)
         } else {
             val stageId = arg.toInt()
             openStage(stageId)

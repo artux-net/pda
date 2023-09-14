@@ -34,14 +34,14 @@ import javax.inject.Inject
 @PerGameMap
 class MissionsSystem @Inject constructor(
     private val messagesList: MessagesList,
-    assetManager: AssetManager,
     private val dataRepository: DataRepository,
     private val soundsSystem: AudioSystem,
-    private val cameraSystem: CameraSystem
+    private val cameraSystem: CameraSystem,
+
+    assetManager: AssetManager
 ) : BaseSystem(
-    Family.all(BodyComponent::class.java, QuestComponent::class.java).exclude(
-        PassivityComponent::class.java
-    ).get()
+    Family.all(BodyComponent::class.java, QuestComponent::class.java)
+        .exclude(PassivityComponent::class.java).get()
 ), Disposable {
 
     private val pm = ComponentMapper.getFor(BodyComponent::class.java)
@@ -76,14 +76,16 @@ class MissionsSystem @Inject constructor(
         loadPreferences()
     }
 
-    fun updateData(oldDataModel: StoryDataModel) {
+    private fun updateData(oldDataModel: StoryDataModel) {
         val paramArr = getUpdatedParams(oldDataModel).toTypedArray()
         val updatedMissions = getMissionsByParams(paramArr)
         for (m in updatedMissions) {
-            val checkpointModel = m.getCurrentCheckpoint(*paramArr)
+            val checkpointModel = m.getCurrentCheckpoint(*paramArr) ?: continue
             messagesList.addMessage(
-                "textures/avatars/a0.png", "Задание обновлено: " + m.title,
-                "Новая цель: " + checkpointModel!!.title, MessagesList.Length.SHORT
+                checkpointModel.type.iconId,
+                "Задание обновлено: " + m.title,
+                "Новая цель: " + checkpointModel.title,
+                MessagesList.Length.SHORT
             )
             soundsSystem.playSound(missionUpdatedSound)
         }
@@ -291,5 +293,12 @@ class MissionsSystem @Inject constructor(
             val name = preferences.getString("active")
             setActiveMissionByName(name)
         }
+    }
+
+    fun updatePoints() {
+        if (entities.size() > 0)
+            setTargetPosition(pm[entities.first()].position)
+        else
+            setTargetPosition(null)
     }
 }

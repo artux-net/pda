@@ -8,6 +8,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.utils.Timer;
 
 import net.artux.engine.utils.LocaleBundle;
@@ -23,6 +25,7 @@ import net.artux.pda.map.controller.notification.NotificationController;
 import net.artux.pda.map.controller.notification.NotificationType;
 import net.artux.pda.map.di.components.MapComponent;
 import net.artux.pda.map.di.scope.PerGameMap;
+import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.model.map.SpawnModel;
 
@@ -43,18 +46,25 @@ public class EjectionSystem extends EntitySystem {
     private final LocaleBundle localeBundle;
     private final MapComponent mapComponent;
     private final PlayerSystem playerSystem;
+    private final AudioSystem audioSystem;
+    private final Music ejectionMusic;
 
     private static final boolean test = false;
 
     @Inject
-    public EjectionSystem(MapComponent mapComponent, RenderSystem renderSystem, NotificationController notificationController,
+    public EjectionSystem(MapComponent mapComponent, RenderSystem renderSystem,
+                          AudioSystem audioSystem,
+                          AssetManager assetManager,
+                          NotificationController notificationController,
                           LocaleBundle localeBundle, PlayerSystem playerSystem) {
         this.playerSystem = playerSystem;
         this.mapComponent = mapComponent;
         this.renderSystem = renderSystem;
         this.localeBundle = localeBundle;
+        this.audioSystem = audioSystem;
         this.notificationController = notificationController;
 
+        ejectionMusic = assetManager.get("audio/music/background/ejection.ogg", Music.class);
     }
 
     @Override
@@ -131,6 +141,8 @@ public class EjectionSystem extends EntitySystem {
 
     public void processEjection() {
         ejectionActive = true;
+        audioSystem.stopBackgroundMusic();
+        audioSystem.playMusic(ejectionMusic);
         UserMessage message = notificationController.generateMessage();
         notificationController.setTitle(localeBundle.get("main.ejection.begin"));
         message.setContent(localeBundle.get("main.ejection.notif.message"));
@@ -149,6 +161,9 @@ public class EjectionSystem extends EntitySystem {
 
     private void endEjection() {
         ejectionActive = false;
+
+        audioSystem.fadeStopMusic(ejectionMusic);
+        audioSystem.startBackgroundMusic();
         getEngine().removeAllEntities(Family.all(AnomalyComponent.class).get());
         notificationController.notify(NotificationType.ATTENTION,
                 localeBundle.get("main.ejection.end"), localeBundle.get("main.ejection.end.desc"));

@@ -8,6 +8,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.ecs.physics.BodyComponent;
@@ -25,6 +26,7 @@ import javax.inject.Inject;
 @PerGameMap
 public class AudioSystem extends BaseSystem {
 
+    private static final float MUSIC_FADE_STEP = 0.01F;
     private final List<Sound> detections = new ArrayList<>();
     private final List<Music> backgrounds = new ArrayList<>();
 
@@ -57,16 +59,30 @@ public class AudioSystem extends BaseSystem {
     }
 
     public void startBackgroundMusic() {
-        stopMusic();
+        stopBackgroundMusic();
         Music m = backgrounds.get(random.nextInt(backgrounds.size()));
         m.setOnCompletionListener(music -> startBackgroundMusic());
         m.play();
     }
 
-    public void stopMusic() {
+    public void stopBackgroundMusic() {
         for (Music m : backgrounds) {
-            m.stop();
+            fadeStopMusic(m);
         }
+    }
+
+    public void fadeStopMusic(Music music){
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                if (music.getVolume() >= MUSIC_FADE_STEP)
+                    music.setVolume(music.getVolume()-MUSIC_FADE_STEP);
+                else {
+                    music.stop();
+                    this.cancel();
+                }
+            }
+        }, 0f, 0.01f);
     }
 
     @Override

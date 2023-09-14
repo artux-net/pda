@@ -20,6 +20,8 @@ import net.artux.pda.map.utils.Mappers;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.model.map.GameMap;
 
+import java.util.IllegalFormatCodePointException;
+
 import javax.inject.Inject;
 
 @PerGameMap
@@ -66,8 +68,13 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
 
     Vector2 unit = new Vector2();
 
+    boolean specialZoomChangedLastUpdate = false;
+
     @Override
     public void update(float deltaTime) {
+        this.specialZoom = specialZoomChangedLastUpdate;
+        specialZoomChangedLastUpdate = false;
+
         super.update(deltaTime);
 
         if (isPlayerActive()) {
@@ -137,7 +144,7 @@ public class CameraSystem extends BaseSystem implements GestureDetector.GestureL
     }
 
     public void setSpecialZoom(boolean specialZoom) {
-        this.specialZoom = specialZoom;
+        this.specialZoomChangedLastUpdate = specialZoom;
     }
 
     public void moveBy(float x, float y) {

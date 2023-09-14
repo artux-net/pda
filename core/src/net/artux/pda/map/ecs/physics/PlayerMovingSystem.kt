@@ -37,13 +37,19 @@ class PlayerMovingSystem @Inject constructor(
     private var left = false
     private val stepVolume = 0.15f
     private val oneStepDistance = 0.36f
-    private val oneRunStepDistance = 0.75f
+    private val oneRunStepDistance = 2.7f
     private var stepsDistance = 0f
     private var random: Random
     private var lastPosition = Vector2()
 
     val velocity = Vector2()
-    var isRunning: Boolean = false
+    private var isRunning: Boolean = false
+
+    fun setRunning(isRunning: Boolean){
+        if (velocity.isZero)
+            return
+        else this.isRunning = isRunning
+    }
 
     private val operationalVelocity: Vector2 = Vector2()
 

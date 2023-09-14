@@ -103,7 +103,7 @@ public interface StoryMapper {
         List<GameMap> result = new LinkedList<>();
         for (Map.Entry<Long, net.artux.pdanetwork.model.GameMap> map : maps.entrySet()) {
             net.artux.pdanetwork.model.GameMap oldMap = map.getValue();
-            GameMap m = new GameMap(oldMap.getId(), oldMap.getTitle(), oldMap.getTmx(), oldMap.getDefPos(), points(oldMap.getPoints()), spawns(oldMap.getSpawns()));
+            GameMap m = new GameMap(oldMap.getId(), oldMap.getTitle(), 5, oldMap.getTmx(), oldMap.getDefPos(), points(oldMap.getPoints()), spawns(oldMap.getSpawns()));
             m.setId(m.getId());
             result.add(m);
         }

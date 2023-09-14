@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.Gdx;
 
+import net.artux.pda.map.ecs.camera.CameraSystem;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
 import net.artux.pda.map.ecs.interactive.PassivityComponent;
@@ -24,6 +25,7 @@ public class PlayerBattleSystem extends BaseSystem {
 
     private final EntityProcessorSystem entityProcessorSystem;
     private final AudioSystem audioSystem;
+    private final CameraSystem cameraSystem;
 
     private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     private final ComponentMapper<VisionComponent> vm = ComponentMapper.getFor(VisionComponent.class);
@@ -33,11 +35,12 @@ public class PlayerBattleSystem extends BaseSystem {
     private boolean playerShoot = false;
 
     @Inject
-    public PlayerBattleSystem(EntityProcessorSystem entityProcessorSystem, AudioSystem audioSystem) {
+    public PlayerBattleSystem(EntityProcessorSystem entityProcessorSystem, AudioSystem audioSystem, CameraSystem cameraSystem) {
         super(Family.all(PlayerComponent.class, HealthComponent.class, VisionComponent.class,
                 MoodComponent.class, BodyComponent.class, WeaponComponent.class).exclude(PassivityComponent.class).get());
         this.entityProcessorSystem = entityProcessorSystem;
         this.audioSystem = audioSystem;
+        this.cameraSystem = cameraSystem;
     }
 
     public void setPlayerShoot(boolean playerShoot) {
@@ -56,6 +59,8 @@ public class PlayerBattleSystem extends BaseSystem {
             soundStarted = true;
         }
 
+        if (playerMood.hasEnemy())
+            cameraSystem.setSpecialZoom(true);
         playerWeapon.update(deltaTime);
 
         if (playerMood.hasEnemy()) {

@@ -35,7 +35,7 @@ public class InterstitialAdListener implements InterstitialAdEventListener {
 
     @Override
     public void onAdShown() {
-        commandViewModel.processWithServer(Map.of("money", List.of(String.valueOf(100))));
+        commandViewModel.processWithServer(Map.of("add", List.of("87:1")));
     }
 
     @Override

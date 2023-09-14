@@ -25,6 +25,7 @@ import net.artux.pda.map.ecs.ai.states.MutantState;
 import net.artux.pda.map.ecs.ai.states.StalkerState;
 import net.artux.pda.map.ecs.battle.BulletComponent;
 import net.artux.pda.map.ecs.battle.BulletPool;
+import net.artux.pda.map.ecs.battle.InfightingComponent;
 import net.artux.pda.map.ecs.battle.MoodComponent;
 import net.artux.pda.map.ecs.battle.WeaponComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
@@ -203,13 +204,19 @@ public class EntityBuilder {
         BodyComponent bodyComponent = new BodyComponent(Bodies.mutant(targeting.getTarget(), world));
         bodyComponent.setMovementForce(2000);
 
+
+
         MutantType randomType = MutantType.values()[random.nextInt(MutantType.values().length)];
+        InfightingComponent infightingComponent = randomType.getInfightingComponent();
+        for (String soundId : randomType.getAttackSounds())
+            infightingComponent.getSounds().add(assetManager.get(soundId));
+
         entity.add(bodyComponent)
                 .add(new VisionComponent())
                 .add(new FogOfWarComponent())
                 .add(new HealthComponent(new ArmorModel()))
                 .add(new GraphMotionComponent(null))
-                .add(randomType.getInfightingComponent())
+                .add(infightingComponent)
                 .add(statesComponent)
                 .add(new MoodComponent())
                 .add(new TargetMovingComponent(targeting))

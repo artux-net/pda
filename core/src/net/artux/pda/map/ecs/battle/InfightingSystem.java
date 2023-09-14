@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Family;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
 import net.artux.pda.map.ecs.interactive.PassivityComponent;
+import net.artux.pda.map.ecs.sound.AudioSystem;
 import net.artux.pda.map.ecs.systems.BaseSystem;
 import net.artux.pda.map.ecs.vision.VisionComponent;
 import net.artux.pda.map.ecs.characteristics.PlayerComponent;
@@ -23,10 +24,13 @@ public class InfightingSystem extends BaseSystem {
     private final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
     private final ComponentMapper<InfightingComponent> wm = ComponentMapper.getFor(InfightingComponent.class);
 
+    private final AudioSystem audioSystem;
+
     @Inject
-    public InfightingSystem() {
+    public InfightingSystem(AudioSystem audioSystem) {
         super(Family.all(HealthComponent.class, VisionComponent.class,
                 MoodComponent.class, BodyComponent.class, InfightingComponent.class).exclude(PlayerComponent.class, PassivityComponent.class).get());
+        this.audioSystem = audioSystem;
     }
 
     @Override
@@ -44,7 +48,8 @@ public class InfightingSystem extends BaseSystem {
                 return;
             HealthComponent enemyHealth = hm.get(moodComponent.getEnemy());
             enemyHealth.damage(infightingComponent.getDamage());
-            //todo make sound
+
+            audioSystem.playSoundAtDistance(infightingComponent.getSounds().random(), bodyComponent.getPosition());
         }
     }
 

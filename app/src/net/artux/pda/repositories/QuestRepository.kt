@@ -222,7 +222,7 @@ class QuestRepository @Inject constructor(
                         storyDataCache.put("story", data)
                         it.resume(Result.success(data))
                     } else
-                        it.resume(Result.failure(Exception("Story data null")))
+                        it.resume(Result.failure(Exception("Не удалось обновить информацию о прохождении, повторите позже")))
                 }
 
                 override fun onFailure(call: Call<StoryData>, t: Throwable) {

@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import net.artux.pda.scripting.IQuestSoundManager
 import net.artux.pda.utils.URLHelper
 import timber.log.Timber
+import java.io.IOException
 import javax.inject.Singleton
 
 
@@ -18,15 +19,15 @@ class QuestSoundManager(
     override val mediaPlayer: MediaPlayer,
     override val soundPool: SoundPool,
     val context: Context
-) :
-    IQuestSoundManager {
+) : IQuestSoundManager {
 
     private val mediaScope = CoroutineScope(Dispatchers.Main)
-    var audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    var curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
-    var maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat()
-    var leftVolume = curVolume / maxVolume
-    var rightVolume = curVolume / maxVolume
+    private var audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    private val loadedSounds: MutableMap<String, Int> = linkedMapOf()
+    private var curVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
+    private var maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat()
+    private var leftVolume = curVolume / maxVolume
+    private var rightVolume = curVolume / maxVolume
     override var muted = false
 
     init {
@@ -37,17 +38,17 @@ class QuestSoundManager(
         mediaPlayer.setOnPreparedListener(this)
     }
 
-
-    val loadedSounds: MutableMap<String, Int> = linkedMapOf()
-
     override fun playSound(path: String) {
         val id = if (loadedSounds.containsKey(path))
             loadedSounds[path]
-        else {
+        else try {
             val fileDescriptor = context.assets.openFd(path)
             loadedSounds[path] = soundPool.load(fileDescriptor, 1)
             loadedSounds[path]
+        } catch (ioException: IOException) {
+            Timber.w(ioException, "Can not load local sound")
         }
+
         Timber.i("Sound $path loaded as $id")
     }
 
@@ -70,10 +71,11 @@ class QuestSoundManager(
             )
             Timber.i("Music $path played from local file")
             mediaPlayer.prepare()
+
         } catch (_: Exception) {
             loadOnlineResource(path)
         }
-
+        mediaPlayer.start()
     }
 
     override fun loadOnlineResource(path: String) {

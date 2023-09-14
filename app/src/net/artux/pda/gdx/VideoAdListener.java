@@ -46,7 +46,7 @@ public class VideoAdListener implements RewardedAdEventListener {
 
     @Override
     public void onRewarded(@NonNull Reward reward) {
-        commandViewModel.processWithServer(Map.of("money", List.of(String.valueOf(500))));
+        commandViewModel.processWithServer(Map.of("add", List.of("84:1")));
     }
 
     @Override

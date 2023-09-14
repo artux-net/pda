@@ -4,13 +4,28 @@ import net.artux.pda.map.ecs.battle.InfightingComponent;
 
 public enum MutantType {
 
-    DOG("mutant.dog", "textures/avatars/mutants/dog.jpg", false){
+    DOG("mutant.dog", "textures/avatars/mutants/dog.jpg", new String[]{
+            "audio/sounds/mutant/dog/1.ogg",
+            "audio/sounds/mutant/dog/2.ogg",
+            "audio/sounds/mutant/dog/3.ogg",
+            "audio/sounds/mutant/dog/4.ogg",
+            "audio/sounds/mutant/dog/5.ogg",
+            "audio/sounds/mutant/dog/6.ogg",
+            "audio/sounds/mutant/dog/7.ogg",
+            "audio/sounds/mutant/dog/8.ogg",
+            "audio/sounds/mutant/dog/9.ogg",
+    }, false) {
         @Override
         InfightingComponent getInfightingComponent() {
             return new InfightingComponent(10, 10, 1.5f);
         }
     },
-    BOAR("mutant.boar", "textures/avatars/mutants/boar.jpg", false){
+    BOAR("mutant.boar", "textures/avatars/mutants/boar.jpg", new String[]{
+            "audio/sounds/mutant/boar/1.ogg",
+            "audio/sounds/mutant/boar/2.ogg",
+            "audio/sounds/mutant/boar/3.ogg",
+            "audio/sounds/mutant/boar/4.ogg"
+    }, false) {
         @Override
         InfightingComponent getInfightingComponent() {
             return new InfightingComponent(10, 25, 2);
@@ -18,7 +33,11 @@ public enum MutantType {
     },
     //DEAD_STALKER("mutant.stalker", "avatarId", false),
     //CONTROLLER("mutant.controller", "textures/avatars/mutants/ctrl.jpg", true),
-    BLOOD_HUNTER("mutant.blood_hunter", "textures/avatars/mutants/blood_hunter.jpg", true){
+    BLOOD_HUNTER("mutant.blood_hunter", "textures/avatars/mutants/blood_hunter.jpg", new String[]{
+            "audio/sounds/mutant/blood_hunter/1.ogg",
+            "audio/sounds/mutant/blood_hunter/2.ogg",
+            "audio/sounds/mutant/blood_hunter/3.ogg"
+    }, true) {
         @Override
         InfightingComponent getInfightingComponent() {
             return new InfightingComponent(9, 40, 3);
@@ -27,12 +46,18 @@ public enum MutantType {
 
     private final String titleId;
     private final String avatarId;
+    private final String[] attackSounds;
     private final boolean isImportant;
 
-    MutantType(String titleId, String avatarId, boolean isImportant) {
+    MutantType(String titleId, String avatarId, String[] attackSounds, boolean isImportant) {
         this.titleId = titleId;
         this.avatarId = avatarId;
+        this.attackSounds = attackSounds;
         this.isImportant = isImportant;
+    }
+
+    public String[] getAttackSounds() {
+        return attackSounds;
     }
 
     public String getAvatarId() {
@@ -43,7 +68,7 @@ public enum MutantType {
         return titleId;
     }
 
-    public String getIconId(){
+    public String getIconId() {
         if (isImportant)
             return "textures/icons/entity/importantMutant.png";
         else return "textures/icons/entity/mutant.png";
