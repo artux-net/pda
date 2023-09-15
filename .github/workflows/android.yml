@@ -85,7 +85,7 @@ jobs:
           path: ./releaseNotes/whatsnew-ru-RU
 
       - name: Send message to Artux channel
-        uses: prygunov/telegram-action@master
+        uses: appleboy/telegram-action@master
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
           to: ${{ secrets.TELEGRAM_TO }}
