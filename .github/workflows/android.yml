@@ -70,7 +70,6 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
           status: draft
-          userFraction: 1.0
           mappingFile: app/build/outputs/mapping/release/mapping.txt
           debugSymbols: app/build/intermediates/merged_native_libs/release/out/lib
           whatsNewDirectory: ./releaseNotes
