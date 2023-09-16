@@ -79,7 +79,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
-          releaseFiles: app/build/outputs/apk/*/*.apk
+          releaseFiles: ./*/*.apk
           track: internalsharing
 
 
@@ -87,7 +87,7 @@ jobs:
         name: Sign APK
         id: sign_apk
         with:
-          releaseDirectory: app/build/outputs/apk/release
+          releaseDirectory: ./release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.key_alias }}
           keyStorePassword: ${{ secrets.keystore_password }}
@@ -99,14 +99,13 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
           status: draft
-          mappingFile: app/build/outputs/mapping/release/mapping.txt
-          debugSymbols: app/build/intermediates/merged_native_libs/release/out/lib
           whatsNewDirectory: ./releaseNotes
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
           releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
           track: internal
 
+      - uses: actions/checkout@v3
       - name: Read updates
         id: updates
         uses: juliangruber/read-file-action@v1
