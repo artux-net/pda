@@ -88,7 +88,7 @@ jobs:
         name: Sign APK
         id: sign_apk
         with:
-          releaseDirectory: ./release
+          releaseDirectory: /release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.key_alias }}
           keyStorePassword: ${{ secrets.keystore_password }}
@@ -100,7 +100,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
           status: draft
-          whatsNewDirectory: ./releaseNotes
+          whatsNewDirectory: /releaseNotes
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
           releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
@@ -111,7 +111,7 @@ jobs:
         id: updates
         uses: juliangruber/read-file-action@v1
         with:
-          path: ./releaseNotes/whatsnew-ru-RU
+          path: /releaseNotes/whatsnew-ru-RU
 
       - name: Send message to Artux channel
         uses: appleboy/telegram-action@master
