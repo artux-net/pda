@@ -9,7 +9,7 @@ on:
 
 jobs:
   assemble_job:
-    name: Assemble
+    name: Assemble versions
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -54,6 +54,24 @@ jobs:
         id: build
         run: ./gradlew clean assemble
 
+      - uses: actions/upload-artifact@v3
+        with:
+          name: apks
+          path: app/build/outputs/apk/*/*.apk
+
+  upload:
+    name: Uploads
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: apks
+          
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: path/to/artifact
+  
       - uses: r0adkll/upload-google-play@v1
         name: Upload to internal sharing
         id: upload
