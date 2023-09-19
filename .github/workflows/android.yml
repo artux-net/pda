@@ -83,16 +83,6 @@ jobs:
           packageName: net.artux.pda
           releaseFiles: ./*/*.apk
           track: internalsharing
-
-      - uses: r0adkll/sign-android-release@v1
-        name: Sign APK
-        id: sign_apk
-        with:
-          releaseDirectory: ./release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.key_alias }}
-          keyStorePassword: ${{ secrets.keystore_password }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }} 
           
       - uses: r0adkll/upload-google-play@v1.1.2
         name: Upload to Beta channel
@@ -111,7 +101,7 @@ jobs:
         id: updates
         uses: juliangruber/read-file-action@v1
         with:
-          path: /releaseNotes/whatsnew-ru-RU
+          path: ./releaseNotes/whatsnew-ru-RU
 
       - name: Send message to Artux channel
         uses: appleboy/telegram-action@master
