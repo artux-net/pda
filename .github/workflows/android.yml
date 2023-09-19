@@ -83,7 +83,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
-          releaseFiles: build/outputs/apk/*/*.apk
+          releaseFiles: apk/*/*.apk
           track: internalsharing
           
       - uses: r0adkll/upload-google-play@v1.1.2
@@ -95,8 +95,8 @@ jobs:
           whatsNewDirectory: releaseNotes
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
-          releaseFiles: build/outputs/apk/release/*.apk
-          mappingFile: build/outputs/mapping/release/mapping.txt
+          releaseFiles: apk/release/*.apk
+          mappingFile: mapping/release/mapping.txt
           track: beta
 
       - uses: actions/checkout@v3
