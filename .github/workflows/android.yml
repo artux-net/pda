@@ -57,7 +57,10 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: apks
-          path: app/build/outputs/apk/*/*.apk
+          path: |
+            app/build/outputs/apk/*/*.apk
+            app/build/outputs/mapping/release/mapping.txt
+            app/intermediates/merged_native_libs/release/out/lib
 
   upload:
     name: Uploads
@@ -93,7 +96,9 @@ jobs:
           whatsNewDirectory: ./releaseNotes
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
-          releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          releaseFiles: ./release/*.apk
+          mappingFile: mapping.txt
+          debugSymbols: .
           track: beta
 
       - uses: actions/checkout@v3
@@ -101,7 +106,7 @@ jobs:
         id: updates
         uses: juliangruber/read-file-action@v1
         with:
-          path: ./releaseNotes/whatsnew-ru-RU
+          path: ./releaseNotes/whatsnew-ru
 
       - name: Send message to Artux channel
         uses: appleboy/telegram-action@master
