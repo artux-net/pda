@@ -95,8 +95,8 @@ jobs:
           whatsNewDirectory: releaseNotes
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
-          releaseFiles: apk/release/*.apk
-          mappingFile: mapping/release/mapping.txt
+          releaseFiles: ./apk/release/app-release.apk
+          mappingFile: ./mapping/release/mapping.txt
           track: beta
 
       - uses: actions/checkout@v3
