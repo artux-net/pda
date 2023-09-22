@@ -74,17 +74,17 @@ jobs:
         working-directory: .
 
       - uses: actions/checkout@v3
-        
+
       - uses: r0adkll/sign-android-release@v1
         name: Sign APK
         id: sign_apk
         with:
-          releaseDirectory: ./apk/release
+          releaseDirectory: apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.key_alias }}
           keyStorePassword: ${{ secrets.keystore_password }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
-      
+
       - uses: r0adkll/upload-google-play@v1.1.2
         name: Upload to internal sharing
         id: upload
@@ -127,7 +127,7 @@ jobs:
             Ожидает публикации в beta-канале Google Play
             Изменения:
             ${{ steps.updates.outputs.content }}
-            
+
       - name: Send message to Artux channel
         uses: appleboy/telegram-action@master
         if: ${{ github.ref == 'refs/heads/dev' }}
