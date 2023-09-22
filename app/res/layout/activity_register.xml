@@ -136,12 +136,13 @@
                 android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent">
 
-                <TextView
-                    android:id="@+id/agreement"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:text="@string/agreement"/>
+        <TextView
+            android:id="@+id/agreement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/registerBtn"
+            android:text="@string/agreement" />
 
                 <Button
                     android:id="@+id/registerBtn"
