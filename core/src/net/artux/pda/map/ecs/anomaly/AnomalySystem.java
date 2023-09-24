@@ -68,7 +68,7 @@ public class AnomalySystem extends EntitySystem {
         this.audioSystem = audioSystem;
         this.renderSystem = renderSystem;
         this.notificationController = notificationController;
-        anomaliesWorkSounds = new EnumMap(Anomaly.class);
+        anomaliesWorkSounds = new EnumMap<>(Anomaly.class);
         for (Anomaly a : Anomaly.values()) {
             anomaliesWorkSounds.put(a, assetManager.get(a.getSoundId()));
         }

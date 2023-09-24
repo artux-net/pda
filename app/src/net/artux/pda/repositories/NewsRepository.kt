@@ -4,6 +4,7 @@ import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.ArticleSimpleDto
 import net.artux.pdanetwork.model.QueryPage
 import net.artux.pdanetwork.model.ResponsePageArticleSimpleDto
+import net.artux.pdanetwork.model.ResponsePageCommentDto
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -77,19 +78,4 @@ class NewsRepository @Inject constructor(
             })
         }
     }
-
-    /*suspend fun getComments(articleId: UUID): Result<List<ArticleSimpleDto>> {
-        return suspendCoroutine {
-            webservice.getComments("ARTICLE", articleId, ).enqueue(object : Callback<List<ArticleSimpleDto>> {
-                override fun onResponse(
-                    call: Call<List<ArticleSimpleDto>>,
-                    response: Response<List<ArticleSimpleDto>>
-                ) {
-                    val data = response.body()
-                    if (data != null) {
-                        it.resume(Result.success(data))
-                    } else
-                        it.resume(Result.failure(Exception("Feed null")))
-                }*/
-
 }

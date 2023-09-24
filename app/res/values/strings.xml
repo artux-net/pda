@@ -162,6 +162,13 @@
         <item>Посмотреть профиль</item>
     </string-array>
 
+    <string-array name="comment_actions">
+        <item>Ответить</item>
+        <item>Перейти к диалогу</item>
+        <item>Посмотреть профиль</item>
+        <item>Оценить</item>
+    </string-array>
+
     <string-array name="dialogs_actions"></string-array>
     <string name="quit">Quit</string>
     <string name="empty">"There are no entries. "</string>
@@ -271,4 +278,7 @@
     <string name="iwait">I\'m gonna wait</string>
     <string name="need_wait_message">We\'re updating our services, please wait some time...</string>
     <string name="need_wait">We need time\n</string>
+    <string name="likeIt">Like</string>
+    <string name="comments">Comments</string>
+    <string name="shareIt">Share</string>
 </resources>

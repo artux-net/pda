@@ -5,14 +5,13 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import net.artux.pda.R;
+import net.artux.pda.databinding.ItemNewsBinding;
 import net.artux.pda.model.news.ArticleModel;
 
 import java.time.ZoneId;
@@ -25,7 +24,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     private List<ArticleModel> mArticleModels;
     private final OnClickListener clickListener;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter
-            .ofPattern("dd.MM")
+            .ofPattern("dd/MM")
             .withZone(ZoneId.systemDefault());
 
     public NewsAdapter(OnClickListener onClickListener) {
@@ -37,16 +36,16 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
     public NewsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_news, parent, false);
-        return new NewsAdapter.ViewHolder(view);
+        ItemNewsBinding binding = ItemNewsBinding.inflate(LayoutInflater.from(parent.getContext()));
+        return new NewsAdapter.ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(NewsAdapter.ViewHolder holder, int position) {
-        holder.bind(holder.mainView, mArticleModels.get(position));
+        holder.bind(holder.binding.getRoot(), mArticleModels.get(position));
     }
 
     @Override
@@ -56,29 +55,25 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        View mainView;
-        ImageView imageView;
-        TextView titleView;
-        TextView contentView;
+        ItemNewsBinding binding;
 
-        public ViewHolder(View itemView) {
-            super(itemView);
-            mainView = itemView;
-            imageView = itemView.findViewById(R.id.image);
-            titleView = itemView.findViewById(R.id.title);
-            contentView = itemView.findViewById(R.id.content);
+        public ViewHolder(ItemNewsBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
         @SuppressLint("SetTextI18n")
         public void bind(View mainView, final ArticleModel articleModel) {
-            titleView.setText(Html.fromHtml(articleModel.getTitle()));
-            contentView.setText(Html.fromHtml(articleModel.getDescription()));
-
+            binding.title.setText(Html.fromHtml(articleModel.getTitle()));
+            binding.content.setText(Html.fromHtml(articleModel.getDescription()));
+            binding.likes.setText(Integer.toString(articleModel.getLikes()));
+            binding.comments.setText(Integer.toString(articleModel.getComments()));
+            binding.date.setText(dateTimeFormatter.format(articleModel.getPublished()));
             mainView.setOnClickListener(v -> clickListener.onClick(articleModel));
             Glide
-                    .with(imageView.getContext())
+                    .with(binding.image.getContext())
                     .load(articleModel.getImage())
-                    .into(imageView);
+                    .into(binding.image);
         }
 
     }

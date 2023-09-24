@@ -23,6 +23,7 @@ import net.artux.pda.databinding.FragmentChatBinding;
 import net.artux.pda.model.ConversationModel;
 import net.artux.pda.model.chat.ChatUpdate;
 import net.artux.pda.model.chat.UserMessage;
+import net.artux.pda.model.user.SimpleUserModel;
 import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
@@ -59,7 +60,7 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
     private ObjectWebSocketListener<ChatUpdate> userMessageObjectWebSocketListener;
     private final Timer timer = new Timer();
 
-    static ChatFragment with(UserModel userModel) {
+    public static ChatFragment with(SimpleUserModel userModel) {
         ChatFragment chatFragment1 = new ChatFragment();
         Bundle bundle1 = new Bundle();
         bundle1.putSerializable("user", userModel.getId());

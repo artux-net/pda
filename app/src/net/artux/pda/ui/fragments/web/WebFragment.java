@@ -23,6 +23,7 @@ import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 public class WebFragment extends BaseFragment {
 
     protected WebView content;
+    protected String url;
 
     public static WebFragment of(String title, String url) {
         WebFragment webFragment = new WebFragment();
@@ -45,7 +46,6 @@ public class WebFragment extends BaseFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        String url = null;
         if (getArguments() != null)
             url = getArguments().getString("url");
 

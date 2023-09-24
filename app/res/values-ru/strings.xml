@@ -165,4 +165,7 @@
     <string name="iwait">Я подожду</string>
     <string name="need_wait_message">Мы обновляем наши системы, сервер временно недоступен, зайдите чуть позже...</string>
     <string name="need_wait">Нам нужно время</string>
+    <string name="likeIt">Оценить</string>
+    <string name="comments">Комментарии</string>
+    <string name="shareIt">Поделиться</string>
 </resources>

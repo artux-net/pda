@@ -15,6 +15,7 @@
             android:id="@+id/rating_more"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/border_background"
             android:text="@string/loadMore"/>
     </LinearLayout>
 

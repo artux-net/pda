@@ -34,7 +34,7 @@ data class UserMessage(
         author = UserModel()
         author.login = storyDataModel.login
         author.avatar = storyDataModel.avatar
-        author.pdaId = storyDataModel.pdaId.toLong()
+        author.pdaId = storyDataModel.pdaId
         author.nickname = storyDataModel.nickname
         author.gang = storyDataModel.gang
     }
@@ -51,7 +51,7 @@ data class UserMessage(
         author.name = senderLogin
         author.nickname = ""
         author.role = Role.ADMIN
-        author.pdaId = -1L
+        author.pdaId = (-1L).toInt()
     }
 
     enum class Type {

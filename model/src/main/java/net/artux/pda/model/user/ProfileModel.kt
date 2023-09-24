@@ -35,7 +35,7 @@ class ProfileModel {
         login = userModel.login
         name = userModel.name
         avatar = userModel.avatar
-        pdaId = Math.toIntExact(userModel.pdaId!!)
+        pdaId = Math.toIntExact(userModel.pdaId.toLong())
         xp = userModel.xp
         registration = userModel.registration
     }

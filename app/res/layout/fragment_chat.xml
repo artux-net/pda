@@ -10,37 +10,10 @@
         android:layout_width="match_parent"
         app:stackFromEnd="true"
         android:layout_height="match_parent"
-        android:layout_above="@id/inputLayout"/>
+        android:layout_above="@id/chatInput"/>
 
-    <LinearLayout
-        android:id="@+id/inputLayout"
-        android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/inputMessage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/inptmsg"
-            android:imeOptions="flagNoExtractUi"
-            android:layout_weight="1"
-            android:padding="3dp"
-            android:layout_margin="1dp"
-            android:background="@drawable/border_background"/>
-
-        <Button
-            android:id="@+id/sendButton"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="OK"
-            android:layout_margin="1dp"
-            android:layout_weight="8"
-            android:background="@drawable/border_background"/>
-
-    </LinearLayout>
-
+    <include
+        android:id="@+id/chatInput"
+        layout="@layout/fragment_input"/>
 
 </RelativeLayout>

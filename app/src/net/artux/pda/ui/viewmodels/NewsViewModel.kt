@@ -43,7 +43,9 @@ class NewsViewModel @Inject constructor(
     fun likeArticle(uuid: UUID){
         viewModelScope.launch {
             repository.likeArticle(uuid)
-                .onSuccess { status.postValue(StatusModel("$it")) }
+                .onSuccess {
+                    val m = if (it) "Оценка установлена" else "Оценка снята"
+                    status.postValue(StatusModel(m)) }
                 .onFailure { status.postValue(StatusModel(it)) }
         }
     }

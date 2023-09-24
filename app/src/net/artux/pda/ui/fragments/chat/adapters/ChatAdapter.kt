@@ -1,185 +1,119 @@
-package net.artux.pda.ui.fragments.chat.adapters;
+package net.artux.pda.ui.fragments.chat.adapters
 
-import android.annotation.SuppressLint;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.URLSpan;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.annotation.SuppressLint
+import android.text.Html
+import android.text.SpannableStringBuilder
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.URLSpan
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import net.artux.pda.databinding.ItemChatBinding
+import net.artux.pda.model.chat.ChatUpdate
+import net.artux.pda.model.chat.UserMessage
+import net.artux.pda.utils.init
+import java.util.function.Consumer
+import java.util.stream.Collectors
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+open class ChatAdapter(private val listener: MessageClickListener) :
+    RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
+    private var messages: MutableList<UserMessage>
 
-import net.artux.pda.R;
-import net.artux.pda.model.chat.ChatUpdate;
-import net.artux.pda.model.chat.UserMessage;
-import net.artux.pda.model.user.Role;
-import net.artux.pda.model.user.UserModel;
-import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
-
-    private List<UserMessage> messages;
-    private final MessageClickListener listener;
-
-    public ChatAdapter(MessageClickListener listener) {
-        this.listener = listener;
-        messages = new LinkedList<>();
+    init {
+        messages = mutableListOf()
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setItems(List<UserMessage> messages) {
-        clearItems();
-        this.messages = messages;
-        notifyDataSetChanged();
+    fun setItems(messages: MutableList<UserMessage>) {
+        clearItems()
+        this.messages = messages
+        notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void clearItems() {
-        messages.clear();
-        notifyDataSetChanged();
+    fun clearItems() {
+        messages.clear()
+        notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void update(ChatUpdate update) {
-        if (update.getUpdatesByType(UserMessage.Type.OLD).size() > 0) {
-            messages = update.getUpdatesByType(UserMessage.Type.OLD);
+    fun update(update: ChatUpdate) {
+        if (update.getUpdatesByType(UserMessage.Type.OLD).isNotEmpty()) {
+            messages = update.getUpdatesByType(UserMessage.Type.OLD).toMutableList()
         }
-
-        for (UserMessage msg : update.getUpdatesByType(UserMessage.Type.DELETE))
-            messages.removeIf(userMessage -> msg.getId().equals(userMessage.getId()));
-
-        for (UserMessage msg : update.getUpdatesByType(UserMessage.Type.UPDATE))
-            messages.forEach(userMessage -> {
-                if (msg.getId().equals(userMessage.getId())) {
-                    userMessage.setContent(msg.getContent());
-                }
-            });
-
-        messages.addAll(update.getUpdatesByType(UserMessage.Type.NEW));
-        messages.addAll(update.getEvents().stream().map(UserMessage::event).collect(Collectors.toList()));
-        notifyDataSetChanged();
+        for ((id) in update.getUpdatesByType(UserMessage.Type.DELETE))
+            messages.removeIf { (id1): UserMessage -> id == id1 }
+        for ((id, _, content) in update.getUpdatesByType(UserMessage.Type.UPDATE))
+            messages.forEach(
+                Consumer { userMessage: UserMessage ->
+                    if (id == userMessage.id) {
+                        userMessage.content = content
+                    }
+                })
+        messages.addAll(update.getUpdatesByType(UserMessage.Type.NEW))
+        messages.addAll(update.events!!.stream().map { UserMessage.event(it) }
+            .collect(Collectors.toList()))
+        notifyDataSetChanged()
     }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_chat, parent, false);
-        return new ViewHolder(view);
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemChatBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding.root)
     }
 
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bind(messages.get(position));
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(messages[position])
     }
 
-    @Override
-    public int getItemCount() {
-        return messages.size();
+    override fun getItemCount(): Int {
+        return messages.size
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
-
-        ImageView avatarView;
-        TextView nicknameView;
-        TextView infoView;
-        TextView messageView;
-
-        ViewHolder(View itemView) {
-            super(itemView);
-            avatarView = itemView.findViewById(R.id.avatar);
-            nicknameView = itemView.findViewById(R.id.nickname);
-            infoView = itemView.findViewById(R.id.info);
-            messageView = itemView.findViewById(R.id.message);
-        }
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm")
-                .withZone(ZoneId.systemDefault());
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val binding: ItemChatBinding = ItemChatBinding.bind(itemView)
 
         @SuppressLint("SetTextI18n")
-        void bind(UserMessage userMessage) {
-            if (userMessage == null) return;
-            Instant instant = userMessage.getTimestamp();
-            UserModel userModel = userMessage.getAuthor();
+        fun bind(userMessage: UserMessage?) {
+            if (userMessage == null) return
 
-            if (userModel != null) {
-                if (userModel.getName() == null)
-                    nicknameView.setText(userModel.getNickname());
-                else if (userModel.getNickname() == null)
-                    nicknameView.setText(userModel.getName());
-                else nicknameView.setText(userModel.getName() + " " + userModel.getNickname());
-                itemView.setOnLongClickListener(view -> {
-                    listener.onLongClick(userMessage);
-                    return false;
-                });
-                itemView.setOnClickListener(view -> listener.onClick(userMessage));
-                if (userModel.getPdaId() == null || userModel.getPdaId() < 0 || userModel.getGang() == null) {
-                    infoView.setText(" [PDA ###]"
-                            + " - " + formatter.format(instant));
-                } else {
-                    infoView.setText(" [PDA #" + userModel.getPdaId() + "] "
-                            + infoView.getContext().getResources().getStringArray(R.array.groups)[userModel.getGang().getId()] // группировка
-                            + " - " + formatter.format(instant));
+            init(binding, userMessage.author, userMessage.timestamp)
+            setTextViewHTML(binding.message, userMessage.content)
+            itemView.setOnClickListener { listener.onClick(userMessage) }
+            itemView.setOnLongClickListener { listener.onLongClick(userMessage); true }
+        }
+    }
+
+    private fun setTextViewHTML(text: TextView, html: String?) {
+        val sequence: CharSequence = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY)
+        val strBuilder = SpannableStringBuilder(sequence)
+        val urls = strBuilder.getSpans(0, sequence.length, URLSpan::class.java)
+        for (span in urls) {
+            makeLinkClickable(strBuilder, span)
+        }
+        text.text = strBuilder
+        text.movementMethod = LinkMovementMethod.getInstance()
+    }
+
+    protected fun makeLinkClickable(strBuilder: SpannableStringBuilder, span: URLSpan) {
+        val start = strBuilder.getSpanStart(span)
+        val end = strBuilder.getSpanEnd(span)
+        val flags = strBuilder.getSpanFlags(span)
+        val clickable: ClickableSpan =
+            object : ClickableSpan() {
+                override fun onClick(view: View) {
+                    listener.onLinkClick(span.url)
                 }
-
-                if (userModel.getRole() != null && userModel.getRole() != Role.USER)
-                    infoView.setText(infoView.getText() + " " + userModel.getRole());
-
-                ProfileHelper.setAvatar(avatarView, userModel.getAvatar());
-            } else {
-                nicknameView.setText("System ");
-                infoView.setText(formatter.format(instant));
-                messageView.setMovementMethod(LinkMovementMethod.getInstance());
             }
-            setTextViewHTML(messageView, userMessage.getContent());
-        }
+        strBuilder.setSpan(clickable, start, end, flags)
+        strBuilder.removeSpan(span)
     }
 
-    protected void setTextViewHTML(TextView text, String html) {
-        CharSequence sequence = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
-        SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
-        URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
-        for (URLSpan span : urls) {
-            makeLinkClickable(strBuilder, span);
-        }
-        text.setText(strBuilder);
-        text.setMovementMethod(LinkMovementMethod.getInstance());
+    interface MessageClickListener {
+        fun onClick(message: UserMessage?)
+        fun onLongClick(message: UserMessage?)
+        fun onLinkClick(url: String?)
     }
-
-    protected void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span) {
-        int start = strBuilder.getSpanStart(span);
-        int end = strBuilder.getSpanEnd(span);
-        int flags = strBuilder.getSpanFlags(span);
-        ClickableSpan clickable = new ClickableSpan() {
-            public void onClick(View view) {
-                listener.onLinkClick(span.getURL());
-            }
-        };
-        strBuilder.setSpan(clickable, start, end, flags);
-        strBuilder.removeSpan(span);
-    }
-
-    public interface MessageClickListener {
-
-        void onClick(UserMessage message);
-
-        void onLongClick(UserMessage message);
-
-        void onLinkClick(String url);
-
-    }
-
 }

@@ -58,6 +58,7 @@ public class NetworkModule {
             }
 
             try {
+                Timber.d("Request: %s", chain.request().toString());
                 return chain.proceed(requestBuilder.build());
             } catch (Exception e) {
                 Timber.w(e);
