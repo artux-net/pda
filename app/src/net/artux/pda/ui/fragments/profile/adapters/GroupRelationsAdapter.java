@@ -90,6 +90,7 @@ public class GroupRelationsAdapter extends RecyclerView.Adapter<GroupRelationsAd
         void bind(Gang gang, int relation) {
             title.setText(context.getResources().getStringArray(R.array.groups)[gang.getId()]);
             ProfileHelper.setGangAvatar(avatar, gang);
+            relation /= 20;
 
             if (relation < 0) {
                 if (relation < -5) relation = -5;

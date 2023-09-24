@@ -25,6 +25,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignStart="@id/deleteButton"
             android:layout_alignEnd="@id/deleteButton"
+            android:background="@drawable/border_background"
             android:hint="@string/noteTitleInput"/>
 
         <ImageButton
@@ -32,17 +33,16 @@
             android:src="@drawable/ic_delete_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/border_background"/>
 
     </RelativeLayout>
-
-
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/editNoteContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:background="@drawable/border_background"
         android:hint="@string/noteContentInput"/>
 
     <TextView

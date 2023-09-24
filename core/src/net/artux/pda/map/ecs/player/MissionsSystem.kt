@@ -17,6 +17,7 @@ import net.artux.engine.pathfinding.own.DijkstraPathFinder
 import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.ecs.camera.CameraSystem
 import net.artux.pda.map.ecs.interactive.PassivityComponent
+import net.artux.pda.map.ecs.interactive.map.PointComponent
 import net.artux.pda.map.ecs.interactive.map.QuestComponent
 import net.artux.pda.map.ecs.physics.BodyComponent
 import net.artux.pda.map.ecs.sound.AudioSystem
@@ -40,12 +41,13 @@ class MissionsSystem @Inject constructor(
 
     assetManager: AssetManager
 ) : BaseSystem(
-    Family.all(BodyComponent::class.java, QuestComponent::class.java)
+    Family.all(BodyComponent::class.java, QuestComponent::class.java, PointComponent::class.java)
         .exclude(PassivityComponent::class.java).get()
 ), Disposable {
 
     private val pm = ComponentMapper.getFor(BodyComponent::class.java)
     private val qcm = ComponentMapper.getFor(QuestComponent::class.java)
+    private val pcm = ComponentMapper.getFor(PointComponent::class.java)
 
     private val pixelsPerMeter = 3f
     private val mapDigraph: Digraph<GameMap>
@@ -269,9 +271,9 @@ class MissionsSystem @Inject constructor(
     fun setTargetPosition(position: Vector2?) {
         if (position != null) {
             targetPosition = position
-            cameraSystem.isDetached = true
+           /* cameraSystem.isDetached = true
             cameraSystem.camera.position.x = position.x
-            cameraSystem.camera.position.y = position.y
+            cameraSystem.camera.position.y = position.y*/
         }
     }
 
@@ -296,9 +298,14 @@ class MissionsSystem @Inject constructor(
     }
 
     fun updatePoints() {
-        if (entities.size() > 0)
-            setTargetPosition(pm[entities.first()].position)
-        else
+        if (entities.size() > 0){
+            for (entity in entities){
+                if(pcm.get(entity).type != PointComponent.Type.QUEST)
+                    continue
+                setTargetPosition(pm[entity].position)
+                break
+            }
+        } else
             setTargetPosition(null)
     }
 }

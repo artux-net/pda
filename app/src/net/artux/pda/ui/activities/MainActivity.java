@@ -98,7 +98,8 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
             if (intent.hasExtra("status")) {
                 StatusModel statusModel = (StatusModel) intent.getSerializableExtra("status");
                 Snackbar.make(binding.getRoot(), statusModel.getDescription(), Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Ok", view -> {})
+                        .setAction("Ok", view -> {
+                        })
                         .show();
                 if (!statusModel.getSuccess())
                     Timber.e(statusModel.getDescription());
@@ -140,6 +141,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
             fragmentTransaction.addToBackStack(null);
         fragmentTransaction
                 .replace(R.id.containerView, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
         Timber.d("Set fragment: %s", fragment.getClass().getSimpleName());
     }
@@ -149,6 +151,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.rightContainer, fragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .commit();
         Timber.d("Set second fragment: %s", fragment.getClass().getSimpleName());
     }
