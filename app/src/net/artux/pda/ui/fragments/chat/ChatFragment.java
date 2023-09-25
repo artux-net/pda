@@ -117,6 +117,28 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
             builder.show();
         }
 
+
+        mRecyclerView = view.findViewById(R.id.recycleView);
+        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        manager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(manager);
+        mChatAdapter = new ChatAdapter(this);
+        mRecyclerView.setAdapter(mChatAdapter);
+
+        mInputEditText = view.findViewById(R.id.inputMessage);
+
+        Button sendButton = view.findViewById(R.id.sendButton);
+        sendButton.setOnClickListener(this);
+
+
+
+
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         userMessageObjectWebSocketListener = new ObjectWebSocketListener<>(ChatUpdate.class, gson, new ObjectWebSocketListener.OnUpdateListener<>() {
             @Override
             public void onOpen() {
@@ -148,19 +170,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
             }
         });
 
-        mRecyclerView = view.findViewById(R.id.recycleView);
-        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-        manager.setStackFromEnd(true);
-        mRecyclerView.setLayoutManager(manager);
-        mChatAdapter = new ChatAdapter(this);
-        mRecyclerView.setAdapter(mChatAdapter);
-
-        mInputEditText = view.findViewById(R.id.inputMessage);
-
-        Button sendButton = view.findViewById(R.id.sendButton);
-        sendButton.setOnClickListener(this);
-
-
         Bundle args = getArguments();
         Request.Builder builder = new Request.Builder();
         String path = BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API;
@@ -191,7 +200,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
             builder.url(path + "chat");
             navigationPresenter.setTitle("Chat");
         }
-
         ws = client.newWebSocket(builder.build(), userMessageObjectWebSocketListener);
     }
 
