@@ -51,7 +51,7 @@ jobs:
           gradle-version: 8.2.1
 
       - name: Build APK
-        id: build
+        id: buildDebug
         if: ${{ github.ref == 'refs/heads/dev' }}
         run: ./gradlew clean assembleDebug
 
