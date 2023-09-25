@@ -60,8 +60,9 @@ class QuestSoundManager(
     }
 
     override fun playMusic(path: String, loop: Boolean) = mediaScope.launch {
-        mediaPlayer.stop()
         mediaPlayer.isLooping = loop
+        mediaPlayer.stop()
+        mediaPlayer.reset()
         try {
             val descriptor = context.assets.openFd(path)
             mediaPlayer.setDataSource(
@@ -75,6 +76,7 @@ class QuestSoundManager(
         } catch (_: Exception) {
             loadOnlineResource(path)
         }
+        mediaPlayer.seekTo(0)
         mediaPlayer.start()
     }
 
