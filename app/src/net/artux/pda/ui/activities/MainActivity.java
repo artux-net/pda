@@ -204,7 +204,7 @@ public class MainActivity extends FragmentActivity implements MainContract.View,
         runOnUiThread(() -> Glide.with(getApplicationContext())
                 .asGif()
                 .load(Uri.parse("file:///android_asset/loadCube.gif"))
-                .listener(new RequestListener<GifDrawable>() {
+                .listener(new RequestListener<>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<GifDrawable> target, boolean isFirstResource) {
                         return false;

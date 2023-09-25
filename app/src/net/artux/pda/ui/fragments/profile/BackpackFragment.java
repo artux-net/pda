@@ -54,7 +54,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
         RecyclerView recyclerView = view.findViewById(R.id.list);
         recyclerView.setVisibility(View.VISIBLE);
         recyclerView.setAdapter(itemsAdapter);
-        recyclerView.setLayoutManager(itemsAdapter.getLayoutManager(getContext(), 3));
+        recyclerView.setLayoutManager(itemsAdapter.getLayoutManager(getContext(), 4));
         view.findViewById(R.id.viewMessage).setVisibility(View.GONE);
 
         itemsViewModel.getStoryData().observe(getViewLifecycleOwner(), storyDataModel -> {
@@ -82,8 +82,7 @@ public class BackpackFragment extends BaseFragment implements ItemsAdapter.OnCli
             navigationPresenter.addFragment(EncyclopediaFragment.of(item), true);
         });
 
-        if (item instanceof WearableModel) {
-            WearableModel wearableModel = (WearableModel) item;
+        if (item instanceof WearableModel wearableModel) {
             if (!wearableModel.isEquipped())
                 builder.setNeutralButton(getString(R.string.item_as_main),
                         (dialogInterface, i) -> itemsViewModel.setWearable((WearableModel) item));

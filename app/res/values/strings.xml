@@ -281,4 +281,5 @@
     <string name="likeIt">Like</string>
     <string name="comments">Comments</string>
     <string name="shareIt">Share</string>
+    <string name="empty_slot">Пусто</string>
 </resources>
