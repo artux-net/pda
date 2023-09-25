@@ -10,6 +10,8 @@
     </string>
     <string name="quest_ads_usual_id" translatable="false">R-M-2151056-3</string>
     <string name="quest_ads_video_id" translatable="false">R-M-2151056-2</string>
+    <string name="news_ads_banner_id" translatable="false">R-M-2151056-1</string>
+
 
     <string name="prompt_user">User</string>
 
