@@ -16,6 +16,7 @@ import net.artux.pda.map.view.debug.widgets.CheckBoxWidget;
 import net.artux.pda.map.view.debug.widgets.ItemsWidget;
 import net.artux.pda.map.view.debug.widgets.MapsWidget;
 import net.artux.pda.map.view.debug.widgets.MusicWidget;
+import net.artux.pda.map.view.debug.widgets.MutantWidget;
 import net.artux.pda.map.view.debug.widgets.SoundsWidget;
 import net.artux.pda.map.view.Utils;
 import net.artux.pda.map.view.view.window.PDAWindow;
@@ -31,13 +32,16 @@ public class DebugWindow extends PDAWindow {
     @Inject
     public DebugWindow(Skin skin, Label.LabelStyle labelStyle, CheckBoxWidget checkBoxWidget,
                        Logger logger, ItemsWidget itemsWidget, MapsWidget mapsWidget,
-                       ActionsWidget actionsWidget, MusicWidget musicWidget,
+                       ActionsWidget actionsWidget,
+                       MutantWidget mutantWidget,
+                       MusicWidget musicWidget,
                        SoundsWidget soundsWidget,
                        PDAButton loggerButton,
                        PDAButton mapsButton,
                        PDAButton soundButton,
                        PDAButton musicButton,
                        PDAButton actionsButton,
+                       PDAButton mutantButton,
                        PDAButton checks, PDAButton items) {
         super(skin);
         setFillParent(true);
@@ -109,6 +113,15 @@ public class DebugWindow extends PDAWindow {
             }
         });
 
+        mutantButton.setText("Мутанты");
+        mutantButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                setWidget(mutantWidget);
+            }
+        });
+
         buttons.addActor(checks);
         buttons.addActor(loggerButton);
         buttons.addActor(items);
@@ -116,6 +129,7 @@ public class DebugWindow extends PDAWindow {
         buttons.addActor(soundButton);
         buttons.addActor(musicButton);
         buttons.addActor(actionsButton);
+        buttons.addActor(mutantButton);
 
         selectPane = new ScrollPane(buttons, skin);
         selectPane.setScrollingDisabled(true, false);

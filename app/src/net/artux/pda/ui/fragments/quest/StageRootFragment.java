@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.gson.GsonBuilder;
 
 import net.artux.pda.R;
+import net.artux.pda.common.PropertyFields;
 import net.artux.pda.databinding.FragmentQuestRootBinding;
 import net.artux.pda.model.quest.Stage;
 import net.artux.pda.model.quest.StageModel;
@@ -26,6 +27,8 @@ import net.artux.pda.ui.activities.LogActivity;
 import net.artux.pda.ui.activities.MainActivity;
 import net.artux.pda.ui.viewmodels.QuestViewModel;
 
+import java.util.Properties;
+
 import javax.inject.Inject;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -35,6 +38,8 @@ public class StageRootFragment extends Fragment implements View.OnClickListener 
 
     @Inject
     protected QuestSoundManager soundManager;
+    @Inject
+    protected Properties properties;
 
     private QuestViewModel questViewModel;
     private FragmentQuestRootBinding rootBinding;
@@ -54,6 +59,7 @@ public class StageRootFragment extends Fragment implements View.OnClickListener 
         rootBinding.musicSetup.setOnClickListener(this);
         rootBinding.closeButton.setOnClickListener(this);
         rootBinding.log.setOnClickListener(this);
+        rootBinding.log.setVisibility(properties.get(PropertyFields.TESTER_MODE).equals(true) ? View.VISIBLE : View.GONE);
     }
 
     @Override

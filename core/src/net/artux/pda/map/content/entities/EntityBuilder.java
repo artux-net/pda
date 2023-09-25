@@ -198,17 +198,19 @@ public class EntityBuilder {
     }
 
     public Entity randomMutant(TargetMovingComponent.Targeting targeting) {
+        MutantType randomType = MutantType.values()[random.nextInt(MutantType.values().length)];
+        return randomMutant(randomType, targeting);
+    }
+
+    public Entity randomMutant(MutantType mutantType, TargetMovingComponent.Targeting targeting) {
         Entity entity = new Entity();
         StatesComponent statesComponent = new StatesComponent(entity, new MessageDispatcher(), MutantState.INITIAL, MutantState.GUARDING);
 
         BodyComponent bodyComponent = new BodyComponent(Bodies.mutant(targeting.getTarget(), world));
-        bodyComponent.setMovementForce(2000);
+        bodyComponent.setMovementForce(1000);
 
-
-
-        MutantType randomType = MutantType.values()[random.nextInt(MutantType.values().length)];
-        InfightingComponent infightingComponent = randomType.getInfightingComponent();
-        for (String soundId : randomType.getAttackSounds())
+        InfightingComponent infightingComponent = mutantType.getInfightingComponent();
+        for (String soundId : mutantType.getAttackSounds())
             infightingComponent.getSounds().add(assetManager.get(soundId));
 
         entity.add(bodyComponent)
@@ -220,10 +222,10 @@ public class EntityBuilder {
                 .add(statesComponent)
                 .add(new MoodComponent())
                 .add(new TargetMovingComponent(targeting))
-                .add(new EntityComponent(localeBundle.get(randomType.getTitleId()), randomType.getAvatarId(), new ArrayList<>()))
-                .add(new SpriteComponent(assetManager.get(randomType.getIconId()), 8, 8));
+                .add(new EntityComponent(localeBundle.get(mutantType.getTitleId()), mutantType.getAvatarId(), new ArrayList<>()))
+                .add(new SpriteComponent(assetManager.get(mutantType.getIconId()), 8, 8));
 
-        logger.log("WorldSystem", "Mutant " + randomType + " created.");
+        logger.log("WorldSystem", "Mutant " + mutantType + " created.");
         return entity;
     }
 

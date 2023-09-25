@@ -230,6 +230,10 @@ public class RenderSystem extends BaseSystem implements Drawable {
         blurEffect += seconds;
     }
 
+    public float getBlurEffect() {
+        return blurEffect;
+    }
+
     public void setRedEffect(float redEffect) {
         this.redEffect = redEffect;
     }

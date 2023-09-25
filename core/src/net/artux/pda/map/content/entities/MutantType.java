@@ -1,6 +1,7 @@
 package net.artux.pda.map.content.entities;
 
 import net.artux.pda.map.ecs.battle.InfightingComponent;
+import net.artux.pda.map.ecs.effects.Effect;
 
 public enum MutantType {
 
@@ -32,7 +33,17 @@ public enum MutantType {
         }
     },
     //DEAD_STALKER("mutant.stalker", "avatarId", false),
-    //CONTROLLER("mutant.controller", "textures/avatars/mutants/ctrl.jpg", true),
+    CONTROLLER("mutant.controller", "textures/avatars/mutants/ctrl.jpg", new String[]{
+            "audio/sounds/mutant/controller/1.ogg",
+            "audio/sounds/mutant/controller/2.ogg"
+    }, true){
+        @Override
+        InfightingComponent getInfightingComponent() {
+            InfightingComponent infightingComponent = new InfightingComponent(30, 5, 10);
+            infightingComponent.setEffect(Effect.LOST_MIND, 10);
+            return infightingComponent;
+        }
+    },
     BLOOD_HUNTER("mutant.blood_hunter", "textures/avatars/mutants/blood_hunter.jpg", new String[]{
             "audio/sounds/mutant/blood_hunter/1.ogg",
             "audio/sounds/mutant/blood_hunter/2.ogg",
@@ -40,7 +51,9 @@ public enum MutantType {
     }, true) {
         @Override
         InfightingComponent getInfightingComponent() {
-            return new InfightingComponent(9, 40, 3);
+            InfightingComponent infightingComponent = new InfightingComponent(9, 40, 5);
+            infightingComponent.setEffect(Effect.STUCK, 1);
+            return infightingComponent;
         }
     };
 

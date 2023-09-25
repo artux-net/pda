@@ -44,7 +44,7 @@ public class EffectsSystem extends BaseSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         HealthComponent healthComponent = hcm.get(entity);
-        ecm.get(entity).getEffects().forEach(effect -> effect.affect(deltaTime, entity));
+        ecm.get(entity).getEffects().forEach(effect -> effect.affect(getEngine(), deltaTime, entity));
         Vector2 position = bcm.get(entity).getPosition();
         TileType type = tiledNavigator.getTileType(position.x, position.y);
 
