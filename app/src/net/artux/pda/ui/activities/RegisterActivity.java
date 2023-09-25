@@ -3,6 +3,7 @@ package net.artux.pda.ui.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -23,10 +24,19 @@ import net.artux.pda.model.user.RegisterUserModel;
 import net.artux.pda.ui.activities.adapters.AvatarsAdapter;
 import net.artux.pda.ui.viewmodels.AuthViewModel;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
+import java.util.function.BinaryOperator;
+import java.util.stream.Stream;
 
 import dagger.hilt.android.AndroidEntryPoint;
+import timber.log.Timber;
 
 @AndroidEntryPoint
 public class RegisterActivity extends AppCompatActivity {
@@ -73,7 +83,7 @@ public class RegisterActivity extends AppCompatActivity {
         mPasswordView = findViewById(R.id.password);
         mRepeatPasswordView = findViewById(R.id.repeat_password);
         findViewById(R.id.agreement).setOnClickListener(view -> {
-            String url = "https://www.artux.net/privacy";
+            String url = getString(R.string.privacy_url);
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             startActivity(i);
@@ -113,6 +123,30 @@ public class RegisterActivity extends AppCompatActivity {
                         .show();
             }
         });
+        loadTemplates();
+    }
+
+    public void loadTemplates(){
+        try {
+            InputStream is = getAssets().open("templates/names");
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8 ));
+            Random random = new Random();
+            br.lines()
+                    .skip(random.nextInt(34))
+                    .findAny()
+                    .ifPresent(name -> mNameView.setText(name));
+            br.close();
+
+            is = getAssets().open("templates/nicks");
+            br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8 ));
+            br.lines()
+                    .skip(random.nextInt(34))
+                    .findAny()
+                    .ifPresent( name -> mNicknameView.setText(name));
+            br.close();
+        } catch (IOException ignored) {
+            Timber.e(ignored);
+        }
     }
 
     boolean isViewWithIncorrectData(EditText editText, String regex) {

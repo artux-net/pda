@@ -129,11 +129,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
 
         Button sendButton = view.findViewById(R.id.sendButton);
         sendButton.setOnClickListener(this);
-
-
-
-
-
     }
 
     @Override
@@ -159,7 +154,6 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
                         if (mChatAdapter.getItemCount() > 0)
                             mRecyclerView.smoothScrollToPosition(mChatAdapter.getItemCount() - 1);
                     });
-
             }
 
             @Override

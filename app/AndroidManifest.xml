@@ -30,6 +30,7 @@
         <activity
             android:name=".ui.activities.HelpActivity"
             android:exported="true"
+            android:screenOrientation="sensorLandscape"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activities.FinishRegistrationActivity"
