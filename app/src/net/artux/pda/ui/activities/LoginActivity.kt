@@ -85,6 +85,13 @@ open class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cu
             findViewById<View>(R.id.register).setOnClickListener(this)
             findViewById<View>(R.id.help).setOnClickListener(this)
             findViewById<View>(R.id.email_sign_in_button).setOnClickListener(this)
+            findViewById<View>(R.id.logo).setOnLongClickListener {
+                var info =
+                    "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.BUILD_TYPE}"
+                info = "$info\n${BuildConfig.URL_API}"
+                Toast.makeText(this, info, Toast.LENGTH_LONG).show()
+                true
+            }
             mLoginFormView = findViewById(R.id.login_form)
             mProgressView = findViewById(R.id.login_progress)
         }
