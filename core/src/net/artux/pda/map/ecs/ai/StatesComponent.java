@@ -6,6 +6,7 @@ import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.MessageDispatcher;
 
+import net.artux.pda.map.ecs.ai.states.MutantState;
 import net.artux.pda.map.ecs.ai.states.StalkerState;
 
 public class StatesComponent extends DefaultStateMachine<Entity, State<Entity>> implements Component {
@@ -22,9 +23,13 @@ public class StatesComponent extends DefaultStateMachine<Entity, State<Entity>> 
     }
 
     public String getStateTitle() {
-        if (getCurrentState() instanceof StalkerState) {
-            StalkerState state = (StalkerState) getCurrentState();
+        if (getCurrentState() instanceof StalkerState state) {
             StalkerState globalState = (StalkerState) getGlobalState();
+            return state.name() + " (" + globalState.name()+ ")";
+        }
+
+        if (getCurrentState() instanceof MutantState state) {
+            MutantState globalState = (MutantState) getGlobalState();
             return state.name() + " (" + globalState.name()+ ")";
         }
         return "";

@@ -125,18 +125,15 @@ public class EjectionSystem extends EntitySystem {
     }
 
     private void startEjection() {
-        int minutes = random(2, 3);
-        if (test)
-            minutes = 1;
         notificationController.notify(NotificationType.ATTENTION,
-                localeBundle.get("main.ejection.notif"), localeBundle.get("main.ejection.notif.desc", minutes));
+                localeBundle.get("main.ejection.notif"), localeBundle.get("main.ejection.notif.desc"));
 
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
                 processEjection();
             }
-        }, minutes * 60 + random(-20, 20));
+        }, random(15, 30));
     }
 
     public void processEjection() {

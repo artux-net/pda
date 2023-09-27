@@ -49,7 +49,6 @@ class HealthComponent : Component {
     fun thermalDamage(damage: Float): Boolean =
         health(calculateDamage(-damage, armorModel.thermalProtection))
 
-
     fun electricDamage(damage: Float): Boolean =
         health(calculateDamage(-damage, armorModel.electricProtection))
 
@@ -61,6 +60,20 @@ class HealthComponent : Component {
 
     fun damage(damage: Float): Boolean =
         health(calculateDamage(-damage, armorModel.damageProtection))
+
+    fun damage(damage: Float, damageType: DamageType): Boolean =
+        when (damageType) {
+            DamageType.PSY -> psyDamage(damage)
+            DamageType.ELECTRIC -> electricDamage(damage)
+            DamageType.THERMAL -> thermalDamage(damage)
+            DamageType.RAD -> radiationDamage(damage)
+            DamageType.CHEMICAL -> chemicalDamage(damage)
+
+            else -> {
+                damage(damage)
+            }
+        }
+
 
     private fun calculateDamage(damage: Float, inputProtection: Float): Float {
         val protection = inputProtection * armorModel.condition / 100
@@ -116,5 +129,14 @@ class HealthComponent : Component {
                 ", health=" + health +
                 ", stamina=" + stamina +
                 ", radiation=" + radiation
+    }
+
+    enum class DamageType {
+        PSY,
+        RAD,
+        ELECTRIC,
+        THERMAL,
+        CHEMICAL,
+        SIMPLE
     }
 }

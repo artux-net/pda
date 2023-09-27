@@ -10,6 +10,7 @@ import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Timer;
 
+import net.artux.pda.map.ecs.battle.InfightingComponent;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.ai.GraphMotionComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
@@ -91,8 +92,14 @@ public enum MutantState implements State<Entity> {
 
                 Vector2 enemyBodyComponent = pm.get(enemy).getPosition();
                 Vector2 entityBodyComponent = pm.get(entity).getPosition();
+                float fightDst = icm.get(entity).getDistance();
 
                 float dst = entityBodyComponent.dst(enemyBodyComponent);
+                if (dst < fightDst - 1){
+                    gmm.get(entity).setMovementTarget(entityBodyComponent);
+                    statesComponent.changeState(STANDING);
+                    return;
+                }
                 if (dst > 200) {
                     moodComponent.setEnemy(null);
                 } else
@@ -145,6 +152,7 @@ public enum MutantState implements State<Entity> {
     protected final ComponentMapper<GraphMotionComponent> gmm = ComponentMapper.getFor(GraphMotionComponent.class);
     protected final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
     protected final ComponentMapper<MoodComponent> mm = ComponentMapper.getFor(MoodComponent.class);
+    protected final ComponentMapper<InfightingComponent> icm = ComponentMapper.getFor(InfightingComponent.class);
 
     @Override
     public void enter(Entity entity) {

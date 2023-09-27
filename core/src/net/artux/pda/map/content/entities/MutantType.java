@@ -1,6 +1,7 @@
 package net.artux.pda.map.content.entities;
 
 import net.artux.pda.map.ecs.battle.InfightingComponent;
+import net.artux.pda.map.ecs.characteristics.HealthComponent;
 import net.artux.pda.map.ecs.effects.Effect;
 
 public enum MutantType {
@@ -18,7 +19,7 @@ public enum MutantType {
     }, false) {
         @Override
         InfightingComponent getInfightingComponent() {
-            return new InfightingComponent(10, 10, 1.5f);
+            return new InfightingComponent(10, 10, 1.5f, HealthComponent.DamageType.PSY);
         }
     },
     BOAR("mutant.boar", "textures/avatars/mutants/boar.jpg", new String[]{
@@ -29,7 +30,7 @@ public enum MutantType {
     }, false) {
         @Override
         InfightingComponent getInfightingComponent() {
-            return new InfightingComponent(10, 25, 2);
+            return new InfightingComponent(10, 25, 2, HealthComponent.DamageType.SIMPLE);
         }
     },
     //DEAD_STALKER("mutant.stalker", "avatarId", false),
@@ -39,7 +40,7 @@ public enum MutantType {
     }, true){
         @Override
         InfightingComponent getInfightingComponent() {
-            InfightingComponent infightingComponent = new InfightingComponent(30, 5, 10);
+            InfightingComponent infightingComponent = new InfightingComponent(200, 30, 10, HealthComponent.DamageType.PSY);
             infightingComponent.setEffect(Effect.LOST_MIND, 10);
             return infightingComponent;
         }
@@ -51,7 +52,7 @@ public enum MutantType {
     }, true) {
         @Override
         InfightingComponent getInfightingComponent() {
-            InfightingComponent infightingComponent = new InfightingComponent(9, 40, 5);
+            InfightingComponent infightingComponent = new InfightingComponent(9, 40, 5, HealthComponent.DamageType.SIMPLE);
             infightingComponent.setEffect(Effect.STUCK, 1);
             return infightingComponent;
         }

@@ -62,7 +62,7 @@ public enum Effect {
 
         @Override
         public void begin(Entity entity) {
-
+            pm.get(entity).body.setLinearVelocity(random(-20, 20), random(-20, 20));
         }
 
         @Override
@@ -89,7 +89,7 @@ public enum Effect {
                 entry.getKey().setPrecision(entry.getValue());
             }
             precisions.clear();
-
+            pm.get(entity).body.setLinearDamping(10);
         }
     },
     FLY("Полет", "icon") {

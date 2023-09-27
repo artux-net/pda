@@ -62,7 +62,7 @@ class QuestViewModel @javax.inject.Inject constructor(
         //подписка на команду открытия стадии
         commandController.stageEvent.observeForever {
             val stageId = it.payload.stageId
-            var toSync = true
+            var toSync = false
             val chapterId = if (it.payload.chapterId > -1) {
                 toSync = true
                 it.payload.chapterId

@@ -41,6 +41,7 @@ public enum Anomaly {
             hcm.get(entity).psyDamage(random(10, 30));
             pm.get(entity).body.setTransform(nextPosition, 0);
             pm.get(entity).body.setLinearVelocity(random(-600000, 600000), random(-600000, 600000));
+            engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.LOST_MIND, 3);
             if (engine.getSystem(PlayerSystem.class).getPlayer() == entity)
                 engine.getSystem(RenderSystem.class).setBlurEffect(10);
         }

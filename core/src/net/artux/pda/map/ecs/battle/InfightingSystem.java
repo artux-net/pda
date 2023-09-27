@@ -50,7 +50,7 @@ public class InfightingSystem extends BaseSystem {
             if (dst > infightingComponent.getDistance() || !infightingComponent.canDamageSomebody())
                 return;
             HealthComponent enemyHealth = hm.get(moodComponent.getEnemy());
-            enemyHealth.damage(infightingComponent.getDamage());
+            enemyHealth.damage(infightingComponent.getDamage(), infightingComponent.getDamageType());
             if (infightingComponent.getAdditionalEffect() != null)
                 effectsSystem.addEffect(moodComponent.enemy, infightingComponent.getAdditionalEffect(), infightingComponent.getEffectTime());
 
