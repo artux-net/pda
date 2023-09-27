@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Entity;
 import net.artux.pda.map.ecs.ai.StalkerGroup;
 import net.artux.pda.model.quest.story.StoryDataModel;
 import net.artux.pda.model.user.Gang;
+import net.artux.pda.model.user.GangRelation;
 
 import java.util.Set;
 
@@ -49,15 +50,29 @@ public class MoodComponent implements Component {
         this.ignorePlayer = params.contains("ignorePlayer");
     }
 
+    public MoodComponent(Gang gang, GangRelation relation, Set<String> params) {
+        this.gandId = gang.getId();
+        relations = new Integer[9];
+        for (Gang gang1 : Gang.values()) {
+            relations[gang1.getId()] = relation.getFor(gang);
+        }
+        this.alwaysIgnored = params.contains("alwaysIgnored");
+        this.angry = params.contains("angry");
+        immortal = params.contains("immortal");
+        untarget = params.contains("untarget");
+        this.angryOnPlayer = params.contains("angryOnPlayer");
+        this.ignorePlayer = params.contains("ignorePlayer");
+    }
+
     public MoodComponent() {
         gandId = -1;
-        this.relations = new Integer[]{-5, -5, -5, -5, -5, -5, -5, -5, -5};
+        this.relations = new Integer[]{-100, -100, -100, -100, -100, -100, -100, -100, -100};
         this.angry = true;
     }
 
     public MoodComponent(Gang gang) {
         gandId = gang.getId();
-        this.relations = new Integer[]{5, 5, 5, 5, 5, 5, 5, 5, 5};
+        this.relations = new Integer[]{100, 100, 100, 100, 100, 100, 100, 100, 100};
         this.ignorePlayer = true;
         this.alwaysIgnored = true;
     }
@@ -81,7 +96,7 @@ public class MoodComponent implements Component {
         else
             //usual compare
             response = moodComponent.gandId < 0 // is animal
-                    || moodComponent.gandId < relations.length && relations[moodComponent.gandId] < -2 && gandId != moodComponent.gandId; // is person
+                    || moodComponent.gandId < relations.length && relations[moodComponent.gandId] < -40 && gandId != moodComponent.gandId; // is person
 
         return response;
     }

@@ -38,6 +38,7 @@ import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.map.Strength;
 import net.artux.pda.model.user.Gang;
+import net.artux.pda.model.user.GangRelation;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -86,7 +87,7 @@ public class EntityProcessorSystem {
         this.controlPointDialog = controlPointDialog1;
         this.userInterface = userInterface;
         this.worldSystem = worldSystem;
-        JsonReader reader = new JsonReader(Gdx.files.internal("config/mobs.json").reader());
+        JsonReader reader = new JsonReader(Gdx.files.internal("config/relations.json").reader());
         gangRelations = gson.fromJson(reader, GangRelations.class);
         this.contentGenerator = contentGenerator;
     }
@@ -163,7 +164,7 @@ public class EntityProcessorSystem {
     }
 
     public StalkerGroup generateNewGroup(Vector2 pos, Gang gang, int n, Set<String> params, Strength strength) {
-        Integer[] relations = gangRelations.get(gang);
+        Integer[] relations = gangRelations.getRelations(gang);
         StalkerGroup stalkerGroup = new StalkerGroup(gang, relations, strength, params);
         if (n > 0) {
             if (n > 1) {
