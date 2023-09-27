@@ -4,15 +4,29 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <include layout="@layout/item_chat"/>
+    <include layout="@layout/item_chat" />
 
-    <TextView
-        android:id="@+id/likes"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="end"
-        android:text="10"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp" />
+        android:orientation="horizontal"
+        android:gravity="center_vertical|end">
+
+        <ImageView
+            android:layout_width="12sp"
+            android:layout_height="12sp"
+            android:layout_margin="1dp"
+            android:src="@drawable/news_like_good" />
+
+        <TextView
+            android:id="@+id/likes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:paddingEnd="10dp"
+            android:text="10" />
+
+
+    </LinearLayout>
 
 </LinearLayout>

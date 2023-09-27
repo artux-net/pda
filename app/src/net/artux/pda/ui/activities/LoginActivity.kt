@@ -278,7 +278,7 @@ open class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cu
         }
         if (v.id == R.id.forgotPassword) {
             val builder = AlertDialog.Builder(this@LoginActivity, R.style.PDADialogStyle)
-            builder.setTitle(R.string.action_input_login_or_email)
+            builder.setTitle(R.string.action_input_email)
             val input = EditText(this@LoginActivity)
             input.text = mEmailView.text
             input.inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS

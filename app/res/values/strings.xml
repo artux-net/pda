@@ -51,7 +51,7 @@
     <string name="action_clear_saved_images">Clear cache of images</string>
 
     <!-- Strings related to messenger -->
-    <string name="action_input_login_or_email">Input your Login or Email..</string>
+    <string name="action_input_email">Input your e-mail..</string>
     <string name="action_cancel">Cancel</string>
     <string name="unable_connect">Unable to connect server</string>
     <string name="group_chat_channel">Group Chat channel</string>
@@ -284,5 +284,5 @@
     <string name="comments">Comments</string>
     <string name="shareIt">Share</string>
     <string name="empty_slot">Пусто</string>
-    <string name="privacy_url">https://www.artux.net/privacy.html</string>
+    <string name="privacy_url" translatable="false">https://www.artux.net/privacy.html</string>
 </resources>
