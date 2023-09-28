@@ -97,7 +97,7 @@ jobs:
         id: uploadPlay
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
-          status: inProgress
+          status: draft
           mappingFile: app/build/outputs/mapping/release/mapping.txt
           debugSymbols: app/build/intermediates/merged_native_libs/release/out/lib
           whatsNewDirectory: ./releaseNotes
