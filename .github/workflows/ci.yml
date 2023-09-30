@@ -23,8 +23,8 @@ jobs:
         distribution: 'temurin'
         cache: gradle
         
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+  # Download & install the Android SDK.
+    - uses: malinskiy/action-android/install-sdk@release/0.1.3
     
     - name: Build SampleApplication
       run: ./gradlew --no-daemon build
