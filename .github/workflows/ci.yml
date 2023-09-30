@@ -7,7 +7,8 @@ jobs:
   build:
 
     runs-on: self-hosted
-
+    env:
+      ANDROID_HOME: /opt/android-sdk/
     steps:
     
     - uses: actions/checkout@v3
