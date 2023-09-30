@@ -28,6 +28,11 @@ jobs:
       # Set up platform tools like adb.
     - run: sdkmanager platform-tools
     
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v2
+      with:
+        sdk-platform: 'android-30'
+        
     - name: Build SampleApplication
       run: ./gradlew --no-daemon build
       
