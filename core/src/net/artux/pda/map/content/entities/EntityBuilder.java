@@ -100,7 +100,7 @@ public class EntityBuilder {
         BodyComponent bodyComponent = pm.get(author);
 
         Vector2 targetPosition = pm.get(target).getPosition();
-        targetPosition = getPointNear(targetPosition, weaponModel.getPrecision());
+        targetPosition = getPointNear(targetPosition, weaponModel.getCalcPrecision());
 
         Vector2 velocityUnit = targetPosition.cpy().sub(bodyComponent.getPosition()).nor();
 
@@ -134,7 +134,7 @@ public class EntityBuilder {
         Vector2 targetPosition = bodyComponent.getPosition().cpy();
         targetPosition.y += 200;
         targetPosition.rotateAroundDeg(bodyComponent.getPosition(), rotationDeg - 90);
-        targetPosition = getPointNear(targetPosition, weaponModel.getPrecision());
+        targetPosition = getPointNear(targetPosition, weaponModel.getCalcPrecision());
 
         Vector2 velocityUnit = targetPosition.cpy().sub(bodyComponent.getPosition()).nor();
 

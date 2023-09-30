@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -51,7 +50,6 @@ public class WebFragment extends BaseFragment {
 
         content = view.findViewById(R.id.content);
 
-        content.getSettings().setLayoutAlgorithm(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING);
         content.getSettings().setJavaScriptEnabled(true);
         content.getSettings().setDomStorageEnabled(true);
         content.getSettings().setLoadWithOverviewMode(true);

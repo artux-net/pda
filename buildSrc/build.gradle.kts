@@ -22,7 +22,7 @@ object PluginsVersions {
 dependencies {
     //classpath
     implementation("com.squareup:javapoet:1.13.0")
-    implementation("com.android.tools.build:gradle:8.0.2")
+    implementation("com.android.tools.build:gradle:8.1.0")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${PluginsVersions.KOTLIN}")
 
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${PluginsVersions.KOTLIN}")

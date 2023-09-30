@@ -8,4 +8,12 @@ data class WeaponModel(
     var bulletQuantity: Int = 0,
     var bulletId: Int = 0,
     var sounds: WeaponSound? = null
-) : WearableModel()
+) : WearableModel() {
+
+    fun getCalcPrecision(): Float{
+        if (type === ItemType.PISTOL)
+            return precision + 2
+
+        return precision
+    }
+}

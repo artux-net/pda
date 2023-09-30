@@ -52,6 +52,8 @@ class WeaponComponent : Component {
         reload()
     }
 
+
+
     fun setWeaponModel(weaponModel: WeaponModel?) {
         selected = weaponModel
         if (weaponModel != null) {
