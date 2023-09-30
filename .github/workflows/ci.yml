@@ -22,17 +22,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
-        
-  # Download & install the Android SDK.
-    - uses: malinskiy/action-android/install-sdk@release/0.1.4
-      # Set up platform tools like adb.
-    - run: sdkmanager platform-tools
-    
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v2
-      with:
-        sdk-platform: 'android-30'
-        
+                
     - name: Build SampleApplication
       run: ./gradlew --no-daemon build
       
