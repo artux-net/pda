@@ -219,12 +219,12 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
     //ads
-    implementation 'com.yandex.android:mobileads:5.8.0'
+    implementation 'com.yandex.android:mobileads:6.0.1'
 
     dokkaPlugin 'org.jetbrains.dokka:android-documentation-plugin:1.8.20'
 }
 
-task copyAndroidNatives {
+tasks.register('copyAndroidNatives') {
     doFirst {
         file("libs/armeabi/").mkdirs()
         file("libs/armeabi-v7a/").mkdirs()
@@ -250,7 +250,7 @@ task copyAndroidNatives {
     }
 }
 
-tasks.whenTaskAdded { packageTask ->
+tasks.configureEach { packageTask ->
     if (packageTask.name.contains("package")) {
         packageTask.dependsOn "copyAndroidNatives"
     }

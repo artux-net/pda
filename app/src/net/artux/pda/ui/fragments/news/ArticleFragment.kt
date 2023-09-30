@@ -11,7 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
-import com.yandex.mobile.ads.banner.AdSize
+import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.common.AdRequest
 import net.artux.pda.R
 import net.artux.pda.databinding.FragmentInputBinding
@@ -91,7 +91,7 @@ class ArticleFragment : WebFragment(), View.OnClickListener, CommentsAdapter.OnC
 
         val ad = binding.adView
         ad.setAdUnitId(getString(R.string.news_ads_banner_id))
-        ad.setAdSize(AdSize.stickySize(ad.width))
+        ad.setAdSize(BannerAdSize.stickySize(requireContext(), ad.width))
         val adRequest: AdRequest = AdRequest.Builder().build()
         ad.loadAd(adRequest)
     }

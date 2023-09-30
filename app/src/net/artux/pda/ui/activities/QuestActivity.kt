@@ -21,8 +21,14 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.datatransport.Event
 import com.google.gson.Gson
 import com.yandex.mobile.ads.common.AdRequest
+import com.yandex.mobile.ads.common.AdRequestConfiguration
+import com.yandex.mobile.ads.common.AdRequestError
 import com.yandex.mobile.ads.interstitial.InterstitialAd
+import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
+import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
 import com.yandex.mobile.ads.rewarded.RewardedAd
+import com.yandex.mobile.ads.rewarded.RewardedAdLoadListener
+import com.yandex.mobile.ads.rewarded.RewardedAdLoader
 import dagger.hilt.android.AndroidEntryPoint
 import net.artux.pda.R
 import net.artux.pda.gdx.CoreFragment
@@ -132,19 +138,33 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
         }
         commandViewModel.adEvent.observe(this) { data: AdType ->
             if (data === AdType.VIDEO) {
-                val rewardedAd = RewardedAd(this)
-                rewardedAd.setAdUnitId(getString(R.string.quest_ads_video_id))
-                val adRequest = AdRequest.Builder().build()
-                rewardedAd.setRewardedAdEventListener(VideoAdListener(commandViewModel, rewardedAd))
-                rewardedAd.loadAd(adRequest)
+
+                val loader = RewardedAdLoader(this).apply {
+                    setAdLoadListener(object : RewardedAdLoadListener {
+                        override fun onAdLoaded(rewardedAd: RewardedAd) {
+                            rewardedAd.setAdEventListener(VideoAdListener(commandViewModel))
+                            rewardedAd.show(this@QuestActivity)
+                        }
+
+                        override fun onAdFailedToLoad(adRequestError: AdRequestError) {}
+                    })
+                }
+                loader.loadAd(AdRequestConfiguration.Builder(getString(R.string.quest_ads_video_id)).build())
             } else {
-                val interstitialAd = InterstitialAd(this)
-                interstitialAd.setAdUnitId(getString(R.string.quest_ads_usual_id))
-                val adRequest = AdRequest.Builder().build()
-                interstitialAd.setInterstitialAdEventListener(
-                    InterstitialAdListener(commandViewModel, interstitialAd)
-                )
-                interstitialAd.loadAd(adRequest)
+                val loader = InterstitialAdLoader(this).apply {
+                    setAdLoadListener(object : InterstitialAdLoadListener{
+                        override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                            interstitialAd.setAdEventListener(
+                                InterstitialAdListener(commandViewModel)
+                            )
+                            interstitialAd.show(this@QuestActivity)
+                        }
+
+                        override fun onAdFailedToLoad(p0: AdRequestError) {}
+
+                    })
+                }
+                loader.loadAd(AdRequestConfiguration.Builder(getString(R.string.quest_ads_usual_id)).build())
             }
         }
         questViewModel.background.observe(this) { nextBackground: String? ->

@@ -3,6 +3,7 @@ package net.artux.pda.gdx;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.yandex.mobile.ads.common.AdError;
 import com.yandex.mobile.ads.common.AdRequestError;
 import com.yandex.mobile.ads.common.ImpressionData;
 import com.yandex.mobile.ads.rewarded.Reward;
@@ -17,25 +18,18 @@ import java.util.Map;
 public class VideoAdListener implements RewardedAdEventListener {
 
     private final CommandViewModel commandViewModel;
-    private final RewardedAd rewardedAd;
 
-    public VideoAdListener(CommandViewModel commandViewModel, RewardedAd rewardedAd) {
+    public VideoAdListener(CommandViewModel commandViewModel) {
         this.commandViewModel = commandViewModel;
-        this.rewardedAd = rewardedAd;
-    }
-
-    @Override
-    public void onAdLoaded() {
-        rewardedAd.show();
-    }
-
-    @Override
-    public void onAdFailedToLoad(@NonNull AdRequestError adRequestError) {
-
     }
 
     @Override
     public void onAdShown() {
+
+    }
+
+    @Override
+    public void onAdFailedToShow(@NonNull AdError adError) {
 
     }
 
@@ -55,17 +49,8 @@ public class VideoAdListener implements RewardedAdEventListener {
     }
 
     @Override
-    public void onLeftApplication() {
+    public void onAdImpression(@Nullable ImpressionData impressionData) {
 
     }
 
-    @Override
-    public void onReturnedToApplication() {
-
-    }
-
-    @Override
-    public void onImpression(@Nullable ImpressionData impressionData) {
-
-    }
 }
