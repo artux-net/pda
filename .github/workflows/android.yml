@@ -92,19 +92,18 @@ jobs:
           releaseFiles: ${{steps.sign_apk_dev.outputs.signedReleaseFile}}
           track: internalsharing
 
+
       - uses: r0adkll/upload-google-play@v1
-        name: Upload to Beta channel
         id: uploadPlay
         if: ${{ github.ref == 'refs/heads/master' }}
         with:
-          status: draft
-          mappingFile: app/build/outputs/mapping/release/mapping.txt
-          debugSymbols: app/build/intermediates/merged_native_libs/release/out/lib
-          whatsNewDirectory: ./releaseNotes
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.artux.pda
           releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
-          track: beta
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
+          debugSymbols: app/build/intermediates/merged_native_libs/release/out/lib
+          whatsNewDirectory: ./releaseNotes
+          track: internal       
 
       - name: Read updates
         id: updates
