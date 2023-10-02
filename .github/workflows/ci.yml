@@ -5,10 +5,7 @@ on:
 
 jobs:
   build:
-
-    runs-on: self-hosted
-    env:
-      ANDROID_HOME: /opt/android-sdk/
+    runs-on: pc
     steps:
     
     - uses: actions/checkout@v3
@@ -34,7 +31,7 @@ jobs:
       
     - name: Build APK
       id: buildDebug
-      run: ./gradlew clean build
+      run: ./gradlew assembleDebug
       
     - uses: r0adkll/sign-android-release@v1
       name: Sign APK
