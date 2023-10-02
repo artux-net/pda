@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: pc
+    runs-on: self-hosted, pc
     steps:
     
     - uses: actions/checkout@v3
