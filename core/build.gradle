@@ -1,8 +1,9 @@
-plugins{
+plugins {
     id "java"
     id "kotlin"
     id "kotlin-kapt"
     //id "gdx"
+    id "com.google.protobuf" version "0.9.4"
 }
 
 javadoc {
@@ -11,6 +12,11 @@ javadoc {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation 'com.google.protobuf:protobuf-javalite:3.24.4'
+    implementation 'com.google.protobuf:protobuf-javalite:3.24.4'
+    implementation("com.google.protobuf:protobuf-gradle-plugin:0.9.4")
+
+    implementation 'com.google.protobuf:protobuf-kotlin-lite:3.20.1'
     implementation "org.apache.commons:commons-lang3:3.12.0"
     implementation 'org.int4.dirk:dirk-di:1.0.0-beta1'
 }
@@ -18,6 +24,37 @@ dependencies {
 sourceCompatibility = BuildConfig.JDK
 targetCompatibility = BuildConfig.JDK
 
-sourceSets.main.java.srcDirs = [ "src/" ]
+sourceSets {
+    main {
+        proto {
+            srcDir('src/main/protobuf')
+        }
+        java {
+            srcDir("src/main/java")
+        }
+    }
+    test {
+        proto {
+            // In addition to the default 'src/test/proto'
+            srcDir 'src/test/protocolbuffers'
+        }
+    }
+}
 [compileJava, compileTestJava]*.options*.encoding = "UTF-8"
 
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.24.4"
+    }
+    generateProtoTasks {
+        all().configureEach { task ->
+            task.builtins {
+                java {
+                    option "lite"
+                }
+            }
+
+            ofSourceSet('main')
+        }
+    }
+}

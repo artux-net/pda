@@ -13,7 +13,7 @@ public class FlatTiledConnection extends NodeConnection<FlatTiledNode> {
 
     @Override
     public float getCost () {
-        if (worldMap.diagonal) return 1*cost;
+        if (FlatTiledGraph.diagonal) return 1*cost;
         return cost * (!getToNode().equals(worldMap.startNode) ? NON_DIAGONAL_COST : 1);
     }
 }

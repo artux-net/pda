@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 public class TiledSmoothableGraphPath<N extends TiledNode<N>> extends DefaultGraphPath<N> implements
         SmoothableGraphPath<N, Vector2> {
 
-    private Vector2 tmpPosition = new Vector2();
+    private final Vector2 tmpPosition = new Vector2();
 
     /** Returns the position of the node at the given index.
      * <p>

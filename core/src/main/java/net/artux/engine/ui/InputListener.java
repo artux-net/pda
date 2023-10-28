@@ -20,12 +20,12 @@ public class InputListener extends com.badlogic.gdx.scenes.scene2d.InputListener
     private float tapRectangleWidth;
     private float tapRectangleHeight;
     private boolean inTapRectangle;
-    private long tapCountInterval = 400L;
+    private final long tapCountInterval = 400L;
     boolean longPressFired;
     private static final float longPressSeconds = 1.1f;
 
-    private Array<Vector2> initialPointers = new Array<>(maxPointers);
-    private Array<Vector2> pointers = new Array<>(maxPointers);
+    private final Array<Vector2> initialPointers = new Array<>(maxPointers);
+    private final Array<Vector2> pointers = new Array<>(maxPointers);
 
     private final Timer.Task longPressTask = new Timer.Task() {
         @Override

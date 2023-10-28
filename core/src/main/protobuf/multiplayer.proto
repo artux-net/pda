@@ -1,0 +1,60 @@
+syntax = "proto3";
+package multiplayer;
+
+message User {
+  string login = 1;
+  int64 health = 2;
+  double x = 3;
+  double y = 4;
+  double dx = 5;
+  double dy = 6;
+}
+
+message Request {
+  RequestType type = 1;
+
+  message JOIN {
+    string login = 1;
+    int64 mapId = 2;
+  }
+  optional JOIN join = 2;
+
+  message GET {
+    string uuid = 1;
+    int64 health = 2;
+    double x = 3;
+    double y = 4;
+    double dx = 5;
+    double dy = 6;
+  }
+  optional GET get = 3;
+
+  message LEAVE {
+    string uuid = 1;
+  }
+  optional LEAVE leave = 4;
+}
+
+enum RequestType {
+  JOIN = 0;
+  GET = 1;
+  LEAVE = 2;
+}
+
+message Response {
+  message JOIN {
+    bool ok = 1;
+    string uuid = 2;
+  }
+  optional JOIN join = 1;
+
+  message GET {
+    repeated User users = 1;
+  }
+  optional GET get = 2;
+
+  message LEAVE {
+    bool ok = 1;
+  }
+  optional LEAVE leave = 3;
+}
