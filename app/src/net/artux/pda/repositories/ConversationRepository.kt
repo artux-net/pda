@@ -4,7 +4,7 @@ import net.artux.pdanetwork.api.DefaultApi
 import net.artux.pdanetwork.model.ConversationCreateDTO
 import net.artux.pdanetwork.model.ConversationDTO
 import net.artux.pdanetwork.model.QueryPage
-import net.artux.pdanetwork.model.SliceConversationDTO
+import net.artux.pdanetwork.model.ResponsePageConversationDTO
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,38 +16,38 @@ import kotlin.coroutines.suspendCoroutine
 @Singleton
 class ConversationRepository @Inject constructor(
     private val webservice: DefaultApi,
-    private val cache: Cache<ConversationDTO>,
+//    private val cache: Cache<ConversationDTO>,
 ) {
-
-    fun clearCache() {
-        cache.clear()
-    }
-
-    fun getCachedConversations(): Result<List<ConversationDTO>> {
-        return if (cache.all != null)
-            Result.success(cache.all)
-        else Result.failure(Exception("Note isn't found"))
-    }
+//
+//    fun clearCache() {
+//        cache.clear()
+//    }
+//
+//    fun getCachedConversations(): Result<List<ConversationDTO>> {
+//        return if (cache.all != null)
+//            Result.success(cache.all)
+//        else Result.failure(Exception("Note isn't found"))
+//    }
 
     suspend fun getConversations(queryPage: QueryPage): Result<List<ConversationDTO>> {
         return suspendCoroutine {
-            webservice.getConversations(queryPage).enqueue(object : Callback<SliceConversationDTO> {
+            webservice.getConversations(queryPage).enqueue(object : Callback<ResponsePageConversationDTO> {
                 override fun onResponse(
-                    call: Call<SliceConversationDTO>,
-                    response: Response<SliceConversationDTO>
+                    call: Call<ResponsePageConversationDTO>,
+                    response: Response<ResponsePageConversationDTO>
                 ) {
                     val data = response.body()
                     if (data != null) {
-                        clearCache()
-                        for (conversation in data.content) {
-                            cache.put(conversation.id.toString(), conversation)
-                        }
+//                        clearCache()
+//                        for (conversation in data.content) {
+//                            cache.put(conversation.id.toString(), conversation)
+//                        }
                         it.resume(Result.success(data.content))
                     } else
                         it.resume(Result.failure(Exception(response.toString())))
                 }
 
-                override fun onFailure(call: Call<SliceConversationDTO>, t: Throwable) {
+                override fun onFailure(call: Call<ResponsePageConversationDTO>, t: Throwable) {
                     it.resume(Result.failure(java.lang.Exception(t)))
                 }
 
@@ -65,7 +65,7 @@ class ConversationRepository @Inject constructor(
                     ) {
                         val data = response.body()
                         if (data != null) {
-                            cache.put(data.id.toString(), data)
+//                            cache.put(data.id.toString(), data)
                             it.resume(Result.success(data))
                         } else
                             it.resume(Result.failure(Exception(response.toString())))

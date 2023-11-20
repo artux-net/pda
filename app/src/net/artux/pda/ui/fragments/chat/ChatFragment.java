@@ -20,17 +20,16 @@ import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.databinding.FragmentChatBinding;
-import net.artux.pda.model.ConversationModel;
 import net.artux.pda.model.chat.ChatUpdate;
 import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.model.user.SimpleUserModel;
-import net.artux.pda.model.user.UserModel;
 import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 import net.artux.pda.ui.fragments.chat.adapters.ChatAdapter;
 import net.artux.pda.ui.fragments.news.ArticleFragment;
 import net.artux.pda.ui.fragments.profile.UserProfileFragment;
 import net.artux.pda.ui.fragments.stories.StoriesFragment;
 import net.artux.pda.utils.ObjectWebSocketListener;
+import net.artux.pdanetwork.model.ConversationDTO;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -80,12 +79,14 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         return chatFragment;
     }
 
-
-    public static ChatFragment withConversation(ConversationModel conversation) {
+    public static ChatFragment asConversationChat(ConversationDTO conversation) {
         ChatFragment chatFragment = new ChatFragment();
-        Bundle bundle1 = new Bundle();
-        bundle1.putSerializable("conversation", conversation.getId());
-        chatFragment.setArguments(bundle1);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("conversation", true);
+        bundle.putString("conversationId", conversation.getId().toString());
+        bundle.putString("conversationTitle", conversation.getTitle());
+
+        chatFragment.setArguments(bundle);
         return chatFragment;
     }
 
@@ -168,31 +169,24 @@ public class ChatFragment extends BaseFragment implements View.OnClickListener, 
         Request.Builder builder = new Request.Builder();
         String path = BuildConfig.WS_PROTOCOL + "://" + BuildConfig.URL_API;
         navigationPresenter.setLoadingState(true);
-        if (args != null) {
+
+        if (args == null) {
+            builder.url(path + "chat");
+            navigationPresenter.setTitle("Chat");
+        } else {
             if (args.containsKey("rp")) {
                 builder.url(path + "rp");
                 navigationPresenter.setTitle("RP chat");
             } else if (args.containsKey("group")) {
                 builder.url(path + "groups");
                 navigationPresenter.setTitle("Group chat");
+            } else if (args.containsKey("conversation")) {
+                builder.url(path + "dialog?chatId=" + args.getString("conversationId"));
+                navigationPresenter.setTitle(args.getString("conversationTitle"));
             } else {
-                if (args.containsKey("c")) {
-                    builder.url(path + "dialog"
-                            + "?c=" + getArguments().getSerializable("c"));
-                    System.out.println(getArguments().getInt("c"));
-                    navigationPresenter.setTitle("Chat");
-                } else if (args.containsKey("to")) {
-                    builder.url(path + "dialog"
-                            + "?to=" + getArguments().getSerializable("to"));
-                    navigationPresenter.setTitle("Dialog with #" + getArguments().getInt("to"));
-                } else {
-                    builder.url(path + "chat");
-                    navigationPresenter.setTitle("Chat");
-                }
+                builder.url(path + "chat");
+                navigationPresenter.setTitle("Chat");
             }
-        } else {
-            builder.url(path + "chat");
-            navigationPresenter.setTitle("Chat");
         }
         ws = client.newWebSocket(builder.build(), userMessageObjectWebSocketListener);
     }

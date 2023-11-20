@@ -41,8 +41,9 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
     private ItemsAdapter sellerAdapter;
     private ItemsAdapter userAdapter;
     private ImageView background;
-    private SellerViewModel sellerViewModel;
 
+    private SellerViewModel sellerViewModel;
+    private QuestViewModel questViewModel;
     private FragmentQuest3Binding binding;
 
     public static SellerFragment newInstance(int sellerId) {
@@ -66,7 +67,7 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
 
         ViewModelProvider provider = new ViewModelProvider(requireActivity());
         sellerViewModel = provider.get(SellerViewModel.class);
-        QuestViewModel questViewModel = provider.get(QuestViewModel.class);
+        questViewModel = provider.get(QuestViewModel.class);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -91,8 +92,6 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
                 binding.playerMoney.setText(getString(R.string.money, String.valueOf(dataModel.getMoney())));
             });
 
-            sellerViewModel.updateSeller(sellerId);
-
             sellerView.setLayoutManager(sellerAdapter.getLayoutManager(requireContext(), 3));
             sellerView.setAdapter(sellerAdapter);
 
@@ -112,10 +111,14 @@ public class SellerFragment extends Fragment implements View.OnClickListener {
                 }
             });
             sellerViewModel.getStatus().observe(getViewLifecycleOwner(), statusModel -> {
-                questViewModel.updateStoryDataFromCache();
-                sellerViewModel.updateSeller(sellerId);
                 Toast.makeText(requireContext(), statusModel.getDescription(), Toast.LENGTH_SHORT).show();
+
+                sellerViewModel.updateSeller(sellerId);
+                questViewModel.updateStoryDataFromServer();
             });
+
+            questViewModel.updateStoryDataFromServer();
+            sellerViewModel.updateSeller(sellerId);
         } else
             throw new RuntimeException();
     }

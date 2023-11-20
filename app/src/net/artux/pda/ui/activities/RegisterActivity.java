@@ -3,7 +3,6 @@ package net.artux.pda.ui.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -32,8 +31,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
-import java.util.function.BinaryOperator;
-import java.util.stream.Stream;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import timber.log.Timber;

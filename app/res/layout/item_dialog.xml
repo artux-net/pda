@@ -19,21 +19,26 @@
             android:id="@+id/titleDialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            android:layout_margin="3dp"
-            android:text="12"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="3dp"
+            android:layout_marginBottom="3dp"
+            android:text="12" />
 
         <TextView
             android:id="@+id/lastMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginStart="10dp"
-            android:textSize="18sp"
-            android:layout_below="@id/titleDialog"
-            android:layout_alignParentBottom="true"/>
+            android:layout_below="@+id/titleDialog"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="3dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="6dp"
+            android:textSize="8sp" />
 
     </RelativeLayout>
 

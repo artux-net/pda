@@ -25,6 +25,7 @@ import net.artux.pda.ui.fragments.profile.UserProfileFragment
 import net.artux.pda.ui.fragments.web.WebFragment
 import net.artux.pda.ui.viewmodels.CommentViewModel
 import net.artux.pda.ui.viewmodels.NewsViewModel
+import net.artux.pda.utils.URLHelper
 import net.artux.pda.utils.serializable
 import java.util.UUID
 
@@ -108,7 +109,7 @@ class ArticleFragment : WebFragment(), View.OnClickListener, CommentsAdapter.OnC
             val bundle = Bundle()
             bundle.putSerializable("id", articleModel.id)
             bundle.putString("title", articleModel.title)
-            bundle.putString("url", articleModel.url)
+            bundle.putString("url", URLHelper.getApiUrl(articleModel.url?.substring(1)))
             webFragment.arguments = bundle
             return webFragment
         }

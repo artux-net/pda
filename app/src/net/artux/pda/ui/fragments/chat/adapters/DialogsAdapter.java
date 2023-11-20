@@ -10,35 +10,27 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import net.artux.pda.R;
-import net.artux.pda.model.ConversationModel;
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper;
+import net.artux.pdanetwork.model.ConversationDTO;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHolder> {
 
-    private List<ConversationModel> content;
+    private List<ConversationDTO> mConversationList;
     private final OnClickListener onClickListener;
 
     public DialogsAdapter(OnClickListener onClickListener) {
-        content = new LinkedList<>();
+        mConversationList = new LinkedList<>();
         this.onClickListener = onClickListener;
     }
 
-    public void setDialogs(List<ConversationModel> dialogs) {
-        content = dialogs;
+    public void setDialogs(List<ConversationDTO> dialogs) {
+        mConversationList = dialogs;
         notifyDataSetChanged();
     }
 
-    /*public void updateDialog(UserMessage message) {
-        for (ConversationModel d : mDialogList) {
-            //todo
-            if (d.id == message.getAuthor().getPdaId())
-                d.lastMessage = message.getAuthor().getLogin() + ": " + message.getContent();
-        }
-    }
-*/
     @NonNull
     @Override
     public DialogsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -48,12 +40,12 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(DialogsAdapter.ViewHolder holder, int position) {
-        holder.bind(content.get(position));
+        holder.bind(mConversationList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return content.size();
+        return mConversationList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -71,15 +63,15 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
             mainView = itemView;
         }
 
-        void bind(ConversationModel dialog) {
-            ProfileHelper.setAvatar(avatarView, dialog.getAvatar());
-            lastMessage.setText(dialog.getLastMessage());
+        void bind(ConversationDTO dialog) {
+            ProfileHelper.setAvatar(avatarView, dialog.getIcon());
+            lastMessage.setText(dialog.getType().toString());
             titleView.setText(dialog.getTitle());
             mainView.setOnClickListener(view -> onClickListener.onClick(dialog));
         }
     }
 
     public interface OnClickListener {
-        void onClick(ConversationModel model);
+        void onClick(ConversationDTO model);
     }
 }
