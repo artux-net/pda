@@ -16,10 +16,14 @@ import net.artux.pda.ui.fragments.additional.AdditionalFragment
 import net.artux.pda.ui.fragments.chat.ChatFragment
 import net.artux.pda.ui.fragments.profile.adapters.GroupRelationsAdapter
 import net.artux.pda.ui.fragments.profile.helpers.ProfileHelper
+import net.artux.pda.ui.viewmodels.ConversationsViewModel
 import net.artux.pda.ui.viewmodels.ProfileViewModel
 import net.artux.pda.utils.GroupHelper
 import net.artux.pda.utils.serializable
-import java.util.*
+import net.artux.pdanetwork.model.ConversationCreateDTO
+import net.artux.pdanetwork.model.ConversationDTO
+import timber.log.Timber
+import java.util.UUID
 
 @AndroidEntryPoint
 class UserProfileFragment : BaseFragment(), View.OnClickListener {
@@ -29,6 +33,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
     private lateinit var groupRelationsAdapter: GroupRelationsAdapter
 
     private lateinit var profileViewModel: ProfileViewModel
+    private lateinit var conversationsViewModel: ConversationsViewModel
 
     init {
         defaultAdditionalFragment = AdditionalFragment::class.java
@@ -59,6 +64,8 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         profileViewModel = ViewModelProvider(requireActivity())[ProfileViewModel::class.java]
+        conversationsViewModel = ViewModelProvider(requireActivity())[ConversationsViewModel::class.java]
+
         groupRelationsAdapter = GroupRelationsAdapter()
         if (navigationPresenter != null) {
             navigationPresenter.setTitle(getString(R.string.profileModel))
@@ -122,7 +129,8 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
 
             binding.profileFriend.visibility = View.GONE
             binding.requests.visibility = View.GONE
-            binding.writeMessage.visibility = View.GONE
+            binding.writeMessage.visibility = if (model.id != profileViewModel.getId()) View.VISIBLE else View.GONE
+            binding.writeMessage.setOnClickListener(this)
 
             /*val friendButton: Button = binding.profileFriend
             val subsButton: Button = binding.requests
@@ -174,9 +182,9 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
     }
 
     override fun onClick(p0: View?) {
-
         val bundle = Bundle()
         val result = profileViewModel.profile.value
+
         when (p0!!.id) {
             R.id.profile_friends -> {
                 navigationPresenter.addFragment(
@@ -195,10 +203,36 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
                 )
             }
             R.id.write_message -> {
-                bundle.putInt("to", result!!.pdaId)
-                val chatFragment = ChatFragment()
-                chatFragment.arguments = bundle
-                navigationPresenter.addFragment(chatFragment, true)
+                conversationsViewModel.conversations.observe(viewLifecycleOwner) {
+                    if (it.isNotEmpty()) {
+                        Timber.i(it.toString())
+
+                        val conversations: List<ConversationDTO> = it.filter {conversation ->
+                            conversation.members.map { it.id }.contains(result?.id)
+                        }
+                        if(conversations.isNotEmpty()) {
+                            val conversation = conversations.first();
+
+                            bundle.putBoolean("conversation", true)
+                            bundle.putString("conversationId", conversation.id.toString())
+                            bundle.putString("conversationTitle", conversation.title)
+
+                            val chatFragment = ChatFragment()
+                            chatFragment.arguments = bundle
+                            navigationPresenter.addFragment(chatFragment, true)
+                        }
+                    } else {
+                        conversationsViewModel.save(
+                            ConversationCreateDTO()
+                                .title(result?.name + " " + result?.nickname)
+                                .icon(result?.avatar)
+                                .type(ConversationCreateDTO.TypeEnum.PRIVATE)
+                                .users(listOf(result?.id))
+                        )
+                    }
+                }
+
+                result?.id?.let { conversationsViewModel.getPrivateByUser(it) }
             }
         }
     }

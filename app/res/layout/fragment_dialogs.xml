@@ -50,7 +50,7 @@
 
        <include
            android:id="@+id/listContainer"
-           layout="@layout/fragment_list"/>
+           layout="@layout/fragment_list" />
 
    </LinearLayout>
 

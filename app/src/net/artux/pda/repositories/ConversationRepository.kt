@@ -8,6 +8,7 @@ import net.artux.pdanetwork.model.ResponsePageConversationDTO
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
@@ -72,6 +73,27 @@ class ConversationRepository @Inject constructor(
                     }
 
                     override fun onFailure(call: Call<ConversationDTO>, t: Throwable) {
+                        it.resume(Result.failure(java.lang.Exception(t)))
+                    }
+                })
+        }
+    }
+
+    suspend fun getPrivateConversation(userId: UUID): Result<List<ConversationDTO>> {
+        return suspendCoroutine {
+            webservice.getPrivateConversation(userId)
+                .enqueue(object : Callback<List<ConversationDTO>> {
+                    override fun onResponse(
+                        call: Call<List<ConversationDTO>>,
+                        response: Response<List<ConversationDTO>>
+                    ) {
+                        val data = response.body()
+                        if(data != null) {
+                            it.resume(Result.success(data))
+                        }
+                    }
+
+                    override fun onFailure(call: Call<List<ConversationDTO>>, t: Throwable) {
                         it.resume(Result.failure(java.lang.Exception(t)))
                     }
                 })

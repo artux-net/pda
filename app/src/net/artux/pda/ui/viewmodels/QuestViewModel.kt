@@ -83,7 +83,7 @@ class QuestViewModel @javax.inject.Inject constructor(
          viewModelScope.launch {
              repository.getStoryData()
                  .map { mapper.dataModel(it) }
-                 .onSuccess { storyData.postValue(it); Timber.e("Обновлено") }
+                 .onSuccess { storyData.postValue(it) }
                  .onFailure { status.postValue(StatusModel(it)) }
          }
     }
