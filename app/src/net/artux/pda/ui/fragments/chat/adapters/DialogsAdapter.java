@@ -68,10 +68,12 @@ public class DialogsAdapter extends RecyclerView.Adapter<DialogsAdapter.ViewHold
             lastMessage.setText(dialog.getType().toString());
             titleView.setText(dialog.getTitle());
             mainView.setOnClickListener(view -> onClickListener.onClick(dialog));
+            mainView.setOnLongClickListener(view -> onClickListener.onLongClick(dialog));
         }
     }
 
     public interface OnClickListener {
         void onClick(ConversationDTO model);
+        boolean onLongClick(ConversationDTO model);
     }
 }

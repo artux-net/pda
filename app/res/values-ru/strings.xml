@@ -169,4 +169,5 @@
     <string name="comments">Комментарии</string>
     <string name="shareIt">Поделиться</string>
     <string name="empty_slot">Пусто</string>
+    <string name="delete_chat">Вы хотите удалить чат с %s?</string>
 </resources>

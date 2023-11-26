@@ -100,4 +100,24 @@ class ConversationRepository @Inject constructor(
         }
     }
 
+    suspend fun deleteConversation(conversationId: UUID): Result<Boolean> {
+        return suspendCoroutine {
+            webservice.deleteConversation(conversationId)
+                .enqueue(object : Callback<Boolean> {
+                    override fun onResponse(
+                        call: Call<Boolean>,
+                        response: Response<Boolean>
+                    ) {
+                        val data = response.body()
+                        if(data != null) {
+                            it.resume(Result.success(data))
+                        }
+                    }
+
+                    override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                        it.resume(Result.failure(java.lang.Exception(t)))
+                    }
+                })
+        }
+    }
 }

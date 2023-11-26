@@ -43,4 +43,12 @@ class ConversationsViewModel @Inject constructor(
                 .onFailure { status.postValue(StatusModel(it)) }
         }
     }
+
+    fun delete(conversationId: UUID) {
+        viewModelScope.launch {
+            repository.deleteConversation(conversationId)
+                .onSuccess { update() }
+                .onFailure { status.postValue(StatusModel(it)) }
+        }
+    }
 }
