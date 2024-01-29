@@ -10,7 +10,7 @@ on:
 jobs:
   assemble_job:
     name: Assemble
-    runs-on: upuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
