@@ -48,25 +48,44 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            app/build/outputs/apk/release
+            app/build/outputs/apk/debug
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Check file existence
+        id: check_apk
+        uses: andstor/file-existence-action@v3.0.0
+        with:
+          files: app/build/outputs/apk/*/*.apk
+
+
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
+        if: steps.check_apk.outputs.files_exists == 'false'
         with:
           gradle-version: 8.2.1
 
       - name: Build APK
         id: buildDebug
-        if: ${{ github.ref == 'refs/heads/dev' }}
+        if: ${{ github.ref == 'refs/heads/dev' && steps.check_apk.outputs.files_exists == 'false'}}
         run: ./gradlew clean assembleDebug
 
       - name: Build APK
         id: build
-        if: ${{ github.ref == 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/master' && steps.check_apk.outputs.files_exists == 'false' }}
         run: ./gradlew clean assembleRelease
 
       - uses: r0adkll/sign-android-release@v1
         name: Sign APK
         id: sign_apk
-        if: ${{ github.ref == 'refs/heads/master' }}
+        if: ${{ github.ref == 'refs/heads/master' && steps.check_apk.outputs.files_exists == 'false' }}
         with:
           releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
@@ -74,12 +93,12 @@ jobs:
           keyStorePassword: ${{ secrets.keystore_password }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "34.0.5"
+          BUILD_TOOLS_VERSION: "33.0.0"
 
       - uses: r0adkll/sign-android-release@v1
         name: Sign APK
         id: sign_apk_dev
-        if: ${{ github.ref == 'refs/heads/dev' }}
+        if: ${{ github.ref == 'refs/heads/dev' && steps.check_apk.outputs.files_exists == 'false' }}
         with:
           releaseDirectory: app/build/outputs/apk/debug
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
@@ -87,7 +106,7 @@ jobs:
           keyStorePassword: ${{ secrets.keystore_password }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         env:
-          BUILD_TOOLS_VERSION: "34.0.5"
+          BUILD_TOOLS_VERSION: "33.0.0"
 
       - uses: r0adkll/upload-google-play@v1
         name: Upload to internal sharing
