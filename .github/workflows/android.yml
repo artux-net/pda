@@ -10,7 +10,7 @@ on:
 jobs:
   assemble_job:
     name: Assemble
-    runs-on: ubuntu-latest
+    runs-on: pc
     steps:
       - uses: actions/checkout@v3
         with:
