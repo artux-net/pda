@@ -78,6 +78,11 @@ jobs:
       runs-on: ubuntu-20.04
       if: ${{ github.ref == 'refs/heads/master' }}
       steps:
+        - uses: actions/checkout@v3
+          with:
+            token: ${{secrets.token}}
+            submodules: recursive
+
         - uses: ./.github/setup
 
         - name: Bump version
