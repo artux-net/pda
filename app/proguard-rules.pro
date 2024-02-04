@@ -1,9 +1,6 @@
 -keep class org.** { *; }
 -keep class java.** { *; }
 -keep class javax.** { *; }
--keep class groovy.** { *; }
--keep class com.google.** { *; }
--keep class org.codehaus.** { *; }
 -keep class com.badlogic.** { *; }
 
 # required for lua scripting
@@ -156,3 +153,15 @@
 -dontwarn org.slf4j.impl.StaticLoggerBinder
 -dontwarn org.slf4j.impl.StaticMDCBinder
 -dontwarn org.slf4j.impl.StaticMarkerBinder
+-dontwarn groovy.lang.GroovyObject
+-dontwarn groovy.lang.MetaClass
+-dontwarn groovy.transform.Generated
+-dontwarn groovy.transform.Internal
+-dontwarn org.codehaus.groovy.reflection.ClassInfo
+-dontwarn org.codehaus.groovy.runtime.BytecodeInterface8
+-dontwarn org.codehaus.groovy.runtime.DefaultGroovyMethods
+-dontwarn org.codehaus.groovy.runtime.ScriptBytecodeAdapter
+-dontwarn org.codehaus.groovy.runtime.dgmimpl.NumberNumberMinus
+-dontwarn org.codehaus.groovy.runtime.typehandling.DefaultTypeTransformation
+-dontwarn org.codehaus.groovy.runtime.typehandling.ShortTypeHandling
+-dontwarn org.codehaus.groovy.transform.ImmutableASTTransformation
