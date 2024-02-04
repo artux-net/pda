@@ -68,7 +68,7 @@ jobs:
             Изменения:
             ${{ steps.updates.outputs.content }}
 
-    assemble-release:
+  assemble-release:
       name: Assemble Release
       runs-on: ubuntu-20.04
       if: ${{ github.ref == 'refs/heads/master' }}
