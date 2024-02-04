@@ -5,6 +5,7 @@ runs:
   steps:
   - name: Get current date
     id: date
+    shell: bash
     run: echo "::set-output name=date::$(date +'%Y.%m.%d')"
 
   - name: set up JDK 17
