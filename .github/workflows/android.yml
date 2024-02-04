@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-20.04
     if: ${{ github.ref == 'refs/heads/dev' }}
     steps:
-      - uses: ./.github/actions/setup
+      - uses: actions/setup
 
       - name: Bump version dev
         uses: chkfung/android-version-actions@v1.2.1
@@ -73,7 +73,7 @@ jobs:
       runs-on: ubuntu-20.04
       if: ${{ github.ref == 'refs/heads/master' }}
       steps:
-        - uses: ./.github/actions/setup
+        - uses: actions/setup
 
         - name: Bump version
           uses: chkfung/android-version-actions@v1.2.1
