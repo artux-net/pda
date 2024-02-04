@@ -1,6 +1,9 @@
 -keep class org.** { *; }
 -keep class java.** { *; }
 -keep class javax.** { *; }
+-keep class groovy.** { *; }
+-keep class com.google.** { *; }
+-keep class org.codehaus.** { *; }
 -keep class com.badlogic.** { *; }
 
 # required for lua scripting
