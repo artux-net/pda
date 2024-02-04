@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
   
 jobs:
-  assemble-dev:
-    name: Assemble Dev
+  build-dev:
+    name: Dev Build
     runs-on: ubuntu-20.04
     if: ${{ github.ref == 'refs/heads/dev' }}
     steps:
@@ -22,7 +22,6 @@ jobs:
 
       - name: Bump version dev
         uses: chkfung/android-version-actions@v1.2.1
-        if: ${{ github.ref == 'refs/heads/dev' }}
         with:
           gradlePath: app/build.gradle
           versionCode: ${{github.run_number}}
@@ -53,7 +52,7 @@ jobs:
           releaseFiles: ${{steps.sign_apk_dev.outputs.signedReleaseFile}}
           track: internalsharing
 
-      - name: Read updates
+      - name: Read release notes
         id: updates
         uses: juliangruber/read-file-action@v1
         with:
@@ -67,14 +66,14 @@ jobs:
           message: |
             Debug сборка ${{github.run_number}}, версия ${{ steps.date.outputs.date }}
             
-            Ссылки для скачивания dev и prod: 
+            Ссылка для скачивания активна три месяца: 
             ${{steps.upload.outputs.internalSharingDownloadUrls}}
             
             Изменения:
             ${{ steps.updates.outputs.content }}
 
-  assemble-release:
-      name: Assemble Release
+  build-release:
+      name: Release Build
       runs-on: ubuntu-20.04
       if: ${{ github.ref == 'refs/heads/master' }}
       steps:
@@ -94,7 +93,7 @@ jobs:
 
         - name: Build APK
           id: build
-          run: ./gradlew clean assembleRelease
+          run: ./gradlew assembleRelease
 
         - uses: r0adkll/sign-android-release@v1
           name: Sign APK
@@ -116,7 +115,7 @@ jobs:
             releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
             track: internal
 
-        - name: Read updates
+        - name: Read release notes
           id: updates
           uses: juliangruber/read-file-action@v1
           with:
