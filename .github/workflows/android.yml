@@ -10,7 +10,7 @@ on:
 jobs:
   assemble_job:
     name: Assemble
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -36,9 +36,6 @@ jobs:
           gradlePath: app/build.gradle
           versionCode: ${{github.run_number}}
           versionName: ${{ steps.date.outputs.date }} DEBUG
-          
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
 
       - name: set up JDK 17
         uses: actions/setup-java@v2
@@ -47,24 +44,23 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: gradle
-
-      - uses: actions/cache@v3
+          
+      - name: Set up cache
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-            app/build/outputs/apk/release
-            app/build/outputs/apk/debug
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+            ~/.ccache
+          key: ${{ runner.os }}-android-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-gradle-
+            ${{ runner.os }}-android-
 
       - name: Check file existence
         id: check_apk
         uses: andstor/file-existence-action@v3.0.0
         with:
           files: app/build/outputs/apk/*/*.apk
-
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
