@@ -64,8 +64,11 @@ public class PlayerBattleSystem extends BaseSystem {
         playerWeapon.update(deltaTime);
 
         if (playerMood.hasEnemy()) {
+
+            //float dstToEnemy = pm.get(playerMood.enemy).body.getPosition().dst(pm.get(player).getPosition());
+
             if (!mm.get(playerMood.enemy).untarget)
-                if (playerVision.isSeeing(playerMood.getEnemy()))
+                if (playerVision.isSeeing(playerMood.getEnemy())) //&& dstToEnemy<=playerWeapon.getSelected().getDistance())
                     if (playerShoot && playerWeapon.shoot()) {
                         soundStarted = false;
                         entityProcessorSystem.startBullet(player, playerMood.getEnemy(), playerWeapon.getSelected());

@@ -13,12 +13,13 @@ jobs:
     runs-on: ubuntu-20.04
     if: ${{ github.ref == 'refs/heads/dev' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           token: ${{secrets.token}}
           submodules: recursive
 
       - uses: ./.github/setup
+        id: date
 
       - name: Bump version dev
         uses: chkfung/android-version-actions@v1.2.1
@@ -73,62 +74,63 @@ jobs:
             ${{ steps.updates.outputs.content }}
 
   build-release:
-      name: Release Build
-      runs-on: ubuntu-20.04
-      if: ${{ github.ref == 'refs/heads/master' }}
-      steps:
-        - uses: actions/checkout@v3
-          with:
-            token: ${{secrets.token}}
-            submodules: recursive
+    name: Release Build
+    runs-on: ubuntu-20.04
+    if: ${{ github.ref == 'refs/heads/master' }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{secrets.token}}
+          submodules: recursive
 
-        - uses: ./.github/setup
+      - uses: ./.github/setup
+        id: date
 
-        - name: Bump version
-          uses: chkfung/android-version-actions@v1.2.1
-          with:
-            gradlePath: app/build.gradle
-            versionCode: ${{github.run_number}}
-            versionName: ${{ steps.date.outputs.date }}
+      - name: Bump version
+        uses: chkfung/android-version-actions@v1.2.1
+        with:
+          gradlePath: app/build.gradle
+          versionCode: ${{github.run_number}}
+          versionName: ${{ steps.date.outputs.date }}
 
-        - name: Build APK
-          id: build
-          run: ./gradlew assembleRelease
+      - name: Build APK
+        id: build
+        run: ./gradlew assembleRelease
 
-        - uses: r0adkll/sign-android-release@v1
-          name: Sign APK
-          id: sign_apk
-          with:
-            releaseDirectory: app/build/outputs/apk/release
-            signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-            alias: ${{ secrets.key_alias }}
-            keyStorePassword: ${{ secrets.keystore_password }}
-            keyPassword: ${{ secrets.KEY_PASSWORD }}
-          env:
-            BUILD_TOOLS_VERSION: "33.0.0"
+      - uses: r0adkll/sign-android-release@v1
+        name: Sign APK
+        id: sign_apk
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.key_alias }}
+          keyStorePassword: ${{ secrets.keystore_password }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "33.0.0"
 
-        - uses: r0adkll/upload-google-play@v1
-          id: uploadPlay
-          with:
-            serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-            packageName: net.artux.pda
-            releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
-            track: internal
+      - uses: r0adkll/upload-google-play@v1
+        id: uploadPlay
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: net.artux.pda
+          releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
+          track: internal
 
-        - name: Read release notes
-          id: updates
-          uses: juliangruber/read-file-action@v1
-          with:
-            path: ./releaseNotes/whatsnew-ru-RU
+      - name: Read release notes
+        id: updates
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./releaseNotes/whatsnew-ru-RU
 
-        - name: Send message to Artux channel
-          uses: appleboy/telegram-action@master
-          with:
-            to: ${{ secrets.TELEGRAM_TO }}
-            token: ${{ secrets.TELEGRAM_TOKEN }}
-            message: |
-              Master-сборка ${{github.run_number}}, версия ${{ steps.date.outputs.date }}
-              
-              Ожидает публикации в beta-канале Google Play
-              Изменения:
-              ${{ steps.updates.outputs.content }}
+      - name: Send message to Artux channel
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            Master-сборка ${{github.run_number}}, версия ${{ steps.date.outputs.date }}
+            
+            Ожидает публикации в beta-канале Google Play
+            Изменения:
+            ${{ steps.updates.outputs.content }}

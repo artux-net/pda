@@ -95,6 +95,7 @@ public class EntityBuilder {
                 .add(new PlayerComponent());
     }
 
+    // Стрельба в прицеле
     public Entity bullet(Entity author, Entity target, WeaponModel weaponModel) {
         Entity bullet = bulletPool.obtain();
         BodyComponent bodyComponent = pm.get(author);
@@ -124,15 +125,20 @@ public class EntityBuilder {
         return bullet;
     }
 
+    // Стрельба свободная
     public Entity bullet(Entity author, WeaponModel weaponModel) {
         Entity bullet = bulletPool.obtain();
+        WeaponComponent weapon = author.getComponent(WeaponComponent.class);
 
         SpriteComponent authorSprite = sm.get(author);
         float rotationDeg = authorSprite.getRotation();
 
+
         BodyComponent bodyComponent = pm.get(author);
         Vector2 targetPosition = bodyComponent.getPosition().cpy();
-        targetPosition.y += 200;
+        if (weapon.getSelected() != null){
+            targetPosition.y += weapon.getSelected().getDistance();
+        }
         targetPosition.rotateAroundDeg(bodyComponent.getPosition(), rotationDeg - 90);
         targetPosition = getPointNear(targetPosition, weaponModel.getCalcPrecision());
 

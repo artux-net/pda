@@ -7,6 +7,7 @@ data class WeaponModel(
     var condition: Float = 0f,
     var bulletQuantity: Int = 0,
     var bulletId: Int = 0,
+    var distance: Float = 0f,
     var sounds: WeaponSound? = null
 ) : WearableModel() {
 

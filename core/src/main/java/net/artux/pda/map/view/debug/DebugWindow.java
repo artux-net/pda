@@ -19,6 +19,7 @@ import net.artux.pda.map.view.debug.widgets.MusicWidget;
 import net.artux.pda.map.view.debug.widgets.MutantWidget;
 import net.artux.pda.map.view.debug.widgets.SoundsWidget;
 import net.artux.pda.map.view.Utils;
+import net.artux.pda.map.view.debug.widgets.WeaponWidget;
 import net.artux.pda.map.view.view.window.PDAWindow;
 
 import javax.inject.Inject;
@@ -36,13 +37,16 @@ public class DebugWindow extends PDAWindow {
                        MutantWidget mutantWidget,
                        MusicWidget musicWidget,
                        SoundsWidget soundsWidget,
+                       WeaponWidget weaponWidget,
                        PDAButton loggerButton,
                        PDAButton mapsButton,
                        PDAButton soundButton,
                        PDAButton musicButton,
                        PDAButton actionsButton,
                        PDAButton mutantButton,
-                       PDAButton checks, PDAButton items) {
+                       PDAButton checks,
+                       PDAButton items,
+                       PDAButton weapons) {
         super(skin);
         setFillParent(true);
         top();
@@ -122,6 +126,15 @@ public class DebugWindow extends PDAWindow {
             }
         });
 
+        weapons.setText("Параметры снарежения");
+        weapons.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+                setWidget(weaponWidget);
+            }
+        });
+
         buttons.addActor(checks);
         buttons.addActor(loggerButton);
         buttons.addActor(items);
@@ -130,6 +143,7 @@ public class DebugWindow extends PDAWindow {
         buttons.addActor(musicButton);
         buttons.addActor(actionsButton);
         buttons.addActor(mutantButton);
+        buttons.addActor(weapons);
 
         selectPane = new ScrollPane(buttons, skin);
         selectPane.setScrollingDisabled(true, false);

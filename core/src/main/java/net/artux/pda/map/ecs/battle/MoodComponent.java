@@ -10,7 +10,11 @@ import net.artux.pda.model.user.GangRelation;
 
 import java.util.Set;
 
-
+/**
+ * Настроение сущности,
+ * отвечает за отношение текущей сущности к другим (по группировке или виду),
+ * определяет текущего врага сущности
+ */
 public class MoodComponent implements Component {
 
     public final int gandId;
@@ -20,12 +24,12 @@ public class MoodComponent implements Component {
 
     public Entity enemy;
 
-    public boolean immortal;
-    public boolean untarget;
-    public boolean angry;
-    public boolean alwaysIgnored;
-    public boolean angryOnPlayer;
-    public boolean ignorePlayer;
+    public boolean immortal; // бессмертный
+    public boolean untarget; // невозможно выбрать как врага
+    public boolean angry; // злой на всех, даже если отношение дружелюбное будет атаковать
+    public boolean alwaysIgnored; // всегда будет проигнорирован
+    public boolean angryOnPlayer; // всегда атаковать игрока
+    public boolean ignorePlayer; // всегда игнорировать игрока
 
     public MoodComponent(StoryDataModel storyDataModel) {
         player = true;
