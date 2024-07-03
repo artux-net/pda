@@ -5,17 +5,17 @@ import java.io.Serializable
 
 class StatusModel : Serializable {
     var success = false
-    var description: String? = null
+    var description: String = ""
     var storyDataModel: StoryDataModel? = null
 
-    constructor() {}
-    constructor(message: String?) {
+    constructor()
+    constructor(message: String) {
         success = true
         description = message
     }
 
     constructor(throwable: Throwable) {
         success = false
-        description = throwable.message
+        description = throwable.message.orEmpty()
     }
 }

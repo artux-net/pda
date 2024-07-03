@@ -1,8 +1,7 @@
 package net.artux.pda.scripting
 
-import kotlinx.coroutines.Job
+import net.artux.pda.utils.AdType
 import org.luaj.vm2.Globals
-import org.luaj.vm2.LuaTable
 
 @Suppress("redundantVisibilityModifier")
 interface ICommandController {
@@ -33,6 +32,8 @@ interface ICommandController {
      */
     public fun showAd(types: List<String>)
 
+    fun showAd(adType: AdType)
+
     /**
      * Выполняет команды на сервере без команды-триггера
      */
@@ -42,4 +43,5 @@ interface ICommandController {
      * Кэширует команды, они выполнятся при следующей команде-триггер (syncNow, exitStory, finishStory)
      */
     fun process(commands: Map<String, List<String>>?)
+
 }

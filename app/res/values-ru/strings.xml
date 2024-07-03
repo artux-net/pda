@@ -4,7 +4,7 @@
     <string name="app_full_name">Сталкерская сеть</string>
 
     <!-- Strings related to login -->
-    <string name="prompt_user">Пользователь</string>
+    <string name="prompt_user">Электронная почта</string>
     <string name="prompt_password">Пароль</string>
     <string name="action_sign_in">ВОЙТИ</string>
     <string name="error_login">Такого пользователя не существует или пароль неправильный</string>
@@ -95,8 +95,8 @@
     <string name="subs">Запросы дружбы - %1$s</string>
     <string name="settings">Настройки</string>
     <string name="exitStory">Выйти из истории</string>
-    <string name="registrationEndDesc">На указанную почту %1$s было отправлено письмо с ссылкой для подтверждения регистрации в сталкерской сети, перейдите по ней для завершения. Письмо может попасть в папку спам, советуем ее проверить.</string>
-    <string name="registrationEndConfirm">Я подтвердил аккаунт</string>
+    <string name="registrationEndDesc">На указанную почту %1$s было отправлено письмо с ссылкой для подтверждения аккаунта в сталкерской сети, перейдите по ней для полного завершения регистрации. Письмо может попасть в папку спам, советуем ее проверить. Тем не менее аккаунт уже работает, можете перейти к странице входа.</string>
+    <string name="registrationEndConfirm">К входу</string>
     <string name="notEqualPasswords">Пароли не совпадают.</string>
     <string name="what_is_pda">Что такое ПДА?</string>
     <string name="wrong_response">Ошибка запроса, обновите приложение</string>
@@ -155,6 +155,7 @@
     <string name="show_logs">Показать логи</string>
     <string name="save_logs">Сохранить логи в файл</string>
     <string name="reset_logs">Сбросить логи</string>
+    <string name="reset_story">Сбросить прохождение</string>
     <string name="no_access">Нет доступа</string>
     <string name="cancel">Закрыть</string>
     <string name="load">Загрузить</string>

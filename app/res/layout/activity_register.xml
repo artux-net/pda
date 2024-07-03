@@ -43,29 +43,16 @@
                 android:id="@+id/fields"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnCount="3"
+                android:columnCount="2"
                 android:rowCount="2"
                 app:layout_constraintTop_toTopOf="parent">
 
-
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/login"
-                    android:hint="@string/prompt_login"
+                    android:id="@+id/email"
+                    android:hint="@string/prompt_email"
                     android:maxLines="1"
+                    android:inputType="textEmailAddress"
                     android:singleLine="true"
-                    android:inputType="text"
-                    android:layout_columnWeight="1"
-                    android:imeOptions="actionNext"
-                    android:theme="@style/EditTextStyle"/>
-
-
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/name"
-                    android:hint="@string/prompt_name"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:inputType="textPersonName"
                     android:layout_columnWeight="1"
                     android:imeOptions="actionNext"
                     android:theme="@style/EditTextStyle"/>
@@ -80,15 +67,7 @@
                     android:imeOptions="actionNext"
                     android:theme="@style/EditTextStyle"/>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/email"
-                    android:hint="@string/prompt_email"
-                    android:maxLines="1"
-                    android:inputType="textEmailAddress"
-                    android:singleLine="true"
-                    android:layout_columnWeight="1"
-                    android:imeOptions="actionNext"
-                    android:theme="@style/EditTextStyle"/>
+
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password"

@@ -250,16 +250,20 @@ class CommandController @Inject constructor(
 
     override fun showAd(types: List<String>) {
         if (types.isEmpty())
-            adEvent.postValue(AdType.USUAL)
+            adEvent.postValue(AdType.QUEST_SIMPLE)
         else
             showAd(types.first())
     }
 
-    override fun showAd(type: String) {
+    override fun showAd(adType: AdType) {
+        adEvent.postValue(adType)
+    }
+
+    override fun  showAd(type: String) {
         when (type) {
-            "video" -> adEvent.postValue(AdType.VIDEO)
-            "simple" -> adEvent.postValue(AdType.USUAL)
-            else -> adEvent.postValue(AdType.USUAL)
+            "video" -> adEvent.postValue(AdType.QUEST_VIDEO)
+            "simple" -> adEvent.postValue(AdType.QUEST_SIMPLE)
+            else -> adEvent.postValue(AdType.QUEST_SIMPLE)
         }
     }
 

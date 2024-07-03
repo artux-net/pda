@@ -20,7 +20,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.datatransport.Event
 import com.google.gson.Gson
-import com.yandex.mobile.ads.common.AdRequest
 import com.yandex.mobile.ads.common.AdRequestConfiguration
 import com.yandex.mobile.ads.common.AdRequestError
 import com.yandex.mobile.ads.interstitial.InterstitialAd
@@ -38,7 +37,6 @@ import net.artux.pda.model.StatusModel
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.quest.ChapterModel
 import net.artux.pda.model.quest.NotificationModel
-import net.artux.pda.model.quest.NotificationType
 import net.artux.pda.model.quest.StageModel
 import net.artux.pda.repositories.QuestSoundManager
 import net.artux.pda.ui.fragments.quest.SellerFragment
@@ -50,6 +48,7 @@ import net.artux.pda.ui.viewmodels.UserViewModel
 import net.artux.pda.ui.viewmodels.event.ScreenDestination
 import net.artux.pda.utils.*
 import timber.log.Timber
+import java.util.Random
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -107,10 +106,6 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
             if (notificationModel == null) return@observe
             val builder = AlertDialog.Builder(this, R.style.PDANotificationStyle)
             builder.setIcon(drawableFromAssets(this, notificationModel.type.iconId))
-            /*when (notificationModel.type) {
-                NotificationType.MESSAGE -> builder.setIcon(R.drawable.ic_message)
-                else -> builder.setIcon(R.drawable.ic_alert)
-            }*/
             builder.setTitle(notificationModel.title)
             builder.setMessage(notificationModel.message)
             val dialog = builder.create()
@@ -136,10 +131,11 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
             startActivity(intent)
             finish()
         }
-        commandViewModel.adEvent.observe(this) { data: AdType ->
-            if (data === AdType.VIDEO) {
-
-                val loader = RewardedAdLoader(this).apply {
+        commandViewModel.adEvent.observe(this) { type: AdType ->
+            val probability = Random().nextFloat()
+            if (type.defaultProbability > probability) return@observe
+            if (type.isRewarded) {
+                RewardedAdLoader(this).apply {
                     setAdLoadListener(object : RewardedAdLoadListener {
                         override fun onAdLoaded(rewardedAd: RewardedAd) {
                             rewardedAd.setAdEventListener(VideoAdListener(commandViewModel))
@@ -148,11 +144,13 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
 
                         override fun onAdFailedToLoad(adRequestError: AdRequestError) {}
                     })
-                }
-                loader.loadAd(AdRequestConfiguration.Builder(getString(R.string.quest_ads_video_id)).build())
+                }.loadAd(
+                    AdRequestConfiguration.Builder(type.adUnitId)
+                        .build()
+                )
             } else {
-                val loader = InterstitialAdLoader(this).apply {
-                    setAdLoadListener(object : InterstitialAdLoadListener{
+                InterstitialAdLoader(this).apply {
+                    setAdLoadListener(object : InterstitialAdLoadListener {
                         override fun onAdLoaded(interstitialAd: InterstitialAd) {
                             interstitialAd.setAdEventListener(
                                 InterstitialAdListener(commandViewModel)
@@ -163,9 +161,12 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
                         override fun onAdFailedToLoad(p0: AdRequestError) {}
 
                     })
-                }
-                loader.loadAd(AdRequestConfiguration.Builder(getString(R.string.quest_ads_usual_id)).build())
+                }.loadAd(
+                    AdRequestConfiguration.Builder(type.adUnitId)
+                        .build()
+                )
             }
+
         }
         questViewModel.background.observe(this) { nextBackground: String? ->
             setBackground(nextBackground)

@@ -25,6 +25,7 @@ import net.artux.pda.repositories.SellerRepository
 import net.artux.pda.repositories.SummaryRepository
 import net.artux.pda.repositories.UserRepository
 import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
+import net.artux.pda.utils.AdType
 import timber.log.Timber
 
 @HiltViewModel
@@ -182,6 +183,7 @@ class QuestViewModel @javax.inject.Inject constructor(
                                     if (chapterStage.data!!.containsKey("pos"))
                                         it.defPos = chapterStage.data!!["pos"].toString()
                                     Timber.i("${storyData.value}")
+                                    commandController.showAd(AdType.TRANSFER_VIDEO)
                                     map.postValue(it)
                                 }
                                 .onFailure { status.postValue(StatusModel(it)) }
