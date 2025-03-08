@@ -265,6 +265,7 @@
     <string name="offline">Offline</string>
     <string name="position_p">Позиция в рейтинге: %1$s</string>
     <string name="show_logs">Show logs</string>
+    <string name="test_ads">Test ads</string>
     <string name="save_logs">Save logs to file</string>
     <string name="reset_logs">Reset logs</string>
     <string name="reset_story">Reset all stories data</string>

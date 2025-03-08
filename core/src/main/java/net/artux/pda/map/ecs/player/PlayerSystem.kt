@@ -33,7 +33,12 @@ class PlayerSystem @Inject constructor(
     private val mm = ComponentMapper.getFor(MoodComponent::class.java)
     private val sm = ComponentMapper.getFor(SpriteComponent::class.java)
     private val hm = ComponentMapper.getFor(HealthComponent::class.java)
-    lateinit var lastDataModel: StoryDataModel
+    private lateinit var lastDataModel: StoryDataModel
+    private val direction: Vector2 = Vector2()
+
+    val healthComponent: HealthComponent get() = hm[player]
+    val position: Vector2
+        get() = pm[player].position
 
     init {
         CoroutineScope(Dispatchers.Main).launch {
@@ -63,8 +68,6 @@ class PlayerSystem @Inject constructor(
                 }
             })
     }
-
-    val direction: Vector2 = Vector2()
 
     override fun update(deltaTime: Float) {
         super.update(deltaTime)
@@ -97,16 +100,12 @@ class PlayerSystem @Inject constructor(
                 alternativeRotation - degrees
             if (direction.x != 0f && direction.y != 0f) {
                 val step = difference * deltaTime * 20
-                spriteComponent.rotation = spriteComponent.rotation - step
+                spriteComponent.rotation -= step
             }
         }
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {}
-
-    val healthComponent: HealthComponent get() = hm[player]
-    val position: Vector2
-        get() = pm[player].position
 
     override fun dispose() {
         if(isPlayerActive)
@@ -121,9 +120,7 @@ class PlayerSystem @Inject constructor(
     private fun savePreferences() {
         if (isPlayerActive) {
             val preferences = Gdx.app.getPreferences("player")
-            val healthComponent = healthComponent
             preferences.putFloat("health", healthComponent.health)
-            preferences.putFloat("radiation", healthComponent.radiation)
             preferences.flush()
         }
     }
@@ -131,10 +128,11 @@ class PlayerSystem @Inject constructor(
     private fun loadPreferences() {
         if (isPlayerActive) {
             val preferences = Gdx.app.getPreferences("player")
-            val healthComponent = healthComponent
             healthComponent.health = preferences.getFloat("health", 100f)
-            if (healthComponent.isDead()) healthComponent.health = 50f
-            healthComponent.radiation = preferences.getFloat("radiation", 0f)
+            if (healthComponent.health < 50) {
+                healthComponent.health = 100f
+                healthComponent.radiation = 0f
+            }
         }
     }
 

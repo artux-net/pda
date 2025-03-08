@@ -98,7 +98,7 @@ class WeaponComponent : Component {
             bulletModel = null
             return
         }
-        if (item != null && selected!!.bulletId == item.baseId)
+        if (selected!!.bulletId == item.baseId)
             bulletModel = item
     }
 

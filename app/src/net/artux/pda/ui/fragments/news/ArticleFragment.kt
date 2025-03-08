@@ -11,8 +11,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
-import com.yandex.mobile.ads.banner.BannerAdSize
-import com.yandex.mobile.ads.common.AdRequest
 import net.artux.pda.R
 import net.artux.pda.databinding.FragmentInputBinding
 import net.artux.pda.databinding.FragmentListBinding
@@ -89,12 +87,6 @@ class ArticleFragment : WebFragment(), View.OnClickListener, CommentsAdapter.OnC
         newsViewModel.status.observe(viewLifecycleOwner) {
             Toast.makeText(requireContext(), it.description, Toast.LENGTH_SHORT).show()
         }
-
-        val ad = binding.adView
-        ad.setAdUnitId(getString(R.string.news_ads_banner_id))
-        ad.setAdSize(BannerAdSize.stickySize(requireContext(), ad.width))
-        val adRequest: AdRequest = AdRequest.Builder().build()
-        ad.loadAd(adRequest)
     }
 
     override fun onDestroy() {

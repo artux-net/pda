@@ -77,7 +77,7 @@ class DialogsFragment : BaseFragment(), DialogsAdapter.OnClickListener {
     override fun onLongClick(model: ConversationDTO?): Boolean {
         val builder = AlertDialog.Builder(requireContext(), R.style.PDADialogStyle)
         builder.setTitle(getString(R.string.delete_chat, model?.title))
-        builder.setPositiveButton(R.string.yes) { dialog, _ ->
+        builder.setPositiveButton(R.string.yes) { _, _ ->
             model?.id?.let { conversationsViewModel.delete(it) }
         }
         builder.setNegativeButton(R.string.no) { _, _ -> }

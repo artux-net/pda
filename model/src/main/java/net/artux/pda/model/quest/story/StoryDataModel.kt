@@ -14,17 +14,19 @@ import java.io.Serializable
 import java.util.LinkedList
 import java.util.Optional
 
-class StoryDataModel : Serializable {
-    var name: String? = null
-    var nickname: String? = null
-    var login: String? = null
+data class StoryDataModel(
+    var name: String? = null,
+    var nickname: String? = null,
+    var login: String,
+    var money: Int = 0,
+    var xp: Int = 0,
+    var pdaId: Int = 0,
+    var gang: Gang? = null,
+    var relations: GangRelation? = null
+) : Serializable {
+
     var avatar: String? = null
         get() = if (field!!.contains("http")) field else "textures/avatars/a$field.png"
-    var money = 0
-    var xp = 0
-    var pdaId = 0
-    var gang: Gang? = null
-    var relations: GangRelation? = null
     var parameters: MutableList<ParameterModel> = mutableListOf()
     var storyStates: MutableList<StoryStateModel> = mutableListOf()
     var armors: MutableList<ArmorModel> = mutableListOf()
@@ -156,7 +158,7 @@ class StoryDataModel : Serializable {
     val rang: Rang
         get() = getRang(xp)
 
-    enum class Rang constructor(
+    enum class Rang(
         val id: Int,
         val xp: Int,
         val isLast: Boolean = false

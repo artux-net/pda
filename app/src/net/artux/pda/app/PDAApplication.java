@@ -5,8 +5,6 @@ import android.media.MediaPlayer;
 import android.media.SoundPool;
 
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.yandex.mobile.ads.common.MobileAds;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.R;
@@ -44,7 +42,6 @@ public class PDAApplication extends Application {
         Timber.i(getString(R.string.hello_message));
         Timber.i("Сталкерский ПДА запущен, версия: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + "), тип: " + BuildConfig.BUILD_TYPE);
         Timber.i("Режим тестирования: %s", properties.get(PropertyFields.TESTER_MODE));
-        MobileAds.initialize(this, () -> Timber.i("Инициализирован Yandex ADS SDK"));
         URLHelper.init(properties);
     }
 

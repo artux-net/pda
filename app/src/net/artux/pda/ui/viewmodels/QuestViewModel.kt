@@ -27,6 +27,7 @@ import net.artux.pda.repositories.UserRepository
 import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
 import net.artux.pda.utils.AdType
 import timber.log.Timber
+import kotlin.random.Random
 
 @HiltViewModel
 class QuestViewModel @javax.inject.Inject constructor(
@@ -156,7 +157,7 @@ class QuestViewModel @javax.inject.Inject constructor(
         if (texts.isNotEmpty() && texts[0].text.isNotBlank())
             summaryRepository.check(
                 UserMessage(
-                    chapterStage.title,
+                    chapterStage.title!!,
                     chapterStage.texts[0].text,
                     chapterStage.background
                 )
@@ -183,7 +184,9 @@ class QuestViewModel @javax.inject.Inject constructor(
                                     if (chapterStage.data!!.containsKey("pos"))
                                         it.defPos = chapterStage.data!!["pos"].toString()
                                     Timber.i("${storyData.value}")
-                                    commandController.showAd(AdType.TRANSFER_VIDEO)
+                                    if (Random.nextFloat() < 0.1f) {
+                                        commandController.showAd(AdType.TRANSFER_VIDEO)
+                                    }
                                     map.postValue(it)
                                 }
                                 .onFailure { status.postValue(StatusModel(it)) }

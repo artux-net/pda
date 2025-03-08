@@ -53,12 +53,6 @@ jobs:
           releaseFiles: ${{steps.sign_apk_dev.outputs.signedReleaseFile}}
           track: internalsharing
 
-      - name: Read release notes
-        id: updates
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./releaseNotes/whatsnew-ru-RU
-
       - name: Send message to Artux channel
         uses: appleboy/telegram-action@master
         with:
@@ -71,7 +65,7 @@ jobs:
             ${{steps.upload.outputs.internalSharingDownloadUrls}}
             
             Изменения:
-            ${{ steps.updates.outputs.content }}
+            ${{ github.event.head_commit.message }}
 
   build-release:
     name: Release Build
@@ -117,12 +111,6 @@ jobs:
           releaseFiles: ${{steps.sign_apk.outputs.signedReleaseFile}}
           track: internal
 
-      - name: Read release notes
-        id: updates
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./releaseNotes/whatsnew-ru-RU
-
       - name: Send message to Artux channel
         uses: appleboy/telegram-action@master
         with:
@@ -133,4 +121,4 @@ jobs:
             
             Ожидает публикации в beta-канале Google Play
             Изменения:
-            ${{ steps.updates.outputs.content }}
+            ${{ github.event.head_commit.message }}

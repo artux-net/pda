@@ -1,6 +1,7 @@
 package net.artux.pda.di
 
 import android.content.Context
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.Module
 import dagger.Provides
@@ -16,7 +17,8 @@ import net.artux.pda.utils.InternalLogTree
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import java.io.IOException
-import java.util.*
+import java.util.LinkedList
+import java.util.Properties
 import javax.inject.Singleton
 
 
@@ -63,4 +65,10 @@ class AppModule {
     fun internalLogTree(): InternalLogTree {
         return InternalLogTree()
     }
+
+    @Provides
+    @Singleton
+    fun firebaseAnalytics(@ApplicationContext context: Context)
+        = FirebaseAnalytics.getInstance(context)
+
 }

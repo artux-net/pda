@@ -15,24 +15,18 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import com.appodeal.ads.Appodeal
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.datatransport.Event
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.logEvent
 import com.google.gson.Gson
-import com.yandex.mobile.ads.common.AdRequestConfiguration
-import com.yandex.mobile.ads.common.AdRequestError
-import com.yandex.mobile.ads.interstitial.InterstitialAd
-import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
-import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
-import com.yandex.mobile.ads.rewarded.RewardedAd
-import com.yandex.mobile.ads.rewarded.RewardedAdLoadListener
-import com.yandex.mobile.ads.rewarded.RewardedAdLoader
 import dagger.hilt.android.AndroidEntryPoint
 import net.artux.pda.R
 import net.artux.pda.gdx.CoreFragment
-import net.artux.pda.gdx.InterstitialAdListener
-import net.artux.pda.gdx.VideoAdListener
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.quest.ChapterModel
@@ -53,22 +47,24 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
-    @JvmField
+    
     @Inject
-    var gson: Gson? = null
+    lateinit var gson: Gson
 
-    @JvmField
     @Inject
-    var soundManager: QuestSoundManager? = null
+    lateinit var soundManager: QuestSoundManager
 
     private val questViewModel: QuestViewModel by viewModels()
     private val commandViewModel: CommandViewModel by viewModels()
 
     private lateinit var switcher: ImageSwitcher
-    private var coreFragment: CoreFragment? = null
-    private var stageRootFragment: StageRootFragment? = null
+    private lateinit var coreFragment: CoreFragment
+    private lateinit var stageRootFragment: StageRootFragment
     private var currentBackground = ""
     private var currentFragment: Fragment? = null
+
+    @Inject
+    lateinit var firebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,11 +77,11 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
 
             //preload images
             for (stage in chapter.stages.values) {
-                if (stage.background != null && !stage.background!!.isEmpty()) {
-                    val background_url = URLHelper.getResourceURL(stage.background)
+                if (stage.background != null && !stage.background.isNullOrEmpty()) {
+                    val backgroundUrl = URLHelper.getResourceURL(stage.background)
                     Glide.with(this@QuestActivity)
                         .downloadOnly()
-                        .load(background_url)
+                        .load(backgroundUrl)
                         .submit()
                 }
             }
@@ -110,7 +106,7 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
             builder.setMessage(notificationModel.message)
             val dialog = builder.create()
             val window = dialog.window
-            window!!.setGravity(Gravity.START)
+            window?.setGravity(Gravity.START)
             dialog.show()
         }
         commandViewModel.sellerEvent.observe(this) { data: Event<Int> ->
@@ -135,36 +131,19 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
             val probability = Random().nextFloat()
             if (type.defaultProbability > probability) return@observe
             if (type.isRewarded) {
-                RewardedAdLoader(this).apply {
-                    setAdLoadListener(object : RewardedAdLoadListener {
-                        override fun onAdLoaded(rewardedAd: RewardedAd) {
-                            rewardedAd.setAdEventListener(VideoAdListener(commandViewModel))
-                            rewardedAd.show(this@QuestActivity)
-                        }
-
-                        override fun onAdFailedToLoad(adRequestError: AdRequestError) {}
-                    })
-                }.loadAd(
-                    AdRequestConfiguration.Builder(type.adUnitId)
-                        .build()
-                )
+                if (Appodeal.isLoaded(Appodeal.REWARDED_VIDEO)) {
+                    firebaseAnalytics.logEvent("rewarded_ad_show"){
+                        param("type", type.name)
+                    }
+                    Appodeal.show(this, Appodeal.REWARDED_VIDEO)
+                }
             } else {
-                InterstitialAdLoader(this).apply {
-                    setAdLoadListener(object : InterstitialAdLoadListener {
-                        override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                            interstitialAd.setAdEventListener(
-                                InterstitialAdListener(commandViewModel)
-                            )
-                            interstitialAd.show(this@QuestActivity)
-                        }
-
-                        override fun onAdFailedToLoad(p0: AdRequestError) {}
-
-                    })
-                }.loadAd(
-                    AdRequestConfiguration.Builder(type.adUnitId)
-                        .build()
-                )
+                if (Appodeal.isLoaded(Appodeal.INTERSTITIAL)) {
+                    firebaseAnalytics.logEvent("interstitial_ad_show"){
+                        param("type", type.name)
+                    }
+                    Appodeal.show(this, Appodeal.INTERSTITIAL)
+                }
             }
 
         }
@@ -183,27 +162,27 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
         get() = currentFragment === coreFragment
 
     private fun setStage(stageModel: StageModel) {
-        soundManager!!.resume()
+        soundManager.resume()
         val mFragmentTransaction = supportFragmentManager.beginTransaction()
-        if (coreFragment!!.isAdded) {
-            mFragmentTransaction.hide(coreFragment!!)
-            mFragmentTransaction.setMaxLifecycle(coreFragment!!, Lifecycle.State.STARTED)
+        if (coreFragment.isAdded) {
+            mFragmentTransaction.hide(coreFragment)
+            mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.STARTED)
         }
-        if (!stageRootFragment!!.isAdded) mFragmentTransaction.add(
+        if (!stageRootFragment.isAdded) mFragmentTransaction.add(
             R.id.containerView,
-            stageRootFragment!!,
+            stageRootFragment,
             "root"
         )
         mFragmentTransaction
             .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-            .show(stageRootFragment!!)
+            .show(stageRootFragment)
             .commitNow()
-        stageRootFragment!!.setStage(stageModel)
+        stageRootFragment.setStage(stageModel)
         currentFragment = stageRootFragment
     }
 
     private fun startMap(provider: ViewModelProvider, map: GameMap) {
-        soundManager!!.pause()
+        soundManager.pause()
         val mFragmentTransaction = supportFragmentManager.beginTransaction()
         val args = Bundle()
         args.putSerializable("map", map)
@@ -212,18 +191,18 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
         args.putSerializable("user", provider[UserViewModel::class.java].getFromCache())
         args.putSerializable("items", provider[SellerViewModel::class.java].getItems())
         args.putBoolean("updated", true)
-        coreFragment!!.arguments = args
-        if (coreFragment!!.isAdded) {
-            if (coreFragment!!.isHidden) {
-                mFragmentTransaction.setMaxLifecycle(coreFragment!!, Lifecycle.State.RESUMED)
-                mFragmentTransaction.show(coreFragment!!)
+        coreFragment.arguments = args
+        if (coreFragment.isAdded) {
+            if (coreFragment.isHidden) {
+                mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.RESUMED)
+                mFragmentTransaction.show(coreFragment)
             } else {
-                coreFragment!!.onResume()
+                coreFragment.onResume()
             }
         }
         mFragmentTransaction
             .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-            .replace(R.id.containerView, coreFragment!!)
+            .replace(R.id.containerView, coreFragment)
             .commitNow()
         currentFragment = coreFragment
     }
@@ -248,6 +227,11 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
 
             // загрузка последней стадии или намеренной
             questViewModel.beginWithStage(storyId, chapter, stage.toLong(), sync)
+            firebaseAnalytics.logEvent("stage_begin"){
+                param("story_id", storyId.toString())
+                param("chapter_id", chapter.toString())
+                param("stage_id", stage.toString())
+            }
             Timber.i("Story started from args %d, %d, %d", storyId, chapter, stage)
         } else {
             questViewModel.beginWithStage(keys[0], keys[1], keys[2].toLong(), true)
@@ -275,17 +259,17 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
 
     override fun onPause() {
         super.onPause()
-        soundManager!!.pause()
+        soundManager.pause()
     }
 
     override fun onResume() {
         super.onResume()
-        soundManager!!.resume()
+        soundManager.resume()
     }
 
     override fun onDestroy() {
         Timber.i("QuestActivity destroyed")
-        soundManager!!.stop()
+        soundManager.stop()
         super.onDestroy()
     }
 

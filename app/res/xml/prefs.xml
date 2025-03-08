@@ -98,6 +98,11 @@
 
         <Preference
             app:iconSpaceReserved="false"
+            app:key="test_ads"
+            app:title="@string/test_ads" />
+
+        <Preference
+            app:iconSpaceReserved="false"
             app:key="save_logs"
             app:title="@string/save_logs" />
 

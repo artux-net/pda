@@ -19,7 +19,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.logEvent
 import dagger.hilt.android.AndroidEntryPoint
+import net.artux.pda.BuildConfig
 import net.artux.pda.R
 import net.artux.pda.model.StatusModel
 import net.artux.pda.model.user.RegisterUserModel
@@ -31,6 +34,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.util.Random
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RegisterActivity : AppCompatActivity() {
@@ -45,6 +49,9 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var mLoginFormView: View
     private lateinit var avatarsAdapter: AvatarsAdapter
     private val authViewModel: AuthViewModel by viewModels()
+
+    @Inject
+    lateinit var firebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -181,6 +188,9 @@ class RegisterActivity : AppCompatActivity() {
                 mPasswordView.text.toString(), avatarsAdapter.selected.toString()
             )
             showProgress(true)
+            firebaseAnalytics.logEvent("account_register"){
+                param("app_version", BuildConfig.VERSION_NAME)
+            }
             authViewModel.registerUser(registerUserModel)
         }
     }

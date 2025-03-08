@@ -14,8 +14,10 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.appodeal.ads.Appodeal
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
+import net.artux.pda.BuildConfig
 import net.artux.pda.R
 import net.artux.pda.ui.activities.LogActivity
 import net.artux.pda.ui.activities.LoginActivity
@@ -62,7 +64,7 @@ class PrefsFragment : PreferenceFragmentCompat() {
                 Timber.e("Получен неуспешный код: $it")
             }
         }
-        navigationPresenter = (requireActivity() as MainActivity).presenter
+        navigationPresenter = (requireActivity() as MainActivity).presenter!!
         navigationPresenter.setTitle(getString(R.string.settings))
 
         val signOutPreference = findPreference<Preference>("sign_out")
@@ -125,6 +127,13 @@ class PrefsFragment : PreferenceFragmentCompat() {
         saveLogsPreference?.setOnPreferenceClickListener {
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
             launcher.launch(intent)
+            true
+        }
+
+        val testAds = findPreference<Preference>("test_ads")
+        testAds?.isEnabled = BuildConfig.DEBUG
+        testAds?.setOnPreferenceClickListener {
+            Appodeal.startTestActivity(requireActivity())
             true
         }
 

@@ -15,8 +15,8 @@ repositories {
 }
 
 object PluginsVersions {
-    const val KOTLIN = "1.8.0"
-    const val DAGGER = "2.46.1"
+    const val KOTLIN = "2.0.0"
+    const val DAGGER = "2.51.1"
 }
 
 dependencies {
@@ -28,7 +28,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${PluginsVersions.KOTLIN}")
     implementation("com.google.dagger:hilt-android-gradle-plugin:${PluginsVersions.DAGGER}")
 
-    implementation("com.google.gms:google-services:4.4.0")
+    implementation("com.google.gms:google-services:4.4.2")
     implementation("com.google.firebase:firebase-crashlytics-gradle:2.9.9")
 
     implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.8.20")

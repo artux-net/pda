@@ -1,7 +1,5 @@
 package net.artux.pda.map.service
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Net
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

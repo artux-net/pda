@@ -73,7 +73,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
                 itemView.setBackgroundColor(Color.rgb(30, 40, 50));
             ProfileHelper.setAvatar(avatar, userInfo.avatar);
             title.setText(title.getContext().getString(R.string.rating_title, userInfo.login,
-                    String.valueOf(userInfo.pdaId), String.valueOf(ProfileHelper.getRangTitleByXp(userInfo.xp, title.getContext()))));
+                    String.valueOf(userInfo.pdaId), ProfileHelper.getRangTitleByXp(userInfo.xp, title.getContext())));
 
             desc.setText(desc.getContext().getString(R.string.rating_desc,
                     ProfileHelper.getGroup(desc.getContext(), userInfo.gang.getId()),

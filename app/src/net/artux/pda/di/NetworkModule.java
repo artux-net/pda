@@ -2,6 +2,8 @@ package net.artux.pda.di;
 
 import static okhttp3.Protocol.HTTP_2;
 
+import android.os.LocaleList;
+
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.gson.Gson;
@@ -17,9 +19,9 @@ import net.artux.pda.common.PropertyFields;
 import net.artux.pdanetwork.ApiClient;
 import net.artux.pdanetwork.api.DefaultApi;
 
+
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -45,13 +47,13 @@ public class NetworkModule {
     @Provides
     @Singleton
     public OkHttpClient httpClient(DataManager dataManager) {
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
+                .retryOnConnectionFailure(true);
         httpClient.addInterceptor(chain -> {
             Request original = chain.request();
             Request.Builder requestBuilder = original
                     .newBuilder()
-                    .addHeader("assets/locale", Locale.getDefault().getLanguage());
+                    .addHeader("Accept-Language", LocaleList.getDefault().toLanguageTags());
 
             if (dataManager.isAuthenticated()) {
                 requestBuilder.addHeader("Authorization", dataManager.getAuthToken());
@@ -59,6 +61,7 @@ public class NetworkModule {
 
             try {
                 Timber.d("Request: %s", chain.request().toString());
+
                 return chain.proceed(requestBuilder.build());
             } catch (Exception e) {
                 Timber.w(e);
@@ -72,6 +75,8 @@ public class NetworkModule {
             }
 
         });
+
+        httpClient.addNetworkInterceptor(new ExponentialBackoffRetryInterceptor(4, 1000, 32000));
 
 
         httpClient.connectTimeout(10, TimeUnit.SECONDS)

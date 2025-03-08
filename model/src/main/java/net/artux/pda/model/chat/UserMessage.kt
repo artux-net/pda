@@ -31,7 +31,7 @@ data class UserMessage(
         message,
         Instant.now()
     ) {
-        author = UserModel()
+        author = UserModel(storyDataModel.login)
         author.login = storyDataModel.login
         author.avatar = storyDataModel.avatar
         author.pdaId = storyDataModel.pdaId
@@ -39,14 +39,13 @@ data class UserMessage(
         author.gang = storyDataModel.gang
     }
 
-    constructor(senderLogin: String?, message: String, avatarId: String?) : this(
+    constructor(senderLogin: String, message: String, avatarId: String?) : this(
         UUID.randomUUID(),
         Type.NEW,
         message,
         Instant.now()
     ) {
-        author = UserModel()
-        author.login = senderLogin
+        author = UserModel(senderLogin)
         author.avatar = avatarId
         author.name = senderLogin
         author.nickname = ""

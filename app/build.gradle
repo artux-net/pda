@@ -9,20 +9,20 @@ plugins {
     id "com.google.firebase.crashlytics"
 }
 
-task downloadAPI {
+def apiFile = file("api.json")
+tasks.register('downloadAPI') {
     def url = new URL("https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest")
     def uc = url.openConnection()
     def userPass = "pass"
     def basicAuth = "Basic " + new String(Base64.getEncoder().encode(userPass.getBytes()))
     uc.setRequestProperty("Authorization", basicAuth)
-
-    def f = new File("app/api.json")
-    uc.getInputStream().transferTo(new FileOutputStream(f))
+    uc.getInputStream().transferTo(new FileOutputStream(apiFile))
 }
+
 
 swaggerSources {
     pdanetwork {
-        inputFile = file("api.json")
+        inputFile = apiFile
         code {
             language = "java"
             configFile = file("apiconfig.json")
@@ -32,20 +32,13 @@ swaggerSources {
 }
 
 gradle.projectsEvaluated {
-    preBuild.dependsOn downloadAPI
+    if (!apiFile.exists()){
+        preBuild.dependsOn(downloadAPI)
+    }
     preBuild.dependsOn swaggerSources.pdanetwork.code
 }
 
 android {
-    signingConfigs {
-        release {
-            storeFile file(keystore)
-            storePassword "pass"
-            keyAlias "pda"
-            keyPassword "pass"
-        }
-    }
-
     namespace "net.artux.pda"
     sourceSets {
         main {
@@ -59,9 +52,7 @@ android {
 
     }
     packaging {
-        resources {
-            excludes.add("META-INF/*")
-        }
+        resources.excludes.add("META-INF/*")
     }
 
     defaultConfig {
@@ -77,19 +68,16 @@ android {
         signingConfig signingConfigs.debug
     }
 
-    applicationVariants.all { variant ->
-        {
-            // add versions to resources
-            variant.resValue "string", "versionName", variant.versionName
-            variant.resValue "string", "versionCode", variant.versionCode.toString()
-        }
+    applicationVariants.configureEach { variant ->
+        // add versions to resources
+        variant.resValue "string", "versionName", variant.versionName
+        variant.resValue "string", "versionCode", variant.versionCode.toString()
     }
 
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources false
-            signingConfig signingConfigs.release
 
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
@@ -101,7 +89,6 @@ android {
 
         debug {
             debuggable true
-            signingConfig signingConfigs.release
 
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
@@ -141,7 +128,7 @@ ext {
     json_fire_version = "1.8.0"
     mapstruct_version = "1.5.2.Final"
     glide_version = "4.12.0"
-    dagger_version = "2.46.1"
+    dagger_version = "2.51.1"
     retrofit_version = "2.9.0"
     androidx_version = "2.6.1"
 }
@@ -164,7 +151,8 @@ dependencies {
     implementation "org.threeten:threetenbp:$threetenbp_version"
     implementation "javax.annotation:javax.annotation-api:1.3.2"
 
-    implementation "com.google.firebase:firebase-ads:22.0.0"
+    // https://mvnrepository.com/artifact/com.google.android.datatransport/transport-runtime
+    implementation group: 'com.google.android.datatransport', name: 'transport-runtime', version: '3.3.0'
 
     //androidx
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$androidx_version"
@@ -194,13 +182,14 @@ dependencies {
     implementation "com.github.bastienpaulfr:Treessence:1.0.5"
 
     //firebase
-    implementation platform("com.google.firebase:firebase-bom:30.3.2")
+    implementation platform("com.google.firebase:firebase-bom:33.1.2")
     implementation "com.google.firebase:firebase-analytics"
     implementation "com.google.firebase:firebase-config"
     implementation "com.google.firebase:firebase-crashlytics"
 
     //ktx
     implementation "org.jetbrains.kotlin:kotlin-stdlib:${Versions.KOTLIN}"
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
 
     implementation "com.github.bumptech.glide:glide:$glide_version"
@@ -219,7 +208,13 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
     //ads
-    implementation 'com.yandex.android:mobileads:6.0.1'
+    implementation("com.appodeal.ads:sdk:3.3.1.0") {
+        exclude group: "com.appodeal.ads.sdk.services", module: "adjust"
+        exclude group: "com.appodeal.ads.sdk.services", module: "appsflyer"
+        exclude group: "com.appodeal.ads.sdk.services", module: "facebook_analytics"
+        exclude group: "com.appodeal.ads.sdk.services", module: "firebase"
+        exclude group: "com.appodeal.ads.sdk.services", module: "sentry_analytics"
+    }
 
     dokkaPlugin 'org.jetbrains.dokka:android-documentation-plugin:1.8.20'
 }

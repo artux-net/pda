@@ -2,7 +2,6 @@ package net.artux.pda.ui.activities
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.annotation.TargetApi
 import android.app.Activity
 import android.app.LoaderManager
 import android.content.ActivityNotFoundException
@@ -12,7 +11,6 @@ import android.content.Intent
 import android.content.Loader
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.text.InputType
@@ -29,6 +27,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.logEvent
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import dagger.hilt.android.AndroidEntryPoint
 import net.artux.pda.BuildConfig
@@ -55,7 +55,10 @@ open class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cu
     private val authViewModel: AuthViewModel by viewModels()
 
     @Inject
-    protected lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
+    lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
+
+    @Inject
+    lateinit var firebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -143,6 +146,9 @@ open class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cu
             // perform the user login attempt.
             loginUser = LoginUser(email, password)
             showProgress(true)
+            firebaseAnalytics.logEvent("account_login"){
+                param("app_version", BuildConfig.VERSION_NAME)
+            }
             authViewModel.login(loginUser!!)
         }
     }
@@ -204,37 +210,29 @@ open class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cu
         return password.matches(PASSWORD_VALIDATION_REGEX)
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private fun showProgress(show: Boolean) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime)
-            mLoginFormView.visibility = if (show) View.GONE else View.VISIBLE
-            mLoginFormView.animate().setDuration(shortAnimTime.toLong()).alpha(
-                (
-                        if (show) 0 else 1).toFloat()
-            ).setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    mLoginFormView.visibility = if (show) View.GONE else View.VISIBLE
-                }
-            })
-            mProgressView.visibility = if (show) View.VISIBLE else View.GONE
-            mProgressView.visibility = if (show) View.VISIBLE else View.GONE
-            /*mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });*/
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.visibility = if (show) View.VISIBLE else View.GONE
-            mLoginFormView.visibility = if (show) View.GONE else View.VISIBLE
+        val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime)
+        mLoginFormView.visibility = if (show) View.GONE else View.VISIBLE
+        mLoginFormView.animate().setDuration(shortAnimTime.toLong()).alpha(
+            (
+                    if (show) 0 else 1).toFloat()
+        ).setListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                mLoginFormView.visibility = if (show) View.GONE else View.VISIBLE
+            }
+        })
+        mProgressView.visibility = if (show) View.VISIBLE else View.GONE
+        mProgressView.visibility = if (show) View.VISIBLE else View.GONE
+        /*mProgressView.animate().setDuration(shortAnimTime).alpha(
+            show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
         }
+    });*/
     }
 
     override fun onCreateLoader(i: Int, bundle: Bundle): Loader<Cursor> {
