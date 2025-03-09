@@ -20,52 +20,51 @@ inputs:
   service_account_json:
     type: string
     description: Service account JSON for Google Play
-
 outputs:
   date:
     value: ${{ steps.upload.outputs.internalSharingDownloadUrls }}
     description: "Link to download"
-
 runs:
   using: composite
   steps:
-    - name: Set preview environment variables
-      if: ${{ github.event.inputs.profile == 'preview' }}
-      shell: bash
-      run: |
-        echo "::set-output name=GOOGLE_PLAY_TRACK::internalsharing"
-        echo "::set-output name=GRADLE_TASK::assembleDebug"
-        echo "::set-output name=RELEASE_DIRECTORY::app/build/outputs/apk/debug"
-        echo "::set-output name=VERSION::${{ steps.date.outputs.date }}-preview"
-
-    - name: Set beta environment variables
-      if: ${{ github.event.inputs.profile == 'beta' }}
-      shell: bash
-      run: |
-        echo "::set-output name=GOOGLE_PLAY_TRACK::internal"
-        echo "::set-output name=GRADLE_TASK::assembleRelease"
-        echo "::set-output name=RELEASE_DIRECTORY::app/build/outputs/apk/release"
-        echo "::set-output name=VERSION::${{ steps.date.outputs.date }}"
-
     - uses: ./.github/setup
       id: date
+
+    - name: Set environment variables
+      id: set_env
+      shell: bash
+      run: |
+        if [ "${{ github.event.inputs.profile }}" = "preview" ]; then
+          echo "::set-output name=GOOGLE_PLAY_TRACK::internalsharing"
+          echo "::set-output name=GRADLE_TASK::assembleDebug"
+          echo "::set-output name=RELEASE_DIRECTORY::app/build/outputs/apk/debug"
+          echo "::set-output name=VERSION::${{ steps.date.outputs.date }}-preview"
+        elif [ "${{ github.event.inputs.profile }}" = "beta" ]; then
+          echo "::set-output name=GOOGLE_PLAY_TRACK::internal"
+          echo "::set-output name=GRADLE_TASK::assembleRelease"
+          echo "::set-output name=RELEASE_DIRECTORY::app/build/outputs/apk/release"
+          echo "::set-output name=VERSION::${{ steps.date.outputs.date }}"
+        else
+          echo "Unknown profile: ${{ github.event.inputs.profile }}"
+          exit 1
+        fi
 
     - name: Bump version
       uses: chkfung/android-version-actions@v1.2.1
       with:
         gradlePath: app/build.gradle
         versionCode: ${{ github.run_number }}
-        versionName: ${{ env.VERSION }}
+        versionName: ${{ steps.set_env.outputs.VERSION }}
 
     - name: Build APK
       shell: bash
-      run: ./gradlew ${{ env.GRADLE_TASK }}
+      run: ./gradlew ${{ steps.set_env.outputs.GRADLE_TASK }}
 
     - uses: r0adkll/sign-android-release@v1
       name: Sign APK
       id: sign_apk
       with:
-        releaseDirectory: ${{ env.RELEASE_DIRECTORY }}
+        releaseDirectory: ${{ steps.set_env.outputs.RELEASE_DIRECTORY }}
         signingKeyBase64: ${{ inputs.signing_key }}
         alias: ${{ inputs.key_alias }}
         keyStorePassword: ${{ inputs.keystore_password }}
@@ -80,4 +79,4 @@ runs:
         serviceAccountJsonPlainText: ${{ inputs.service_account_json }}
         packageName: net.artux.pda
         releaseFiles: ${{ steps.sign_apk.outputs.signedReleaseFile }}
-        track: ${{ env.GOOGLE_PLAY_TRACK }}
+        track: ${{ steps.set_env.outputs.GOOGLE_PLAY_TRACK }}
