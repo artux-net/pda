@@ -1,0 +1,66 @@
+name: Build & Deploy
+description: Builds and uploads apk to Google Play
+inputs:
+  profile:
+    type: string
+    description: Profile to build (beta/preview)
+    default: preview
+
+outputs:
+  date:
+    value: ${{ steps.upload.outputs.internalSharingDownloadUrls }}
+    description: "Link to download"
+
+runs:
+  using: composite
+  steps:
+    - name: Set preview environment variables
+      if: ${{ github.event.inputs.profile == 'preview' }}
+      run: |
+        echo "::set-output GOOGLE_PLAY_TRACK=internalsharing
+        echo "::set-output GRADLE_TASK=assembleRelease"
+        echo "::set-output RELEASE_DIRECTORY=app/build/outputs/apk/debug"
+        echo "::set-output VERSION=${{ steps.date.outputs.date }}-preview"
+
+    - name: Set beta environment variables
+      if: ${{ github.event.inputs.profile == 'beta' }}
+      run: |
+        echo "::set-output GOOGLE_PLAY_TRACK=internal"
+        echo "::set-output GRADLE_TASK=assembleDebug"
+        echo "::set-output RELEASE_DIRECTORY=app/build/outputs/apk/release"
+        echo "::set-output VERSION=${{ steps.date.outputs.date }}"
+
+    - uses: ./.github/setup
+      id: date
+
+    - name: Bump version
+      uses: chkfung/android-version-actions@v1.2.1
+      with:
+        gradlePath: app/build.gradle
+        versionCode: ${{ github.run_number }}
+        versionName: ${{ env.VERSION }}
+
+    - name: Build APK
+      run: ./gradlew ${{ env.GRADLE_TASK }}
+
+    - uses: r0adkll/sign-android-release@v1
+      name: Sign APK
+      id: sign_apk
+      with:
+        releaseDirectory: ${{ env.RELEASE_DIRECTORY }}
+        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+        alias: ${{ secrets.key_alias }}
+        keyStorePassword: ${{ secrets.keystore_password }}
+        keyPassword: ${{ secrets.KEY_PASSWORD }}
+      env:
+        BUILD_TOOLS_VERSION: "33.0.0"
+
+    - uses: r0adkll/upload-google-play@v1
+      name: Upload to internal sharing
+      id: upload
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+        packageName: net.artux.pda
+        releaseFiles: ${{ steps.sign_apk.outputs.signedReleaseFile }}
+        track: ${{ env.GOOGLE_PLAY_TRACK }}
+

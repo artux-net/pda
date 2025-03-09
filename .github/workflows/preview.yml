@@ -1,13 +1,11 @@
-name: Beta Build
+name: Preview Build
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Beta build
+    name: Internal build
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
@@ -24,8 +22,10 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Beta сборка ${{github.run_number}}, версия ${{ steps.date.outputs.date }}
+            Preview сборка ${{github.run_number}}, версия ${{ steps.date.outputs.date }}-preview
             
-            Ожидает публикации в beta-канале Google Play
+            Ссылка для скачивания активна три месяца: 
+            ${{steps.assembly.outputs.internalSharingDownloadUrls}}
+            
             Изменения:
             ${{ github.event.head_commit.message }}

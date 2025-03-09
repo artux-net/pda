@@ -38,7 +38,6 @@ import net.artux.pda.model.map.GameMap;
 import net.artux.pda.model.map.SpawnModel;
 import net.artux.pda.model.map.Strength;
 import net.artux.pda.model.user.Gang;
-import net.artux.pda.model.user.GangRelation;
 
 import java.util.Collections;
 import java.util.Iterator;

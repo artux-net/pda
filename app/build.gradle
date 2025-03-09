@@ -215,8 +215,6 @@ dependencies {
         exclude group: "com.appodeal.ads.sdk.services", module: "firebase"
         exclude group: "com.appodeal.ads.sdk.services", module: "sentry_analytics"
     }
-
-    dokkaPlugin 'org.jetbrains.dokka:android-documentation-plugin:1.8.20'
 }
 
 tasks.register('copyAndroidNatives') {
