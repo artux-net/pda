@@ -34,18 +34,18 @@ runs:
       id: set_env
       shell: bash
       run: |
-        if [ "${{ github.event.inputs.profile }}" = "preview" ]; then
-          echo "::set-output name=GOOGLE_PLAY_TRACK::internalsharing"
-          echo "::set-output name=GRADLE_TASK::assembleDebug"
-          echo "::set-output name=RELEASE_DIRECTORY::app/build/outputs/apk/debug"
-          echo "::set-output name=VERSION::${{ steps.date.outputs.date }}-preview"
-        elif [ "${{ github.event.inputs.profile }}" = "beta" ]; then
-          echo "::set-output name=GOOGLE_PLAY_TRACK::internal"
-          echo "::set-output name=GRADLE_TASK::assembleRelease"
-          echo "::set-output name=RELEASE_DIRECTORY::app/build/outputs/apk/release"
-          echo "::set-output name=VERSION::${{ steps.date.outputs.date }}"
+        if [ "${{ inputs.profile }}" = "preview" ]; then
+          echo "GOOGLE_PLAY_TRACK=internalsharing" >> $GITHUB_OUTPUT
+          echo "GRADLE_TASK=assembleDebug" >> $GITHUB_OUTPUT
+          echo "RELEASE_DIRECTORY=app/build/outputs/apk/debug" >> $GITHUB_OUTPUT
+          echo "VERSION=${{ steps.date.outputs.date }}-preview" >> $GITHUB_OUTPUT
+        elif [ "${{ inputs.profile }}" = "beta" ]; then
+          echo "GOOGLE_PLAY_TRACK=internal" >> $GITHUB_OUTPUT
+          echo "GRADLE_TASK=assembleRelease" >> $GITHUB_OUTPUT
+          echo "RELEASE_DIRECTORY=app/build/outputs/apk/release" >> $GITHUB_OUTPUT
+          echo "VERSION=${{ steps.date.outputs.date }}" >> $GITHUB_OUTPUT
         else
-          echo "Unknown profile: ${{ github.event.inputs.profile }}"
+          echo "Unknown profile: ${{ inputs.profile }}"
           exit 1
         fi
 
