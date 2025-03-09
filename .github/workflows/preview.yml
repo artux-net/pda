@@ -15,6 +15,13 @@ jobs:
 
       - uses: ./.github/assembly
         id: assembly
+        with:
+          profile: preview
+          signing_key: ${{ secrets.SIGNING_KEY }}
+          key_alias: ${{ secrets.KEY_ALIAS }}
+          keystore_password: ${{ secrets.KEYSTORE_PASSWORD }}
+          key_password: ${{ secrets.KEY_PASSWORD }}
+          service_account_json: ${{ secrets.SERVICE_ACCOUNT_JSON }}
 
       - name: Send message to Artux channel
         uses: appleboy/telegram-action@master

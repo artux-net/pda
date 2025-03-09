@@ -5,6 +5,21 @@ inputs:
     type: string
     description: Profile to build (beta/preview)
     default: preview
+  signing_key:
+    type: string
+    description: Signing key in base64 format
+  key_alias:
+    type: string
+    description: Key alias for signing
+  keystore_password:
+    type: string
+    description: Keystore password
+  key_password:
+    type: string
+    description: Key password
+  service_account_json:
+    type: string
+    description: Service account JSON for Google Play
 
 outputs:
   date:
@@ -16,19 +31,21 @@ runs:
   steps:
     - name: Set preview environment variables
       if: ${{ github.event.inputs.profile == 'preview' }}
+      shell: bash
       run: |
-        echo "::set-output GOOGLE_PLAY_TRACK=internalsharing
-        echo "::set-output GRADLE_TASK=assembleRelease"
-        echo "::set-output RELEASE_DIRECTORY=app/build/outputs/apk/debug"
-        echo "::set-output VERSION=${{ steps.date.outputs.date }}-preview"
+        echo "::set-output name=GOOGLE_PLAY_TRACK::internalsharing"
+        echo "::set-output name=GRADLE_TASK::assembleDebug"
+        echo "::set-output name=RELEASE_DIRECTORY::app/build/outputs/apk/debug"
+        echo "::set-output name=VERSION::${{ steps.date.outputs.date }}-preview"
 
     - name: Set beta environment variables
       if: ${{ github.event.inputs.profile == 'beta' }}
+      shell: bash
       run: |
-        echo "::set-output GOOGLE_PLAY_TRACK=internal"
-        echo "::set-output GRADLE_TASK=assembleDebug"
-        echo "::set-output RELEASE_DIRECTORY=app/build/outputs/apk/release"
-        echo "::set-output VERSION=${{ steps.date.outputs.date }}"
+        echo "::set-output name=GOOGLE_PLAY_TRACK::internal"
+        echo "::set-output name=GRADLE_TASK::assembleRelease"
+        echo "::set-output name=RELEASE_DIRECTORY::app/build/outputs/apk/release"
+        echo "::set-output name=VERSION::${{ steps.date.outputs.date }}"
 
     - uses: ./.github/setup
       id: date
@@ -41,6 +58,7 @@ runs:
         versionName: ${{ env.VERSION }}
 
     - name: Build APK
+      shell: bash
       run: ./gradlew ${{ env.GRADLE_TASK }}
 
     - uses: r0adkll/sign-android-release@v1
@@ -48,10 +66,10 @@ runs:
       id: sign_apk
       with:
         releaseDirectory: ${{ env.RELEASE_DIRECTORY }}
-        signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-        alias: ${{ secrets.key_alias }}
-        keyStorePassword: ${{ secrets.keystore_password }}
-        keyPassword: ${{ secrets.KEY_PASSWORD }}
+        signingKeyBase64: ${{ inputs.signing_key }}
+        alias: ${{ inputs.key_alias }}
+        keyStorePassword: ${{ inputs.keystore_password }}
+        keyPassword: ${{ inputs.key_password }}
       env:
         BUILD_TOOLS_VERSION: "33.0.0"
 
@@ -59,8 +77,7 @@ runs:
       name: Upload to internal sharing
       id: upload
       with:
-        serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+        serviceAccountJsonPlainText: ${{ inputs.service_account_json }}
         packageName: net.artux.pda
         releaseFiles: ${{ steps.sign_apk.outputs.signedReleaseFile }}
         track: ${{ env.GOOGLE_PLAY_TRACK }}
-
