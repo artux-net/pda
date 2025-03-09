@@ -13,7 +13,6 @@
 -keep class net.artux.pda.map.scenes.** { *; }
 -keep class net.artux.pda.map.content.** { *; }
 
-
 -verbose
 
 -dontwarn android.support.**
@@ -40,6 +39,8 @@
 }
 
 -verbose
+
+-keepattributes StackMapTable
 
 -dontwarn com.badlogic.gdx.backends.android.AndroidFragmentApplication
 

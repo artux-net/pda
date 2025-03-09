@@ -114,6 +114,7 @@ android {
         viewBinding true
         aidl true
     }
+
     lint {
         abortOnError false
     }
@@ -208,7 +209,7 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:$dagger_version"
 
     //ads
-    implementation("com.appodeal.ads:sdk:3.3.1.0") {
+    implementation("com.appodeal.ads:sdk:3.5.0.0") {
         exclude group: "com.appodeal.ads.sdk.services", module: "adjust"
         exclude group: "com.appodeal.ads.sdk.services", module: "appsflyer"
         exclude group: "com.appodeal.ads.sdk.services", module: "facebook_analytics"
