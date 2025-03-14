@@ -10,7 +10,7 @@ runs:
     - name: Get current date
       id: date
       shell: bash
-      run: echo "date=$(date +'%Y.%m.%d')" >> $GITHUB_OUTPUT
+      run: echo "date=$(date +'%Y.%m')" >> $GITHUB_OUTPUT
 
     - name: Setup JDK
       uses: actions/setup-java@v4

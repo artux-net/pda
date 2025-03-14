@@ -20,7 +20,8 @@ jobs:
           token: ${{secrets.token}}
           submodules: recursive
 
-      - uses: ./.github/assembly
+      - name: Build & Deploy
+        uses: ./.github/assembly
         id: assembly
         with:
           profile: preview
@@ -30,7 +31,7 @@ jobs:
           key_password: ${{ secrets.KEY_PASSWORD }}
           service_account_json: ${{ secrets.SERVICE_ACCOUNT_JSON }}
 
-      - name: Вычисление даты окончания (через 3 месяца, русский формат)
+      - name: Вычисление даты окончания
         id: expiration
         run: |
           expiration_date=$(date -d "+3 months" +"%d.%m.%Y")
@@ -43,10 +44,10 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Preview сборка ${{github.run_number}}, версия ${{ steps.date.outputs.date }}-preview
-            ${{ github.event.pull_request.title }}
+            Preview сборка ${{github.run_number}}, версия ${{ steps.assembly.outputs.versionName }}
+            ${{ github.event.issue.pull_request.title }}
             Автор: ${{ github.actor }}
-            PR: ${{ github.event.pull_request.html_url }}
+            PR: ${{ github.event.issue.pull_request.html_url }}
             
             Ссылка для скачивания активна до ${{ steps.expiration.outputs.expiration_date }}
             ${{steps.assembly.outputs.internalSharingDownloadUrls}}

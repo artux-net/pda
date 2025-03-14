@@ -24,6 +24,9 @@ outputs:
   internalSharingDownloadUrls:
     value: ${{ steps.upload.outputs.internalSharingDownloadUrls }}
     description: "Link to download"
+  versionName:
+    value: ${{ steps.set_env.outputs.VERSION }}
+    description: "Version name"
 runs:
   using: composite
   steps:
