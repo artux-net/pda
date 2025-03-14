@@ -1,12 +1,19 @@
 name: Preview Build
 
 on:
-  workflow_dispatch:
+  issue_comment:
+    types: [ created ]
 
 jobs:
   build:
     name: Internal build
     runs-on: ubuntu-20.04
+    if: >-
+      github.event.issue.pull_request != '' && 
+      (
+        contains(github.event.comment.body, '/preview') || 
+        contains(github.event.comment.body, '/build')
+      )
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,6 +30,13 @@ jobs:
           key_password: ${{ secrets.KEY_PASSWORD }}
           service_account_json: ${{ secrets.SERVICE_ACCOUNT_JSON }}
 
+      - name: Вычисление даты окончания (через 3 месяца, русский формат)
+        id: expiration
+        run: |
+          expiration_date=$(date -d "+3 months" +"%d.%m.%Y")
+          echo "expiration_date=$expiration_date" >> $GITHUB_OUTPUT
+          echo "$expiration_date - Ссылка для скачивания действительна до этой даты"
+
       - name: Send message to Artux channel
         uses: appleboy/telegram-action@master
         with:
@@ -30,9 +44,9 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
             Preview сборка ${{github.run_number}}, версия ${{ steps.date.outputs.date }}-preview
+            ${{ github.event.pull_request.title }}
+            Автор: ${{ github.actor }}
+            PR: ${{ github.event.pull_request.html_url }}
             
-            Ссылка для скачивания активна три месяца: 
+            Ссылка для скачивания активна до ${{ steps.expiration.outputs.expiration_date }}
             ${{steps.assembly.outputs.internalSharingDownloadUrls}}
-            
-            Изменения:
-            ${{ github.event.head_commit.message }}

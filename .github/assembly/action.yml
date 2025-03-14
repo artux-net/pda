@@ -21,7 +21,7 @@ inputs:
     type: string
     description: Service account JSON for Google Play
 outputs:
-  date:
+  internalSharingDownloadUrls:
     value: ${{ steps.upload.outputs.internalSharingDownloadUrls }}
     description: "Link to download"
 runs:
