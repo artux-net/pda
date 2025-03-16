@@ -1,17 +1,8 @@
 name: Setup
 description: Setup project
-outputs:
-  date:
-    value: ${{ steps.date.outputs.date }}
-    description: "Current date"
 runs:
   using: composite
   steps:
-    - name: Get current date
-      id: date
-      shell: bash
-      run: echo "date=$(date +'%Y.%m')" >> $GITHUB_OUTPUT
-
     - name: Setup JDK
       uses: actions/setup-java@v4
       with:

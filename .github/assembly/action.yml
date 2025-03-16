@@ -27,26 +27,32 @@ outputs:
   versionName:
     value: ${{ steps.set_env.outputs.VERSION }}
     description: "Version name"
+  versionCode:
+    value: ${{ steps.set_env.outputs.VERSION_CODE }}
+    description: "Version code"
 runs:
   using: composite
   steps:
     - uses: ./.github/setup
-      id: date
+
+    - uses: paulhatch/semantic-version@v5.4.0
+      id: semantic_versioning
 
     - name: Set environment variables
       id: set_env
       shell: bash
       run: |
+        echo "VERSION_CODE=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
         if [ "${{ inputs.profile }}" = "preview" ]; then
           echo "GOOGLE_PLAY_TRACK=internalsharing" >> $GITHUB_OUTPUT
           echo "GRADLE_TASK=assembleDebug" >> $GITHUB_OUTPUT
           echo "RELEASE_DIRECTORY=app/build/outputs/apk/debug" >> $GITHUB_OUTPUT
-          echo "VERSION=${{ steps.date.outputs.date }}-preview" >> $GITHUB_OUTPUT
+          echo "VERSION=${{ steps.semantic_versioning.outputs.version }}-preview" >> $GITHUB_OUTPUT
         elif [ "${{ inputs.profile }}" = "beta" ]; then
           echo "GOOGLE_PLAY_TRACK=internal" >> $GITHUB_OUTPUT
           echo "GRADLE_TASK=assembleRelease" >> $GITHUB_OUTPUT
           echo "RELEASE_DIRECTORY=app/build/outputs/apk/release" >> $GITHUB_OUTPUT
-          echo "VERSION=${{ steps.date.outputs.date }}" >> $GITHUB_OUTPUT
+          echo "VERSION=${{ steps.semantic_versioning.outputs.version }}" >> $GITHUB_OUTPUT
         else
           echo "Unknown profile: ${{ inputs.profile }}"
           exit 1
@@ -56,7 +62,7 @@ runs:
       uses: chkfung/android-version-actions@v1.2.1
       with:
         gradlePath: app/build.gradle
-        versionCode: ${{ github.run_number }}
+        versionCode: ${{ steps.set_env.outputs.VERSION_CODE }}
         versionName: ${{ steps.set_env.outputs.VERSION }}
 
     - name: Build APK
@@ -74,6 +80,12 @@ runs:
         keyPassword: ${{ inputs.key_password }}
       env:
         BUILD_TOOLS_VERSION: "33.0.0"
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-release
+        path: ${{ steps.set_env.outputs.RELEASE_DIRECTORY }}
 
     - uses: r0adkll/upload-google-play@v1
       name: Upload to internal sharing

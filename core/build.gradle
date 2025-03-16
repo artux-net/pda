@@ -1,8 +1,9 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id "java"
     id "kotlin"
     id "kotlin-kapt"
-    //id "gdx"
     id "com.google.protobuf" version "0.9.4"
 }
 
@@ -12,13 +13,13 @@ javadoc {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    implementation 'com.google.protobuf:protobuf-javalite:3.25.2'
-    implementation 'com.google.protobuf:protobuf-javalite:3.25.2'
+    implementation("com.google.protobuf:protobuf-javalite:3.25.2")
+    implementation("com.google.protobuf:protobuf-javalite:3.25.2")
     implementation("com.google.protobuf:protobuf-gradle-plugin:0.9.4")
 
-    implementation 'com.google.protobuf:protobuf-kotlin-lite:3.20.1'
-    implementation "org.apache.commons:commons-lang3:3.12.0"
-    implementation 'org.int4.dirk:dirk-di:1.0.0-beta1'
+    implementation("com.google.protobuf:protobuf-kotlin-lite:3.20.1")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("org.int4.dirk:dirk-di:1.0.0-beta1")
 }
 
 sourceSets {
@@ -53,5 +54,17 @@ protobuf {
 
             ofSourceSet('main')
         }
+    }
+}
+
+
+java {
+    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
     }
 }

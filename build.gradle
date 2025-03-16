@@ -51,8 +51,7 @@ project(":app") {
         natives("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64")
 
         // lua script engine
-        // https://mvnrepository.com/artifact/org.luaj/luaj-jse
-        implementation 'org.luaj:luaj-jse:3.0.1'
+        implementation("org.luaj:luaj-jse:3.0.1")
     }
 
 

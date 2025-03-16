@@ -1,0 +1,31 @@
+name: Test
+
+on:
+  workflow_call:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: 'Test artifact'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/setup
+
+      - name: Build with Gradle
+        run: ./gradlew buildDebug
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: | 
+            app/build/reports/jacoco/
+
+      - name: Lint Preview
+        id: lint_preview
+        uses: pavi2410/html-preview-action@v4
+        with:
+          html_file: 'app/build/reports/lint-results-debug.html'
+          job_summary: true

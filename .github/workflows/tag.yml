@@ -1,0 +1,24 @@
+name: Build and Tag master branch
+
+on:
+  workflow_run:
+    workflows: [Beta Build]
+    types: [completed]
+    branches: [master]
+
+jobs:
+  tag-commit:
+    name: Tag Commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Version
+        id: version
+        uses: paulhatch/semantic-version@v5.4.0
+
+      - name: Create tag
+        run: git tag ${{ steps.version.outputs.version_tag }} ${{ env.COMMIT_SHA }} && git push origin ${{ steps.version.outputs.version_tag }}
