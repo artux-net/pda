@@ -4,10 +4,6 @@ on:
   issue_comment:
     types: [ created ]
 
-env:
-  FIREBASE_ID: android-pda-589b5
-  PACKAGE: net.artux.pda
-
 jobs:
   build:
     name: Internal build
@@ -44,18 +40,17 @@ jobs:
 
       - name: Send message to Artux channel
         uses: appleboy/telegram-action@master
-
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
           message: |
-            Preview сборка ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}
+            Preview сборка [${{ github.event.issue.pull_request.title }}](${{ github.event.issue.pull_request.html_url }})
+            Код ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}
             загружена и активна до ${{ steps.expiration.outputs.expiration_date }}
             
-            [${{ github.event.issue.pull_request.title }}](${{ github.event.issue.pull_request.html_url }})
             Автор: ${{ github.actor }}
             
             [Ссылка для скачивания](${{steps.assembly.outputs.internalSharingDownloadUrls}})
             
-            [Crashlytics](https://console.firebase.google.com/project/%FIREBASE_ID/crashlytics/app/android:$PACKAGE/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }}]
+            [Crashlytics](https://console.firebase.google.com/project/${{ env.FIREBASE_ID }}/crashlytics/app/android:${{ env.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})

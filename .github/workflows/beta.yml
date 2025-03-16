@@ -5,9 +5,9 @@ on:
     branches:
       - master
 
-env:
-  FIREBASE_ID: android-pda-589b5
-  PACKAGE: net.artux.pda
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -53,9 +53,4 @@ jobs:
             Автор: ${{ github.event.head_commit.author.name }}
             PR: https://github.com/${{ github.repository }}/pull/${{ steps.extract_pr.outputs.pr_number }}
             Changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
-            [Crashlytics](https://console.firebase.google.com/project/%FIREBASE_ID/crashlytics/app/android:$PACKAGE/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }}]      
-
-      - name: Bump version and push tag
-        uses: paulhatch/semantic-version@v5.4.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+            [Crashlytics](https://console.firebase.google.com/project/${{ env.FIREBASE_ID }}/crashlytics/app/android:${{ env.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})

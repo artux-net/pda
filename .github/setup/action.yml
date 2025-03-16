@@ -20,6 +20,6 @@ runs:
           ~/core/build
           ~/model/build
           ~/.cache
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
