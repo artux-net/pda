@@ -81,11 +81,13 @@ runs:
       env:
         BUILD_TOOLS_VERSION: "33.0.0"
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+    - name: Upload release
+      uses: actions/upload-artifact@v4
+      continue-on-error: true
       with:
         name: app-release
         path: ${{ steps.set_env.outputs.RELEASE_DIRECTORY }}
+        overwrite: true
 
     - uses: r0adkll/upload-google-play@v1
       name: Upload to internal sharing

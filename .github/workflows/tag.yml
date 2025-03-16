@@ -1,4 +1,4 @@
-name: Build and Tag master branch
+name: Create tag
 
 on:
   workflow_run:
