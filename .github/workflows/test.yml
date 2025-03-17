@@ -4,6 +4,10 @@ on:
   workflow_call:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -23,9 +27,4 @@ jobs:
           path: | 
             app/build/reports/jacoco/
 
-      - name: Lint Preview
-        id: lint_preview
-        uses: pavi2410/html-preview-action@v4
-        with:
-          html_file: 'app/build/reports/lint-results-debug.html'
-          job_summary: true
+# upload 'app/build/reports/lint-results-debug.html' to s3

@@ -6,6 +6,10 @@ on:
     types: [completed]
     branches: [master]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tag-commit:
     name: Tag Commit

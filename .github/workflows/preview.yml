@@ -4,6 +4,10 @@ on:
   issue_comment:
     types: [ created ]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Internal build
@@ -19,6 +23,7 @@ jobs:
         with:
           token: ${{secrets.token}}
           submodules: recursive
+          fetch-depth: 0
 
       - name: Build & Deploy
         uses: ./.github/assembly
@@ -39,18 +44,16 @@ jobs:
           echo "$expiration_date - Ссылка для скачивания действительна до этой даты"
 
       - name: Send message to Artux channel
-        uses: appleboy/telegram-action@master
+        uses: ./.github/notify
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          format: markdown
           message: |
-            Preview сборка [${{ github.event.issue.pull_request.title }}](${{ github.event.issue.pull_request.html_url }})
-            Код ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}
-            загружена и активна до ${{ steps.expiration.outputs.expiration_date }}
+            Preview сборка [${{ github.event.issue.pull_request.id }}](${{ github.event.issue.pull_request.html_url }})
+            Код ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}, активна до ${{ steps.expiration.outputs.expiration_date }}
             
             Автор: ${{ github.actor }}
             
-            [Ссылка для скачивания](${{steps.assembly.outputs.internalSharingDownloadUrls}})
+            [Ссылка для скачивания](${{ steps.assembly.outputs.internalSharingDownloadUrl }})
             
-            [Crashlytics](https://console.firebase.google.com/project/${{ env.FIREBASE_ID }}/crashlytics/app/android:${{ env.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})
+            [Crashlytics](https://console.firebase.google.com/project/${{ vars.FIREBASE_ID }}/crashlytics/app/android:${{ vars.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})
