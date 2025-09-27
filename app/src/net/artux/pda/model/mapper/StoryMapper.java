@@ -99,15 +99,4 @@ public interface StoryMapper {
 
     net.artux.pda.model.quest.Transfer map(Transfer value);
 
-    default List<GameMap> maps(HashMap<Long, net.artux.pdanetwork.model.GameMap> maps) {
-        List<GameMap> result = new LinkedList<>();
-        for (Map.Entry<Long, net.artux.pdanetwork.model.GameMap> map : maps.entrySet()) {
-            net.artux.pdanetwork.model.GameMap oldMap = map.getValue();
-            GameMap m = new GameMap(oldMap.getId(), oldMap.getTitle(), 5, oldMap.getTmx(), oldMap.getDefPos(), points(oldMap.getPoints()), spawns(oldMap.getSpawns()));
-            m.setId(m.getId());
-            result.add(m);
-        }
-        return result;
-    }
-
 }

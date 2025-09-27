@@ -10,16 +10,6 @@ plugins {
 }
 
 def apiFile = file("api.json")
-tasks.register('downloadAPI') {
-    def url = new URL("https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest")
-    def uc = url.openConnection()
-    def userPass = "pass"
-    def basicAuth = "Basic " + new String(Base64.getEncoder().encode(userPass.getBytes()))
-    uc.setRequestProperty("Authorization", basicAuth)
-    uc.getInputStream().transferTo(new FileOutputStream(apiFile))
-}
-
-
 swaggerSources {
     pdanetwork {
         inputFile = apiFile
@@ -32,14 +22,16 @@ swaggerSources {
 }
 
 gradle.projectsEvaluated {
-    if (!apiFile.exists()){
+    if (!apiFile.exists()) {
         preBuild.dependsOn(downloadAPI)
     }
+
     preBuild.dependsOn swaggerSources.pdanetwork.code
 }
 
 android {
     namespace "net.artux.pda"
+
     sourceSets {
         main {
             manifest.srcFile "AndroidManifest.xml"
@@ -49,8 +41,8 @@ android {
             assets.srcDirs = ["../assets"]
             jniLibs.srcDirs = ["libs"]
         }
-
     }
+
     packaging {
         resources.excludes.add("META-INF/*")
     }
@@ -100,6 +92,7 @@ android {
             buildConfigField("String", "NewsAdId", "\"ca-app-pub-3940256099942544/2247696110\"")
         }
     }
+
     compileOptions {
         sourceCompatibility = BuildConfig.JDK
         targetCompatibility = BuildConfig.JDK
@@ -140,12 +133,12 @@ dependencies {
     implementation(fileTree(dir: "libs", include: ["*.aar"]))
 
     implementation("androidx.multidex:multidex:2.0.1")
-    //mapstruct
+    // mapstruct
     implementation("org.mapstruct:mapstruct:1.5.2.Final")
     kapt("org.mapstruct:mapstruct-processor:1.5.2.Final")
 
-    //for api code gen
-    swaggerCodegen("io.swagger.codegen.v3:swagger-codegen-cli:3.0.34")  // or Swagger Codegen V3
+    // swagger Codegen V3
+    swaggerCodegen("io.swagger.codegen.v3:swagger-codegen-cli:3.0.34")
     implementation("io.swagger.core.v3:swagger-annotations:$swagger_annotations_version")
     implementation("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:$oltu_version") {
         exclude group: "org.apache.oltu.oauth2", module: "org.apache.oltu.oauth2.common"
@@ -155,9 +148,9 @@ dependencies {
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
     // https://mvnrepository.com/artifact/com.google.android.datatransport/transport-runtime
-    implementation group: 'com.google.android.datatransport', name: 'transport-runtime', version: '3.3.0'
+    implementation("com.google.android.datatransport:transport-runtime:3.3.0")
 
-    //androidx
+    // androidx
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$androidx_version")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$androidx_version")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$androidx_version")
@@ -165,7 +158,7 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.5.7")
     implementation("androidx.preference:preference-ktx:1.2.0")
 
-    //retrofit
+    // retrofit
     implementation("com.squareup.retrofit2:retrofit:$retrofit_version")
     implementation("com.squareup.retrofit2:converter-scalars:$retrofit_version")
     implementation("com.squareup.retrofit2:converter-gson:$retrofit_version")
@@ -184,16 +177,15 @@ dependencies {
     implementation("com.jakewharton.timber:timber:5.0.1")
     implementation("com.github.bastienpaulfr:Treessence:1.0.5")
 
-    //firebase
+    // firebase
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-config")
     implementation("com.google.firebase:firebase-crashlytics")
 
-    //ktx
+    // ktx
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
-
 
     implementation("com.github.bumptech.glide:glide:$glide_version")
     annotationProcessor("com.github.bumptech.glide:compiler:$glide_version")
@@ -201,7 +193,7 @@ dependencies {
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 
-    //dagger
+    // dagger
     implementation("com.google.dagger:dagger:$dagger_version")
     kapt("com.google.dagger:dagger-compiler:$dagger_version")
     kapt("com.google.dagger:dagger-android-processor:$dagger_version")
@@ -210,7 +202,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$dagger_version")
     kapt("com.google.dagger:hilt-compiler:$dagger_version")
 
-    //ads
+    // ads
     implementation("com.appodeal.ads:sdk:3.5.0.0") {
         exclude group: "com.appodeal.ads.sdk.services", module: "adjust"
         exclude group: "com.appodeal.ads.sdk.services", module: "appsflyer"
@@ -218,6 +210,12 @@ dependencies {
         exclude group: "com.appodeal.ads.sdk.services", module: "firebase"
         exclude group: "com.appodeal.ads.sdk.services", module: "sentry_analytics"
     }
+}
+
+tasks.register('downloadAPI') {
+    def url = new URL("https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest")
+    def uc = url.openConnection()
+    uc.getInputStream().transferTo(new FileOutputStream(apiFile))
 }
 
 tasks.register('copyAndroidNatives') {
