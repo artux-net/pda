@@ -1,0 +1,30 @@
+name: Test
+
+on:
+  workflow_call:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: 'Test artifact'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/setup
+
+      - name: Build with Gradle
+        run: ./gradlew buildDebug
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: | 
+            app/build/reports/jacoco/
+
+# upload 'app/build/reports/lint-results-debug.html' to s3

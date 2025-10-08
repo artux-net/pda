@@ -1,0 +1,99 @@
+name: Build & Deploy
+description: Builds and uploads apk to Google Play
+inputs:
+  profile:
+    type: string
+    description: Profile to build (beta/preview)
+    default: preview
+  signing_key:
+    type: string
+    description: Signing key in base64 format
+  key_alias:
+    type: string
+    description: Key alias for signing
+  keystore_password:
+    type: string
+    description: Keystore password
+  key_password:
+    type: string
+    description: Key password
+  service_account_json:
+    type: string
+    description: Service account JSON for Google Play
+outputs:
+  internalSharingDownloadUrl:
+    value: ${{ steps.upload.outputs.internalSharingDownloadUrl }}
+    description: "Link to download"
+  versionName:
+    value: ${{ steps.set_env.outputs.VERSION }}
+    description: "Version name"
+  versionCode:
+    value: ${{ steps.set_env.outputs.VERSION_CODE }}
+    description: "Version code"
+runs:
+  using: composite
+  steps:
+    - uses: ./.github/setup
+
+    - uses: paulhatch/semantic-version@v5.4.0
+      id: semantic_versioning
+
+    - name: Set environment variables
+      id: set_env
+      shell: bash
+      run: |
+        echo "VERSION_CODE=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+        if [ "${{ inputs.profile }}" = "preview" ]; then
+          echo "GOOGLE_PLAY_TRACK=internalsharing" >> $GITHUB_OUTPUT
+          echo "GRADLE_TASK=assembleDebug" >> $GITHUB_OUTPUT
+          echo "RELEASE_DIRECTORY=app/build/outputs/apk/debug" >> $GITHUB_OUTPUT
+          echo "VERSION=${{ steps.semantic_versioning.outputs.version }}-preview" >> $GITHUB_OUTPUT
+        elif [ "${{ inputs.profile }}" = "beta" ]; then
+          echo "GOOGLE_PLAY_TRACK=internal" >> $GITHUB_OUTPUT
+          echo "GRADLE_TASK=assembleRelease" >> $GITHUB_OUTPUT
+          echo "RELEASE_DIRECTORY=app/build/outputs/apk/release" >> $GITHUB_OUTPUT
+          echo "VERSION=${{ steps.semantic_versioning.outputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "Unknown profile: ${{ inputs.profile }}"
+          exit 1
+        fi
+
+    - name: Bump version
+      uses: chkfung/android-version-actions@v1.2.1
+      with:
+        gradlePath: app/build.gradle
+        versionCode: ${{ steps.set_env.outputs.VERSION_CODE }}
+        versionName: ${{ steps.set_env.outputs.VERSION }}
+
+    - name: Build APK
+      shell: bash
+      run: ./gradlew ${{ steps.set_env.outputs.GRADLE_TASK }}
+
+    - uses: r0adkll/sign-android-release@v1
+      name: Sign APK
+      id: sign_apk
+      with:
+        releaseDirectory: ${{ steps.set_env.outputs.RELEASE_DIRECTORY }}
+        signingKeyBase64: ${{ inputs.signing_key }}
+        alias: ${{ inputs.key_alias }}
+        keyStorePassword: ${{ inputs.keystore_password }}
+        keyPassword: ${{ inputs.key_password }}
+      env:
+        BUILD_TOOLS_VERSION: "33.0.0"
+
+    - name: Upload release
+      uses: actions/upload-artifact@v4
+      continue-on-error: true
+      with:
+        name: app-release
+        path: ${{ steps.set_env.outputs.RELEASE_DIRECTORY }}
+        overwrite: true
+
+    - uses: r0adkll/upload-google-play@v1
+      name: Upload to internal sharing
+      id: upload
+      with:
+        serviceAccountJsonPlainText: ${{ inputs.service_account_json }}
+        packageName: net.artux.pda
+        releaseFiles: ${{ steps.sign_apk.outputs.signedReleaseFile }}
+        track: ${{ steps.set_env.outputs.GOOGLE_PLAY_TRACK }}

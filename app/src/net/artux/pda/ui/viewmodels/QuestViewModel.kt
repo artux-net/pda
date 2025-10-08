@@ -1,0 +1,297 @@
+package net.artux.pda.ui.viewmodels
+
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import net.artux.pda.model.StatusModel
+import net.artux.pda.model.chat.UserMessage
+import net.artux.pda.model.map.GameMap
+import net.artux.pda.model.mapper.StageMapper
+import net.artux.pda.model.mapper.StatusMapper
+import net.artux.pda.model.mapper.StoryMapper
+import net.artux.pda.model.quest.ChapterModel
+import net.artux.pda.model.quest.NotificationModel
+import net.artux.pda.model.quest.Stage
+import net.artux.pda.model.quest.StageModel
+import net.artux.pda.model.quest.StoryModel
+import net.artux.pda.model.quest.TransferModel
+import net.artux.pda.model.quest.story.StoryDataModel
+import net.artux.pda.repositories.CommandController
+import net.artux.pda.repositories.MissionController
+import net.artux.pda.repositories.QuestRepository
+import net.artux.pda.repositories.SellerRepository
+import net.artux.pda.repositories.SummaryRepository
+import net.artux.pda.repositories.UserRepository
+import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
+import net.artux.pda.utils.AdType
+import timber.log.Timber
+import kotlin.random.Random
+
+@HiltViewModel
+class QuestViewModel @javax.inject.Inject constructor(
+    var sellerRepository: SellerRepository,
+    var summaryRepository: SummaryRepository,
+    var userRepository: UserRepository,
+    var repository: QuestRepository,
+    var stageMapper: StageMapper,
+    var mapper: StoryMapper,
+    var missionController: MissionController,
+    var commandController: CommandController,
+    var statusMapper: StatusMapper
+) : ViewModel() {
+
+    var title: MutableLiveData<String> = MutableLiveData()
+    var loadingState: MutableLiveData<Boolean> = MutableLiveData()
+    var stage: MutableLiveData<StageModel> = MutableLiveData()
+    var background: MutableLiveData<String> = MutableLiveData()
+
+    var chapter: MutableLiveData<ChapterModel> = MutableLiveData()
+    var map: MutableLiveData<GameMap> = MutableLiveData()
+    var data: MutableLiveData<Map<String, String>> = MutableLiveData()
+
+    val status: SingleLiveEvent<StatusModel> get() = commandController.status
+    val storyData: MutableLiveData<StoryDataModel> get() = commandController.storyData
+    val notification: SingleLiveEvent<NotificationModel> get() = commandController.notification
+
+    var currentStoryId: Int = repository.getCurrentStoryId()
+    var currentChapterId: Int = repository.getCurrentChapterId()
+    var currentStageId: Long = -1
+    var transferDisabled = true
+
+    init {
+        //подписка на команду открытия стадии
+        commandController.stageEvent.observeForever {
+            val stageId = it.payload.stageId
+            var toSync = false
+            val chapterId = if (it.payload.chapterId > -1) {
+                toSync = true
+                it.payload.chapterId
+            } else
+                currentChapterId
+            beginWithStage(currentStoryId, chapterId, stageId, toSync)
+        }
+    }
+
+    fun updateStoryDataFromCache() {
+        repository.getCachedStoryData()
+            .map { mapper.dataModel(it) }
+            .onSuccess { storyData.postValue(it) }
+            .onFailure { status.postValue(StatusModel(it)) }
+    }
+
+     fun updateStoryDataFromServer() {
+         viewModelScope.launch {
+             repository.getStoryData()
+                 .map { mapper.dataModel(it) }
+                 .onSuccess { storyData.postValue(it) }
+                 .onFailure { status.postValue(StatusModel(it)) }
+         }
+    }
+
+    fun getCurrentStory(): StoryModel {
+        return repository.getCachedStory(currentStoryId)
+            .map { mapper.story(it) }
+            .getOrThrow()
+    }
+
+    private suspend fun suspendUpdateData() {
+        storyData.value = repository.getStoryData()
+            .map { mapper.dataModel(it) }
+            .getOrThrow()
+        sellerRepository.getItems().getOrThrow()
+    }
+
+    fun beginWithStage(
+        storyId: Int = currentStoryId,
+        chapterId: Int,
+        stageId: Long,
+        sync: Boolean = true
+    ) {
+        if (storyId < 0)
+            exitStory()
+        viewModelScope.launch {
+            currentStoryId = storyId
+            currentChapterId = chapterId
+
+            loadingState.postValue(true)
+
+            suspendUpdateData()
+
+            repository.getChapter(storyId, chapterId)
+                .map { mapper.chapter(it) }
+                .onSuccess {
+                    chapter.postValue(it)
+                    background.postValue(it.stages[0]?.background)
+                    val chapterStage = it.getStage(stageId)
+
+                    if (chapterStage == null) {
+                        status.postValue(StatusModel(Exception("Can not find stage with id: $stageId in chapter: $currentChapterId")))
+                        return@launch
+                    }
+                    if (sync) {
+                        prepareSync(chapterStage)
+                        syncNow()
+                    }
+                    setStage(chapterStage)
+                }
+                .onFailure {
+                    status.postValue(StatusModel(it))
+                }
+            repository.getCachedStory(storyId)
+                .map {
+                    mapper.story(it)
+                }.onSuccess {
+                    missionController.missions = it.missions
+                }
+            loadingState.postValue(false)
+        }
+    }
+
+    private fun prepareSync(chapterStage: Stage) {
+        commandController.checkStage(currentStoryId, currentChapterId, chapterStage.id)
+        commandController.process(chapterStage.actions)
+
+        val texts = chapterStage.texts
+        if (texts.isNotEmpty() && texts[0].text.isNotBlank())
+            summaryRepository.check(
+                UserMessage(
+                    chapterStage.title!!,
+                    chapterStage.texts[0].text,
+                    chapterStage.background
+                )
+            )
+    }
+
+    private fun setStage(chapterStage: Stage) {
+        currentStageId = chapterStage.id
+        Timber.i("Opening stage: ${chapterStage.id}")
+        viewModelScope.launch {
+            when (chapterStage.typeStage) {
+                4 -> {
+                    //переход на карту
+                    if (chapterStage.data == null)
+                        return@launch
+                    syncNow()
+                    title.postValue("Loading map...")
+                    val mapId: String? = chapterStage.data!!["map"]
+                    if (mapId != null) {
+                        if (chapterStage.data!!.containsKey("pos")) {
+                            repository.getMap(currentStoryId, mapId.toInt())
+                                .map { mapper.map(it) }
+                                .onSuccess {
+                                    if (chapterStage.data!!.containsKey("pos"))
+                                        it.defPos = chapterStage.data!!["pos"].toString()
+                                    Timber.i("${storyData.value}")
+                                    if (Random.nextFloat() < 0.1f) {
+                                        commandController.showAd(AdType.TRANSFER_VIDEO)
+                                    }
+                                    map.postValue(it)
+                                }
+                                .onFailure { status.postValue(StatusModel(it)) }
+                        }
+                    } else
+                        status.postValue(StatusModel("Указан тип стадии - карта, но id не задан"))
+                }
+
+                5, 6 -> {
+                    processData(chapterStage.data)
+                }
+
+                else -> {
+                    background.postValue(chapterStage.background)
+                    if (storyData.value == null) {
+                        status.postValue(StatusModel(Exception("Story Data null")))
+                        return@launch
+                    }
+                    if (chapterStage.isNeedSync())
+                        syncNow()
+                    notification.postValue(stageMapper.notification(chapterStage, storyData.value))
+                    stage.postValue(stageMapper.model(chapterStage, storyData.value))
+                    transferDisabled = false
+                }
+            }
+        }
+    }
+
+    fun chooseTransfer(transfer: TransferModel) {
+        if (transferDisabled)
+            return
+        transferDisabled = true
+        summaryRepository.check(UserMessage(storyData.value!!, transfer.text))
+
+        val chapterStage = chapter.value!!.getStage(transfer.stageId)
+        if (chapterStage != null) {
+            prepareSync(chapterStage)
+            setStage(chapterStage)
+        } else
+            status.postValue(StatusModel(Exception("Не удалось найти стадию ${transfer.stageId} в главе: $currentChapterId")))
+    }
+
+    fun getCurrentStage(): Stage? {
+        return chapter.value!!.getStage(stage.value!!.id)
+    }
+
+    private suspend fun syncNow() {
+        title.postValue("Синхронизация")
+        loadingState.postValue(true)
+
+        commandController.syncNow()
+            .onSuccess {
+                summaryRepository.updateSummary()//save summary
+            }.onFailure {
+                status.postValue(StatusModel(it))
+            }
+        loadingState.postValue(false)
+    }
+
+    fun exitStory() {
+        commandController.processWithServer(mapOf(Pair("exitStory", listOf())))
+    }
+
+    fun resetData() {
+        viewModelScope.launch {
+            userRepository.clearMemberCache()
+            repository.clearCache()
+            userRepository.getMember()
+            commandController.resetData()
+        }
+    }
+
+    fun clear() {
+        repository.clearCache()
+    }
+
+    fun processDataWithActions(data: Map<String, String>?, actions: Map<String, MutableList<String>>) {
+        loadingState.postValue(true)
+        viewModelScope.launch {
+            commandController.syncNow(actions)
+                .onSuccess {
+                    processData(data)
+                }.onFailure {
+                    status.postValue(StatusModel(it))
+                }
+            loadingState.postValue(false)
+        }
+    }
+
+    private fun processData(data: Map<String, String>?) {
+        if (data == null)
+            return
+        loadingState.postValue(true)
+        Timber.i("Processing data - commands: ${data}")
+        if (data.containsKey("chapter")) {
+            val chapterId: String? = data["chapter"]
+            val stageId: String? = data["stage"]
+            if (!chapterId.isNullOrBlank() && !stageId.isNullOrBlank())
+                beginWithStage(chapterId = chapterId.toInt(), stageId = stageId.toLong(), sync = false)
+
+        } else if (data.containsKey("seller")) {
+            val sellerId: String? = data["seller"]
+            if (!sellerId.isNullOrBlank())
+                this.data.postValue(data)
+        }
+    }
+
+}

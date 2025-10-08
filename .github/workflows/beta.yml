@@ -1,0 +1,54 @@
+name: Beta Build
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Beta build
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{secrets.token}}
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Build & Deploy
+        uses: ./.github/assembly
+        id: assembly
+        with:
+          profile: beta
+          signing_key: ${{ secrets.SIGNING_KEY }}
+          key_alias: ${{ secrets.KEY_ALIAS }}
+          keystore_password: ${{ secrets.KEYSTORE_PASSWORD }}
+          key_password: ${{ secrets.KEY_PASSWORD }}
+          service_account_json: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+
+      - name: Extract PR number
+        id: extract_pr
+        run: |
+          echo "Исходное сообщение: ${{ github.event.head_commit.message }}"
+          pr_number=$(echo "${{ github.event.head_commit.message }}" | grep -oE '#[0-9]+' | head -n 1 | tr -d '#')
+          echo "Извлечённый номер PR: $pr_number"
+          echo "pr_number=$pr_number" >> $GITHUB_OUTPUT
+
+      - name: Send message to Artux channel
+        uses: ./.github/notify
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            Beta сборка ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}
+            
+            Ожидает публикации в beta-канале Google Play
+            
+            Название: ${{ github.event.head_commit.message }}
+            Автор: ${{ github.event.head_commit.author.name }}
+            [PR](https://github.com/${{ github.repository }}/pull/${{ steps.extract_pr.outputs.pr_number }}) | [Changes](https://github.com/${{ github.repository }}/commit/${{github.sha}}) | [Crashlytics](https://console.firebase.google.com/project/${{ vars.FIREBASE_ID }}/crashlytics/app/android:${{ vars.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})           

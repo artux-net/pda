@@ -1,0 +1,88 @@
+package net.artux.pda.map.ecs.vision;
+
+import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.math.Frustum;
+
+import net.artux.pda.map.ecs.camera.CameraSystem;
+import net.artux.pda.map.ecs.sound.AudioSystem;
+import net.artux.pda.map.ecs.physics.BodyComponent;
+import net.artux.pda.map.ecs.interactive.PassivityComponent;
+import net.artux.pda.map.ecs.systems.BaseSystem;
+import net.artux.pda.map.di.scope.PerGameMap;
+
+import javax.inject.Inject;
+
+@PerGameMap
+public class FogSystem extends BaseSystem {
+
+    private final ComponentMapper<BodyComponent> pm = ComponentMapper.getFor(BodyComponent.class);
+    private final ComponentMapper<FogOfWarComponent> fwm = ComponentMapper.getFor(FogOfWarComponent.class);
+
+    private final AudioSystem audioSystem;
+    private final CameraSystem cameraSystem;
+    private final Frustum frustum;
+
+    public int resource;
+    public int visibleEntities;
+
+    @Inject
+    public FogSystem(AudioSystem audioSystem, CameraSystem cameraSystem) {
+        super(Family.all(BodyComponent.class, FogOfWarComponent.class).exclude(PassivityComponent.class).get());
+        this.audioSystem = audioSystem;
+        this.cameraSystem = cameraSystem;
+
+        frustum = cameraSystem.getCamera().frustum;
+    }
+
+    @Override
+    public void update(float deltaTime) {
+        super.update(deltaTime);
+        ImmutableArray<Entity> entities = getEntities();
+        if (!isPlayerActive())
+            return;
+        Entity player = getPlayer();
+        BodyComponent playerBodyComponent = pm.get(player);
+
+        int entitiesVisibleByPlayer = 0;
+        for (int i = 0; i < entities.size(); i++) {
+            Entity entity1 = entities.get(i);
+            BodyComponent firstBodyComponent = pm.get(entity1);
+            FogOfWarComponent fogOfWarComponent = fwm.get(entity1);
+
+            float dst = firstBodyComponent.getPosition().dst(playerBodyComponent.getPosition());
+
+            float visibleCoefficient;
+            if (dst < 200) {
+                visibleCoefficient = 1;
+                entitiesVisibleByPlayer += 1;
+            } else if (dst > 270)
+                visibleCoefficient = 0;
+            else
+                visibleCoefficient = (300 - dst) / 150;
+            fogOfWarComponent.setVisionCoefficient(visibleCoefficient);
+
+            if (fogOfWarComponent.isVisible()
+                    && frustum.pointInFrustum(firstBodyComponent.getX(), firstBodyComponent.getY(), 0)) {
+                if (!fogOfWarComponent.isCameraVisible
+                        && !cameraSystem.isDetached()) {
+                    audioSystem.playStalkerDetection();
+                }
+                fogOfWarComponent.setCameraVisible(true);
+            } else
+                fogOfWarComponent.setCameraVisible(false);
+        }
+
+        if (isPlayerActive())
+            visibleEntities = entitiesVisibleByPlayer + 1;
+        else
+            visibleEntities = entitiesVisibleByPlayer;
+    }
+
+    @Override
+    protected void processEntity(Entity entity, float deltaTime) {
+
+    }
+}

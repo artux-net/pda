@@ -1,0 +1,50 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="colorAccent">@color/yellow</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:dialogTheme">@style/PDADialogStyle</item>
+    </style>
+
+    <style name="PDADialogStyle" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:dialogTheme">@style/PDADialogStyle</item>
+        <item name="android:windowBackground">@drawable/border_background_black</item>
+        <item name="android:colorAccent">#f3f3f3</item>
+        <item name="android:textColor">#f3f3f3</item>
+        <item name="android:textColorPrimary">#f3f3f3</item>
+    </style>
+
+    <style name="PDANotificationStyle" parent="PDADialogStyle">
+        <item name="android:dialogTheme">@style/PDADialogStyle</item>
+        <item name="android:windowBackground">#80000000</item>
+    </style>
+
+    <style name="EditTextStyle" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/yellow</item>
+        <item name="colorControlHighlight">@color/yellow</item>
+        <item name="colorControlNormal">@color/yellow</item>
+        <item name="backgroundTint">@color/yellow</item>
+        <item name="android:textColorHint">#808080</item>
+        <item name="android:textColorPrimary">#fff</item>
+
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="Widget.AppTheme.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="Widget.AppTheme.ButtonBar.Fullscreen" parent="">
+        <item name="android:background">@color/black_overlay</item>
+        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+    </style>
+</resources>

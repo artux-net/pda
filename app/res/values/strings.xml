@@ -1,0 +1,292 @@
+<resources>
+    <string name="app_name">PDA</string>
+    <string name="app_full_name">PDA Network</string>
+    <string name="hello_message" translatable="false">
+\n
+─█▀▀█ ░█▀▀█ ▀▀█▀▀ ░█─░█ ▀▄░▄▀ 　 ── 　 ░█▀▀█ ░█▀▀▄ ─█▀▀█ \n
+░█▄▄█ ░█▄▄▀ ─░█── ░█─░█ ─░█── 　 ▀▀ 　 ░█▄▄█ ░█─░█ ░█▄▄█ \n
+░█─░█ ░█─░█ ─░█── ─▀▄▄▀ ▄▀░▀▄ 　 ── 　 ░█─── ░█▄▄▀ ░█─░█ \n
+\n
+    </string>
+    
+    <string name="news_ads_banner_id" translatable="false">R-M-2151056-1</string>
+    <string name="quest_ads_video_id" translatable="false">R-M-2151056-2</string>
+    <string name="quest_ads_usual_id" translatable="false">R-M-2151056-3</string>
+    <string name="quest_ads_transfer_video_id" translatable="false">R-M-2151056-4</string>
+
+
+    <string name="prompt_user">E-mail</string>
+
+    <string name="prompt_password">Password</string>
+
+    <string name="action_sign_in">Sign in</string>
+
+    <string name="error_login">This user is unable</string>
+
+    <!-- Strings related to login -->
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_invalid_value">Invalid chars: %1$s</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">The field is empty</string>
+    <string name="error_server_connection">Server connection error</string>
+    <string name="action_register">Registration</string>
+    <string name="action_forgot_password">Forgot password?</string>
+    <string name="prompt_login">Login</string>
+    <string name="prompt_email" translatable="false">Email</string>
+    <string name="prompt_name">Name</string>
+    <string name="doubleSlash" translatable="false">//</string>
+
+    <!-- Strings related to register -->
+    <string name="news">News</string>
+    <string name="chat">Chat</string>
+    <string name="messages">Messages</string>
+
+    <!-- Strings related to main view -->
+    <string name="profileModel">Profile</string>
+    <string name="notes">Notes</string>
+    <string name="map">Map</string>
+    <string name="inptmsg">Input a message..</string>
+    <string name="choose_avatar">Choose avatar</string>
+    <string name="general_chat_channel">General Chat Channel</string>
+    <string name="write_with_id">Write with PDAID..</string>
+    <string name="action_sign_out">Sign out of your account</string>
+    <string name="action_clear_saved_images">Clear cache of images</string>
+
+    <!-- Strings related to messenger -->
+    <string name="action_input_email">Input your e-mail..</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="unable_connect">Unable to connect server</string>
+    <string name="group_chat_channel">Group Chat channel</string>
+    <string name="profile_inventory">Inventory</string>
+    <string name="profile_equipment">Equipment</string>
+    <string name="profile_achievements">Achievements</string>
+    <string name="profile_brief">Summary</string>
+
+    <!-- Strings related to profileModel view -->
+    <string name="profile_arena">Arena</string>
+    <string name="profile_shop">Shop</string>
+    <string name="profile_error">Cannot find this pdaId</string>
+    <string name="backpack">Backpack</string>
+    <string name="enc">Encyclopedia</string>
+    <string name="kinds">Kinds</string>
+    <string name="friends">Friends - %1$s</string>
+
+    <string name="subscribers">Subscribers - %1$s</string>
+
+
+    <string name="add_friend">Add to friends</string>
+    <string name="is_friend">%1$s is your friend</string>
+    <string name="is_sub">%1$s is your subscriber</string>
+    <string name="requested">You have sent friend request.</string>
+    <string name="zoneColon">In zone:</string>
+    <string name="groupColon">Group:</string>
+    <string name="rangColon">Rang:</string>
+    <string name="jobsColon">Jobs:</string>
+    <string name="ratingColon">Rating:</string>
+    <string name="xpColon">Experience:</string>
+    <string name="locationColon">Location:</string>
+    <string name="loadMore">Load more</string>
+
+    <string name="ratingTitle">Rating</string>
+
+    <string name="in_zone_time_p">In zone: %1$s</string>
+    <string name="group_p">Group: %1$s</string>
+    <string name="rang_p">Rang: %1$s</string>
+    <string name="xp_p">Experience: %1$s</string>
+    <string name="rating_p">Rating: %1$s</string>
+    <string name="location_p">Location: %1$s</string>
+
+    <string name="rating_title" translatable="false">%1$s - [PDA #%2$s] %3$s</string>
+    <string name="rating_desc">Group - %1$s, in zone %2$s</string>
+
+    <string name="nickname">Nickname</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="agreement">Pressing \"Registration\",  you accept <font color="#f2cd34">privacy policy</font> and receiving emails.</string>
+    <string name="weight">%1$s kg</string>
+    <string name="item_desc">Price: %1$s \nWeight: %2$s \nQuantity: %3$s - %4$s kg at all\n</string>
+    <string name="weapon_desc">Precision: %1$s \nSpeed: %2$s \nDamage: %3$s \nCondition: %4$s \n</string>
+    <string name="armor_desc">Thermal protection: %1$s \nElectric protection: %2$s \nChemical protection: %3$s \nRadio protection: %4$s \nPsy protection: %5$s \nDamage protection: %6$s \nCondition: %7$s \n</string>
+    <string name="artifact_desc">"Health: %1$s  Radio: %2$s  Damage: %3$s  Bleeding: %4$s  Thermal: %5$s  Chemical: %6$s  Endurance: %7$s  Electric: %8$s  "</string>
+    <string name="detector_desc">"Type: %1$s"</string>
+
+    <string name="resetData">Reset data</string>
+    <string name="wr_message">Write a message</string>
+    <string name="okay">Okay</string>
+    <string name="add_friend_q">Add friend?</string>
+    <string name="remove_friend_q">Remove from friends?</string>
+    <string name="cancel_friend_q">Cancel request?</string>
+    <string name="money">Money: %1$s</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string-array name="groups">
+        <item>Одиночки</item>
+        <item>Бандиты</item>
+        <item>Военные</item>
+        <item>Свобода</item>
+        <item>Долг</item>
+        <item>Монолит</item>
+        <item>Наёмники</item>
+        <item>Ученые</item>
+        <item>Чистое небо</item>
+    </string-array>
+    <string-array name="rang">
+        <item>Отмычка</item>
+        <item>Новичок</item>
+        <item>Сталкер</item>
+        <item>Опытный</item>
+        <item>Ветеран</item>
+        <item>Мастер</item>
+        <item>Легенда</item>
+    </string-array>
+    <string-array name="profile_buttons">
+        <item>Снаряжение</item>
+        <item>Профиль</item>
+        <item>Рюкзак</item>
+        <item>Энциклопедия</item>
+        <item>Рейтинг сталкеров</item>
+        <!--<item>Достижения</item>-->
+        <item>Сводка</item>
+        <item>Настройки</item>
+    </string-array>
+    <string-array name="encyclopedia_types">
+        <item>Оружие</item>
+        <item>Броня</item>
+        <item>Артефакты</item>
+        <item>Детекторы</item>
+        <item>Аномалии</item>
+        <item>Др. предметы</item>
+        <item>Мутанты</item>
+        <item>Группировки</item>
+        <item>Локации</item>
+    </string-array>
+
+    <string-array name="message_actions">
+        <item>Ответить</item>
+        <item>Перейти к диалогу</item>
+        <item>Посмотреть профиль</item>
+    </string-array>
+
+    <string-array name="comment_actions">
+        <item>Ответить</item>
+        <item>Перейти к диалогу</item>
+        <item>Посмотреть профиль</item>
+        <item>Оценить</item>
+    </string-array>
+
+    <string-array name="dialogs_actions"></string-array>
+    <string name="quit">Quit</string>
+    <string name="empty">"There are no entries. "</string>
+
+    <string name="note_isnt_selected">Note isn\'t selected.</string>
+    <string name="noteTitleInput">Input title...</string>
+    <string name="noteContentInput">Input content of the note...</string>
+    <string name="subs">Friend requests - %1$s</string>
+    <string name="settings">Settings</string>
+    <string name="registrationEndDesc">An mail has been sent to the specified email address %1$s with a link to confirm registration in the stalker network, follow it to complete. The letter may end up in the spam folder, we advise you to check it. Anyway, you can already log in.</string>
+    <string name="registrationEndConfirm">OK, log in</string>
+    <string name="notEqualPasswords">Passwords are not equal.</string>
+    <string name="exitStory">Exit story</string>
+    <string name="wrong_response">Wrong response from server, please update the app or try again</string>
+    <string name="what_is_pda">Что такое ПДА?</string>
+    <string name="help_tab1_title">What is PDA?</string>
+    <string name="help_tab1_content">Stalker PDA is a multifunctional application for Android that will help you immerse yourself in the atmosphere of life in the Exclusion Zone. You can have a good time in the general chat, compete with friends in the online arena, buy and sell equipment, and most importantly, complete story quests. And after completing the story, you will have freeplay available, in which you will decide your own fate!</string>
+    <string name="help_tab2_title">How it works</string>
+    <string name="help_tab2_content"><![CDATA[
+
+<h2>Новости мира Зоны</h2>
+Мы собираем самые актуальные новости постапокалиптической индустрии. Этот раздел позволит быть в курсе событий во вселенных S.T.A.L.K.E.R., Metro, Survarium, Fallout, модификаций к проектам и многих других тематических проектов. Наши редакторы регулярно обновляют информацию и публикуют только достоверную информацию. Тем не менее, объективно правдоподобные слухи от проверенных источников будут помечены специальным знаком.
+<h2>Общий и приватный чат-канал</h2>
+Общаться со всеми? Или со своей группировкой? Может быть, в личных сообщениях? Всё в твоих руках, общение - одна из основных идей приложения. Ты можешь переписываться со сталкерами, заходить в их профили, смотреть репутацию и снаряжение. В чате работают боты, которые высылают информацию о выбросах, опасных локациях, некрологах погибших сталкеров. Имеет место быть и официальная агитация группировок.
+<h2>Профиль</h2>
+Профиль является одним из самых функциональных элементов. Из основного здесь можно посмотреть список друзей, репутацию, отношение группировок, текущую локацию. Из дополнительных разделов - снаряжение, рюкзак, энциклопедия Зоны, общий рейтинг сталкеров, достижения и статистика.
+<h2>Карта</h2>
+На карте тебе доступны прохождения сюжетных линий и режима свободной игры. Ты сможешь исследовать мир Зоны, выполнять задания, покупать и продавать снаряжение, находить схроны.
+
+]]></string>
+    <string name="help_tab3_content"><![CDATA[
+
+<h2>Регистрация</h2>
+Для начала необходимо зарегистрировать свой ПДА в сталкерской сети - нажать на кнопку "Регистрация". Далее нужно заполнить все поля, а именно логин, имя, кличку, ввести почту, пароль, а также выбрать аватарку из списка доступных. Старайтесь выбирать уникальные логин и кличку, чтобы вы были уникальными. Однако придерживайтесь правил: кличка обязательно должна соответствовать общему виду, который принят в Зоне. В противном случае модераторы сбросят вашу кличку. Логин может быть любой, он необходим для входа в приложение. В настройках можно будет выбрать, что отображается в чате и профиле, логин или кличка. Далее необходимо ознакомиться с условиями пользования и нажать кнопку "Регистрация", подтвердить почту и войти в приложение.
+<h2>Что дальше?</h2>
+Дальше начни свой путь в Зоне с пролога, для этого зайди в "Карта" и выбери соответствующий пункт. Пройди его, чтобы понимать, как устроен ПДА. После ты можешь начинать общение со сталкерами в чате, проходить режим свободной игры, который содержит в себе десятки квестов. Становись лучшим из лучших. Удачной дороги, сталкер!
+
+]]></string>
+    <string name="friends_of">Friends of %s</string>
+    <string name="create_note">Create note</string>
+    <string name="help_tab3_title">How to use</string>
+    <string name="summaryDate">Summary from %s</string>
+    <string name="selectSummary">Select summary.</string>
+    <string name="item_as_main">Equip</string>
+    <string name="notification_message">Message</string>
+    <string name="notification_alert">Notification</string>
+    <string name="any_select_action">Choose action</string>
+    <string name="take_off">Take off</string>
+    <string name="help_tab4_title">How shall we proceed then?</string>
+    <string name="info">Information</string>
+    <string name="cost">Cost: %s RU</string>
+    <string name="sell_question">Вы хотите продать %s?</string>
+    <string name="buy_question">Вы хотите купить %s?</string>
+    <string name="group_relation">Group relations</string>
+    <string name="progress">Progress</string>
+    <string name="rp_chat_channel" translatable="false">RP</string>
+    <string name="chatLimit">Чтобы получить доступ к чату, нужно пройти один из сюжетов.</string>
+
+
+    <string name="link_artux" translatable="false">https://artux.net/</string>
+    <string name="link_youtube" translatable="false">https://www.youtube.com/@Artux</string>
+    <string name="link_vk" translatable="false">https://vk.com/stalker_pda</string>
+    <string name="link_discord" translatable="false">https://discord.gg/qwVGfQDwWt</string>
+    <string name="discord_server">Сервер Discord</string>
+    <string name="vk_group">VK Group</string>
+    <string name="interesting">Interesting</string>
+    <string name="walk_through">Walkthrough</string>
+    <string name="disable_ads">Disable ads</string>
+    <string name="update_stories">Update stories</string>
+    <string name="pda">PDA</string>
+    <string name="clear_all_cache">Clear all cache</string>
+    <string name="clear_all_cache_summary">Очищает весь кэш приложения</string>
+    <string name="clear_images_cache">Сбросить кэш изображений</string>
+    <string name="clear_images_cache_summary">Очищает загруженные арты из историй</string>
+    <string name="cache">Cache</string>
+    <string name="reset_walk_through_summary">Reset all data, no changes in xp</string>
+    <string name="youtube_channel">YouTube channel</string>
+    <string name="developers_site">Developer\'s site</string>
+    <string name="account">Account</string>
+    <string name="reset_walk_through">Reset walkthrough</string>
+    <string name="exit_story">Exit current story</string>
+    <string name="version">Version</string>
+    <string name="build">Build</string>
+    <string name="support">Support</string>
+    <string name="write_to_developer">Write a suggestion to developer.</string>
+    <string name="write_to_developer_summary">Found a bug? Let us know</string>
+    <string name="exit_story_summary">Exit only current story, let you choose another</string>
+    <string name="update_stories_summary">" "</string>
+    <string name="online">Online</string>
+    <string name="offline">Offline</string>
+    <string name="position_p">Позиция в рейтинге: %1$s</string>
+    <string name="show_logs">Show logs</string>
+    <string name="test_ads">Test ads</string>
+    <string name="save_logs">Save logs to file</string>
+    <string name="reset_logs">Reset logs</string>
+    <string name="reset_story">Reset all stories data</string>
+    <string name="no_access">No access</string>
+    <string name="early_story_alert">Прохождение этой истории недоступно пока не пройдены предыдущие</string>
+    <string name="enterNotNumber">Введены не числа</string>
+    <string name="enterNotThreeValues">Введено не 3 значения.</string>
+    <string name="inputFormatToLoadStory">Формат ввода {storyId}:{chapterId}:{stageId}</string>
+    <string name="complete_story_alert">История уже пройдена, приступайте к прохождению других. При сбросе прохождения этой истории другие истории могут оказаться недоступны.</string>
+    <string name="update">Update</string>
+    <string name="need_update_message">Your version is unsupported, for new features and stable work of app you need to update it.</string>
+    <string name="need_update">Need update</string>
+    <string name="load">Load</string>
+    <string name="cancel">Close</string>
+    <string name="iwait">I\'m gonna wait</string>
+    <string name="need_wait_message">We\'re updating our services, please wait some time...</string>
+    <string name="need_wait">We need time\n</string>
+    <string name="likeIt">Like</string>
+    <string name="comments">Comments</string>
+    <string name="shareIt">Share</string>
+    <string name="empty_slot">Пусто</string>
+    <string name="privacy_url" translatable="false">https://www.artux.net/privacy.html</string>
+    <string name="delete_chat">Do you want to delete a chat with %s?</string>
+</resources>

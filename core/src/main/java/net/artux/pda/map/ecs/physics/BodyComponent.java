@@ -1,0 +1,94 @@
+package net.artux.pda.map.ecs.physics;
+
+import com.badlogic.ashley.core.Component;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.World;
+
+import net.artux.pda.map.engine.entities.BodyBuilder;
+
+/**
+ * Компонент физического тела сущности, определяет ее позицию, скорость, вес и так далее
+ */
+public class BodyComponent implements Component {
+
+    public final Body body;
+    private boolean destroyed = false;
+
+    private float MOVEMENT_FORCE = 30f; // H per step
+
+    public BodyComponent(BodyBuilder bodyBuilder, Vector2 position, World world) {
+        this.body = bodyBuilder.init(position, world);
+    }
+
+    public BodyComponent(Body body) {
+        this.body = body;
+    }
+
+    public BodyComponent(Vector2 vector2, World world) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(vector2.x, vector2.y);
+        body = world.createBody(bodyDef);
+    }
+
+    public BodyComponent(Vector2 vector2, BodyDef.BodyType type, World world) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(vector2);
+        bodyDef.type = type;
+        bodyDef.bullet = true;
+        body = world.createBody(bodyDef);
+    }
+
+    public Body getBody() {
+        return body;
+    }
+
+    public Vector2 getPosition() {
+        return body.getPosition();
+    }
+
+    public float getX() {
+        return body.getPosition().x;
+    }
+
+    public float getY() {
+        return body.getPosition().y;
+    }
+
+    public BodyComponent velocity(double vX, double vY) {
+        body.setLinearDamping(0);
+        body.setLinearVelocity((float) vX, (float) vY);
+        return this;
+    }
+
+    public BodyComponent setPosition(Vector2 position) {
+        return setPosition(position.x, position.y);
+    }
+
+    public BodyComponent setPosition(float x, float y) {
+        body.setTransform(x, y, 0);
+        return this;
+    }
+
+    public BodyComponent impulse(float x, float y) {
+        body.applyForceToCenter(x, y, true);
+        return this;
+    }
+
+    public void setDestroyed(boolean destroyed) {
+        this.destroyed = destroyed;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
+    public float getMovementForce() {
+        return MOVEMENT_FORCE;
+    }
+
+    public void setMovementForce(float value) {
+        MOVEMENT_FORCE = value;
+    }
+}

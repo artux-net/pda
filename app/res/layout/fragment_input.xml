@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/inputLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:orientation="horizontal">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/inputMessage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="1dp"
+        android:layout_weight="1"
+        android:background="@drawable/border_background"
+        android:hint="@string/inptmsg"
+        android:imeOptions="flagNoExtractUi"
+        android:padding="3dp" />
+
+    <Button
+        android:id="@+id/sendButton"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="1dp"
+        android:layout_weight="8"
+        android:background="@drawable/border_background"
+        android:text="OK" />
+
+</LinearLayout>

@@ -1,0 +1,193 @@
+package net.artux.pda.map.ecs.battle
+
+import com.badlogic.ashley.core.Component
+import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.audio.Sound
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import net.artux.pda.map.repository.DataRepository
+import net.artux.pda.model.items.ItemModel
+import net.artux.pda.model.items.ItemType
+import net.artux.pda.model.items.WeaponModel
+import net.artux.pda.model.quest.story.StoryDataModel
+
+class WeaponComponent : Component {
+    var selected: WeaponModel? = null
+        private set
+    private var bulletModel: ItemModel? = null
+    private lateinit var dataModel: StoryDataModel
+    var magazine = 0
+        private set
+    private var stack = 0
+    var timeout = 0f
+    var player = false
+    var shootLastFrame = false
+    var shotSound: Sound? = null
+        private set
+    var reloadSound: Sound? = null
+        private set
+    private var assetManager: AssetManager
+
+    constructor(dataRepository: DataRepository, assetManager: AssetManager) {
+        this.assetManager = assetManager
+
+        CoroutineScope(Dispatchers.Unconfined).launch {
+            dataRepository.storyDataModelFlow.collect {
+                updateData(it)
+            }
+        }
+    }
+
+    fun updateData(dataModel: StoryDataModel) {
+        this.dataModel = dataModel
+        player = true
+        updateWeapon()
+    }
+
+    constructor(weaponModel: WeaponModel?, assetManager: AssetManager) {
+        this.assetManager = assetManager
+        player = false
+        setWeaponModel(weaponModel)
+        reload()
+    }
+
+
+
+    fun setWeaponModel(weaponModel: WeaponModel?) {
+        selected = weaponModel
+        if (weaponModel != null) {
+            if (player)
+                setBulletModel(dataModel.getItemByBaseId(weaponModel.bulletId))
+
+            var reloadSoundName: String
+            var shotSoundName: String
+            if (weaponModel.type === ItemType.RIFLE) {
+                reloadSoundName = rifleDefaultReloadSound
+                shotSoundName = rifleDefaultShotSound
+            } else {
+                shotSoundName = pistolDefaultShotSound
+                reloadSoundName = pistolDefaultReloadSound
+            }
+
+            var path = prefix + weaponModel.baseId + "/reload.ogg"
+            if (assetManager.contains(path))
+                reloadSoundName = path
+            path = prefix + weaponModel.baseId + "/shoot.ogg"
+            if (assetManager.contains(path))
+                shotSoundName = path
+
+            shotSound = assetManager.get(shotSoundName)
+            reloadSound = assetManager.get(reloadSoundName)
+            reload()
+            reloading = false
+        } else if (player)
+            setBulletModel(null)
+    }
+
+    fun getBulletModel(): ItemModel? {
+        return bulletModel
+    }
+
+    private fun setBulletModel(item: ItemModel?) {
+        if (selected == null) {
+            bulletModel = null
+            return
+        }
+        if (item == null) {
+            bulletModel = null
+            return
+        }
+        if (selected!!.bulletId == item.baseId)
+            bulletModel = item
+    }
+
+    var type = ItemType.RIFLE
+
+    fun updateWeapon() {
+        setWeaponModel(dataModel.getEquippedWearable(type) as WeaponModel?)
+        if (selected == null) {
+            type = if (type === ItemType.RIFLE) ItemType.PISTOL else ItemType.RIFLE
+            setWeaponModel(dataModel.getEquippedWearable(type) as WeaponModel?)
+        }
+    }
+
+    fun switchWeapons() {
+        type = if (type === ItemType.RIFLE) ItemType.PISTOL else ItemType.RIFLE
+        setWeaponModel(dataModel.getEquippedWearable(type) as WeaponModel?)
+    }
+
+    fun update(dt: Float) {
+        if (timeout > 0) timeout -= dt
+        if (timeout < 0) reloading = false
+
+        /* if (resource != null && resource.getQuantity() < 1) {
+            switchWeapons();
+        }*/
+    }
+
+    fun limit(): Int {
+        return if (player) selected!!.bulletQuantity else 4
+    }
+
+    var reloading = false
+    fun shoot(): Boolean {
+        if (selected == null)
+            return false
+
+        if (timeout <= 0 && (bulletModel != null && bulletModel!!.quantity > 0 || !player)) {
+            val weaponModel = selected
+            val magazine = magazine // кол-во патрон в магазине
+            if (stack < limit() && magazine > 0) {
+                this.magazine--
+                //выстрел, текущая очередь (stack) не кончилась
+                timeout += 1 / weaponModel!!.speed
+                if (player)
+                    bulletModel!!.quantity = bulletModel!!.quantity - 1
+                stack++
+                shootLastFrame = true
+            } else if (magazine == 0) {
+                //патрон в магазине нет
+                reload()
+                timeout += 5 / weaponModel!!.speed // перезарядка
+                shootLastFrame = false
+            } else {
+                // магазин не пуст, очередь кончилась, моб "ждет"
+                stack = 0
+                timeout += 20 / weaponModel!!.speed
+                shootLastFrame = false
+            }
+        } else shootLastFrame = false
+        return shootLastFrame // показывает, произошел выстрел или нет
+    }
+
+    fun reload() {
+        val weaponModel = selected
+
+        if (weaponModel != null) {
+            var take = weaponModel.bulletQuantity
+            reloading = true
+            if (player) {
+                if (bulletModel != null) {
+                    take = bulletModel!!.quantity
+                    if (weaponModel.bulletQuantity < take) {
+                        take = weaponModel.bulletQuantity
+                    }
+                } else take = 0
+            }
+            stack = 0
+            magazine = take
+        }
+
+        if (magazine == 0)
+            setBulletModel(null)
+    }
+
+    companion object {
+        private const val prefix = "audio/sounds/weapons/"
+        private const val rifleDefaultShotSound = prefix + "rifle/ak74_shot.ogg"
+        private const val rifleDefaultReloadSound = prefix + "rifle/ak74_reload.ogg"
+        private const val pistolDefaultShotSound = prefix + "pistol/pm_shot.ogg"
+        private const val pistolDefaultReloadSound = prefix + "pistol/pm_reload.ogg"
+    }
+}

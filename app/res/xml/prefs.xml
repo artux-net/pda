@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="pda_category"
+        app:title="@string/pda">
+
+        <SwitchPreferenceCompat
+            app:enabled="false"
+            app:iconSpaceReserved="false"
+            app:key="story_updatable"
+            app:summary="@string/update_stories_summary"
+            app:title="@string/update_stories" />
+
+        <Preference
+            app:enableCopying="true"
+            app:enabled="false"
+            app:iconSpaceReserved="false"
+            app:title="@string/disable_ads" />
+
+        <Preference
+            app:enableCopying="true"
+            app:enabled="false"
+            app:iconSpaceReserved="false"
+            app:summary="@string/versionName"
+            app:title="@string/version" />
+
+        <Preference
+            app:enableCopying="true"
+            app:enabled="false"
+            app:iconSpaceReserved="false"
+            app:summary="@string/versionCode"
+            app:title="@string/build" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="walk-through"
+        app:title="@string/walk_through">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="exit_story"
+            app:summary="@string/exit_story_summary"
+            app:title="@string/exit_story" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="reset_data"
+            app:summary="@string/reset_walk_through_summary"
+            app:title="@string/reset_walk_through" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="cache_category"
+        app:title="@string/cache">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="clear_images_cache"
+            app:summary="@string/clear_images_cache_summary"
+            app:title="@string/clear_images_cache" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="clear_all_cache"
+            app:summary="@string/clear_all_cache_summary"
+            app:title="@string/clear_all_cache" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="account_category"
+        app:title="@string/account">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="sign_out"
+            app:title="@string/action_sign_out" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="support_category"
+        app:title="@string/support">
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="show_logs"
+            app:title="@string/show_logs" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="test_ads"
+            app:title="@string/test_ads" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="save_logs"
+            app:title="@string/save_logs" />
+
+        <Preference
+            app:iconSpaceReserved="false"
+            app:key="reset_logs"
+            app:title="@string/reset_logs" />
+
+        <PreferenceScreen
+            app:iconSpaceReserved="false"
+            app:summary="@string/write_to_developer_summary"
+            app:title="@string/write_to_developer">
+            <intent
+                android:action="android.intent.action.SENDTO"
+                android:data="mailto:maxim@artux.net" />
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/interesting">
+
+        <PreferenceScreen
+            app:icon="@drawable/logo_artux"
+            app:summary="artux.net"
+            app:title="@string/developers_site">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/link_artux" />
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            app:iconSpaceReserved="false"
+            app:summary="https://www.youtube.com/@Artux"
+            app:title="@string/youtube_channel">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/link_youtube" />
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            app:iconSpaceReserved="false"
+            app:summary="vk.com/stalker_pda"
+            app:title="@string/vk_group">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/link_vk" />
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            app:iconSpaceReserved="false"
+            app:summary="discord.gg/qwVGfQDwWt"
+            app:title="@string/discord_server">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/link_discord" />
+
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

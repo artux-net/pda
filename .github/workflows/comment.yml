@@ -1,0 +1,35 @@
+name: Comment PR
+
+on:
+  pull_request:
+    types:
+      - opened
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  comment:
+    name: Comment PR
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{secrets.token}}
+
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            `/preview` или `/build` - вызов сборки APK и публикация в закрытом канале 
+
+      - name: Send message to Artux channel
+        uses: ./.github/notify
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            Опубликован новый PR [${{ github.event.pull_request.title }}](${{ github.event.pull_request.url }})
+            Автор: ${{ github.event.pull_request.user.login }}

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:orientation="vertical">
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal">
+
+           <Button
+               android:id="@+id/commonChatBtn"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:text="@string/general_chat_channel"
+               android:background="@drawable/border_background"
+               android:layout_weight="1"/>
+           <Button
+               android:id="@+id/groupChatBtn"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:text="@string/group_chat_channel"
+               android:background="@drawable/border_background"
+               android:layout_weight="1"/>
+
+           <Button
+               android:id="@+id/rpChatBtn"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:background="@drawable/border_background"
+               android:text="@string/rp_chat_channel"
+               android:layout_weight="1"/>
+
+           <!--<ImageButton
+               android:id="@+id/addChatBtn"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:layout_weight="1"
+               android:background="@drawable/border_background"
+               android:src="@drawable/ic_add"
+               tools:visibility="gone" />-->
+
+       </LinearLayout>
+
+       <include
+           android:id="@+id/listContainer"
+           layout="@layout/fragment_list" />
+
+   </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

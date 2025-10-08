@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/storyIcon"
+        android:layout_width="1300dp"
+        android:layout_height="130dp"
+        android:paddingTop="3dp"
+        android:src="@mipmap/ic_launcher"
+        android:layout_weight="5"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/storyTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Player"
+            android:textSize="20sp"
+            android:textColor="#FFF"
+            android:paddingLeft="10dp"/>
+
+        <TextView
+            android:id="@+id/storyDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:text="message"/>
+
+    </LinearLayout>
+
+</LinearLayout>

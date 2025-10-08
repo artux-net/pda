@@ -1,0 +1,40 @@
+name: Prepare and send summary
+description: Add summary message to pipeline and notify TG
+inputs:
+  message:
+    description: File content
+    required: true
+  to:
+    description: Telegram Bot Token
+    required: true
+  token:
+    description: Telegram Chat ID
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create summary file
+      uses: 1arp/create-a-file-action@0.4.5
+      with:
+        file: summary.md
+        content: ${{ inputs.message }}
+
+    - name: Read file
+      id: read_file
+      shell: bash
+      run: |
+        content=$(cat summary.md)
+        echo "summary_message<<EOF" >> $GITHUB_OUTPUT
+        echo "$content" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+        echo "$content" >> $GITHUB_STEP_SUMMARY
+
+    - name: Send message to Telegram
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ inputs.to }}
+        token: ${{ inputs.token }}
+        format: markdown
+        message: ${{ steps.read_file.outputs.summary_message }}
