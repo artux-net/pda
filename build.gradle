@@ -4,7 +4,7 @@ ext {
     ashleyVersion = Versions.ASHLEY
     dagger_version = Versions.DAGGER
     aiVersion = "1.8.2"
-    gdxControllersVersion = "2.2.1"
+    gdxControllersVersion = "2.2.4"
     keystore = '..\\keystore\\pda.jks'
 }
 
