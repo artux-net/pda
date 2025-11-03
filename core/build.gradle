@@ -4,7 +4,7 @@ plugins {
     id "java"
     id "kotlin"
     id "kotlin-kapt"
-    id "com.google.protobuf" version "0.9.4"
+    id "com.google.protobuf" version "0.9.5"
 }
 
 javadoc {
@@ -15,7 +15,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation("com.google.protobuf:protobuf-javalite:3.25.2")
     implementation("com.google.protobuf:protobuf-javalite:3.25.2")
-    implementation("com.google.protobuf:protobuf-gradle-plugin:0.9.4")
+    implementation("com.google.protobuf:protobuf-gradle-plugin:0.9.5")
 
     implementation("com.google.protobuf:protobuf-kotlin-lite:3.20.1")
     implementation("org.apache.commons:commons-lang3:3.12.0")
