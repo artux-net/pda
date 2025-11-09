@@ -1,0 +1,41 @@
+{
+  "project_info": {
+    "project_number": "76546312325",
+    "firebase_url": "https://android-pda-589b5.firebaseio.com",
+    "project_id": "android-pda-589b5",
+    "storage_bucket": "android-pda-589b5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:76546312325:android:2d99312ab81feffb6b01ec",
+        "android_client_info": {
+          "package_name": "net.artux.pda"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "76546312325-o39ek3kthc9o9cleedhn4db7faj2f25f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6IA4B7VM-ayAvd5m_fDL7tzpsWkSrE7s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "76546312325-o39ek3kthc9o9cleedhn4db7faj2f25f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-4707001480680280~1357953477"
+    }
+  ],
+  "configuration_version": "1"
+}

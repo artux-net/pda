@@ -30,6 +30,10 @@ gradle.projectsEvaluated {
 }
 
 android {
+    buildFeatures{
+        buildConfig = true
+    }
+
     namespace "net.artux.pda"
 
     sourceSets {
@@ -213,7 +217,7 @@ dependencies {
 }
 
 tasks.register('downloadAPI') {
-    def url = new URL("https://dev.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest")
+    def url = new URL("https://app.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest")
     def uc = url.openConnection()
     uc.getInputStream().transferTo(new FileOutputStream(apiFile))
 }
