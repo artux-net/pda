@@ -1,4 +1,4 @@
-# Staler PDA
+# Stalker PDA
 [![Google Play](https://img.shields.io/badge/Google_Play-414141?style=flat-square&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=net.artux.pda&hl=ru)
 [![Downloads](https://img.shields.io/badge/downloads-50K+-success?style=flat-square)](https://play.google.com/store/apps/details?id=net.artux.pda&hl=ru)
 
@@ -25,11 +25,6 @@ PDA (Personal Digital Assistant)  is a strategy/tactical game that combines RPG 
 - **Ashley** Entity Component System (ECS)
 - **Box2D** Physics engine for combat and movement
 
-### Android
-- **Target SDK**: 34
-- **Minimum SDK**: 26
-- **Gradle**: 8.9.0
-
 ### Additional Libraries
 - **Dagger 2** - Dependency injection
 - **Kotlin Coroutines** - Asynchronous programming
@@ -50,11 +45,6 @@ pda/
 
 ## Building the Project
 
-### Prerequisites
-- JDK 17 or higher
-- Android SDK with API level 34
-- Gradle 8.x (wrapper included)
-
 ### Build Commands
 
 #### Android (Debug)
@@ -65,16 +55,6 @@ pda/
 #### Android (Release)
 ```bash
 ./gradlew app:assembleRelease
-```
-
-#### Desktop (for testing)
-```bash
-./gradlew desktop:run
-```
-
-### Running Tests
-```bash
-./gradlew test
 ```
 
 ## Development Setup
@@ -93,15 +73,6 @@ git submodule update --init --recursive
 3. Open the project in Android Studio or IntelliJ IDEA
 
 4. Sync Gradle and build the project
-
-## CI/CD
-
-The project uses GitHub Actions for continuous integration and deployment:
-
-- **Beta Build**: Automatically builds and deploys to Google Play Beta on push to master
-- **Preview Build**: Creates preview builds for pull requests
-- **Tag Build**: Creates release builds when tags are pushed
-- **Test**: Runs automated tests on pull requests
 
 ## Modules
 
@@ -133,10 +104,6 @@ Data models and domain objects:
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-## License
-
-This project is proprietary software. All rights reserved.
 
 ## Contact
 
