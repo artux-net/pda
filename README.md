@@ -1,29 +1,29 @@
-# PDA Network
+# Staler PDA
+[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=flat-square&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=net.artux.pda&hl=ru)
+[![Downloads](https://img.shields.io/badge/downloads-50K+-success?style=flat-square)](https://play.google.com/store/apps/details?id=net.artux.pda&hl=ru)
 
-PDA Network is an Android game built with the libGDX framework. The game features a tactical gameplay experience with gang relations, quests, and a dynamic map system.
+Stalker PDA is an Android game built with the [libGDX](https://libgdx.com) framework. The game features a tactical gameplay experience with quests and interactive map system.
 
 ## Overview
 
-PDA (Personal Digital Assistant) Network is a strategy/tactical game that combines RPG elements with real-time combat mechanics. Players navigate through various maps, manage stalkers, complete quests, and interact with different gangs in a persistent game world.
+PDA (Personal Digital Assistant)  is a strategy/tactical game that combines RPG elements with real-time combat mechanics. Players navigate through various maps, manage stalkers, complete quests, and interact with different gangs in a persistent game world.
 
 ## Features
 
+- **Quest System**: Story-driven quests with Lua scripting support
+- **Real-time Combat**: Tactical battles using Box2D physics engine
 - **Dynamic Map System**: Explore various locations with spawn points and interactive elements
 - **Gang Relations**: Complex relationship system between different factions
-- **Quest System**: Story-driven quests with Lua scripting support
 - **Character Management**: Manage stalkers with unique attributes and equipment
-- **Real-time Combat**: Tactical battles using Box2D physics engine
 - **News & Articles**: In-game news system to track events
-- **Multiplayer Support**: Network-enabled gameplay features
-- **Cross-platform**: Android and Desktop support
 
 ## Technology Stack
 
 ### Core Technologies
-- **Kotlin** 2.0.0 - Primary programming language
-- **libGDX** 1.12.1 - Game development framework
-- **Ashley** 1.7.4 - Entity Component System (ECS)
-- **Box2D** - Physics engine for combat and movement
+- **Kotlin** Primary programming language
+- **libGDX** Game development framework
+- **Ashley** Entity Component System (ECS)
+- **Box2D** Physics engine for combat and movement
 
 ### Android
 - **Target SDK**: 34
@@ -33,9 +33,9 @@ PDA (Personal Digital Assistant) Network is a strategy/tactical game that combin
 ### Additional Libraries
 - **Dagger 2** - Dependency injection
 - **Kotlin Coroutines** - Asynchronous programming
-- **LuaJ** 3.0.1 - Lua scripting engine
+- **LuaJ** - Lua scripting engine
 - **Gson** - JSON serialization
-- **Google AdMob** - Advertisement integration
+- **Firebase** - To collect analytics
 
 ## Project Structure
 
@@ -44,8 +44,6 @@ pda/
 ├── app/              # Android application module
 ├── core/             # Core game logic and engine
 ├── model/            # Data models and domain objects
-├── desktop/          # Desktop launcher (for testing)
-├── buildSrc/         # Build configuration and versioning
 ├── assets/           # Game assets (sprites, sounds, etc.)
 └── .github/          # CI/CD workflows and automation
 ```
@@ -146,4 +144,4 @@ For questions or support, please contact the development team through the GitHub
 
 ---
 
-**Note**: This is a game in active development. Features and APIs may change without notice.
+**Note**: This is a game in development. Features and APIs may change without notice.

@@ -1,17 +1,15 @@
-package net.artux.pda.common;
+package net.artux.pda.common
 
-public abstract class PropertyFields {
+object PropertyFields {
+    const val API_URL: String = "baseUrl"
+    const val RESOURCE_URL: String = "resourceUrl"
+    const val XP_CHAT_LIMIT: String = "xpChatLimit"
+    const val MINIMUM_VERSION: String = "minimalVersion"
+    const val SERVER_UPDATING: String = "isServerUpdating"
 
-    public static final String API_URL = "baseUrl";
-    public static final String RESOURCE_URL = "resourceUrl";
-    public static final String XP_CHAT_LIMIT = "xpChatLimit";
-    public static final String MINIMUM_VERSION = "minimalVersion";
-    public static final String SERVER_UPDATING = "isServerUpdating";
+    const val TESTER_MODE: String = "testMode"
 
-    public static final String TESTER_MODE = "testMode";
-
-    public static final String STORIES_SEQUENCE = "stories.sequence";
-    public static final String SINGLE_BOT_FREQ = "core.generation.bot.singleFrequency";
-    public static final String GROUP_BOT_FREQ = "core.generation.bot.groupFrequency";
-
+    const val STORIES_SEQUENCE: String = "stories.sequence"
+    const val SINGLE_BOT_FREQ: String = "core.generation.bot.singleFrequency"
+    const val GROUP_BOT_FREQ: String = "core.generation.bot.groupFrequency"
 }

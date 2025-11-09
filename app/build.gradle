@@ -52,9 +52,9 @@ android {
     }
 
     defaultConfig {
-        targetSdk BuildConfig.SDK
-        compileSdk BuildConfig.SDK
-        minSdk BuildConfig.MIN_SDK
+        targetSdk 43
+        compileSdk 34
+        minSdk 26
 
         applicationId "net.artux.pda"
         versionCode 1
@@ -98,15 +98,15 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = BuildConfig.JDK
-        targetCompatibility = BuildConfig.JDK
+        sourceCompatibility = 17
+        targetCompatibility = 17
     }
 
     kotlin {
         jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(BuildConfig.JDK))
+            languageVersion.set(JavaLanguageVersion.of(17))
         }
-        jvmToolchain(BuildConfig.JDK)
+        jvmToolchain(17)
     }
 
     buildFeatures {
