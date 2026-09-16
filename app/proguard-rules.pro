@@ -166,3 +166,5 @@
 -dontwarn org.codehaus.groovy.runtime.typehandling.DefaultTypeTransformation
 -dontwarn org.codehaus.groovy.runtime.typehandling.ShortTypeHandling
 -dontwarn org.codehaus.groovy.transform.ImmutableASTTransformation
+-dontwarn java.lang.invoke.MethodHandleProxies
+-dontwarn java.lang.reflect.AnnotatedType
