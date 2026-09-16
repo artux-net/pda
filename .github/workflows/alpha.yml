@@ -1,9 +1,9 @@
-name: Beta Build
+name: Alpha Build
 
 on:
   push:
     branches:
-      - master
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build:
-    name: Beta build
+    name: Alpha build
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
         uses: ./.github/assembly
         id: assembly
         with:
-          profile: beta
+          profile: alpha
           signing_key: ${{ secrets.SIGNING_KEY }}
           key_alias: ${{ secrets.KEY_ALIAS }}
           keystore_password: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -40,15 +40,16 @@ jobs:
           echo "pr_number=$pr_number" >> $GITHUB_OUTPUT
 
       - name: Send message to Artux channel
+        continue-on-error: true
         uses: ./.github/notify
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Beta сборка ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}
-            
-            Ожидает публикации в beta-канале Google Play
-            
+            Alpha сборка ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}
+
+            Опубликована в internal-канале Google Play
+
             Название: ${{ github.event.head_commit.message }}
             Автор: ${{ github.event.head_commit.author.name }}
-            [PR](https://github.com/${{ github.repository }}/pull/${{ steps.extract_pr.outputs.pr_number }}) | [Changes](https://github.com/${{ github.repository }}/commit/${{github.sha}}) | [Crashlytics](https://console.firebase.google.com/project/${{ vars.FIREBASE_ID }}/crashlytics/app/android:${{ vars.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})           
+            [PR](https://github.com/${{ github.repository }}/pull/${{ steps.extract_pr.outputs.pr_number }}) | [Changes](https://github.com/${{ github.repository }}/commit/${{github.sha}}) | [Crashlytics](https://console.firebase.google.com/project/${{ vars.FIREBASE_ID }}/crashlytics/app/android:${{ vars.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})
