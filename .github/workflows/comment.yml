@@ -12,11 +12,9 @@ concurrency:
 jobs:
   comment:
     name: Comment PR
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{secrets.token}}
 
       - name: Create comment
         uses: peter-evans/create-or-update-comment@v4
