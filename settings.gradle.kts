@@ -7,7 +7,6 @@ buildscript {
         maven("https://jitpack.io")
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
         maven("https://oss.sonatype.org/content/repositories/releases/")
-        maven("https://artifactory.appodeal.com/appodeal")
     }
 
     dependencies {
