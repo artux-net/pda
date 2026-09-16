@@ -19,17 +19,40 @@ public class LocaleBundle {
 
     public LocaleBundle(FileHandle fileHandle, Locale locale, boolean simpleFormat) {
         this.simpleFormat = simpleFormat;
+        this.locale = locale;
         properties = new ObjectMap<>();
 
         Properties temp = new Properties();
         try {
-            temp.load(fileHandle.reader(StandardCharsets.UTF_8.name()));//todo locale specific-load
+            temp.load(resolveForLocale(fileHandle, locale).reader(StandardCharsets.UTF_8.name()));
             temp.forEach((key, value) -> {
                 properties.put((String) key, (String) value);
             });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Bundle files follow the convention "name.properties" (base, historically
+     * Russian) / "name_en.properties" (English), sitting next to each other.
+     * Falls back to the base file whenever a translated sibling for the
+     * requested locale doesn't exist, so untranslated locales keep working.
+     */
+    private static FileHandle resolveForLocale(FileHandle fileHandle, Locale locale) {
+        if (locale == null) return fileHandle;
+
+        String language = locale.getLanguage();
+        if (language == null || language.isEmpty()) return fileHandle;
+
+        String extension = fileHandle.extension();
+        String nameWithoutExtension = fileHandle.nameWithoutExtension();
+        String localizedName = extension.isEmpty()
+                ? nameWithoutExtension + "_" + language
+                : nameWithoutExtension + "_" + language + "." + extension;
+
+        FileHandle localized = fileHandle.sibling(localizedName);
+        return localized.exists() ? localized : fileHandle;
     }
 
     public String get(String key) {
