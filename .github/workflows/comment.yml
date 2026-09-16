@@ -26,6 +26,7 @@ jobs:
             `/preview` или `/build` - вызов сборки APK и публикация в закрытом канале 
 
       - name: Send message to Artux channel
+        continue-on-error: true
         uses: ./.github/notify
         with:
           to: ${{ secrets.TELEGRAM_TO }}

@@ -44,6 +44,7 @@ jobs:
           echo "$expiration_date - Ссылка для скачивания действительна до этой даты"
 
       - name: Send message to Artux channel
+        continue-on-error: true
         uses: ./.github/notify
         with:
           to: ${{ secrets.TELEGRAM_TO }}

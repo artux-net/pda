@@ -2,13 +2,16 @@ name: Create tag
 
 on:
   workflow_run:
-    workflows: [Beta Build]
+    workflows: [Alpha Build]
     types: [completed]
-    branches: [master]
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: write
 
 jobs:
   tag-commit:
@@ -19,6 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
 
       - name: Generate Version
@@ -26,4 +30,4 @@ jobs:
         uses: paulhatch/semantic-version@v5.4.0
 
       - name: Create tag
-        run: git tag ${{ steps.version.outputs.version_tag }} ${{ env.COMMIT_SHA }} && git push origin ${{ steps.version.outputs.version_tag }}
+        run: git tag ${{ steps.version.outputs.version_tag }} ${{ github.event.workflow_run.head_sha }} && git push origin ${{ steps.version.outputs.version_tag }}
