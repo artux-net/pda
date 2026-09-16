@@ -205,15 +205,6 @@ dependencies {
 
     implementation("com.google.dagger:hilt-android:$dagger_version")
     kapt("com.google.dagger:hilt-compiler:$dagger_version")
-
-    // ads
-    implementation("com.appodeal.ads:sdk:3.5.0.0") {
-        exclude group: "com.appodeal.ads.sdk.services", module: "adjust"
-        exclude group: "com.appodeal.ads.sdk.services", module: "appsflyer"
-        exclude group: "com.appodeal.ads.sdk.services", module: "facebook_analytics"
-        exclude group: "com.appodeal.ads.sdk.services", module: "firebase"
-        exclude group: "com.appodeal.ads.sdk.services", module: "sentry_analytics"
-    }
 }
 
 tasks.register('downloadAPI') {

@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import com.appodeal.ads.Appodeal
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -42,7 +41,6 @@ import net.artux.pda.ui.viewmodels.UserViewModel
 import net.artux.pda.ui.viewmodels.event.ScreenDestination
 import net.artux.pda.utils.*
 import timber.log.Timber
-import java.util.Random
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -126,26 +124,6 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
             intent.putExtra("section", destination)
             startActivity(intent)
             finish()
-        }
-        commandViewModel.adEvent.observe(this) { type: AdType ->
-            val probability = Random().nextFloat()
-            if (type.defaultProbability > probability) return@observe
-            if (type.isRewarded) {
-                if (Appodeal.isLoaded(Appodeal.REWARDED_VIDEO)) {
-                    firebaseAnalytics.logEvent("rewarded_ad_show"){
-                        param("type", type.name)
-                    }
-                    Appodeal.show(this, Appodeal.REWARDED_VIDEO)
-                }
-            } else {
-                if (Appodeal.isLoaded(Appodeal.INTERSTITIAL)) {
-                    firebaseAnalytics.logEvent("interstitial_ad_show"){
-                        param("type", type.name)
-                    }
-                    Appodeal.show(this, Appodeal.INTERSTITIAL)
-                }
-            }
-
         }
         questViewModel.background.observe(this) { nextBackground: String? ->
             setBackground(nextBackground)

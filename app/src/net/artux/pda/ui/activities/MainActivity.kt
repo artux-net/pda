@@ -12,14 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
-import com.appodeal.ads.Appodeal.INTERSTITIAL
-import com.appodeal.ads.Appodeal.REWARDED_VIDEO
-import com.appodeal.ads.Appodeal.initialize
-import com.appodeal.ads.Appodeal.setLogLevel
-import com.appodeal.ads.Appodeal.setUserId
-import com.appodeal.ads.initializing.ApdInitializationCallback
-import com.appodeal.ads.initializing.ApdInitializationError
-import com.appodeal.ads.utils.Log
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -73,17 +65,6 @@ class MainActivity : FragmentActivity(), MainContract.View, View.OnClickListener
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding!!.root)
 
-        initialize(
-            this,
-            "dfc30cc869b9e15edfe0b7d0cbb8cf37b5291c8e9b4fbe4d",
-            INTERSTITIAL or REWARDED_VIDEO,
-            ApdInitializationCallback { list: List<ApdInitializationError?>? ->
-                Timber.i("Appodeal initialization done")
-                setLogLevel(Log.LogLevel.debug)
-                if (!list.isNullOrEmpty())
-                    for (err in list)
-                    Timber.tag("Add Error").e(err)
-            })
         presenter = MainPresenter()
         presenter!!.attachView(this)
 
@@ -106,7 +87,6 @@ class MainActivity : FragmentActivity(), MainContract.View, View.OnClickListener
 
         viewModel!!.member.observe(this) { memberResult: UserModel ->
             presenter!!.setAdditionalTitle("PDA #" + memberResult.pdaId)
-            setUserId(memberResult.email)
             firebaseAnalytics.setUserId(memberResult.id.toString())
             firebaseAnalytics.setUserProperty("email", memberResult.email)
             firebaseAnalytics.setUserProperty("name", memberResult.name)
