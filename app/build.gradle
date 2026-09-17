@@ -72,7 +72,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             shrinkResources false
 
             buildConfigField("String", "PROTOCOL", "\"https\"")

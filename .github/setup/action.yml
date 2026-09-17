@@ -10,16 +10,3 @@ runs:
         java-version: 17
         cache: gradle
         check-latest: true
-
-    - name: Set up cache
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.gradle
-          ~/app/build
-          ~/core/build
-          ~/model/build
-          ~/.cache
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
