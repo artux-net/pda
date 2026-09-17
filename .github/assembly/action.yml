@@ -84,7 +84,7 @@ runs:
         keyStorePassword: ${{ inputs.keystore_password }}
         keyPassword: ${{ inputs.key_password }}
       env:
-        BUILD_TOOLS_VERSION: "33.0.0"
+        BUILD_TOOLS_VERSION: "34.0.0"
 
     - name: Upload release
       uses: actions/upload-artifact@v4
