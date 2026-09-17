@@ -1,49 +1,57 @@
-plugins {
-    id "org.hidetake.swagger.generator" version "2.19.2"
-    id "kotlin-android"
-    id "com.android.application"
-    id "kotlin-kapt"
-    id "dagger.hilt.android.plugin"
+import org.hidetake.gradle.swagger.generator.GenerateSwaggerCode
+import java.io.FileOutputStream
+import java.net.URL
 
-    id "com.google.gms.google-services"
-    id "com.google.firebase.crashlytics"
+plugins {
+    id("org.hidetake.swagger.generator") version "2.19.2"
+    id("kotlin-android")
+    id("com.android.application")
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
+
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
-def apiFile = file("api.json")
+val apiFile = file("api.json")
+
 swaggerSources {
-    pdanetwork {
-        inputFile = apiFile
-        code {
+    register("pdanetwork") {
+        setInputFile(apiFile)
+        code(delegateClosureOf<GenerateSwaggerCode> {
             language = "java"
             configFile = file("apiconfig.json")
             outputDir = file("$buildDir\\generated\\swagger-code")
-        }
+        })
     }
 }
 
 gradle.projectsEvaluated {
-    if (!apiFile.exists()) {
-        preBuild.dependsOn(downloadAPI)
+    tasks.named("preBuild") {
+        if (!apiFile.exists()) {
+            dependsOn("downloadAPI")
+        }
+        dependsOn(swaggerSources["pdanetwork"].code)
     }
-
-    preBuild.dependsOn swaggerSources.pdanetwork.code
 }
 
 android {
-    buildFeatures{
+    compileSdk = 34
+
+    buildFeatures {
         buildConfig = true
     }
 
-    namespace "net.artux.pda"
+    namespace = "net.artux.pda"
 
     sourceSets {
-        main {
-            manifest.srcFile "AndroidManifest.xml"
-            java.srcDirs = ["src", "${swaggerSources.pdanetwork.code.outputDir}/src/main/java"]
-            aidl.srcDirs = ["src"]
-            res.srcDirs = ["res"]
-            assets.srcDirs = ["../assets"]
-            jniLibs.srcDirs = ["libs"]
+        getByName("main") {
+            manifest.srcFile("AndroidManifest.xml")
+            java.setSrcDirs(listOf("src", "${swaggerSources["pdanetwork"].code.outputDir}/src/main/java"))
+            aidl.setSrcDirs(listOf("src"))
+            res.setSrcDirs(listOf("res"))
+            assets.setSrcDirs(listOf("../assets"))
+            jniLibs.setSrcDirs(listOf("libs"))
         }
     }
 
@@ -52,28 +60,27 @@ android {
     }
 
     defaultConfig {
-        targetSdk 43
-        compileSdk 34
-        minSdk 26
+        targetSdk = 43
+        minSdk = 26
 
-        applicationId "net.artux.pda"
-        versionCode 1
-        versionName "dev-build"
-        proguardFiles "proguard-rules.pro"
-        testProguardFiles "test-proguard-rules.pro"
-        signingConfig signingConfigs.debug
+        applicationId = "net.artux.pda"
+        versionCode = 1
+        versionName = "dev-build"
+        proguardFiles("proguard-rules.pro")
+        testProguardFiles("test-proguard-rules.pro")
+        signingConfig = signingConfigs.getByName("debug")
     }
 
-    applicationVariants.configureEach { variant ->
+    applicationVariants.configureEach {
         // add versions to resources
-        variant.resValue "string", "versionName", variant.versionName
-        variant.resValue "string", "versionCode", variant.versionCode.toString()
+        resValue("string", "versionName", versionName)
+        resValue("string", "versionCode", versionCode.toString())
     }
 
     buildTypes {
         release {
-            minifyEnabled false
-            shrinkResources false
+            isMinifyEnabled = false
+            isShrinkResources = false
 
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
@@ -84,9 +91,9 @@ android {
         }
 
         debug {
-            minifyEnabled false
-            shrinkResources false
-            debuggable true
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isDebuggable = true
 
             buildConfigField("String", "PROTOCOL", "\"https\"")
             buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
@@ -98,8 +105,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = 17
-        targetCompatibility = 17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlin {
@@ -110,31 +117,28 @@ android {
     }
 
     buildFeatures {
-        viewBinding true
-        aidl true
+        viewBinding = true
+        aidl = true
     }
 
     lint {
-        abortOnError false
+        abortOnError = false
     }
 }
 
-ext {
-    oltu_version = "1.0.2"
-    retrofit_version = "2.11.0"
-    swagger_annotations_version = "2.0.0"
-    junit_version = "4.12"
-    threetenbp_version = "1.3.5"
-    json_fire_version = "1.8.0"
-    mapstruct_version = "1.5.2.Final"
-    glide_version = "4.12.0"
-    dagger_version = "2.51.1"
-    retrofit_version = "2.9.0"
-    androidx_version = "2.6.1"
-}
+val oltu_version = "1.0.2"
+val swagger_annotations_version = "2.0.0"
+val junit_version = "4.12"
+val threetenbp_version = "1.3.5"
+val json_fire_version = "1.8.0"
+val mapstruct_version = "1.5.2.Final"
+val glide_version = "4.12.0"
+val dagger_version = "2.51.1"
+val retrofit_version = "2.9.0"
+val androidx_version = "2.6.1"
 
 dependencies {
-    implementation(fileTree(dir: "libs", include: ["*.aar"]))
+    implementation(fileTree("libs") { include("*.aar") })
 
     implementation("androidx.multidex:multidex:2.0.1")
     // mapstruct
@@ -145,7 +149,7 @@ dependencies {
     swaggerCodegen("io.swagger.codegen.v3:swagger-codegen-cli:3.0.34")
     implementation("io.swagger.core.v3:swagger-annotations:$swagger_annotations_version")
     implementation("org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:$oltu_version") {
-        exclude group: "org.apache.oltu.oauth2", module: "org.apache.oltu.oauth2.common"
+        exclude(group = "org.apache.oltu.oauth2", module = "org.apache.oltu.oauth2.common")
     }
     implementation("io.gsonfire:gson-fire:$json_fire_version")
     implementation("org.threeten:threetenbp:$threetenbp_version")
@@ -207,13 +211,13 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:$dagger_version")
 }
 
-tasks.register('downloadAPI') {
-    def url = new URL("https://app.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest")
-    def uc = url.openConnection()
-    uc.getInputStream().transferTo(new FileOutputStream(apiFile))
+tasks.register("downloadAPI") {
+    val url = URL("https://app.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest")
+    val uc = url.openConnection()
+    uc.getInputStream().transferTo(FileOutputStream(apiFile))
 }
 
-tasks.register('copyAndroidNatives') {
+tasks.register("copyAndroidNatives") {
     doFirst {
         file("libs/armeabi/").mkdirs()
         file("libs/armeabi-v7a/").mkdirs()
@@ -221,27 +225,27 @@ tasks.register('copyAndroidNatives') {
         file("libs/x86_64/").mkdirs()
         file("libs/x86/").mkdirs()
 
-        configurations.natives.copy().files.each { jar ->
-            def outputDir = null
+        configurations["natives"].copy().files.forEach { jar ->
+            var outputDir: File? = null
             if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
             if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
             if (jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
             if (jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
             if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-            if (outputDir != null) {
+            val dir = outputDir
+            if (dir != null) {
                 copy {
-                    from zipTree(jar)
-                    into outputDir
-                    include "*.so"
+                    from(zipTree(jar))
+                    into(dir)
+                    include("*.so")
                 }
             }
         }
     }
 }
 
-tasks.configureEach { packageTask ->
-    if (packageTask.name.contains("package")) {
-        packageTask.dependsOn "copyAndroidNatives"
+tasks.configureEach {
+    if (name.contains("package")) {
+        dependsOn("copyAndroidNatives")
     }
 }
-
