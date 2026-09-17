@@ -24,6 +24,12 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
+          # A tag pushed with the default GITHUB_TOKEN does NOT trigger other
+          # workflows (GitHub's anti-loop protection), so Beta Build would
+          # never fire. RELEASE_PAT must be a PAT (classic "repo" scope, or
+          # fine-grained "Contents: Read and write" on this repo) so the tag
+          # push is attributed to a user/app and does trigger beta.yml.
+          token: ${{ secrets.RELEASE_PAT }}
 
       - name: Generate Version
         id: version

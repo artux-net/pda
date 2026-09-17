@@ -2,7 +2,13 @@ name: Preview Build
 
 on:
   issue_comment:
-    types: [ created ]
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag or commit to build from
+        type: string
+        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,14 +19,21 @@ jobs:
     name: Internal build
     runs-on: ubuntu-latest
     if: >-
-      github.event.issue.pull_request != '' && 
+      github.event_name == 'workflow_dispatch' ||
       (
-        contains(github.event.comment.body, '/preview') || 
-        contains(github.event.comment.body, '/build')
+        github.event.issue.pull_request != '' &&
+        (
+          contains(github.event.comment.body, '/preview') ||
+          contains(github.event.comment.body, '/build')
+        )
       )
     steps:
       - uses: actions/checkout@v4
         with:
+          # issue_comment always runs in the context of the default branch,
+          # so the PR's own head ref has to be checked out explicitly -
+          # otherwise this silently builds main instead of the PR's branch.
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || format('refs/pull/{0}/head', github.event.issue.number) }}
           submodules: recursive
           fetch-depth: 0
 
@@ -49,11 +62,11 @@ jobs:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Preview сборка [${{ github.event.issue.pull_request.id }}](${{ github.event.issue.pull_request.html_url }})
+            Preview сборка ${{ github.event_name == 'workflow_dispatch' && format('из `{0}`', inputs.ref) || format('[{0}]({1})', github.event.issue.pull_request.id, github.event.issue.pull_request.html_url) }}
             Код ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}, активна до ${{ steps.expiration.outputs.expiration_date }}
-            
+
             Автор: ${{ github.actor }}
-            
+
             [Ссылка для скачивания](${{ steps.assembly.outputs.internalSharingDownloadUrl }})
-            
+
             [Crashlytics](https://console.firebase.google.com/project/${{ vars.FIREBASE_ID }}/crashlytics/app/android:${{ vars.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})
