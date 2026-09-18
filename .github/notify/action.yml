@@ -10,6 +10,9 @@ inputs:
   token:
     description: Telegram Chat ID
     required: true
+  thread_id:
+    description: Telegram forum topic (message thread) ID
+    required: false
 
 runs:
   using: "composite"
@@ -36,5 +39,6 @@ runs:
       with:
         to: ${{ inputs.to }}
         token: ${{ inputs.token }}
+        message_thread_id: ${{ inputs.thread_id }}
         format: markdown
         message: ${{ steps.read_file.outputs.summary_message }}

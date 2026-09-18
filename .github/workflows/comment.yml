@@ -27,8 +27,9 @@ jobs:
         continue-on-error: true
         uses: ./.github/notify
         with:
-          to: ${{ secrets.TELEGRAM_TO }}
+          to: ${{ vars.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
+          thread_id: ${{ vars.TELEGRAM_THREAD_ID }}
           message: |
             Опубликован новый PR [${{ github.event.pull_request.title }}](${{ github.event.pull_request.url }})
             Автор: ${{ github.event.pull_request.user.login }}
