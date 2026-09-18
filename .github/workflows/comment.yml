@@ -27,6 +27,16 @@ jobs:
           body: |
             `/preview` или `/build` - вызов сборки APK и публикация в закрытом канале
 
+      - name: Escape PR title for Telegram
+        id: escape_title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          # Telegram's "markdown" (legacy) parse mode errors out on any
+          # unbalanced _ * ` [ in the message - a PR title routinely has
+          # these, which would silently kill the notify step below.
+          echo "title=$(echo "$PR_TITLE" | sed -E 's/([_*`\[])/\\\1/g')" >> $GITHUB_OUTPUT
+
       - name: Send message to Artux channel
         # Pinned to @main: same-repo (non-fork) PRs get secrets on this
         # event, so a local-path reference here could run a PR-modified
@@ -38,5 +48,5 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           thread_id: ${{ vars.TELEGRAM_THREAD_ID }}
           message: |
-            Опубликован новый PR [${{ github.event.pull_request.title }}](${{ github.event.pull_request.url }})
+            Опубликован новый PR [${{ steps.escape_title.outputs.title }}](${{ github.event.pull_request.url }})
             Автор: ${{ github.event.pull_request.user.login }}
