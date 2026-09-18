@@ -1,19 +1,9 @@
-name: Manual Release
+name: Beta Build
 
 on:
-  workflow_dispatch:
-    inputs:
-      profile:
-        description: Track to publish to
-        type: choice
-        required: true
-        options:
-          - beta
-          - preview
-      ref:
-        description: Tag (or branch/commit) to build from, e.g. v1.4.2
-        type: string
-        required: true
+  push:
+    tags:
+      - 'v*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,12 +11,11 @@ concurrency:
 
 jobs:
   build:
-    name: ${{ inputs.profile }} build from ${{ inputs.ref }}
+    name: Beta build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
           submodules: recursive
           fetch-depth: 0
 
@@ -34,19 +23,12 @@ jobs:
         uses: ./.github/assembly
         id: assembly
         with:
-          profile: ${{ inputs.profile }}
+          profile: beta
           signing_key: ${{ secrets.SIGNING_KEY }}
           key_alias: ${{ secrets.KEY_ALIAS }}
           keystore_password: ${{ secrets.KEYSTORE_PASSWORD }}
           key_password: ${{ secrets.KEY_PASSWORD }}
           service_account_json: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-
-      - name: Calculate expiration date
-        if: ${{ inputs.profile == 'preview' }}
-        id: expiration
-        run: |
-          expiration_date=$(date -d "+3 months" +"%d.%m.%Y")
-          echo "expiration_date=$expiration_date" >> $GITHUB_OUTPUT
 
       - name: Send message to Artux channel
         continue-on-error: true
@@ -56,13 +38,9 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           thread_id: ${{ vars.TELEGRAM_THREAD_ID }}
           message: |
-            ${{ inputs.profile == 'beta' && 'Beta' || 'Preview' }} сборка из ${{ inputs.ref }}
+            Beta сборка из тега ${{ github.ref_name }}
 
             Код ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}
-            ${{ inputs.profile == 'beta' && 'Опубликована в beta-канале Google Play' || format('Активна до {0}', steps.expiration.outputs.expiration_date) }}
-
-            Запустил: ${{ github.actor }}
-
-            ${{ steps.assembly.outputs.internalSharingDownloadUrl != '' && format('[Ссылка для скачивания]({0})', steps.assembly.outputs.internalSharingDownloadUrl) || '' }}
+            Опубликована в beta-канале Google Play
 
             [Changes](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) | [Crashlytics](https://console.firebase.google.com/project/${{ vars.FIREBASE_ID }}/crashlytics/app/android:${{ vars.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})
