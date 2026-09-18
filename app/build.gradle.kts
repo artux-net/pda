@@ -36,7 +36,7 @@ gradle.projectsEvaluated {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -60,7 +60,7 @@ android {
     }
 
     defaultConfig {
-        targetSdk = 34
+        targetSdk = 36
         minSdk = 26
 
         applicationId = "net.artux.pda"
