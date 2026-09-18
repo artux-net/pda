@@ -42,18 +42,27 @@ runs:
       id: set_env
       shell: bash
       run: |
-        echo "VERSION_CODE=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
         if [ "${{ inputs.profile }}" = "preview" ]; then
+          echo "VERSION_CODE=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
           echo "GOOGLE_PLAY_TRACK=internalsharing" >> $GITHUB_OUTPUT
           echo "GRADLE_TASK=assembleDebug" >> $GITHUB_OUTPUT
           echo "RELEASE_DIRECTORY=app/build/outputs/apk/debug" >> $GITHUB_OUTPUT
           echo "VERSION=${{ steps.semantic_versioning.outputs.version }}-preview" >> $GITHUB_OUTPUT
         elif [ "${{ inputs.profile }}" = "alpha" ]; then
+          # A plain date-based versionCode collides across same-day builds
+          # (e.g. two pushes to main, or a rerun), and Google Play requires
+          # every upload to have a unique, increasing versionCode. Append
+          # the workflow run number (2 digits, wraps past 99 same-day
+          # builds, which alpha never hits) to keep it unique while
+          # staying under the int32 versionCode limit and still
+          # date-readable.
+          echo "VERSION_CODE=$(date +%Y%m%d)$(printf '%02d' $(( ${{ github.run_number }} % 100 )))" >> $GITHUB_OUTPUT
           echo "GOOGLE_PLAY_TRACK=internal" >> $GITHUB_OUTPUT
           echo "GRADLE_TASK=assembleRelease" >> $GITHUB_OUTPUT
           echo "RELEASE_DIRECTORY=app/build/outputs/apk/release" >> $GITHUB_OUTPUT
           echo "VERSION=${{ steps.semantic_versioning.outputs.version }}" >> $GITHUB_OUTPUT
         elif [ "${{ inputs.profile }}" = "beta" ]; then
+          echo "VERSION_CODE=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
           echo "GOOGLE_PLAY_TRACK=beta" >> $GITHUB_OUTPUT
           echo "GRADLE_TASK=assembleRelease" >> $GITHUB_OUTPUT
           echo "RELEASE_DIRECTORY=app/build/outputs/apk/release" >> $GITHUB_OUTPUT
