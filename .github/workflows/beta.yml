@@ -34,8 +34,9 @@ jobs:
         continue-on-error: true
         uses: ./.github/notify
         with:
-          to: ${{ secrets.TELEGRAM_TO }}
+          to: ${{ vars.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
+          thread_id: ${{ vars.TELEGRAM_THREAD_ID }}
           message: |
             Beta сборка из тега ${{ github.ref_name }}
 

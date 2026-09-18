@@ -42,8 +42,9 @@ jobs:
         continue-on-error: true
         uses: ./.github/notify
         with:
-          to: ${{ secrets.TELEGRAM_TO }}
+          to: ${{ vars.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
+          thread_id: ${{ vars.TELEGRAM_THREAD_ID }}
           message: |
             Alpha сборка ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}
 
@@ -52,3 +53,4 @@ jobs:
             Название: ${{ github.event.head_commit.message }}
             Автор: ${{ github.event.head_commit.author.name }}
             [PR](https://github.com/${{ github.repository }}/pull/${{ steps.extract_pr.outputs.pr_number }}) | [Changes](https://github.com/${{ github.repository }}/commit/${{github.sha}}) | [Crashlytics](https://console.firebase.google.com/project/${{ vars.FIREBASE_ID }}/crashlytics/app/android:${{ vars.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})
+            [Скачать APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
