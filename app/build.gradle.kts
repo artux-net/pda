@@ -60,7 +60,7 @@ android {
     }
 
     defaultConfig {
-        targetSdk = 43
+        targetSdk = 34
         minSdk = 26
 
         applicationId = "net.artux.pda"
