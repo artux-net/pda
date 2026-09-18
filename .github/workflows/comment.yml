@@ -9,6 +9,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   comment:
     name: Comment PR
@@ -21,11 +25,14 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            `/preview` или `/build` - вызов сборки APK и публикация в закрытом канале 
+            `/preview` или `/build` - вызов сборки APK и публикация в закрытом канале
 
       - name: Send message to Artux channel
+        # Pinned to @main: same-repo (non-fork) PRs get secrets on this
+        # event, so a local-path reference here could run a PR-modified
+        # notify action with TELEGRAM_TOKEN.
         continue-on-error: true
-        uses: ./.github/notify
+        uses: artux-net/pda/.github/notify@main
         with:
           to: ${{ vars.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}

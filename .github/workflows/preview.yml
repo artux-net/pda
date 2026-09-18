@@ -16,6 +16,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.event.issue.number }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Internal build
@@ -41,7 +44,13 @@ jobs:
           fetch-depth: 0
 
       - name: Build & Deploy
-        uses: ./.github/assembly
+        # Pinned to @main (not ./.github/assembly): this checks out an
+        # untrusted PR head ref above, so a local-path action reference
+        # would run whatever the PR author put in .github/assembly,
+        # exposing the signing secrets to unreviewed code. The gate on
+        # comment author only controls who can trigger a build, not what
+        # code the build runs - pinning to main is what actually closes it.
+        uses: artux-net/pda/.github/assembly@main
         id: assembly
         with:
           profile: preview
@@ -60,7 +69,7 @@ jobs:
 
       - name: Send message to Artux channel
         continue-on-error: true
-        uses: ./.github/notify
+        uses: artux-net/pda/.github/notify@main
         with:
           to: ${{ vars.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}

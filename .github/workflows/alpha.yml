@@ -9,6 +9,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Alpha build
@@ -20,7 +23,11 @@ jobs:
           fetch-depth: 0
 
       - name: Build & Deploy
-        uses: ./.github/assembly
+        # Pinned to @main (not ./.github/assembly) so this always runs the
+        # trusted, reviewed action definition regardless of what's checked
+        # out - closes a path where a build triggered from an unreviewed
+        # ref could smuggle a modified assembly step in with the secrets.
+        uses: artux-net/pda/.github/assembly@main
         id: assembly
         with:
           profile: alpha
@@ -40,7 +47,7 @@ jobs:
 
       - name: Send message to Artux channel
         continue-on-error: true
-        uses: ./.github/notify
+        uses: artux-net/pda/.github/notify@main
         with:
           to: ${{ vars.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
