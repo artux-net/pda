@@ -46,9 +46,9 @@ jobs:
         continue-on-error: true
         uses: ./.github/notify
         with:
-          to: ${{ secrets.TELEGRAM_TO }}
+          to: ${{ vars.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          thread_id: "362"
+          thread_id: ${{ vars.TELEGRAM_THREAD_ID }}
           message: |
             Preview сборка [${{ github.event.issue.pull_request.id }}](${{ github.event.issue.pull_request.html_url }})
             Код ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}, активна до ${{ steps.expiration.outputs.expiration_date }}
