@@ -48,6 +48,7 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
+          thread_id: "362"
           message: |
             Preview сборка [${{ github.event.issue.pull_request.id }}](${{ github.event.issue.pull_request.html_url }})
             Код ${{ steps.assembly.outputs.versionCode }}, версия ${{ steps.assembly.outputs.versionName }}, активна до ${{ steps.expiration.outputs.expiration_date }}
