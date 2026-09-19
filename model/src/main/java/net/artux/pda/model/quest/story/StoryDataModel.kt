@@ -17,7 +17,7 @@ import java.util.Optional
 data class StoryDataModel(
     var name: String? = null,
     var nickname: String? = null,
-    var login: String,
+    var login: String? = null,
     var money: Int = 0,
     var xp: Int = 0,
     var pdaId: Int = 0,
