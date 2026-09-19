@@ -53,6 +53,39 @@ project(":app") {
     }
 }
 
+// Runs core's game/map logic on iOS via RoboVM/MobiVM, with mocked data (see
+// ios/src/.../mock) standing in for what the Android app module normally fetches
+// from the real backend and passes in through CoreFragment's Bundle args.
+project(":ios") {
+    apply(plugin = "java")
+    apply(plugin = "robovm")
+
+    val robovmVersion = "2.3.21"
+
+    configurations {
+        create("natives")
+    }
+
+    dependencies {
+        "implementation"(project(":core"))
+        "implementation"(project(":model"))
+
+        "implementation"("com.mobidevelop.robovm:robovm-rt:$robovmVersion")
+        "implementation"("com.mobidevelop.robovm:robovm-cocoatouch:$robovmVersion")
+        "implementation"("com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion")
+        "natives"("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios")
+        "natives"("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-ios")
+        "natives"("com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios")
+        // GamepadInputSystem (core) polls Controllers.getCurrent() unconditionally every
+        // frame; without this, Controllers' reflective lookup of the iOS manager class
+        // throws (ClassNotFoundException -> GdxRuntimeException) as soon as the map loads.
+        "implementation"("com.badlogicgames.gdx-controllers:gdx-controllers-ios:$gdxControllersVersion")
+
+        // lua script engine - same as :app/:core, RoboVM AOT-compiles plain Java fine.
+        "implementation"("org.luaj:luaj-jse:3.0.1")
+    }
+}
+
 project(":core") {
     apply(plugin = "java-library")
     apply(plugin = "kotlin")
