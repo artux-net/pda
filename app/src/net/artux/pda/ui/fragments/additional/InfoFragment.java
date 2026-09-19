@@ -53,7 +53,7 @@ public class InfoFragment extends AdditionalBaseFragment {
             mLoginView.setText(memberResult.getName() + " " + memberResult.getNickname());
             AutofitHelper.create(mLoginView);
 
-            mDaysView.setText(ProfileHelper.getDays(memberResult.getRegistration()));
+            mDaysView.setText(ProfileHelper.getDays(memberResult.getRegistration(), mDaysView.getContext()));
         });
 
         viewModel.getStoryData().observe(getViewLifecycleOwner(), dataModel -> {

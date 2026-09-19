@@ -87,7 +87,7 @@ class UserProfileFragment : BaseFragment(), View.OnClickListener {
             binding.profileStatus.text = onlineStatus
             binding.profileGroup.text = GroupHelper.getTitle(model.gang, context)
             binding.profileTime.text =
-                getString(R.string.in_zone_time_p, ProfileHelper.getDays(model))
+                getString(R.string.in_zone_time_p, ProfileHelper.getDays(model, requireContext()))
             binding.profileRang.text =
                 getString(R.string.rang_p, ProfileHelper.getRangTitleByXp(model.xp, view.context))
             binding.profileRating.text =

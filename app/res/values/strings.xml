@@ -288,4 +288,10 @@
     <string name="empty_slot">Пусто</string>
     <string name="privacy_url" translatable="false">https://www.artux.net/privacy.html</string>
     <string name="delete_chat">Do you want to delete a chat with %s?</string>
+    <string name="delete_summary">Delete summary from %s?</string>
+
+    <plurals name="days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
 </resources>
