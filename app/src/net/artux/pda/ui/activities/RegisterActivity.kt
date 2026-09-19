@@ -92,6 +92,7 @@ class RegisterActivity : AppCompatActivity() {
             if (status.success) {
                 val intent = Intent(this@RegisterActivity, FinishRegistrationActivity::class.java)
                 intent.putExtra("email", registerUserModel.email)
+                intent.putExtra("password", registerUserModel.password)
                 intent.putExtra("description", status.description)
                 startActivity(intent)
                 finish()

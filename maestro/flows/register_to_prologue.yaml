@@ -1,6 +1,6 @@
 appId: net.artux.pda
 ---
-# Registration -> Login -> Map flow, run against the real dev backend.
+# Registration -> auto-login -> prologue flow, run against the real dev backend.
 # Uses a unique fake-test-<timestamp>@artux.net address each run so repeat
 # runs never collide with a previously created account.
 
@@ -42,27 +42,13 @@ appId: net.artux.pda
 - tapOn:
     id: "net.artux.pda:id/endBtn"
 
-# --- back on LoginActivity: log in with the same credentials ---
-- tapOn:
-    id: "net.artux.pda:id/email"
-- inputText: "${output.email}"
-- hideKeyboard
-- tapOn:
-    id: "net.artux.pda:id/password"
-- inputText: "${output.password}"
-- hideKeyboard
-- tapOn:
-    id: "net.artux.pda:id/email_sign_in_button"
-
-# --- MainActivity: open the map ---
+# endBtn now auto-logs in with the credentials just registered and drops the user
+# straight into the first story with no prerequisites (the prologue, for a fresh
+# account) - see FinishRegistrationActivity. sceneResponses is StageFragment's
+# (static, id'd) container for the dynamically-created choice buttons, so its
+# visibility confirms we actually landed on a story stage rather than back on
+# LoginActivity.
 - extendedWaitUntil:
     visible:
-      id: "net.artux.pda:id/mapButton"
-    timeout: 15000
-- tapOn:
-    id: "net.artux.pda:id/mapButton"
-
-# StoriesFragment sets the top title to "Map" once it's loaded.
-- assertVisible:
-    id: "net.artux.pda:id/titleView"
-    text: "Map"
+      id: "net.artux.pda:id/sceneResponses"
+    timeout: 20000
