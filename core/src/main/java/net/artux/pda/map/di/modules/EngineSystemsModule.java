@@ -12,6 +12,7 @@ import net.artux.pda.map.ecs.characteristics.HealthSystem;
 import net.artux.pda.map.ecs.battle.InfightingSystem;
 import net.artux.pda.map.ecs.global.WorldSystem;
 import net.artux.pda.map.ecs.input.GamepadInputSystem;
+import net.artux.pda.map.ecs.input.KeyboardInputSystem;
 import net.artux.pda.map.ecs.logger.MapLoggerSystem;
 import net.artux.pda.map.ecs.ai.MapOrientationSystem;
 import net.artux.pda.map.ecs.physics.MovementTargetingSystem;
@@ -149,4 +150,8 @@ public abstract class EngineSystemsModule {
     @IntoSet
     @Binds
     public abstract EntitySystem gamepadInputSystem(GamepadInputSystem gamepadInputSystem);
+
+    @IntoSet
+    @Binds
+    public abstract EntitySystem keyboardInputSystem(KeyboardInputSystem keyboardInputSystem);
 }

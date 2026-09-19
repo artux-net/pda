@@ -123,6 +123,11 @@ public class StageFragment extends Fragment {
                 // setBackgroundColor() replaces the default focus-state selector with a flat
                 // color, so a gamepad-focused choice needs its own highlight here to be visible.
                 button.setFocusable(true);
+                // The device is in touch mode up until the first D-pad/key press, and
+                // View.requestFocus() is a no-op in touch mode unless this is also set - without
+                // it, the very first gamepad/keyboard press would have nothing focused to move
+                // from.
+                button.setFocusableInTouchMode(true);
                 button.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.black_overlay));
                 button.setOnFocusChangeListener((v, hasFocus) -> button.setBackgroundColor(
                         ContextCompat.getColor(getActivity(), hasFocus ? R.color.yellow : R.color.black_overlay)));
@@ -135,9 +140,12 @@ public class StageFragment extends Fragment {
         }
         // Lets a connected gamepad's D-pad/stick start navigating choices immediately; Android
         // only renders the highlight once the user actually moves off touch mode, so this is a
-        // no-op visually until a D-pad/stick press happens.
-        if (firstButton != null)
-            firstButton.requestFocus();
+        // no-op visually until a D-pad/stick press happens. Posted because the button was just
+        // added - requestFocus() called before its first layout pass silently does nothing.
+        if (firstButton != null) {
+            Button buttonToFocus = firstButton;
+            buttonToFocus.post(buttonToFocus::requestFocus);
+        }
     }
 
     @Override
