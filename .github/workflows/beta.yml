@@ -4,6 +4,10 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    # No inputs: dispatched by tag.yml with --ref <tag>, which resolves
+    # github.ref_name/github.sha below the same way a `push: tags:` event
+    # would, so the rest of this workflow needs no changes for that path.
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
