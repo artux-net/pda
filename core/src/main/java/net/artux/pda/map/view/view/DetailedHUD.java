@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.ecs.player.MissionsSystem;
 import net.artux.pda.map.ecs.player.PlayerSystem;
 import net.artux.pda.map.di.scope.PerGameMap;
@@ -21,11 +22,13 @@ public class DetailedHUD extends HUD {
     private final MissionsSystem missionsSystem;
     private final Label distanceLabel;
     private final Image directionImage;
+    private final LocaleBundle localeBundle;
 
     @Inject
-    public DetailedHUD(AssetManager assetManager, PlayerSystem playerSystem, MissionsSystem missionsSystem, UserInterface userInterface) {
+    public DetailedHUD(AssetManager assetManager, PlayerSystem playerSystem, MissionsSystem missionsSystem, UserInterface userInterface, LocaleBundle localeBundle) {
         super(assetManager, playerSystem);
         this.missionsSystem = missionsSystem;
+        this.localeBundle = localeBundle;
 
         distanceLabel = new Label("", userInterface.getLabelStyle());
         row();
@@ -51,7 +54,7 @@ public class DetailedHUD extends HUD {
 
         int dist = missionsSystem.getTargetDistance();
         if (dist > 5) {
-            distanceLabel.setText(dist + " м.");
+            distanceLabel.setText(localeBundle.get("unit.meters", dist));
             directionImage.setVisible(true);
             directionImage.setRotation((float) missionsSystem.getTargetAngle());
         } else {

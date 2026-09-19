@@ -110,9 +110,9 @@ public class EjectionSystem extends EntitySystem {
 
                 if (entity == playerSystem.getPlayer()){
                     if (hidden)
-                        notificationController.setTitle("В укрытии");
+                        notificationController.setTitle(localeBundle.get("main.ejection.hidden"));
                     else
-                        notificationController.setTitle("Вернитесь в укрытие");
+                        notificationController.setTitle(localeBundle.get("main.ejection.notHidden"));
                 }
 
                 if (hidden)

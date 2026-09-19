@@ -5,6 +5,7 @@ import static com.badlogic.gdx.math.MathUtils.random;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.engine.utils.LocaleBundleHolder;
 import net.artux.pda.map.ecs.ai.StalkerGroup;
 import net.artux.pda.map.ecs.ai.TargetMovingComponent;
 import net.artux.pda.map.utils.Mappers;
@@ -71,14 +72,14 @@ public class SpawnComponent implements Component, TargetMovingComponent.Targetin
     public String desc() {
         StringBuilder stringBuilder = new StringBuilder();
         if (!StringUtils.isBlank(spawnModel.getTitle()))
-            stringBuilder.append("Объект: ").append(spawnModel.getTitle());
+            stringBuilder.append(LocaleBundleHolder.get("spawn.desc.object", spawnModel.getTitle()));
         else
-            stringBuilder.append("Контрольная точка.");
+            stringBuilder.append(LocaleBundleHolder.get("spawn.desc.controlPoint"));
         stringBuilder.append('\n');
         if (isEmpty())
-            stringBuilder.append("Не занята");
+            stringBuilder.append(LocaleBundleHolder.get("spawn.desc.notTaken"));
         else
-            stringBuilder.append("Занята");
+            stringBuilder.append(LocaleBundleHolder.get("spawn.desc.taken"));
         stringBuilder.append('\n');
         stringBuilder.append(getStalkerGroup().toString());
         return stringBuilder.toString();

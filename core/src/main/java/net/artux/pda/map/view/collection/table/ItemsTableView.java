@@ -101,7 +101,7 @@ public class ItemsTableView extends Table {
 
             weightSum += itemModel.getQuantity() * itemModel.getWeight();
             Container<ItemView> container = new Container<>();
-            ItemView itemView = new ItemView(itemModel, titleStyle, subtitleStyle, assetManager);
+            ItemView itemView = new ItemView(itemModel, titleStyle, subtitleStyle, assetManager, localeBundle);
             container
                     .fill()
                     .minHeight(140)
