@@ -23,7 +23,7 @@ import kotlin.math.sqrt
  * Mapping:
  *  WASD / arrow keys - move (same setVelocity() the on-screen touchpad calls)
  *  Left shift        - hold to run, mirrors the on-screen run button
- *  Space             - hold to shoot, mirrors the on-screen shoot button
+ *  F / Space         - hold to shoot, mirrors the on-screen shoot button
  *  Tab               - cycle/lock the nearest visible target, mirrors the on-screen target button
  *  E                 - interact with the nearest available prompt (dialog/loot/transfer)
  *  Q (tap)           - switch weapon; Q (held) - reload, mirrors the weapon slot's tap/long-press
@@ -63,7 +63,7 @@ class KeyboardInputSystem @Inject constructor(
         // released) - GamepadInputSystem calls it too, and both calling it unconditionally every
         // frame would have whichever ran last in the engine's system order silently override the
         // other's state every single frame, even when neither key/button is actually pressed.
-        val shootDown = Gdx.input.isKeyPressed(Input.Keys.SPACE)
+        val shootDown = Gdx.input.isKeyPressed(Input.Keys.F) || Gdx.input.isKeyPressed(Input.Keys.SPACE)
         if (shootDown || shootWasDown) playerBattleSystem.setPlayerShoot(shootDown)
         shootWasDown = shootDown
 
