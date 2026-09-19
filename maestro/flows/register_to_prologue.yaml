@@ -1,14 +1,15 @@
 appId: net.artux.pda
 ---
 # Registration -> auto-login -> prologue flow, run against the real dev backend.
-# Uses a unique fake-test-<timestamp>@artux.net address each run so repeat
-# runs never collide with a previously created account.
+#
+# TEST_EMAIL/TEST_PASSWORD are passed in from outside (-e TEST_EMAIL=... -e
+# TEST_PASSWORD=...), not generated in here, so the same values are available
+# to the caller afterwards to delete the account this run creates (DELETE
+# api/v1/user/delete - see run_register_to_prologue.sh, which does both).
+# Run standalone for debugging: maestro test -e TEST_EMAIL=a@b.c -e TEST_PASSWORD=secret register_to_prologue.yaml
 
 - launchApp:
     clearState: true
-
-- runScript:
-    file: ../scripts/generate_test_user.js
 
 # --- LoginActivity: go to registration ---
 - tapOn:
@@ -21,15 +22,15 @@ appId: net.artux.pda
 # dumped all the text into the still-focused "email" field.
 - tapOn:
     id: "net.artux.pda:id/email"
-- inputText: "${output.email}"
+- inputText: "${TEST_EMAIL}"
 - hideKeyboard
 - tapOn:
     id: "net.artux.pda:id/password"
-- inputText: "${output.password}"
+- inputText: "${TEST_PASSWORD}"
 - hideKeyboard
 - tapOn:
     id: "net.artux.pda:id/repeat_password"
-- inputText: "${output.password}"
+- inputText: "${TEST_PASSWORD}"
 - hideKeyboard
 - tapOn:
     id: "net.artux.pda:id/registerBtn"
