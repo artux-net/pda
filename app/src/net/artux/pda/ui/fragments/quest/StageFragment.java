@@ -2,6 +2,7 @@ package net.artux.pda.ui.fragments.quest;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -110,6 +111,7 @@ public class StageFragment extends Fragment {
         if (context == null)
             return;
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        Button firstButton = null;
         for (TransferModel transfer : transferModels) {
             Button button = new Button(context);
             button.setLayoutParams(layoutParams);
@@ -119,12 +121,55 @@ public class StageFragment extends Fragment {
             button.setAllCaps(false);
             button.setTextColor(colorStateList);
             if (getActivity() != null) {
-                button.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.black_overlay));
+                // setBackgroundColor() replaces the default focus-state selector with a flat
+                // color, so a gamepad-focused choice needs its own highlight here to be visible.
+                button.setFocusable(true);
+                // The device is in touch mode up until the first D-pad/key press, and
+                // View.requestFocus() is a no-op in touch mode unless this is also set - without
+                // it, the very first gamepad/keyboard press would have nothing focused to move
+                // from.
+                button.setFocusableInTouchMode(true);
+                button.setBackground(choiceBackground(false));
+                button.setOnFocusChangeListener((v, hasFocus) -> updateChoiceHighlight(button));
                 button.setOnClickListener(v ->
                         questViewModel.chooseTransfer(transfer));
             }
             sceneResponses.addView(button);
+            if (firstButton == null)
+                firstButton = button;
         }
+        if (firstButton != null) {
+            // Silently claims focus for the first choice so D-pad/stick/keyboard navigation has
+            // somewhere to start, but with focusableInTouchMode set, requestFocus() succeeds (and
+            // updateChoiceHighlight would draw the border) immediately - including while the user
+            // is just tapping around, before any real key navigation happened. Posted because the
+            // button was just added - requestFocus() called before its first layout pass silently
+            // does nothing.
+            Button buttonToFocus = firstButton;
+            buttonToFocus.post(buttonToFocus::requestFocus);
+            // Only draw the border once the device actually leaves touch mode (the first D-pad/
+            // stick/key press), which is when whatever's focused - the pre-selected first choice,
+            // unless the user already moved off it - should first become visible.
+            sceneResponses.getViewTreeObserver().addOnTouchModeChangeListener(inTouchMode -> {
+                View focused = sceneResponses.getFocusedChild();
+                if (focused instanceof Button)
+                    updateChoiceHighlight((Button) focused);
+            });
+        }
+    }
+
+    private void updateChoiceHighlight(Button button) {
+        button.setBackground(choiceBackground(button.isFocused() && !button.isInTouchMode()));
+    }
+
+    private GradientDrawable choiceBackground(boolean focused) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setColor(ContextCompat.getColor(getActivity(), R.color.black_overlay));
+        if (focused) {
+            int strokeWidth = Math.round(2 * getResources().getDisplayMetrics().density);
+            drawable.setStroke(strokeWidth, ContextCompat.getColor(getActivity(), R.color.yellow));
+        }
+        return drawable;
     }
 
     @Override

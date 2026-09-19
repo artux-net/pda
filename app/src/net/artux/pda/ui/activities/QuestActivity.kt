@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.ImageSwitcher
@@ -60,6 +61,7 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
     private lateinit var stageRootFragment: StageRootFragment
     private var currentBackground = ""
     private var currentFragment: Fragment? = null
+    private var notificationDialog: AlertDialog? = null
 
     @Inject
     lateinit var firebaseAnalytics: FirebaseAnalytics
@@ -103,6 +105,8 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
             builder.setTitle(notificationModel.title)
             builder.setMessage(notificationModel.message)
             val dialog = builder.create()
+            notificationDialog = dialog
+            dialog.setOnDismissListener { if (notificationDialog === dialog) notificationDialog = null }
             val window = dialog.window
             window?.setGravity(Gravity.START)
             dialog.show()
@@ -220,6 +224,40 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
     override fun onBackPressed() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    /**
+     * Gamepad/keyboard support for the quest screen only - the map (CoreFragment) has its own
+     * GamepadInputSystem/KeyboardInputSystem reading input directly, so events are left untouched
+     * (falling through to super) whenever the map is on screen.
+     *
+     * Android already handles arrow-key/D-pad focus movement and ENTER/DPAD_CENTER clicking the
+     * focused view for free (standard View.onKeyUp() behavior), which is enough for a hardware
+     * keyboard to navigate quest choices. A gamepad's face buttons aren't treated as a "click"
+     * the same way, though, so KEYCODE_BUTTON_A needs to be translated into a click on whatever
+     * choice button D-pad/stick navigation last focused (see StageFragment).
+     *
+     * KEYCODE_BUTTON_B and KEYCODE_ESCAPE call the dismiss/back action directly instead of
+     * synthesizing a KEYCODE_BACK KeyEvent and redispatching it - on API levels with predictive
+     * back enabled, a synthetic BACK event doesn't reliably reach onBackPressed() (even the real
+     * hardware/gesture back button ends up closing the whole task instead here), so this calls
+     * exactly what should happen instead of hoping the system routes it there.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (!isMapActive && event.action == KeyEvent.ACTION_UP) {
+            when (event.keyCode) {
+                KeyEvent.KEYCODE_BUTTON_A -> {
+                    currentFocus?.performClick()
+                    return true
+                }
+                KeyEvent.KEYCODE_BUTTON_B, KeyEvent.KEYCODE_ESCAPE -> {
+                    val dialog = notificationDialog
+                    if (dialog != null && dialog.isShowing) dialog.dismiss() else onBackPressed()
+                    return true
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     private fun setBackground(nextBackground: String?) {

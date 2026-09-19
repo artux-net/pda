@@ -84,7 +84,14 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
                 .build();
 
         Timber.i("Core view created");
-        return initializeForView(gdxAdapter);
+        View view = initializeForView(gdxAdapter);
+        // Hardware keyboard/gamepad input is routed to whichever Android View currently holds
+        // focus; without this, nothing in the window does while the map is showing (QuestActivity
+        // swaps this fragment in/out alongside StageRootFragment, so focus doesn't land here on
+        // its own), and Gdx.input.isKeyPressed()/Controllers never see a single key/button press.
+        view.setFocusableInTouchMode(true);
+        view.post(view::requestFocus);
+        return view;
     }
 
     @Override
@@ -118,6 +125,12 @@ public class CoreFragment extends AndroidFragmentApplication implements Platform
                     .putObjectToScriptContext("dataRepository", dataRepository);
         }
         setApplicationLogger(gdxTimberLogger);
+        // Re-request focus every time the map is shown again (QuestActivity swaps this fragment's
+        // view with StageRootFragment's back and forth) - see onCreateView() for why this matters.
+        if (getView() != null) {
+            View view = getView();
+            view.post(view::requestFocus);
+        }
         super.onResume();
     }
 
