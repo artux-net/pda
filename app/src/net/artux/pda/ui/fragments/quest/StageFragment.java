@@ -2,6 +2,7 @@ package net.artux.pda.ui.fragments.quest;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -128,9 +129,8 @@ public class StageFragment extends Fragment {
                 // it, the very first gamepad/keyboard press would have nothing focused to move
                 // from.
                 button.setFocusableInTouchMode(true);
-                button.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.black_overlay));
-                button.setOnFocusChangeListener((v, hasFocus) -> button.setBackgroundColor(
-                        ContextCompat.getColor(getActivity(), hasFocus ? R.color.yellow : R.color.black_overlay)));
+                button.setBackground(choiceBackground(false));
+                button.setOnFocusChangeListener((v, hasFocus) -> updateChoiceHighlight(button));
                 button.setOnClickListener(v ->
                         questViewModel.chooseTransfer(transfer));
             }
@@ -138,14 +138,38 @@ public class StageFragment extends Fragment {
             if (firstButton == null)
                 firstButton = button;
         }
-        // Lets a connected gamepad's D-pad/stick start navigating choices immediately; Android
-        // only renders the highlight once the user actually moves off touch mode, so this is a
-        // no-op visually until a D-pad/stick press happens. Posted because the button was just
-        // added - requestFocus() called before its first layout pass silently does nothing.
         if (firstButton != null) {
+            // Silently claims focus for the first choice so D-pad/stick/keyboard navigation has
+            // somewhere to start, but with focusableInTouchMode set, requestFocus() succeeds (and
+            // updateChoiceHighlight would draw the border) immediately - including while the user
+            // is just tapping around, before any real key navigation happened. Posted because the
+            // button was just added - requestFocus() called before its first layout pass silently
+            // does nothing.
             Button buttonToFocus = firstButton;
             buttonToFocus.post(buttonToFocus::requestFocus);
+            // Only draw the border once the device actually leaves touch mode (the first D-pad/
+            // stick/key press), which is when whatever's focused - the pre-selected first choice,
+            // unless the user already moved off it - should first become visible.
+            sceneResponses.getViewTreeObserver().addOnTouchModeChangeListener(inTouchMode -> {
+                View focused = sceneResponses.getFocusedChild();
+                if (focused instanceof Button)
+                    updateChoiceHighlight((Button) focused);
+            });
         }
+    }
+
+    private void updateChoiceHighlight(Button button) {
+        button.setBackground(choiceBackground(button.isFocused() && !button.isInTouchMode()));
+    }
+
+    private GradientDrawable choiceBackground(boolean focused) {
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setColor(ContextCompat.getColor(getActivity(), R.color.black_overlay));
+        if (focused) {
+            int strokeWidth = Math.round(2 * getResources().getDisplayMetrics().density);
+            drawable.setStroke(strokeWidth, ContextCompat.getColor(getActivity(), R.color.yellow));
+        }
+        return drawable;
     }
 
     @Override
