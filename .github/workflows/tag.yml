@@ -12,6 +12,7 @@ concurrency:
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   tag-commit:
@@ -24,12 +25,6 @@ jobs:
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 0
-          # A tag pushed with the default GITHUB_TOKEN does NOT trigger other
-          # workflows (GitHub's anti-loop protection), so Beta Build would
-          # never fire. RELEASE_PAT must be a PAT (classic "repo" scope, or
-          # fine-grained "Contents: Read and write" on this repo) so the tag
-          # push is attributed to a user/app and does trigger beta.yml.
-          token: ${{ secrets.RELEASE_PAT }}
 
       - name: Generate Version
         id: version
@@ -37,3 +32,14 @@ jobs:
 
       - name: Create tag
         run: git tag ${{ steps.version.outputs.version_tag }} ${{ github.event.workflow_run.head_sha }} && git push origin ${{ steps.version.outputs.version_tag }}
+
+      - name: Trigger Beta Build
+        # A tag pushed with the default GITHUB_TOKEN does not trigger other
+        # workflows' `on: push` (GitHub's anti-loop protection), so beta.yml
+        # would never fire on its own. That protection only covers the
+        # automatic event cascade though - explicitly dispatching beta.yml
+        # via the API on the new tag ref works fine with the default token
+        # and needs no extra secret/PAT.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run beta.yml --repo ${{ github.repository }} --ref ${{ steps.version.outputs.version_tag }}
