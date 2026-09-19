@@ -110,6 +110,7 @@ public class StageFragment extends Fragment {
         if (context == null)
             return;
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        Button firstButton = null;
         for (TransferModel transfer : transferModels) {
             Button button = new Button(context);
             button.setLayoutParams(layoutParams);
@@ -119,12 +120,24 @@ public class StageFragment extends Fragment {
             button.setAllCaps(false);
             button.setTextColor(colorStateList);
             if (getActivity() != null) {
+                // setBackgroundColor() replaces the default focus-state selector with a flat
+                // color, so a gamepad-focused choice needs its own highlight here to be visible.
+                button.setFocusable(true);
                 button.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.black_overlay));
+                button.setOnFocusChangeListener((v, hasFocus) -> button.setBackgroundColor(
+                        ContextCompat.getColor(getActivity(), hasFocus ? R.color.yellow : R.color.black_overlay)));
                 button.setOnClickListener(v ->
                         questViewModel.chooseTransfer(transfer));
             }
             sceneResponses.addView(button);
+            if (firstButton == null)
+                firstButton = button;
         }
+        // Lets a connected gamepad's D-pad/stick start navigating choices immediately; Android
+        // only renders the highlight once the user actually moves off touch mode, so this is a
+        // no-op visually until a D-pad/stick press happens.
+        if (firstButton != null)
+            firstButton.requestFocus();
     }
 
     @Override

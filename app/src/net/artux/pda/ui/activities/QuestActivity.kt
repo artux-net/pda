@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.ImageSwitcher
@@ -220,6 +221,34 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
     override fun onBackPressed() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    /**
+     * Gamepad support for the quest screen only - the map (CoreFragment) has its own
+     * GamepadInputSystem reading the libGDX Controllers API, so events are left untouched
+     * (falling through to super) whenever the map is on screen.
+     *
+     * Android doesn't treat a gamepad's face buttons as a "click" the way it does DPAD_CENTER/
+     * ENTER, so KEYCODE_BUTTON_A needs to be translated into a click on whatever choice button
+     * D-pad/stick navigation last focused (see StageFragment). KEYCODE_BUTTON_B is translated
+     * into a real KEYCODE_BACK so it goes through Android's normal dispatch - which is what
+     * already lets the AlertDialog built for questViewModel.notification dismiss itself on back.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (!isMapActive && event.action == KeyEvent.ACTION_UP) {
+            when (event.keyCode) {
+                KeyEvent.KEYCODE_BUTTON_A -> {
+                    currentFocus?.performClick()
+                    return true
+                }
+                KeyEvent.KEYCODE_BUTTON_B -> {
+                    return super.dispatchKeyEvent(
+                        KeyEvent(event.downTime, event.eventTime, event.action, KeyEvent.KEYCODE_BACK, 0)
+                    )
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event)
     }
 
     private fun setBackground(nextBackground: String?) {
