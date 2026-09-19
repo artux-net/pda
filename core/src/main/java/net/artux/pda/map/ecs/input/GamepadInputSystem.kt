@@ -45,6 +45,7 @@ class GamepadInputSystem @Inject constructor(
     private val stickDeadzone = 0.2f
     private var stickWasActive = false
 
+    private var shootWasDown = false
     private var r1WasDown = false
     private var aWasDown = false
     private var yWasDown = false
@@ -64,8 +65,13 @@ class GamepadInputSystem @Inject constructor(
 
         updateMovement(controller, mapping)
 
+        // Only call setPlayerShoot() while R2 actually has something to say (held, or just
+        // released) - KeyboardInputSystem calls it too, and both calling it unconditionally every
+        // frame would have whichever ran last in the engine's system order silently override the
+        // other's state every single frame, even when neither button/key is actually pressed.
         val shootDown = controller.getButton(mapping.buttonR2)
-        playerBattleSystem.setPlayerShoot(shootDown)
+        if (shootDown || shootWasDown) playerBattleSystem.setPlayerShoot(shootDown)
+        shootWasDown = shootDown
 
         val r1Down = controller.getButton(mapping.buttonR1)
         if (r1Down && !r1WasDown) mapInputActions.cycleTarget(player)

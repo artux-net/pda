@@ -42,6 +42,7 @@ class KeyboardInputSystem @Inject constructor(
 
     private var movementWasActive = false
 
+    private var shootWasDown = false
     private var tabWasDown = false
     private var eWasDown = false
     private var iWasDown = false
@@ -58,7 +59,13 @@ class KeyboardInputSystem @Inject constructor(
 
         updateMovement()
 
-        playerBattleSystem.setPlayerShoot(Gdx.input.isKeyPressed(Input.Keys.SPACE))
+        // Only call setPlayerShoot() while this key actually has something to say (held, or just
+        // released) - GamepadInputSystem calls it too, and both calling it unconditionally every
+        // frame would have whichever ran last in the engine's system order silently override the
+        // other's state every single frame, even when neither key/button is actually pressed.
+        val shootDown = Gdx.input.isKeyPressed(Input.Keys.SPACE)
+        if (shootDown || shootWasDown) playerBattleSystem.setPlayerShoot(shootDown)
+        shootWasDown = shootDown
 
         val tabDown = Gdx.input.isKeyPressed(Input.Keys.TAB)
         if (tabDown && !tabWasDown) mapInputActions.cycleTarget(player)
