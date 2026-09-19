@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.google.gson.Gson;
 
 import net.artux.engine.utils.LocaleBundle;
+import net.artux.engine.utils.LocaleBundleHolder;
 import net.artux.pda.common.PropertyFields;
 import net.artux.pda.map.content.assets.AssetsFinder;
 import net.artux.pda.map.repository.DataRepository;
@@ -80,7 +81,10 @@ public class AppModule {
 
     @Provides
     public LocaleBundle getLocaleBundle(AssetsFinder assetsFinder) {
-        return assetsFinder.getLocaleBundle();
+        LocaleBundle localeBundle = assetsFinder.getLocaleBundle();
+        // Also make it reachable statically for ECS components/enums, which Dagger can't inject into.
+        LocaleBundleHolder.init(localeBundle);
+        return localeBundle;
     }
 
     @Provides

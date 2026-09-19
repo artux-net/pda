@@ -77,7 +77,7 @@ public class RatingAdapter extends RecyclerView.Adapter<RatingAdapter.ViewHolder
 
             desc.setText(desc.getContext().getString(R.string.rating_desc,
                     ProfileHelper.getGroup(desc.getContext(), userInfo.gang.getId()),
-                    ProfileHelper.getDays(userInfo.registration)));
+                    ProfileHelper.getDays(userInfo.registration, desc.getContext())));
 
             itemView.setOnClickListener(view -> clickListener.onClick(userInfo));
         }

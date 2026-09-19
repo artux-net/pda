@@ -171,4 +171,12 @@
     <string name="shareIt">Поделиться</string>
     <string name="empty_slot">Пусто</string>
     <string name="delete_chat">Вы хотите удалить чат с %s?</string>
+    <string name="delete_summary">Удалить сводку от %s?</string>
+
+    <plurals name="days">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дня</item>
+        <item quantity="many">%d дней</item>
+        <item quantity="other">%d дней</item>
+    </plurals>
 </resources>

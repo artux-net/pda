@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Timer;
 
+import net.artux.engine.utils.LocaleBundleHolder;
 import net.artux.pda.map.ecs.battle.WeaponComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
 import net.artux.pda.map.ecs.characteristics.PlayerComponent;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Effect {
-    BROKE_GRAVITY("Встряска", "icon") {
+    BROKE_GRAVITY("effect.brokeGravity", "icon") {
         @Override
         public void begin(Entity entity) {
             Timer.schedule(new Timer.Task() {
@@ -40,7 +41,7 @@ public enum Effect {
         public void end(Entity entity) {
         }
     },
-    STUCK("Оцепенение", "icon") {
+    STUCK("effect.stuck", "icon") {
         @Override
         public void begin(Entity entity) {
             pm.get(entity).body.setLinearDamping(1000);
@@ -56,7 +57,7 @@ public enum Effect {
             pm.get(entity).body.setLinearDamping(10);
         }
     },
-    LOST_MIND("Помутнение сознания", "icon") {
+    LOST_MIND("effect.lostMind", "icon") {
 
         final HashMap<WeaponModel, Float> precisions = new HashMap<>();
 
@@ -92,7 +93,7 @@ public enum Effect {
             pm.get(entity).body.setLinearDamping(10);
         }
     },
-    FLY("Полет", "icon") {
+    FLY("effect.fly", "icon") {
         @Override
         public void begin(Entity entity) {
             pm.get(entity).body.setLinearDamping(0);
@@ -108,7 +109,7 @@ public enum Effect {
             pm.get(entity).body.setLinearDamping(10);
         }
     },
-    BLOOD_LESS("Кровотечение", "icon") {
+    BLOOD_LESS("effect.bloodLess", "icon") {
         @Override
         public void begin(Entity entity) {
 
@@ -130,16 +131,16 @@ public enum Effect {
     private static final ComponentMapper<WeaponComponent> wm = ComponentMapper.getFor(WeaponComponent.class);
     private static final ComponentMapper<PlayerComponent> plm = ComponentMapper.getFor(PlayerComponent.class);
 
-    private final String name;
+    private final String nameKey;
     private final String icon;
 
-    Effect(String name, String icon) {
-        this.name = name;
+    Effect(String nameKey, String icon) {
+        this.nameKey = nameKey;
         this.icon = icon;
     }
 
     public String getName() {
-        return name;
+        return LocaleBundleHolder.get(nameKey);
     }
 
     public String getIcon() {

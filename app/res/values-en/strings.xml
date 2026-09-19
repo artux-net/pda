@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+    These arrays only exist in the default (Russian) values/strings.xml, so an
+    English-locale device fell back to Russian faction/rank names on the profile
+    screens. Naming here matches assets/locale/ui_en.properties (gang.* keys) so
+    the in-game map and the profile UI use the same English terminology.
+    -->
+    <string-array name="groups">
+        <item>Loners</item>
+        <item>Bandits</item>
+        <item>Military</item>
+        <item>Freedom</item>
+        <item>Duty</item>
+        <item>Monolith</item>
+        <item>Mercenaries</item>
+        <item>Scientists</item>
+        <item>Clear Sky</item>
+    </string-array>
+    <string-array name="rang">
+        <item>Lockpick</item>
+        <item>Novice</item>
+        <item>Stalker</item>
+        <item>Experienced</item>
+        <item>Veteran</item>
+        <item>Master</item>
+        <item>Legend</item>
+    </string-array>
+    <string-array name="profile_buttons">
+        <item>Equipment</item>
+        <item>Profile</item>
+        <item>Backpack</item>
+        <item>Encyclopedia</item>
+        <item>Stalker Rating</item>
+        <!--<item>Achievements</item>-->
+        <item>Summary</item>
+        <item>Settings</item>
+    </string-array>
+</resources>

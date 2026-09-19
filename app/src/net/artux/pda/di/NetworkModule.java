@@ -12,14 +12,22 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 
 import net.artux.pda.BuildConfig;
 import net.artux.pda.app.DataManager;
 import net.artux.pda.common.PropertyFields;
 import net.artux.pdanetwork.ApiClient;
+import net.artux.pdanetwork.JSON;
 import net.artux.pdanetwork.api.DefaultApi;
+import net.artux.pdanetwork.model.StoryInfoLocale;
 
-
+import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +46,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 import timber.log.Timber;
 
 @Module(includes = AppModule.class)
@@ -133,11 +142,63 @@ public class NetworkModule {
         return remoteConfig;
     }
 
+    /**
+     * The backend serializes java.util.Locale fields (e.g. StoryInfo.locale) as a plain
+     * string ("ru"), but the OpenAPI spec describes it as an object (from reflecting over
+     * Locale's getters), so the generated StoryInfoLocale model expects BEGIN_OBJECT. That
+     * mismatch
+     * crashed the whole app with an IllegalStateException while parsing /stories. Since
+     * StoryInfoLocale isn't used anywhere in the app, we just skip the string form instead
+     * of failing the entire response.
+     */
+    private static final TypeAdapterFactory LENIENT_STORY_LOCALE_FACTORY = new TypeAdapterFactory() {
+        @Override
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            if (type.getRawType() != StoryInfoLocale.class) {
+                return null;
+            }
+            TypeAdapter<T> delegate = gson.getDelegateAdapter(this, type);
+            return new TypeAdapter<T>() {
+                @Override
+                public void write(JsonWriter out, T value) throws IOException {
+                    delegate.write(out, value);
+                }
+
+                @Override
+                public T read(JsonReader in) throws IOException {
+                    if (in.peek() == JsonToken.STRING) {
+                        in.skipValue();
+                        return null;
+                    }
+                    return delegate.read(in);
+                }
+            };
+        }
+    };
+
     @Provides
     @Singleton
     public ApiClient apiClient(OkHttpClient okHttpClient, FirebaseRemoteConfig remoteConfig) {
         ApiClient apiClient = new ApiClient();
         apiClient.configureFromOkclient(okHttpClient);
+
+        // Retrofit picks the first converter factory that can handle a type, and
+        // ApiClient's default adapterBuilder already carries its own (unfixable, generated)
+        // Gson converter first - appending ours after it would never be reached. Replace the
+        // whole builder instead, keeping the same base URL placeholder createDefaultAdapter()
+        // used; it's overridden below regardless. Layer our factory on top of a fresh JSON()'s
+        // Gson (via newBuilder()) rather than a bare GsonBuilder, so we keep its Date/
+        // OffsetDateTime/LocalDate adapters instead of silently losing them.
+        Gson lenientGson = new JSON().getGson().newBuilder()
+                .registerTypeAdapterFactory(LENIENT_STORY_LOCALE_FACTORY)
+                .create();
+        apiClient.setAdapterBuilder(
+                new Retrofit.Builder()
+                        .baseUrl("https://app.artux.net/pdanetwork/")
+                        .addConverterFactory(ScalarsConverterFactory.create())
+                        .addConverterFactory(GsonConverterFactory.create(lenientGson))
+        );
+
         String baseUrl = remoteConfig.getString(PropertyFields.API_URL);
         if (BuildConfig.DEBUG)
             apiClient.getAdapterBuilder().baseUrl(BuildConfig.PROTOCOL + "://" + BuildConfig.URL_API);

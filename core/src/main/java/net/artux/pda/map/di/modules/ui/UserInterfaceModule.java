@@ -1,5 +1,7 @@
 package net.artux.pda.map.di.modules.ui;
 
+import net.artux.engine.utils.LocaleBundle;
+
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
@@ -177,7 +179,7 @@ public class UserInterfaceModule {
                          @Named("hudTable") Table hudTable,
                          @Named("targetLabel") PDALabel targetLabel,
                          UserInterface userInterface, PlayerSystem playerSystem,
-                         PlayerBattleSystem playerBattleSystem) {
+                         PlayerBattleSystem playerBattleSystem, LocaleBundle localeBundle) {
         hudTable.add(hud);
         hud.addListener(new ActorGestureListener() {
             @Override
@@ -225,7 +227,7 @@ public class UserInterfaceModule {
                         weaponSlot.setLabelText("0/0");
                     }
                 } else {
-                    weaponSlot.setText("Оружие отсутствует");//todo locale
+                    weaponSlot.setText(localeBundle.get("hud.weapon.empty"));
                     weaponSlot.setLabelText("");
                 }
                 return false;

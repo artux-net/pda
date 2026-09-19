@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 
+import net.artux.engine.utils.LocaleBundleHolder;
 import net.artux.pda.map.ecs.physics.BodyComponent;
 import net.artux.pda.map.ecs.characteristics.HealthComponent;
 import net.artux.pda.map.ecs.effects.Effect;
@@ -18,7 +19,7 @@ import net.artux.pda.map.ecs.player.PlayerSystem;
 
 public enum Anomaly {
 
-    SPRINGBOARD("Трамплин", "audio/sounds/anomalies/springboard/work.ogg") {
+    SPRINGBOARD("anomaly.springboard", "audio/sounds/anomalies/springboard/work.ogg") {
         @Override
         public void interact(Engine engine, Entity entity) {
             pm.get(entity).body.setLinearVelocity(random(-600000, 600000), random(-600000, 600000));
@@ -27,14 +28,14 @@ public enum Anomaly {
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.FLY, 1);
         }
     },
-    ELECTRA("Электра", "audio/sounds/anomalies/electra/work.ogg") {
+    ELECTRA("anomaly.electra", "audio/sounds/anomalies/electra/work.ogg") {
         @Override
         public void interact(Engine engine, Entity entity) {
             hcm.get(entity).electricDamage(random(10, 30));
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.STUCK, 5);
         }
     },
-    TELEPORT("Пузырь", "audio/sounds/anomalies/teleport/work.ogg") {
+    TELEPORT("anomaly.teleport", "audio/sounds/anomalies/teleport/work.ogg") {
         @Override
         public void interact(Engine engine, Entity entity) {
             Vector2 nextPosition = engine.getSystem(MapOrientationSystem.class).getRandomFreePoint();
@@ -46,23 +47,23 @@ public enum Anomaly {
                 engine.getSystem(RenderSystem.class).setBlurEffect(10);
         }
     },
-    GRAVITY("Гравити", "audio/sounds/anomalies/gravity/work.ogg") {
+    GRAVITY("anomaly.gravity", "audio/sounds/anomalies/gravity/work.ogg") {
         @Override
         public void interact(Engine engine, Entity entity) {
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.BROKE_GRAVITY, 5);
         }
     };
 
-    private final String title;
+    private final String titleKey;
     private final String soundId;
 
-    Anomaly(String title, String soundId) {
-        this.title = title;
+    Anomaly(String titleKey, String soundId) {
+        this.titleKey = titleKey;
         this.soundId = soundId;
     }
 
     public String getTitle() {
-        return title;
+        return LocaleBundleHolder.get(titleKey);
     }
 
     public String getSoundId() {

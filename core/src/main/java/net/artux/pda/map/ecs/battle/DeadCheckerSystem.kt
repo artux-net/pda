@@ -26,6 +26,7 @@ import net.artux.pda.map.ecs.systems.BaseSystem
 import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.view.view.window.LootWindow
 import net.artux.pda.map.view.root.UserInterface
+import net.artux.engine.utils.LocaleBundle
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -37,7 +38,8 @@ class DeadCheckerSystem @Inject constructor(
     lootWindow: LootWindow,
     dataRepository: DataRepository,
     assetManager: AssetManager,
-    world: World
+    world: World,
+    localeBundle: LocaleBundle
 ) : BaseSystem(Family.all(HealthComponent::class.java, BodyComponent::class.java).get()) {
 
     private val gameZone: Group
@@ -46,6 +48,7 @@ class DeadCheckerSystem @Inject constructor(
     private var deadMessage = false
     private val dataRepository: DataRepository
     private val userInterface: UserInterface
+    private val localeBundle: LocaleBundle
     private val pm = ComponentMapper.getFor(BodyComponent::class.java)
     private val hm = ComponentMapper.getFor(HealthComponent::class.java)
     private val assetManager: AssetManager
@@ -57,6 +60,7 @@ class DeadCheckerSystem @Inject constructor(
         this.dataRepository = dataRepository
         this.lootWindow = lootWindow
         this.world = world
+        this.localeBundle = localeBundle
         labelStyle = userInterface.labelStyle
         labelStyle.fontColor = Color.RED
 
@@ -91,7 +95,7 @@ class DeadCheckerSystem @Inject constructor(
                     )
                     deadEntity.add(
                         InteractiveComponent(
-                            "Обыскать: " + entityComponent.name,
+                            localeBundle.get("interaction.search", entityComponent.name),
                             5
                         ) {
                             lootWindow.updateBot(
@@ -122,7 +126,7 @@ class DeadCheckerSystem @Inject constructor(
                 style.font = labelStyle.font
                 style.fontColor = Color.RED
                 val textButton =
-                    TextButton("Игра провалена! \n Для продолжения нажмите в любом месте.", style)
+                    TextButton(localeBundle.get("main.gameOver"), style)
                 textButton.setFillParent(true)
                 textButton.align(Align.center)
                 textButton.label.setAlignment(Align.center)

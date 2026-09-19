@@ -84,7 +84,7 @@ public class ItemsHorizontalView extends Table {
                 if (itemModel.getQuantity() > 0) {
                     weightSum += itemModel.getQuantity() * itemModel.getWeight();
 
-                    ItemView itemView = new ItemView(itemModel, titleStyle, subtitleStyle, assetManager);
+                    ItemView itemView = new ItemView(itemModel, titleStyle, subtitleStyle, assetManager, localeBundle);
                     itemView.addListener(new ClickListener() {
                         @Override
                         public void clicked(InputEvent event, float x, float y) {

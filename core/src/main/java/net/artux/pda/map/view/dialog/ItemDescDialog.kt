@@ -47,7 +47,7 @@ class ItemDescDialog @Inject constructor(
                     wearableModel.precision,
                     wearableModel.speed,
                     wearableModel.damage,
-                    bulletModel?.title ?: "Не определено",
+                    bulletModel?.title ?: localeBundle.get("main.undefined"),
                     wearableModel.condition
                 )
             )

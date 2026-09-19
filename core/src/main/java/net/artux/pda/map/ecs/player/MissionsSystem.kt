@@ -28,6 +28,7 @@ import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.quest.mission.MissionModel
 import net.artux.pda.model.quest.story.ParameterModel
 import net.artux.pda.model.quest.story.StoryDataModel
+import net.artux.engine.utils.LocaleBundle
 import java.util.*
 import java.util.stream.Collectors
 import javax.inject.Inject
@@ -38,6 +39,7 @@ class MissionsSystem @Inject constructor(
     private val dataRepository: DataRepository,
     private val soundsSystem: AudioSystem,
     private val cameraSystem: CameraSystem,
+    private val localeBundle: LocaleBundle,
 
     assetManager: AssetManager
 ) : BaseSystem(
@@ -85,8 +87,8 @@ class MissionsSystem @Inject constructor(
             val checkpointModel = m.getCurrentCheckpoint(*paramArr) ?: continue
             messagesList.addMessage(
                 checkpointModel.type.iconId,
-                "Задание обновлено: " + m.title,
-                "Новая цель: " + checkpointModel.title,
+                localeBundle.get("mission.updated", m.title),
+                localeBundle.get("mission.newGoal", checkpointModel.title),
                 MessagesList.Length.SHORT
             )
             soundsSystem.playSound(missionUpdatedSound)

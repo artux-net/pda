@@ -31,7 +31,7 @@ data class UserMessage(
         message,
         Instant.now()
     ) {
-        author = UserModel(storyDataModel.login)
+        author = UserModel(storyDataModel.login ?: "")
         author.login = storyDataModel.login
         author.avatar = storyDataModel.avatar
         author.pdaId = storyDataModel.pdaId

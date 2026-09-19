@@ -3,6 +3,7 @@ package net.artux.pda.map.ecs.anomaly;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Timer;
 
+import net.artux.engine.utils.LocaleBundleHolder;
 import net.artux.pda.map.engine.entities.model.Anomaly;
 
 public class AnomalyComponent implements Component {
@@ -43,14 +44,11 @@ public class AnomalyComponent implements Component {
     }
 
     public String desc() {
-        return "Объект: " +
-                "Аномалия" +
+        return LocaleBundleHolder.get("anomaly.desc.header") +
                 '\n' +
-                "Наименование: " +
-                getAnomaly().getTitle() +
+                LocaleBundleHolder.get("anomaly.desc.name", getAnomaly().getTitle()) +
                 '\n' +
-                "Размер: " +
-                size * 2;
+                LocaleBundleHolder.get("anomaly.desc.size", size * 2);
     }
 
 }

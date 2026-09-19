@@ -89,27 +89,17 @@ object ProfileHelper {
         return context.resources.getStringArray(R.array.rang)[id]
     }
 
-    fun getDays(profileModel: ProfileModel): String {
+    @JvmStatic
+    fun getDays(profileModel: ProfileModel, context: Context): String {
         return if (profileModel.registration != null) {
-            getDays(profileModel.registration)
+            getDays(profileModel.registration, context)
         } else "null"
     }
 
     @JvmStatic
-    fun getDays(date: Instant?): String {
+    fun getDays(date: Instant?, context: Context): String {
         val days = ((Instant.now().toEpochMilli() - date!!.toEpochMilli())
                 / (1000 * 60 * 60 * 24)).toInt()
-        return days.toString() + " " + getDayAddition(days)
-    }
-
-    private fun getDayAddition(num: Int): String {
-        val preLastDigit = num % 100 / 10
-        return if (preLastDigit == 1) {
-            "дней"
-        } else when (num % 10) {
-            1 -> "день"
-            2, 3, 4 -> "дня"
-            else -> "дней"
-        }
+        return context.resources.getQuantityString(R.plurals.days, days, days)
     }
 }

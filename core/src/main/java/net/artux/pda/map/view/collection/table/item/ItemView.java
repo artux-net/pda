@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.image.LazyImage;
 import net.artux.pda.map.view.Utils;
@@ -16,15 +17,11 @@ import net.artux.pda.model.items.ItemModel;
 import net.artux.pda.model.items.WeaponModel;
 import net.artux.pda.model.items.WearableModel;
 
-import java.text.DecimalFormat;
-
 public class ItemView extends Table {
 
     private final Image image;
 
-    private static final DecimalFormat formater = new DecimalFormat("##.##");
-
-    public ItemView(ItemModel itemModel, Label.LabelStyle titleStyle, Label.LabelStyle subtitleStyle, AssetManager assetManager) {
+    public ItemView(ItemModel itemModel, Label.LabelStyle titleStyle, Label.LabelStyle subtitleStyle, AssetManager assetManager, LocaleBundle localeBundle) {
         super();
         String iconFilename = "textures/icons/items/" + itemModel.getIcon();
 
@@ -77,7 +74,7 @@ public class ItemView extends Table {
                 .colspan(2);
         row();
 
-        Label subtitle = new Label(formater.format(itemModel.getWeight() * itemModel.getQuantity()) + " кг.", subtitleStyle);
+        Label subtitle = new Label(localeBundle.get("item.weight", itemModel.getWeight() * itemModel.getQuantity()), subtitleStyle);
         subtitle.setAlignment(Align.right);
         add(subtitle)
                 .growX()

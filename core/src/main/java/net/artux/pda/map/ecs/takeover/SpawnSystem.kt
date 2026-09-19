@@ -13,13 +13,15 @@ import net.artux.pda.map.ecs.systems.BaseSystem
 import net.artux.pda.map.ecs.creation.EntityProcessorSystem
 import net.artux.pda.map.controller.notification.NotificationController
 import net.artux.pda.map.di.scope.PerGameMap
+import net.artux.engine.utils.LocaleBundle
 import javax.inject.Inject
 
 @PerGameMap
 class SpawnSystem @Inject constructor(
     private val notificationController: NotificationController,
     private val entityProcessorSystem: EntityProcessorSystem,
-    private val dataRepository: DataRepository
+    private val dataRepository: DataRepository,
+    private val localeBundle: LocaleBundle
 ) : BaseSystem(Family.all(VisionComponent::class.java, BodyComponent::class.java).exclude(
     PassivityComponent::class.java).get()) {
     lateinit var spawns: ImmutableArray<Entity>
@@ -78,11 +80,11 @@ class SpawnSystem @Inject constructor(
                     takingSpawm = spawnComponent
                     timer = secsToTakeSpawn.toFloat()
                 }
-                notificationController.setTitle("Захват позиции через " + timer.toInt() + " cекунд")
+                notificationController.setTitle(localeBundle.get("takeover.capturing", timer.toInt()))
                 timer-=deltaTime
                 if (timer < 1) {
-                    notificationController.setTitle("Позиция захвачена!")
-                    notificationController.addMessage("Спасибо, уже отправили группу на занятие позиции.")
+                    notificationController.setTitle(localeBundle.get("takeover.captured"))
+                    notificationController.addMessage(localeBundle.get("takeover.captured.thanks"))
                     takingSpawm == null
                     val gang = dataRepository.initDataModel.gang
                     spawnComponent.stalkerGroup = entityProcessorSystem.generateNewGroup(gang)

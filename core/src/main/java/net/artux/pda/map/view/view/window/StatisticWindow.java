@@ -3,6 +3,7 @@ package net.artux.pda.map.view.view.window;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.utils.Colors;
 import net.artux.pda.map.view.button.PDAButton;
 import net.artux.pda.map.view.debug.Logger;
@@ -19,13 +20,13 @@ public class StatisticWindow extends PDAWindow {
     @Inject
     public StatisticWindow(Skin skin, Label.LabelStyle labelStyle, CheckBoxWidget checkBoxWidget,
                            Logger logger, ItemsWidget itemsWidget, MapsWidget mapsWidget,
-                           PDAButton checks, PDAButton items) {
+                           PDAButton checks, PDAButton items, LocaleBundle localeBundle) {
         super(skin);
         setFillParent(true);
         top();
         left();
 
-        Label label = new Label("В разработке", labelStyle);
+        Label label = new Label(localeBundle.get("main.workInProgress"), labelStyle);
         top();
         add(label).colspan(3);
         row();
