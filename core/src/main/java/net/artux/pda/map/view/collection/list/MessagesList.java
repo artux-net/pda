@@ -15,17 +15,17 @@ import com.badlogic.gdx.utils.Timer;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.map.view.root.FontManager;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.inject.Inject;
 
 @PerGameMap
 public class MessagesList extends ListView {
 
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-            .withZone(ZoneId.systemDefault());
+    // java.time.DateTimeFormatter is only a phantom (compile-only) class on RoboVM's
+    // runtime and throws NoClassDefFoundError there - SimpleDateFormat isn't.
+    private final SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
     private final AssetManager assetManager;
     private final Label.LabelStyle titleStyle;
     private final Label.LabelStyle subtitleStyle;
@@ -60,7 +60,7 @@ public class MessagesList extends ListView {
                 .growX();
 
 
-        title = timeFormatter.format(Instant.now()) + " " + title;
+        title = timeFormatter.format(new Date()) + " " + title;
         Label titleLabel = new Label(title, titleStyle);
         contentGroup.row();
         contentGroup.add(titleLabel)

@@ -43,10 +43,11 @@ import net.artux.pda.map.view.view.bars.Slot;
 import net.artux.pda.map.view.view.window.BackpackWindow;
 import net.artux.pda.model.items.ItemModel;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -112,7 +113,11 @@ public class UserInterfaceModule {
             @Override
             public boolean act(float delta) {
                 Collection<InteractiveComponent> components = interactionSystem.getInteractiveComponents();
-                removeActors(horizontalGroup, components.stream().map(InteractiveComponent::getTitle).collect(Collectors.toList()));
+                List<String> titles = new ArrayList<>();
+                for (InteractiveComponent component : components) {
+                    titles.add(component.getTitle());
+                }
+                removeActors(horizontalGroup, titles);
                 for (InteractiveComponent component : components) {
                     if (horizontalGroup.findActor(component.title) != null)
                         continue;

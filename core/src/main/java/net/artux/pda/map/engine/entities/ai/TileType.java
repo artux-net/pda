@@ -46,6 +46,7 @@ public enum TileType {
     }
 
     public static TileType get(Integer id) {
-        return types.getOrDefault(id, EMPTY);
+        TileType type = types.get(id);
+        return type != null ? type : EMPTY;
     }
 }

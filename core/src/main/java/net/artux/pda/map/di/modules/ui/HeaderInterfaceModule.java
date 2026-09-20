@@ -33,9 +33,8 @@ import net.artux.pda.map.view.debug.widgets.CheckBoxWidget;
 import net.artux.pda.map.view.view.window.StatisticWindow;
 import net.artux.pda.model.map.GameMap;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
 import javax.inject.Named;
@@ -48,8 +47,9 @@ import dagger.multibindings.IntoSet;
 @Module(includes = RootInterfaceModule.class)
 public class HeaderInterfaceModule {
 
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-            .withZone(ZoneId.systemDefault());
+    // java.time.DateTimeFormatter is only a phantom (compile-only) class on RoboVM's
+    // runtime and throws NoClassDefFoundError there - SimpleDateFormat isn't.
+    private final SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
 
     @IntoSet
     @Provides
@@ -140,7 +140,7 @@ public class HeaderInterfaceModule {
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
-                timeLabel.setText(timeFormatter.format(Instant.now()));
+                timeLabel.setText(timeFormatter.format(new Date()));
             }
         }, 0, 3);
 

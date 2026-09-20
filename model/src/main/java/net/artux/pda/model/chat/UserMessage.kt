@@ -4,14 +4,13 @@ import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.model.user.Role
 import net.artux.pda.model.user.UserModel
 import java.io.Serializable
-import java.time.Instant
 import java.util.UUID
 
 data class UserMessage(
     var id: UUID,
     var type: Type,
     var content: String,
-    var timestamp: Instant,
+    var timestamp: Long,
 ) : Serializable {
 
     lateinit var author: UserModel
@@ -20,7 +19,7 @@ data class UserMessage(
         UUID.randomUUID(),
         Type.NEW,
         message,
-        Instant.now()
+        System.currentTimeMillis()
     ) {
         author = userModel
     }
@@ -29,7 +28,7 @@ data class UserMessage(
         UUID.randomUUID(),
         Type.NEW,
         message,
-        Instant.now()
+        System.currentTimeMillis()
     ) {
         author = UserModel(storyDataModel.login ?: "")
         author.login = storyDataModel.login
@@ -43,7 +42,7 @@ data class UserMessage(
         UUID.randomUUID(),
         Type.NEW,
         message,
-        Instant.now()
+        System.currentTimeMillis()
     ) {
         author = UserModel(senderLogin)
         author.avatar = avatarId

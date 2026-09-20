@@ -1,3 +1,5 @@
+import ru.vyarus.gradle.plugin.animalsniffer.AnimalSnifferExtension
+
 val kotlin_version = "2.0.0"
 val gdxVersion = "1.12.1"
 val ashleyVersion = "1.7.4"
@@ -53,13 +55,60 @@ project(":app") {
     }
 }
 
+// Runs core's game/map logic on iOS via RoboVM/MobiVM, with mocked data (see
+// ios/src/.../mock) standing in for what the Android app module normally fetches
+// from the real backend and passes in through CoreFragment's Bundle args.
+project(":ios") {
+    apply(plugin = "java")
+    apply(plugin = "robovm")
+
+    val robovmVersion = "2.3.26"
+
+    dependencies {
+        "implementation"(project(":core"))
+        "implementation"(project(":model"))
+
+        "implementation"("com.mobidevelop.robovm:robovm-rt:$robovmVersion")
+        "implementation"("com.mobidevelop.robovm:robovm-cocoatouch:$robovmVersion")
+        "implementation"("com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion")
+        // Unlike Android, iOS has no separate "natives" configuration - libGDX's own
+        // project template puts natives-ios jars on the regular compile classpath, since
+        // RoboVM's compiler pulls their embedded xcframeworks straight off the classpath.
+        // A custom "natives" config here (as Android needs) would silently exclude them,
+        // leaving native methods like IOSGLES20.init() unresolved at runtime.
+        "implementation"("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios")
+        "implementation"("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-ios")
+        "implementation"("com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios")
+        "implementation"("com.badlogicgames.gdx-controllers:gdx-controllers-ios:$gdxControllersVersion")
+
+        // lua script engine - same as :app/:core, RoboVM AOT-compiles plain Java fine.
+        "implementation"("org.luaj:luaj-jse:3.0.1")
+    }
+}
+
 project(":core") {
     apply(plugin = "java-library")
     apply(plugin = "kotlin")
     apply(plugin = "kotlin-kapt")
+    // Guards :core (compiled for both Android and iOS/RoboVM) against Java 8+ API usage,
+    // since RoboVM's classlib only has phantom (compile-only) stubs or is entirely
+    // missing a lot of it (java.time.*, java.util.stream.*, java.util.function.*,
+    // several Collection default methods) - checks compiled bytecode against a JDK 7
+    // signature, so it catches both Java and Kotlin sources (sourceCompatibility alone
+    // doesn't - Kotlin ignores it).
+    apply(plugin = "ru.vyarus.animalsniffer")
+
+    configure<AnimalSnifferExtension> {
+        // Kotlin's own data class hashCode() codegen calls Integer/Long/Float.hashCode
+        // (int/long/float) unconditionally, regardless of compile target - confirmed via
+        // `javap` against robovm-rt-2.3.26.jar that RoboVM's runtime actually implements
+        // these three despite them being JDK 8 additions, so they're not a real risk.
+        ignore("java.lang.Integer", "java.lang.Long", "java.lang.Float")
+    }
 
     dependencies {
         "implementation"(project(":model"))
+        "signature"("org.codehaus.mojo.signature:java17:1.0@signature")
 
         "implementation"("com.google.code.gson:gson:2.8.9")
         "implementation"("org.apache.commons:commons-lang3:3.0")

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    RoboVM/MobiVM packaging config.
+
+    No <libs> section: as of gdx 1.12.1, gdx-platform/gdx-box2d-platform/gdx-freetype-
+    platform's natives-ios jars ship prebuilt .xcframeworks plus their own
+    META-INF/robovm/ios/robovm.xml fragment (<frameworks>gdx/gdx-box2d/gdx-freetype/
+    ObjectAL</frameworks>), which the robovm gradle plugin merges in automatically from
+    every dependency jar - confirmed by inspecting those jars directly (this file predates
+    Xcode being available to verify the rest of the build end-to-end, see the README in
+    this directory).
+-->
+<config>
+    <executableName>PDA</executableName>
+    <mainClass>net.artux.pda.ios.IOSLauncher</mainClass>
+    <os>ios</os>
+    <arch>arm64</arch>
+    <target>ios</target>
+    <iosInfoPList>Info.plist.xml</iosInfoPList>
+
+    <resources>
+        <resource>
+            <directory>../assets</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </resource>
+    </resources>
+
+    <frameworks>
+        <framework>UIKit</framework>
+        <framework>OpenAL</framework>
+        <framework>CoreGraphics</framework>
+        <framework>Foundation</framework>
+        <framework>CoreText</framework>
+        <framework>QuartzCore</framework>
+        <framework>MediaPlayer</framework>
+        <framework>AVFoundation</framework>
+        <!-- gdx-controllers-ios: unlike the natives-ios jars above, this one is a plain
+             (pre-xcframework, 2021-dated) class jar with no bundled robovm.xml fragment -
+             the frameworks its ObjC bridge classes need have to be listed here by hand. -->
+        <framework>GameController</framework>
+        <framework>CoreBluetooth</framework>
+        <framework>CoreMotion</framework>
+    </frameworks>
+
+    <forceLinkClasses>
+        <!-- Controllers.initialize() picks its platform manager with
+             ClassReflection.forName(...) - never referenced directly in source, so RoboVM's
+             dead-code stripping would otherwise drop it. -->
+        <pattern>com.badlogic.gdx.controllers.**</pattern>
+        <pattern>com.badlogic.gdx.scenes.scene2d.**</pattern>
+        <!-- core (Gson-serialized QuestUtil.calculateDifference, MapStruct-mapped model
+             classes) reflects over getters/setters that RoboVM's static analysis can't see
+             are used, for the same reason. -->
+        <pattern>net.artux.**</pattern>
+    </forceLinkClasses>
+</config>

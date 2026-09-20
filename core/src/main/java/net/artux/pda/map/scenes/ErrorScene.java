@@ -18,7 +18,7 @@ import net.artux.pda.map.repository.DataRepository;
 import net.artux.pda.map.di.components.CoreComponent;
 import net.artux.pda.model.map.GameMap;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -85,7 +85,7 @@ public class ErrorScene extends Scene {
 
     public void setThrowable(Throwable throwable) {
         throwable.printStackTrace();
-        label.setText(Instant.now().toString() + " error: " + throwable.getMessage());
+        label.setText(new Date() + " error: " + throwable.getMessage());
         for (StackTraceElement stackTraceElement : throwable.getStackTrace()) {
             label.setText(label.getText() + "\n" + stackTraceElement);
         }

@@ -41,7 +41,6 @@ import net.artux.pda.model.items.ArmorModel;
 import net.artux.pda.model.user.Gang;
 
 import java.util.Collections;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -171,7 +170,7 @@ public class ActionsWidget extends Table {
         addLabel("Синхронизация (сохранить предметы)", labelStyle, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                dataRepository.applyActions(Map.of(), true);
+                dataRepository.applyActions(Collections.emptyMap(), true);
             }
         });
     }
@@ -182,6 +181,4 @@ public class ActionsWidget extends Table {
         row();
         label.addListener(clickListener);
     }
-
-
 }

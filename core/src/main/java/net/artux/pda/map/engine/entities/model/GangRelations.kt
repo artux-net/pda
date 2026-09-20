@@ -7,7 +7,6 @@ import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.map.SpawnModel
 import net.artux.pda.model.user.Gang
 import net.artux.pda.model.user.GangRelation
-import java.util.Objects
 import javax.inject.Inject
 
 @PerGameMap
@@ -45,7 +44,8 @@ class GangRelations @Inject constructor() : ArrayList<GangRelation?>() {
     fun findEnemyByGangFromCurrentMap(gang: Gang, map: GameMap): Gang? {
         val gangs = map.spawns
             .map(SpawnModel::group)
-            .filter { obj: Gang? -> Objects.nonNull(obj) }
+            // Objects.nonNull() isn't implemented on RoboVM's runtime.
+            .filter { it != null }
             .toList()
 
         for (potentialEnemy in gangs) {

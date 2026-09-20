@@ -160,9 +160,10 @@ class LootWindow @Inject constructor(
         background = Utils.getColoredDrawable(1, 1, Colors.backgroundColor)
         touchable = Touchable.enabled
 
-        CoroutineScope(Dispatchers.Main).launch {
+        // Gdx.app.postRunnable is the cross-platform way back onto the game thread.
+        CoroutineScope(Dispatchers.Default).launch {
             dataRepository.storyDataModelFlow.collect {
-                update(it)
+                Gdx.app.postRunnable { update(it) }
             }
         }
     }

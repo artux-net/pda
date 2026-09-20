@@ -26,11 +26,9 @@ import net.artux.pda.map.repository.DataRepository
 import net.artux.pda.map.view.collection.list.MessagesList
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.quest.mission.MissionModel
-import net.artux.pda.model.quest.story.ParameterModel
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.engine.utils.LocaleBundle
 import java.util.*
-import java.util.stream.Collectors
 import javax.inject.Inject
 
 @PerGameMap
@@ -65,11 +63,15 @@ class MissionsSystem @Inject constructor(
         pathFinder = DijkstraPathFinder()
         currentStoryDataModel = dataRepository.initDataModel
 
-        CoroutineScope(Dispatchers.Main).launch {
+        // Dispatchers.Main needs kotlinx-coroutines-android, which doesn't exist on iOS;
+        // Gdx.app.postRunnable is the cross-platform way back onto the game thread.
+        CoroutineScope(Dispatchers.Default).launch {
             dataRepository.storyDataModelFlow.collect {
-                val oldDataModel = currentStoryDataModel
-                currentStoryDataModel = it
-                updateData(oldDataModel)
+                Gdx.app.postRunnable {
+                    val oldDataModel = currentStoryDataModel
+                    currentStoryDataModel = it
+                    updateData(oldDataModel)
+                }
             }
         }
     }
@@ -96,22 +98,26 @@ class MissionsSystem @Inject constructor(
     }
 
     fun getParamsByData(dataModel: StoryDataModel): MutableSet<String> {
-        return dataModel.parameters.stream()
-            .map { obj: ParameterModel -> obj.key }.collect(Collectors.toSet())
+        // java.util.stream/Collectors are only phantom (compile-only) classes on RoboVM's
+        // runtime and throw NoClassDefFoundError there - Kotlin's own collection
+        // extensions don't go through java.util.stream at all.
+        return dataModel.parameters.map { it.key }.toMutableSet()
     }
 
     fun getUpdatedParams(oldDataModel: StoryDataModel): Set<String> {
         val oldParams: Set<String> = getParamsByData(oldDataModel)
         val currentParams = getParamsByData(currentStoryDataModel)
-        currentParams.removeIf { o: String -> oldParams.contains(o) }
+        // MutableCollection.removeIf() takes a real java.util.function.Predicate, which is
+        // only a phantom (compile-only) class on RoboVM's runtime; Kotlin's own removeAll
+        // extension takes a Kotlin function type instead and doesn't hit that.
+        currentParams.removeAll { oldParams.contains(it) }
         return currentParams
     }
 
     val currentParams: Array<String>
         get() {
             val dataModel = currentStoryDataModel
-            return dataModel.parameters.stream()
-                .map { obj: ParameterModel -> obj.key }.collect(Collectors.toSet()).toTypedArray()
+            return dataModel.parameters.map { it.key }.toSet().toTypedArray()
         }
 
     val currentMissions: List<MissionModel>
