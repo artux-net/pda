@@ -10,8 +10,6 @@ import com.badlogic.gdx.utils.Timer;
 
 import net.artux.pda.map.di.scope.PerGameMap;
 
-import java.time.Instant;
-
 import javax.inject.Inject;
 
 @PerGameMap
@@ -46,7 +44,7 @@ public class TimerSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         TimeComponent timeComponent = cm.get(entity);
-        if (timeComponent.isExpired(Instant.now())) {
+        if (timeComponent.isExpired(System.currentTimeMillis())) {
             timeComponent.getListener().onExpire();
             getEngine().removeEntity(entity);
         }

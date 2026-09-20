@@ -27,8 +27,6 @@ import net.artux.pda.map.di.scope.PerGameMap
 import net.artux.pda.map.view.view.window.LootWindow
 import net.artux.pda.map.view.root.UserInterface
 import net.artux.engine.utils.LocaleBundle
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
 
@@ -107,7 +105,7 @@ class DeadCheckerSystem @Inject constructor(
                             engine.removeEntity(deadEntity)
                         })
                         .add(TimeComponent(
-                            Instant.now().plus(1, ChronoUnit.MINUTES)
+                            System.currentTimeMillis() + 60_000
                         ) { engine.removeEntity(entity) })
                         .add(entityComponent)
                 } else {

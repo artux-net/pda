@@ -22,7 +22,15 @@ buildscript {
         // commercial backing ended); this is the only practical way to run JVM/libGDX
         // code on iOS. Building anything with it - even :ios:tasks - needs a full Xcode
         // install (not just Command Line Tools) for its iOS SDK/toolchain/codesign.
-        classpath("com.mobidevelop.robovm:robovm-gradle-plugin:2.3.21")
+        // 2.3.22+ added iOS 17+ device launching via devicectl and Xcode 16's
+        // provisioning profile location - both needed on current Xcode/iOS versions.
+        classpath("com.mobidevelop.robovm:robovm-gradle-plugin:2.3.26")
+
+        // Guards :core (compiled for both Android and iOS/RoboVM) against Java 8+ API
+        // usage - checks compiled .class bytecode against a JDK 7 signature, so it
+        // catches both Java and Kotlin sources alike (unlike sourceCompatibility, which
+        // Kotlin ignores).
+        classpath("ru.vyarus:gradle-animalsniffer-plugin:2.0.1")
     }
 }
 

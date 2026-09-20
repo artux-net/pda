@@ -42,6 +42,12 @@
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
 
+    <!-- Without a launch screen, iOS assumes this is a pre-iOS-8 app unaware of modern
+         screen sizes and runs it letterboxed at the old 480x320 point resolution instead
+         of the device's real native size - an empty dict is enough to opt out of that. -->
+    <key>UILaunchScreen</key>
+    <dict/>
+
     <key>UIRequiredDeviceCapabilities</key>
     <array>
         <string>armv7</string>

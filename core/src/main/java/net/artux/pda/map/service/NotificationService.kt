@@ -1,5 +1,6 @@
 package net.artux.pda.map.service
 
+import com.badlogic.gdx.Gdx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,11 +19,10 @@ class NotificationService @Inject constructor(
 ){
 
     init {
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             dataRepository.storyDataModelFlow.collect {
-                update(it)
+                Gdx.app.postRunnable { update(it) }
             }
-            //Gdx.net.newClientSocket(Net.Protocol.TCP, , 12345)
         }
     }
 

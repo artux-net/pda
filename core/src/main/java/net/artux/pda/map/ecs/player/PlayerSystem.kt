@@ -41,9 +41,11 @@ class PlayerSystem @Inject constructor(
         get() = pm[player].position
 
     init {
-        CoroutineScope(Dispatchers.Main).launch {
+        // Dispatchers.Main needs kotlinx-coroutines-android, which doesn't exist on iOS;
+        // Gdx.app.postRunnable is the cross-platform way back onto the game thread.
+        CoroutineScope(Dispatchers.Default).launch {
             dataRepository.storyDataModelFlow.collect {
-                lastDataModel = it
+                Gdx.app.postRunnable { lastDataModel = it }
             }
         }
     }

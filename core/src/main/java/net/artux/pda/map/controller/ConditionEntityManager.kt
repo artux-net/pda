@@ -58,7 +58,8 @@ class ConditionEntityManager @Inject constructor(
     }
 
     init {
-        CoroutineScope(Dispatchers.Main).launch {
+        // Dispatchers.Main needs kotlinx-coroutines-android, which doesn't exist on iOS.
+        CoroutineScope(Dispatchers.Default).launch {
             dataRepository.storyDataModelFlow.collect {
                 Gdx.app.postRunnable { update(it) }
             }

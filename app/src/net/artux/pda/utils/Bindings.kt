@@ -14,7 +14,9 @@ import java.time.format.DateTimeFormatter
 inline fun init(
     binding: ItemChatBinding,
     simpleUserModel: SimpleUserModel,
-    instant: Instant? = null
+    // UserMessage.timestamp is epoch millis, not Instant - RoboVM's runtime (used by the
+    // iOS build sharing this model) doesn't implement java.time.
+    timestampMillis: Long? = null
 ) {
     val resources = binding.info.context.resources
 
@@ -29,8 +31,8 @@ inline fun init(
             val gangTitle = resources.getStringArray(R.array.groups)[gangId]
             " [PDA #" + simpleUserModel.pdaId + "] $gangTitle"
         }
-    if (instant != null)
-        info += " - ${formatter.format(instant)}"
+    if (timestampMillis != null)
+        info += " - ${formatter.format(Instant.ofEpochMilli(timestampMillis))}"
 
     binding.info.text = info
 

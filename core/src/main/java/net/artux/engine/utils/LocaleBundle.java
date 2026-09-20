@@ -25,9 +25,12 @@ public class LocaleBundle {
         Properties temp = new Properties();
         try {
             temp.load(resolveForLocale(fileHandle, locale).reader(StandardCharsets.UTF_8.name()));
-            temp.forEach((key, value) -> {
-                properties.put((String) key, (String) value);
-            });
+            // Properties.forEach() takes a BiConsumer, which RoboVM's runtime only has as
+            // a phantom (compile-only) class - using it here throws NoClassDefFoundError
+            // on iOS, so this has to iterate directly instead.
+            for (String key : temp.stringPropertyNames()) {
+                properties.put(key, temp.getProperty(key));
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

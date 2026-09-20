@@ -3,6 +3,7 @@ package net.artux.pda.map.ecs.physics
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.math.Vector2
@@ -131,11 +132,16 @@ class PlayerMovingSystem @Inject constructor(
     }
 
     init {
-        CoroutineScope(Dispatchers.Main).launch {
+        // Dispatchers.Main needs kotlinx-coroutines-android, which doesn't exist on iOS;
+        // Gdx.app.postRunnable is the cross-platform way back onto the game thread, which
+        // this needs anyway since it touches a Box2D Body.
+        CoroutineScope(Dispatchers.Default).launch {
             dataRepository.storyDataModelFlow.collect {
                 val storyDataModel = it
-                if (isPlayerActive)
-                    pm[player].body.massData.mass = storyDataModel.totalWeight
+                Gdx.app.postRunnable {
+                    if (isPlayerActive)
+                        pm[player].body.massData.mass = storyDataModel.totalWeight
+                }
             }
         }
 

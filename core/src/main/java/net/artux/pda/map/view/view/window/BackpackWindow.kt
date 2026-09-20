@@ -211,12 +211,10 @@ class BackpackWindow @Inject constructor(
 
         mainItemsView.setOnClickListener(onItemClickListener)
         touchable = Touchable.enabled
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Default).launch {
             dataRepository.storyDataModelFlow.collect {
-                update(it)
+                Gdx.app.postRunnable { update(it) }
             }
         }
     }
-
-
 }

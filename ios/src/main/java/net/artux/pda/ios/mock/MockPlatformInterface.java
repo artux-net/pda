@@ -12,6 +12,11 @@ import java.util.Map;
  * CoreFragment - which talks to QuestActivity/QuestViewModel and, through those, the
  * real backend. There's no equivalent on this iOS build (see MockDataFactory), so
  * every callback here just logs instead of acting on it.
+ *
+ * Uses System.out/err rather than Gdx.app.log: DataRepository's constructor calls
+ * putObjectToLuaContext() as part of MockDataFactory.createApplication(), which runs
+ * before "new IOSApplication(...)" - i.e. before Gdx.app is set - so Gdx.app.log(...)
+ * here would NPE on startup.
  */
 public class MockPlatformInterface implements PlatformInterface {
 
@@ -19,22 +24,22 @@ public class MockPlatformInterface implements PlatformInterface {
 
     @Override
     public void putObjectToLuaContext(String key, Object value) {
-        Gdx.app.log(TAG, "putObjectToLuaContext(" + key + ")");
+        System.out.println("[" + TAG + "] putObjectToLuaContext(" + key + ")");
     }
 
     @Override
     public void send(Map<String, String> data) {
-        Gdx.app.log(TAG, "send() ignored (no backend on this build): " + data);
+        System.out.println("[" + TAG + "] send() ignored (no backend on this build): " + data);
     }
 
     @Override
     public void applyActions(Map<String, List<String>> actions) {
-        Gdx.app.log(TAG, "applyActions() ignored (no backend on this build): " + actions);
+        System.out.println("[" + TAG + "] applyActions() ignored (no backend on this build): " + actions);
     }
 
     @Override
     public void restart() {
-        Gdx.app.log(TAG, "restart() requested - exiting instead, there's no map reload without a real backend to refetch from.");
+        System.out.println("[" + TAG + "] restart() requested - exiting instead, there's no map reload without a real backend to refetch from.");
         Gdx.app.exit();
     }
 
@@ -45,6 +50,6 @@ public class MockPlatformInterface implements PlatformInterface {
 
     @Override
     public void openLogs() {
-        Gdx.app.log(TAG, "openLogs() ignored (no log viewer on this build)");
+        System.out.println("[" + TAG + "] openLogs() ignored (no log viewer on this build)");
     }
 }

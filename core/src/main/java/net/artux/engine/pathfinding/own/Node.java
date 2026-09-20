@@ -2,9 +2,8 @@ package net.artux.engine.pathfinding.own;
 
 import com.badlogic.gdx.utils.Array;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.HashSet;
 
 public class Node<T> {
 
@@ -32,7 +31,11 @@ public class Node<T> {
     }
 
     public Collection<Node<T>> getConnectedNodes() {
-        return Arrays.stream(connections.items).map(Connection::getTarget).collect(Collectors.toSet());
+        HashSet<Node<T>> nodes = new HashSet<>();
+        for (Connection<T> connection : connections) {
+            nodes.add(connection.getTarget());
+        }
+        return nodes;
     }
 
     public T getObject() {

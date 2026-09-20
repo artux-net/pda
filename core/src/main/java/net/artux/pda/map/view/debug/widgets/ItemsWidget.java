@@ -49,7 +49,9 @@ public class ItemsWidget extends Table {
 
             }
         });
-        itemsContainerModel.getAll().forEach(itemModel -> itemModel.setQuantity(1));
+        for (ItemModel itemModel : itemsContainerModel.getAll()) {
+            itemModel.setQuantity(1);
+        }
         tableView.update(itemsContainerModel.getAll());
     }
 

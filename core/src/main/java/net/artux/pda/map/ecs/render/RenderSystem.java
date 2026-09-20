@@ -31,9 +31,8 @@ import net.artux.pda.map.di.scope.PerGameMap;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.List;
-import java.util.function.Consumer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -82,11 +81,6 @@ public class RenderSystem extends BaseSystem implements Drawable {
         Sprite yellowStarSprite = new Sprite(assetManager.get("textures/icons/entity/star-yellow.png", Texture.class));
         Sprite greenStarSprite = new Sprite(assetManager.get("textures/icons/entity/star-green.png", Texture.class));
 
-        Consumer<Sprite> spriteConsumer = sprite -> {
-            sprite.setSize(8, 8);
-            sprite.setOriginCenter();
-        };
-
         relationalSprites.put(RelationType.ENEMY, redSprite);
         relationalSprites.put(RelationType.NEUTRAL, yellowSprite);
         relationalSprites.put(RelationType.FRIEND, greenSprite);
@@ -95,12 +89,20 @@ public class RenderSystem extends BaseSystem implements Drawable {
         relationalLeaderSprites.put(RelationType.NEUTRAL, yellowStarSprite);
         relationalLeaderSprites.put(RelationType.FRIEND, greenStarSprite);
 
-        relationalLeaderSprites.values().forEach(spriteConsumer);
-        relationalSprites.values().forEach(spriteConsumer);
+        // java.util.function.Consumer is only a phantom (compile-only) class on RoboVM's
+        // runtime and throws NoClassDefFoundError there - a plain loop isn't.
+        for (Sprite sprite : relationalLeaderSprites.values()) {
+            sprite.setSize(8, 8);
+            sprite.setOriginCenter();
+        }
+        for (Sprite sprite : relationalSprites.values()) {
+            sprite.setSize(8, 8);
+            sprite.setOriginCenter();
+        }
 
         ShaderProgram shaderProgram = assetManager.get("shaders/blur.frag");
         blurGroup = postProcessing.loadShaderGroup("blur",
-                List.of(Pair.of(shaderProgram, shaderProgram1 -> {
+                Arrays.asList(Pair.of(shaderProgram, shaderProgram1 -> {
                             shaderProgram1.setUniformf("dir", 1f, 0);
                             shaderProgram1.setUniformf("radius", blurEffect);
                             shaderProgram1.setUniformf("resolution", Gdx.graphics.getWidth());
@@ -113,13 +115,13 @@ public class RenderSystem extends BaseSystem implements Drawable {
 
         shaderProgram = assetManager.get("shaders/red.frag");
         redEjectGroup = postProcessing.loadShaderGroup("red",
-                List.of(Pair.of(shaderProgram, shaderProgram1 -> {
+                Arrays.asList(Pair.of(shaderProgram, shaderProgram1 -> {
                     shaderProgram1.setUniformf("red_value",
                             (float) Math.sin(redEffectAccumulator += 0.005f));
                 })));
 
         redDamageGroup = postProcessing.loadShaderGroup("redDamage",
-                List.of(Pair.of(shaderProgram, shaderProgram1 -> {
+                Arrays.asList(Pair.of(shaderProgram, shaderProgram1 -> {
                     if (damageAccumulator > 3) {
                         shaderProgram1.setUniformf("red_value", 1);
                         damageAccumulator = 3;

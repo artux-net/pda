@@ -11,9 +11,9 @@ import net.artux.pda.model.quest.story.StoryDataModel;
 
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.inject.Inject;
 
@@ -69,8 +69,13 @@ public class ItemsGenerator {
             if (bullet != null) bullet.setQuantity(random(1, 15));
             items.add(bullet);
         }
-        items.removeIf(Objects::isNull);
-        items.forEach(item -> item = SerializationUtils.clone(item));
+        Iterator<ItemModel> iterator = items.iterator();
+        while (iterator.hasNext()) {
+            if (iterator.next() == null) iterator.remove();
+        }
+        for (ItemModel item : items) {
+            item = SerializationUtils.clone(item);
+        }
         return items;
     }
 
