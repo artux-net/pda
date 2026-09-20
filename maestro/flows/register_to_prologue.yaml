@@ -1,0 +1,55 @@
+appId: net.artux.pda
+---
+# Registration -> auto-login -> prologue flow, run against the real dev backend.
+#
+# TEST_EMAIL/TEST_PASSWORD are passed in from outside (-e TEST_EMAIL=... -e
+# TEST_PASSWORD=...), not generated in here, so the same values are available
+# to the caller afterwards to delete the account this run creates (DELETE
+# api/v1/user/delete - see run_register_to_prologue.sh, which does both).
+# Run standalone for debugging: maestro test -e TEST_EMAIL=a@b.c -e TEST_PASSWORD=secret register_to_prologue.yaml
+
+- launchApp:
+    clearState: true
+
+# --- LoginActivity: go to registration ---
+- tapOn:
+    id: "net.artux.pda:id/register"
+
+# --- RegisterActivity ---
+# hideKeyboard after each field: the activity is sensorLandscape with
+# windowSoftInputMode=adjustPan, so the open keyboard pans the layout and
+# covers the next field - tapping through the keyboard silently missed and
+# dumped all the text into the still-focused "email" field.
+- tapOn:
+    id: "net.artux.pda:id/email"
+- inputText: "${TEST_EMAIL}"
+- hideKeyboard
+- tapOn:
+    id: "net.artux.pda:id/password"
+- inputText: "${TEST_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "net.artux.pda:id/repeat_password"
+- inputText: "${TEST_PASSWORD}"
+- hideKeyboard
+- tapOn:
+    id: "net.artux.pda:id/registerBtn"
+
+# --- FinishRegistrationActivity (waits for the register API call) ---
+- extendedWaitUntil:
+    visible:
+      id: "net.artux.pda:id/endBtn"
+    timeout: 15000
+- tapOn:
+    id: "net.artux.pda:id/endBtn"
+
+# endBtn now auto-logs in with the credentials just registered and drops the user
+# straight into the first story with no prerequisites (the prologue, for a fresh
+# account) - see FinishRegistrationActivity. sceneResponses is StageFragment's
+# (static, id'd) container for the dynamically-created choice buttons, so its
+# visibility confirms we actually landed on a story stage rather than back on
+# LoginActivity.
+- extendedWaitUntil:
+    visible:
+      id: "net.artux.pda:id/sceneResponses"
+    timeout: 20000
