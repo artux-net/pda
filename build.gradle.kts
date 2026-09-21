@@ -55,36 +55,8 @@ project(":app") {
     }
 }
 
-// Runs core's game/map logic on iOS via RoboVM/MobiVM, with mocked data (see
-// ios/src/.../mock) standing in for what the Android app module normally fetches
-// from the real backend and passes in through CoreFragment's Bundle args.
-project(":ios") {
-    apply(plugin = "java")
-    apply(plugin = "robovm")
-
-    val robovmVersion = "2.3.26"
-
-    dependencies {
-        "implementation"(project(":core"))
-        "implementation"(project(":model"))
-
-        "implementation"("com.mobidevelop.robovm:robovm-rt:$robovmVersion")
-        "implementation"("com.mobidevelop.robovm:robovm-cocoatouch:$robovmVersion")
-        "implementation"("com.badlogicgames.gdx:gdx-backend-robovm:$gdxVersion")
-        // Unlike Android, iOS has no separate "natives" configuration - libGDX's own
-        // project template puts natives-ios jars on the regular compile classpath, since
-        // RoboVM's compiler pulls their embedded xcframeworks straight off the classpath.
-        // A custom "natives" config here (as Android needs) would silently exclude them,
-        // leaving native methods like IOSGLES20.init() unresolved at runtime.
-        "implementation"("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-ios")
-        "implementation"("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-ios")
-        "implementation"("com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-ios")
-        "implementation"("com.badlogicgames.gdx-controllers:gdx-controllers-ios:$gdxControllersVersion")
-
-        // lua script engine - same as :app/:core, RoboVM AOT-compiles plain Java fine.
-        "implementation"("org.luaj:luaj-jse:3.0.1")
-    }
-}
+// :ios is configured in its own ios/build.gradle.kts, not here - see the
+// comment at the top of that file for why.
 
 project(":core") {
     apply(plugin = "java-library")
