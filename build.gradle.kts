@@ -53,6 +53,17 @@ project(":app") {
         // lua script engine
         "implementation"("org.luaj:luaj-jse:3.0.1")
     }
+
+    tasks.register<Exec>("maestroRegisterToPrologue") {
+        group = "verification"
+        description = "Installs the debug build and runs the registration -> prologue Maestro " +
+                "flow (maestro/flows/register_to_prologue.yaml) against the real dev backend; " +
+                "creates and deletes its own throwaway test account. Requires the maestro CLI " +
+                "on PATH (curl -Ls \"https://get.maestro.mobile.dev\" | bash) and a " +
+                "connected/booted device."
+        workingDir = rootProject.projectDir
+        commandLine("bash", "maestro/scripts/run_register_to_prologue.sh")
+    }
 }
 
 // Runs core's game/map logic on iOS via RoboVM/MobiVM, with mocked data (see

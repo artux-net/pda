@@ -85,7 +85,13 @@ public class NetworkModule {
 
         });
 
-        httpClient.addNetworkInterceptor(new ExponentialBackoffRetryInterceptor(4, 1000, 32000));
+        // Must be an application interceptor: it retries by calling chain.proceed()
+        // multiple times in a loop, which OkHttp only allows for application
+        // interceptors - a *network* interceptor is required to call proceed() exactly
+        // once per exchange, so registering this via addNetworkInterceptor made every
+        // single retry attempt throw "must call proceed() exactly once" and get reported
+        // back as a synthetic 503 - the backoff/retry logic never actually worked.
+        httpClient.addInterceptor(new ExponentialBackoffRetryInterceptor(4, 1000, 32000));
 
 
         httpClient.connectTimeout(10, TimeUnit.SECONDS)

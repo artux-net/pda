@@ -199,7 +199,10 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:$glide_version")
     kapt("com.github.bumptech.glide:compiler:$glide_version")
 
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
+    // 2.7's HeapAnalyzerService doesn't declare a foregroundServiceType, which throws
+    // MissingForegroundServiceTypeException (and kills the whole app) on targetSdk 34+
+    // as soon as LeakCanary tries to dump a heap - 2.10+ fixed this.
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 
     // dagger
     implementation("com.google.dagger:dagger:$dagger_version")
