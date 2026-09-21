@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag or commit to build from
+        type: string
+        required: true
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -19,8 +25,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
           submodules: recursive
           fetch-depth: 0
+
+      - name: Resolve build ref
+        id: build_ref
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Build & Deploy
         # Pinned to @main (not ./.github/assembly) so this always runs the
@@ -40,6 +51,10 @@ jobs:
       - name: Extract PR number
         id: extract_pr
         env:
+          # head_commit is only present on push events - a manual
+          # workflow_dispatch run has no commit message to parse, so PR
+          # number/title just come back empty and the message below falls
+          # back to the ref that was built.
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           echo "Исходное сообщение: $COMMIT_MESSAGE"
@@ -67,7 +82,7 @@ jobs:
 
             Опубликована в internal-канале Google Play
 
-            Название: ${{ steps.extract_pr.outputs.commit_title }}
-            Автор: ${{ github.event.head_commit.author.name }}
-            [PR](https://github.com/${{ github.repository }}/pull/${{ steps.extract_pr.outputs.pr_number }}) | [Changes](https://github.com/${{ github.repository }}/commit/${{github.sha}}) | [Crashlytics](https://console.firebase.google.com/project/${{ vars.FIREBASE_ID }}/crashlytics/app/android:${{ vars.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})
+            Название: ${{ steps.extract_pr.outputs.commit_title || format('ручной запуск из `{0}`', inputs.ref) }}
+            Автор: ${{ github.event.head_commit.author.name || github.actor }}
+            [PR](https://github.com/${{ github.repository }}/pull/${{ steps.extract_pr.outputs.pr_number }}) | [Changes](https://github.com/${{ github.repository }}/commit/${{ steps.build_ref.outputs.sha }}) | [Crashlytics](https://console.firebase.google.com/project/${{ vars.FIREBASE_ID }}/crashlytics/app/android:${{ vars.PACKAGE }}/issues?state=open&time=last-seven-days&types=crash&tag=all&sort=eventCount&versions=${{ steps.assembly.outputs.versionName }})
             [Скачать APK](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
