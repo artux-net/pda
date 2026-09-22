@@ -54,7 +54,13 @@ public class ExponentialBackoffRetryInterceptor implements Interceptor {
         try {
             return chain.proceed(request);
         } catch (Exception e) {
-            throw new IOException("Request attempt failed", e);
+            // NetworkModule's outer interceptor turns this into a synthetic
+            // 503 response using only getMessage() (a Response can't carry
+            // a Throwable/cause chain), so the real failure type has to be
+            // in the message itself or it's lost - e.g. a SocketTimeoutException
+            // or UnknownHostException would otherwise all look like the same
+            // generic "Request attempt failed" in crash reports.
+            throw new IOException("Request attempt failed: " + e, e);
         }
     }
 }

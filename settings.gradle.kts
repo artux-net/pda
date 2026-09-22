@@ -18,13 +18,13 @@ buildscript {
         classpath("com.google.gms:google-services:4.4.2")
         classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.9")
 
-        // MobiVM is the maintained community fork of RoboVM (the original project's
-        // commercial backing ended); this is the only practical way to run JVM/libGDX
-        // code on iOS. Building anything with it - even :ios:tasks - needs a full Xcode
-        // install (not just Command Line Tools) for its iOS SDK/toolchain/codesign.
-        // 2.3.22+ added iOS 17+ device launching via devicectl and Xcode 16's
-        // provisioning profile location - both needed on current Xcode/iOS versions.
-        classpath("com.mobidevelop.robovm:robovm-gradle-plugin:2.3.26")
+        // robovm-gradle-plugin is NOT declared here on purpose - it's a fat jar
+        // shading its own unsigned org.bouncycastle.* classes, which collides
+        // (SecurityException: signer information does not match) with the signed
+        // bcprov jar AGP uses internally once both share this classloader. It's
+        // declared in ios/build.gradle.kts's own buildscript block instead, which
+        // gets its own child classloader and keeps that collision away from
+        // :app/AGP's signing tasks entirely.
 
         // Guards :core (compiled for both Android and iOS/RoboVM) against Java 8+ API
         // usage - checks compiled .class bytecode against a JDK 7 signature, so it
