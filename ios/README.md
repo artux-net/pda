@@ -64,3 +64,27 @@ That's as far as this can go without Xcode. To finish:
   on an incomplete mock (see the comments in `MockDataFactory`/`robovm.xml`), but there
   could be others further into actual gameplay that weren't reachable through static
   reading alone.
+
+## On-device: confirmed launching (net.artux.pda.flow entry point)
+
+`./gradlew :ios:launchIOSDevice` now builds, installs and launches on a real iPhone
+without crashing. It previously died immediately on startup with:
+
+```
+java.lang.ExceptionInInitializerError
+  at okhttp3.OkHttpClient.<init>(...)
+Caused by: java.lang.ArrayIndexOutOfBoundsException: length=0; index=0
+  at okhttp3.internal.platform.Platform$Companion.isConscryptPreferred(Platform.kt:202)
+```
+
+Cause: robovm-rt's own `java/security/security.properties` registers 5 security
+providers (`com.android.org.conscrypt.OpenSSLProvider`,
+`org.apache.harmony.security.provider.cert.DRLCertFactory`,
+`com.android.org.bouncycastle.jce.provider.BouncyCastleProvider`,
+`org.apache.harmony.security.provider.crypto.CryptoProvider`,
+`com.android.org.conscrypt.JSSEProvider`) purely via `Class.forName()` inside
+`java.security.Security`'s static init - RoboVM's static analysis can't see that
+reflective load, so all 5 get stripped and `Security.getProviders()` comes back empty.
+`FlowApiClient`'s `OkHttpClient` (built as soon as `PdaFlowGame` is constructed) hits
+that empty array in `Platform.isConscryptPreferred()` before a single screen renders.
+Fixed by force-linking those 3 packages in `robovm.xml` (see its `forceLinkClasses`).

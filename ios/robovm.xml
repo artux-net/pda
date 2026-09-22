@@ -54,5 +54,17 @@
              classes) reflects over getters/setters that RoboVM's static analysis can't see
              are used, for the same reason. -->
         <pattern>net.artux.**</pattern>
+        <!-- robovm-rt's own java/security/security.properties lists these 5 as
+             security.provider.1-5, loaded only via Class.forName() from java.security.Security's
+             static init - RoboVM's static analysis never sees that reflective load, so without
+             this they're stripped and Security.getProviders() comes back empty at runtime. That
+             breaks OkHttpClient's constructor immediately (FlowApiClient's first field init):
+             OkHttp's Platform.isConscryptPreferred() does Security.getProviders()[0], which
+             throws ArrayIndexOutOfBoundsException on an empty array before a single flow screen
+             ever renders - confirmed on-device (:ios:launchIOSDevice on a real iPhone), not
+             guessed. -->
+        <pattern>com.android.org.conscrypt.**</pattern>
+        <pattern>com.android.org.bouncycastle.**</pattern>
+        <pattern>org.apache.harmony.security.provider.**</pattern>
     </forceLinkClasses>
 </config>
