@@ -174,6 +174,16 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
         args.putSerializable("items", provider[SellerViewModel::class.java].getItems())
         args.putBoolean("updated", true)
         coreFragment.arguments = args
+        // Was .replace(R.id.containerView, coreFragment), which - unlike this method's own
+        // hide/show handling of coreFragment just below - actually destroys whatever else was
+        // in containerView (stageRootFragment), while this activity's stageRootFragment field
+        // kept pointing at that now-destroyed instance forever (confirmed via LeakCanary:
+        // QuestActivity.stageRootFragment -> destroyed StageRootFragment, 48 KB retained).
+        // Hide it instead, matching setStage()'s symmetric treatment of coreFragment.
+        if (stageRootFragment.isAdded) {
+            mFragmentTransaction.hide(stageRootFragment)
+            mFragmentTransaction.setMaxLifecycle(stageRootFragment, Lifecycle.State.STARTED)
+        }
         if (coreFragment.isAdded) {
             if (coreFragment.isHidden) {
                 mFragmentTransaction.setMaxLifecycle(coreFragment, Lifecycle.State.RESUMED)
@@ -181,10 +191,11 @@ class QuestActivity : FragmentActivity(), AndroidFragmentApplication.Callbacks {
             } else {
                 coreFragment.onResume()
             }
+        } else {
+            mFragmentTransaction.add(R.id.containerView, coreFragment, "map")
         }
         mFragmentTransaction
             .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
-            .replace(R.id.containerView, coreFragment)
             .commitNow()
         currentFragment = coreFragment
     }

@@ -199,7 +199,7 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:$glide_version")
     kapt("com.github.bumptech.glide:compiler:$glide_version")
 
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 
     // dagger
     implementation("com.google.dagger:dagger:$dagger_version")

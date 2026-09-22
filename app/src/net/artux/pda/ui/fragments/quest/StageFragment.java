@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
@@ -41,6 +42,20 @@ public class StageFragment extends Fragment {
 
     private FragmentQuest0Binding usualStageBinding;
     private FragmentQuest1Binding chapterOverBinding;
+    // sceneResponses.getViewTreeObserver() returns the ViewTreeObserver of the whole window
+    // (shared with QuestActivity's root, not scoped to this fragment's view), and this
+    // fragment is recreated on every stage transition for as long as the story runs - without
+    // removing it, each stage's listener (and everything it captures) stayed in that
+    // observer's list forever, growing across the whole playthrough (confirmed via LeakCanary:
+    // 480 retained objects per stage).
+    //
+    // The observer instance is captured here rather than re-fetched in onDestroyView(): by
+    // then the fragment's view has already been detached from the window (FragmentManager
+    // detaches child views before calling onDestroyView), and View#getViewTreeObserver() on a
+    // detached view returns a different, throwaway observer - removing the listener from that
+    // one is a silent no-op that leaves it registered on the real one forever.
+    private ViewTreeObserver.OnTouchModeChangeListener touchModeChangeListener;
+    private ViewTreeObserver touchModeObserver;
 
 
     public static StageFragment createInstance(StageModel stage) {
@@ -150,11 +165,13 @@ public class StageFragment extends Fragment {
             // Only draw the border once the device actually leaves touch mode (the first D-pad/
             // stick/key press), which is when whatever's focused - the pre-selected first choice,
             // unless the user already moved off it - should first become visible.
-            sceneResponses.getViewTreeObserver().addOnTouchModeChangeListener(inTouchMode -> {
+            touchModeChangeListener = inTouchMode -> {
                 View focused = sceneResponses.getFocusedChild();
                 if (focused instanceof Button)
                     updateChoiceHighlight((Button) focused);
-            });
+            };
+            touchModeObserver = sceneResponses.getViewTreeObserver();
+            touchModeObserver.addOnTouchModeChangeListener(touchModeChangeListener);
         }
     }
 
@@ -175,6 +192,18 @@ public class StageFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (touchModeObserver != null && touchModeChangeListener != null && touchModeObserver.isAlive())
+            touchModeObserver.removeOnTouchModeChangeListener(touchModeChangeListener);
+        touchModeObserver = null;
+        touchModeChangeListener = null;
+        sceneResponses = null;
+        usualStageBinding = null;
+        chapterOverBinding = null;
+        super.onDestroyView();
     }
 
 }
