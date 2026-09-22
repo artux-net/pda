@@ -31,9 +31,16 @@ class ArticleFragment : WebFragment(), View.OnClickListener, CommentsAdapter.OnC
 
     private val newsViewModel: NewsViewModel by viewModels()
     private val commentViewModel: CommentViewModel by viewModels()
-    private lateinit var binding: FragmentOpenNewsBinding
-    private lateinit var fragmentInputBinding: FragmentInputBinding
-    private lateinit var commentsBinding: FragmentListBinding
+    // Backed by nullable properties and cleared in onDestroyView(): this fragment can stay
+    // alive in the back stack after its view is destroyed (LeakCanary caught this - the
+    // fragment itself wasn't leaking, but a lateinit binding kept the old view tree, and
+    // everything hanging off it, pinned in memory since nothing ever released the reference).
+    private var _binding: FragmentOpenNewsBinding? = null
+    private val binding get() = _binding!!
+    private var _fragmentInputBinding: FragmentInputBinding? = null
+    private val fragmentInputBinding get() = _fragmentInputBinding!!
+    private var _commentsBinding: FragmentListBinding? = null
+    private val commentsBinding get() = _commentsBinding!!
     private lateinit var id: UUID
 
     override fun onCreateView(
@@ -41,7 +48,7 @@ class ArticleFragment : WebFragment(), View.OnClickListener, CommentsAdapter.OnC
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentOpenNewsBinding.inflate(inflater)
+        _binding = FragmentOpenNewsBinding.inflate(inflater)
         return binding.root
     }
 
@@ -51,8 +58,8 @@ class ArticleFragment : WebFragment(), View.OnClickListener, CommentsAdapter.OnC
 
         id = UUID.fromString(requireArguments().serializable("id"))
 
-        commentsBinding = FragmentListBinding.bind(binding.root.findViewById(R.id.listLayout))
-        fragmentInputBinding =
+        _commentsBinding = FragmentListBinding.bind(binding.root.findViewById(R.id.listLayout))
+        _fragmentInputBinding =
             FragmentInputBinding.bind(binding.root.findViewById(R.id.inputLayout))
         val commentsView: RecyclerView = commentsBinding.list
         val adapter = CommentsAdapter(this)
@@ -90,8 +97,19 @@ class ArticleFragment : WebFragment(), View.OnClickListener, CommentsAdapter.OnC
     }
 
     override fun onDestroy() {
-        content.destroy()
+        // WebFragment.onDestroyView() already destroys and nulls content by the time
+        // onDestroy() runs (onDestroyView always precedes onDestroy) - content?.destroy()
+        // here is a no-op in the normal case, kept only in case onDestroy somehow fires
+        // without a prior onDestroyView.
+        content?.destroy()
         super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        _fragmentInputBinding = null
+        _commentsBinding = null
+        _binding = null
+        super.onDestroyView()
     }
 
     companion object {

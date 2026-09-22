@@ -21,6 +21,7 @@ import net.artux.pda.ui.activities.hierarhy.BaseFragment;
 
 public class WebFragment extends BaseFragment {
 
+    @Nullable
     protected WebView content;
     protected String url;
 
@@ -86,8 +87,22 @@ public class WebFragment extends BaseFragment {
     }
 
     @Override
+    public void onDestroyView() {
+        // content is never nulled out here, only in onDestroy() - LeakCanary caught this:
+        // a fragment can survive in the back stack well after its view (and this WebView,
+        // 60+ kB retained) is torn down, so the reference has to be released here instead.
+        if (content != null) {
+            content.destroy();
+            content = null;
+        }
+        super.onDestroyView();
+    }
+
+    @Override
     public void onDestroy() {
-        content.destroy();
+        if (content != null) {
+            content.destroy();
+        }
         super.onDestroy();
     }
 }
