@@ -1,8 +1,10 @@
 package net.artux.pda.ui.viewmodels
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.datatransport.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import net.artux.pda.model.StatusModel
@@ -24,6 +26,7 @@ import net.artux.pda.repositories.QuestRepository
 import net.artux.pda.repositories.SellerRepository
 import net.artux.pda.repositories.SummaryRepository
 import net.artux.pda.repositories.UserRepository
+import net.artux.pda.ui.viewmodels.event.OpenStageEvent
 import net.artux.pda.ui.viewmodels.util.SingleLiveEvent
 import net.artux.pda.utils.AdType
 import timber.log.Timber
@@ -60,18 +63,29 @@ class QuestViewModel @javax.inject.Inject constructor(
     var currentStageId: Long = -1
     var transferDisabled = true
 
+    // commandController is a singleton observed via observeForever (not tied to any
+    // LifecycleOwner), so this observer must be removed in onCleared() below - otherwise
+    // every past QuestViewModel instance stays registered forever, leaking them and making
+    // every future stageEvent fire beginWithStage() once per leaked instance.
+    private val stageEventObserver = Observer<Event<OpenStageEvent>> {
+        val stageId = it.payload.stageId
+        var toSync = false
+        val chapterId = if (it.payload.chapterId > -1) {
+            toSync = true
+            it.payload.chapterId
+        } else
+            currentChapterId
+        beginWithStage(currentStoryId, chapterId, stageId, toSync)
+    }
+
     init {
         //подписка на команду открытия стадии
-        commandController.stageEvent.observeForever {
-            val stageId = it.payload.stageId
-            var toSync = false
-            val chapterId = if (it.payload.chapterId > -1) {
-                toSync = true
-                it.payload.chapterId
-            } else
-                currentChapterId
-            beginWithStage(currentStoryId, chapterId, stageId, toSync)
-        }
+        commandController.stageEvent.observeForever(stageEventObserver)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        commandController.stageEvent.removeObserver(stageEventObserver)
     }
 
     fun updateStoryDataFromCache() {
@@ -109,8 +123,10 @@ class QuestViewModel @javax.inject.Inject constructor(
         stageId: Long,
         sync: Boolean = true
     ) {
-        if (storyId < 0)
+        if (storyId < 0) {
             exitStory()
+            return
+        }
         viewModelScope.launch {
             currentStoryId = storyId
             currentChapterId = chapterId
@@ -123,13 +139,17 @@ class QuestViewModel @javax.inject.Inject constructor(
                 .map { mapper.chapter(it) }
                 .onSuccess {
                     chapter.postValue(it)
-                    background.postValue(it.stages[0]?.background)
                     val chapterStage = it.getStage(stageId)
 
                     if (chapterStage == null) {
                         status.postValue(StatusModel(Exception("Can not find stage with id: $stageId in chapter: $currentChapterId")))
                         return@launch
                     }
+                    // it.stages is keyed by stage id (see StoryMapper.stagesMap), not by
+                    // position, so stages[0] was looking up "the stage whose id is 0" rather
+                    // than "the first stage" - almost always absent, silently posting null
+                    // into this non-null LiveData. Use the actual resolved target stage.
+                    chapterStage.background?.let(background::postValue)
                     if (sync) {
                         prepareSync(chapterStage)
                         syncNow()
@@ -157,80 +177,91 @@ class QuestViewModel @javax.inject.Inject constructor(
         if (texts.isNotEmpty() && texts[0].text.isNotBlank())
             summaryRepository.check(
                 UserMessage(
-                    chapterStage.title!!,
+                    chapterStage.title ?: "",
                     chapterStage.texts[0].text,
                     chapterStage.background
                 )
             )
     }
 
-    private fun setStage(chapterStage: Stage) {
+    // Suspend rather than launching its own coroutine: beginWithStage() calls this as the
+    // last step of its own coroutine and previously relied on it finishing synchronously to
+    // sequence loadingState correctly. A nested, un-awaited viewModelScope.launch here let
+    // beginWithStage() post loadingState=false while this was still mid-flight (e.g. still
+    // fetching a map or syncing), so the loading indicator could disappear before the stage
+    // was actually ready. Callers that aren't already inside a coroutine (chooseTransfer)
+    // wrap this call in their own viewModelScope.launch instead.
+    private suspend fun setStage(chapterStage: Stage) {
         currentStageId = chapterStage.id
         Timber.i("Opening stage: ${chapterStage.id}")
-        viewModelScope.launch {
-            when (chapterStage.typeStage) {
-                4 -> {
-                    //переход на карту
-                    if (chapterStage.data == null)
-                        return@launch
-                    syncNow()
-                    title.postValue("Loading map...")
-                    val mapId: String? = chapterStage.data!!["map"]
-                    if (mapId != null) {
-                        if (chapterStage.data!!.containsKey("pos")) {
-                            repository.getMap(currentStoryId, mapId.toInt())
-                                .map { mapper.map(it) }
-                                .onSuccess {
-                                    if (chapterStage.data!!.containsKey("pos"))
-                                        it.defPos = chapterStage.data!!["pos"].toString()
-                                    Timber.i("${storyData.value}")
-                                    if (Random.nextFloat() < 0.1f) {
-                                        commandController.showAd(AdType.TRANSFER_VIDEO)
-                                    }
-                                    map.postValue(it)
-                                }
-                                .onFailure { status.postValue(StatusModel(it)) }
+        when (chapterStage.typeStage) {
+            4 -> {
+                //переход на карту
+                val stageData = chapterStage.data ?: return
+                syncNow()
+                title.postValue("Loading map...")
+                val mapId: String? = stageData["map"]
+                if (mapId != null) {
+                    repository.getMap(currentStoryId, mapId.toInt())
+                        .map { mapper.map(it) }
+                        .onSuccess {
+                            stageData["pos"]?.let { pos -> it.defPos = pos }
+                            Timber.i("${storyData.value}")
+                            if (Random.nextFloat() < 0.1f) {
+                                commandController.showAd(AdType.TRANSFER_VIDEO)
+                            }
+                            map.postValue(it)
                         }
-                    } else
-                        status.postValue(StatusModel("Указан тип стадии - карта, но id не задан"))
-                }
+                        .onFailure { status.postValue(StatusModel(it)) }
+                } else
+                    status.postValue(StatusModel("Указан тип стадии - карта, но id не задан"))
+            }
 
-                5, 6 -> {
-                    processData(chapterStage.data)
-                }
+            5, 6 -> {
+                processData(chapterStage.data)
+            }
 
-                else -> {
-                    background.postValue(chapterStage.background)
-                    if (storyData.value == null) {
-                        status.postValue(StatusModel(Exception("Story Data null")))
-                        return@launch
-                    }
-                    if (chapterStage.isNeedSync())
-                        syncNow()
-                    notification.postValue(stageMapper.notification(chapterStage, storyData.value))
-                    stage.postValue(stageMapper.model(chapterStage, storyData.value))
-                    transferDisabled = false
+            else -> {
+                chapterStage.background?.let(background::postValue)
+                if (storyData.value == null) {
+                    status.postValue(StatusModel(Exception("Story Data null")))
+                    return
                 }
+                if (chapterStage.isNeedSync())
+                    syncNow()
+                notification.postValue(stageMapper.notification(chapterStage, storyData.value))
+                stage.postValue(stageMapper.model(chapterStage, storyData.value))
             }
         }
+        transferDisabled = false
     }
 
     fun chooseTransfer(transfer: TransferModel) {
         if (transferDisabled)
             return
+        val storyDataValue = storyData.value
+        val chapterValue = chapter.value
+        if (storyDataValue == null || chapterValue == null) {
+            status.postValue(StatusModel(Exception("Не удалось выбрать переход: данные главы ещё не загружены")))
+            return
+        }
         transferDisabled = true
-        summaryRepository.check(UserMessage(storyData.value!!, transfer.text))
+        summaryRepository.check(UserMessage(storyDataValue, transfer.text))
 
-        val chapterStage = chapter.value!!.getStage(transfer.stageId)
+        val chapterStage = chapterValue.getStage(transfer.stageId)
         if (chapterStage != null) {
-            prepareSync(chapterStage)
-            setStage(chapterStage)
+            viewModelScope.launch {
+                prepareSync(chapterStage)
+                setStage(chapterStage)
+            }
         } else
             status.postValue(StatusModel(Exception("Не удалось найти стадию ${transfer.stageId} в главе: $currentChapterId")))
     }
 
     fun getCurrentStage(): Stage? {
-        return chapter.value!!.getStage(stage.value!!.id)
+        val chapterValue = chapter.value ?: return null
+        val stageValue = stage.value ?: return null
+        return chapterValue.getStage(stageValue.id)
     }
 
     private suspend fun syncNow() {
