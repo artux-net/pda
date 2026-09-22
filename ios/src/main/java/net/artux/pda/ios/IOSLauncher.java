@@ -6,7 +6,7 @@ import org.robovm.apple.uikit.UIApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
 
-import net.artux.pda.ios.mock.MockDataFactory;
+import net.artux.pda.flow.PdaFlowGame;
 
 /** Standard libGDX RoboVM/MobiVM launcher shape. */
 public class IOSLauncher extends IOSApplication.Delegate {
@@ -19,7 +19,11 @@ public class IOSLauncher extends IOSApplication.Delegate {
         // which axis to expect, matching every Android activity's sensorLandscape.
         config.orientationLandscape = true;
         config.orientationPortrait = false;
-        return new IOSApplication(MockDataFactory.createApplication(), config);
+        // Full registration -> login -> story selection -> stage dialogue -> map flow,
+        // against the real backend (see net.artux.pda.flow's own docs for the architecture).
+        // MockDataFactory.createApplication() (mock.MockDataFactory) is still here, unused,
+        // as a reference/fallback for jumping straight to the map with fabricated data.
+        return new IOSApplication(new PdaFlowGame(), config);
     }
 
     public static void main(String[] argv) {

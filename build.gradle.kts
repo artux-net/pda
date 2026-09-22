@@ -84,6 +84,11 @@ project(":core") {
 
         "implementation"("com.google.code.gson:gson:2.8.9")
         "implementation"("org.apache.commons:commons-lang3:3.0")
+        // Used by net.artux.pda.flow's network client (iOS registration/login/story flow).
+        // Plain OkHttp, not Retrofit: Retrofit builds its API implementation via
+        // java.lang.reflect.Proxy at runtime, which RoboVM's AOT compiler can't handle
+        // without extra reflection config - OkHttp's request/response API needs none of that.
+        "implementation"("com.squareup.okhttp3:okhttp:4.12.0")
 
         "api"("com.badlogicgames.gdx:gdx:$gdxVersion")
         "api"("com.badlogicgames.gdx:gdx-ai:$aiVersion")
@@ -105,5 +110,10 @@ project(":core") {
         // lua script engine
         // https://mvnrepository.com/artifact/org.luaj/luaj-jse
         "implementation"("org.luaj:luaj-jse:3.0.1")
+
+        // FlowApiClient has no Gdx/Android/RoboVM dependency, so it's testable on a plain JVM
+        // without needing an emulator/device - see FlowApiClientTest.
+        "testImplementation"("junit:junit:4.13.2")
+        "testImplementation"("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     }
 }
