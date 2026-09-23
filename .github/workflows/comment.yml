@@ -34,7 +34,9 @@ jobs:
         run: |
           # Telegram's "markdown" (legacy) parse mode errors out on any
           # unbalanced _ * ` [ in the message - a PR title routinely has
-          # these, which would silently kill the notify step below.
+          # these, which would silently kill the notify step below. That
+          # escaping only works outside an entity, so the title must stay
+          # out of the link text - inside [...] an escaped * breaks the link.
           echo "title=$(echo "$PR_TITLE" | sed -E 's/([_*`\[])/\\\1/g')" >> $GITHUB_OUTPUT
 
       - name: Send message to Artux channel
@@ -48,5 +50,5 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           thread_id: ${{ vars.TELEGRAM_THREAD_ID }}
           message: |
-            Опубликован новый PR [${{ steps.escape_title.outputs.title }}](${{ github.event.pull_request.url }})
+            Опубликован новый PR [#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }}): ${{ steps.escape_title.outputs.title }}
             Автор: ${{ github.event.pull_request.user.login }}
