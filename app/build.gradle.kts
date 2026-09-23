@@ -1,12 +1,9 @@
-import org.hidetake.gradle.swagger.generator.GenerateSwaggerCode
-import java.io.FileOutputStream
-import java.net.URL
+import com.android.build.api.variant.ResValue
+import java.net.URI
 
 plugins {
-    id("org.hidetake.swagger.generator") version "2.19.2"
-    id("kotlin-android")
     id("com.android.application")
-    id("kotlin-kapt")
+    id("com.android.legacy-kapt")
     id("dagger.hilt.android.plugin")
 
     id("com.google.gms.google-services")
@@ -15,23 +12,35 @@ plugins {
 
 val apiFile = file("api.json")
 
-swaggerSources {
-    register("pdanetwork") {
-        setInputFile(apiFile)
-        code(delegateClosureOf<GenerateSwaggerCode> {
-            language = "java"
-            configFile = file("apiconfig.json")
-            outputDir = file("$buildDir\\generated\\swagger-code")
-        })
-    }
+val swaggerOutputDir = layout.buildDirectory.dir("generated/swagger-code")
+
+// Runs swagger-codegen-cli directly - the org.hidetake.swagger.generator plugin that
+// used to do this is abandoned and calls Project.javaexec(), which Gradle 9 removed.
+val swaggerCodegen by configurations.creating
+
+val generateSwaggerCode by tasks.registering(JavaExec::class) {
+    inputs.file(apiFile)
+    inputs.file("apiconfig.json")
+    outputs.dir(swaggerOutputDir)
+
+    classpath = swaggerCodegen
+    mainClass.set("io.swagger.codegen.v3.cli.SwaggerCodegen")
+    args(
+        "generate",
+        "-l", "java",
+        "-i", apiFile.absolutePath,
+        "-c", file("apiconfig.json").absolutePath,
+        "-o", swaggerOutputDir.get().asFile.absolutePath,
+    )
+    doFirst { delete(swaggerOutputDir) }
 }
 
 gradle.projectsEvaluated {
+    if (!apiFile.exists()) {
+        generateSwaggerCode { dependsOn(downloadAPI) }
+    }
     tasks.named("preBuild") {
-        if (!apiFile.exists()) {
-            dependsOn("downloadAPI")
-        }
-        dependsOn(swaggerSources["pdanetwork"].code)
+        dependsOn(generateSwaggerCode)
     }
 }
 
@@ -47,7 +56,8 @@ android {
     sourceSets {
         getByName("main") {
             manifest.srcFile("AndroidManifest.xml")
-            java.setSrcDirs(listOf("src", "${swaggerSources["pdanetwork"].code.outputDir}/src/main/java"))
+            java.setSrcDirs(listOf("src", swaggerOutputDir.get().dir("src/main/java")))
+            kotlin.setSrcDirs(listOf("src"))
             aidl.setSrcDirs(listOf("src"))
             res.setSrcDirs(listOf("res"))
             assets.setSrcDirs(listOf("../assets"))
@@ -69,12 +79,6 @@ android {
         proguardFiles("proguard-rules.pro")
         testProguardFiles("test-proguard-rules.pro")
         signingConfig = signingConfigs.getByName("debug")
-    }
-
-    applicationVariants.configureEach {
-        // add versions to resources
-        resValue("string", "versionName", versionName)
-        resValue("string", "versionCode", versionCode.toString())
     }
 
     buildTypes {
@@ -109,20 +113,33 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
-        jvmToolchain(17)
-    }
-
     buildFeatures {
         viewBinding = true
+        resValues = true
         aidl = true
     }
 
     lint {
         abortOnError = false
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+androidComponents {
+    onVariants { variant ->
+        // add versions to resources
+        val output = variant.outputs.first()
+        variant.resValues.put(
+            variant.makeResValueKey("string", "versionName"),
+            output.versionName.map { ResValue(it) }
+        )
+        variant.resValues.put(
+            variant.makeResValueKey("string", "versionCode"),
+            output.versionCode.map { ResValue(it.toString()) }
+        )
     }
 }
 
@@ -133,14 +150,13 @@ val threetenbp_version = "1.3.5"
 val json_fire_version = "1.8.0"
 val mapstruct_version = "1.5.2.Final"
 val glide_version = "4.12.0"
-val dagger_version = "2.51.1"
+val dagger_version = "2.60.1"
 val retrofit_version = "2.9.0"
 val androidx_version = "2.6.1"
 
 dependencies {
     implementation(fileTree("libs") { include("*.aar") })
 
-    implementation("androidx.multidex:multidex:2.0.1")
     // mapstruct
     implementation("org.mapstruct:mapstruct:1.5.2.Final")
     kapt("org.mapstruct:mapstruct-processor:1.5.2.Final")
@@ -192,29 +208,28 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
 
     // ktx
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
     implementation("com.github.bumptech.glide:glide:$glide_version")
-    annotationProcessor("com.github.bumptech.glide:compiler:$glide_version")
-    kapt("com.github.bumptech.glide:compiler:$glide_version")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.14")
 
     // dagger
     implementation("com.google.dagger:dagger:$dagger_version")
     kapt("com.google.dagger:dagger-compiler:$dagger_version")
-    kapt("com.google.dagger:dagger-android-processor:$dagger_version")
-    kapt("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.4.2")
 
     implementation("com.google.dagger:hilt-android:$dagger_version")
     kapt("com.google.dagger:hilt-compiler:$dagger_version")
 }
 
-tasks.register("downloadAPI") {
-    val url = URL("https://app.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest")
-    val uc = url.openConnection()
-    uc.getInputStream().transferTo(FileOutputStream(apiFile))
+val downloadAPI by tasks.registering {
+    outputs.file(apiFile)
+    // Always refetch when run explicitly - the spec lives on the server, not in git
+    outputs.upToDateWhen { false }
+    doLast {
+        val url = URI("https://app.artux.net/pdanetwork/v3/api-docs/pdanetwork-rest").toURL()
+        apiFile.writeBytes(url.openStream().use { it.readBytes() })
+    }
 }
 
 tasks.register("copyAndroidNatives") {

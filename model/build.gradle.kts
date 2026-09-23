@@ -2,8 +2,9 @@ plugins {
     kotlin("jvm")
 }
 
-dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib")
+java {
+    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 kotlin{
