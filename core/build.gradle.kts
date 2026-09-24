@@ -1,14 +1,13 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("java")
+    id("java-library")
     id("kotlin")
     id("kotlin-kapt")
 }
 
 dependencies {
     implementation("org.apache.commons:commons-lang3:3.17.0")
-    implementation("org.int4.dirk:dirk-di:1.0.0-beta1")
 }
 
 java {
