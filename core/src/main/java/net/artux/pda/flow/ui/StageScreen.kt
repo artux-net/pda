@@ -7,12 +7,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.utils.Align
 import net.artux.pda.common.PropertyFields
 import net.artux.pda.flow.FlowPlatformInterface
 import net.artux.pda.flow.PdaFlowGame
+import net.artux.pda.flow.StageRules
+import net.artux.pda.flow.network.FlowApiClient
 import net.artux.pda.flow.network.dto.toModel
 import net.artux.pda.map.GdxAdapter
-import net.artux.pda.model.QuestUtil
 import net.artux.pda.model.items.ItemsContainerModel
 import net.artux.pda.model.map.GameMap
 import net.artux.pda.model.quest.ChapterModel
@@ -26,6 +28,10 @@ import java.util.Properties
  * + QuestViewModel.setStage()'s default branch, driving through the same Stage/ChapterModel
  * (:model) data. typeStage 5/6 (seller/processData) aren't handled - out of scope, see plan;
  * only the default (dialogue) case and typeStage 4 (map hand-off) are.
+ *
+ * The stage it opens with is the player's saved position, which may itself be a map stage
+ * (the usual state after the prologue, or after playing on Android) - that goes straight to
+ * the map, like QuestViewModel.beginWithStage() -> setStage() does.
  */
 class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
 
@@ -33,17 +39,25 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
     private val textLabel = TypewriterLabel(skin).apply { wrap = true }
     private val transfersTable = Table()
     private val status = errorLabel()
+    private val background = StageBackground(game.api)
 
     private var chapter: ChapterModel? = null
     private var currentStage: Stage? = null
     private var transfersLocked = false
+    private var jumpsInARow = 0
 
     init {
+        // Behind BaseFlowScreen's scrolled content.
+        stage.root.addActorAt(0, background.image)
+
         root.add(titleLabel).padBottom(10f).row()
 
-        val textScroll = ScrollPane(textLabel, skin)
+        // fragment_quest0's sceneText: the text sits on a black_overlay panel.
+        val textScroll = ScrollPane(textLabel, skin, "panel")
         textScroll.setScrollingDisabled(true, false)
-        root.add(textScroll).width(700f).height(220f).padBottom(20f).row()
+        // Short enough that 3-4 transfer buttons still fit below it on a landscape phone;
+        // BaseFlowScreen scrolls the rest.
+        root.add(textScroll).width(700f).height(150f).padBottom(15f).row()
 
         root.add(transfersTable).width(700f).row()
         root.add(status).width(700f).row()
@@ -68,39 +82,86 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
             status.setText("Не удалось найти стадию ${game.session.currentStageId}")
             return
         }
-        showStage(stage)
+        // Already the server's current position - no "state" sync needed to resume it.
+        enter(stage)
+    }
+
+    private fun enter(stage: Stage) {
+        game.session.currentStageId = stage.id
+        if (StageRules.exitsStory(stage)) {
+            // The server already applied finishStory/exitStory with this stage's "state".
+            game.goTo(StorySelectionScreen(game))
+            return
+        }
+        val jump = StageRules.jump(stage)
+        if (jump != null) {
+            jumpTo(jump)
+            return
+        }
+        jumpsInARow = 0
+        if (stage.typeStage == StageRules.TYPE_MAP) {
+            loadMapAndHandOff(stage)
+        } else {
+            showStage(stage)
+        }
+    }
+
+    /** Follows a stage's own redirect (see StageRules.jump), possibly into another chapter. */
+    private fun jumpTo(jump: StageRules.Jump) {
+        if (++jumpsInARow > MAX_JUMPS_IN_A_ROW) {
+            status.setText("Стадии ссылаются друг на друга по кругу")
+            return
+        }
+        val story = game.session.story ?: return
+        val chapterId = jump.chapterId ?: game.session.currentChapterId
+        val targetChapter = story.getChapter(chapterId.toString())
+        val target = targetChapter?.getStage(jump.stageId)
+        if (targetChapter == null || target == null) {
+            status.setText("Не удалось найти стадию ${jump.stageId} в главе $chapterId")
+            return
+        }
+        chapter = targetChapter
+        game.session.currentChapterId = chapterId
+        if (!jump.sync) {
+            enter(target)
+            return
+        }
+        val (email, password) = game.session.credentialsOrThrow()
+        transfersTable.clear()
+        status.setText("Синхронизация...")
+        runIO({ game.api.enterStage(story.id, chapterId, target.id, email, password) }) { result ->
+            result.onSuccess { dto ->
+                game.session.storyData = dto.toModel()
+                enter(target)
+            }.onFailure {
+                status.setText("Ошибка синхронизации: ${it.message}")
+                addRetryButton { jumpTo(jump) }
+            }
+        }
     }
 
     private fun showStage(stage: Stage) {
         currentStage = stage
         transfersLocked = false
-        game.session.currentStageId = stage.id
         status.setText("")
         titleLabel.setText(stage.title ?: "")
+        background.show(stage.background)
 
         val storyData = game.session.storyData
-        val text = stage.texts
-            .filter { storyData == null || QuestUtil.check(it.condition, storyData) }
-            .firstOrNull()
-            ?.text
-            ?: "Недостижимые условия текста"
-        textLabel.setFullText(text)
+        textLabel.setFullText(StageRules.visibleText(stage, storyData) ?: "Недостижимые условия текста")
 
         transfersTable.clear()
-        // Same fallback StageMapper.getTransfers() has: if no transfer's condition actually
-        // passes, show every transfer anyway (marked "unreachable" on Android) rather than
-        // stranding the player with no way forward.
-        val passable = stage.transfers.filter { storyData == null || QuestUtil.check(it.condition, storyData) }
-        val toShow = if (passable.isEmpty()) stage.transfers else passable
-        toShow.forEach { transfer -> addTransferButton(transfer) }
+        val transfers = StageRules.visibleTransfers(stage, storyData)
+        transfers.forEach { transfer -> addTransferButton(transfer) }
+        background.prefetch(transfers.map { chapter?.getStage(it.stage.toLong())?.background })
     }
 
     private fun addTransferButton(transfer: Transfer) {
-        val button = TextButton(transfer.text ?: "Далее", skin)
+        val button = choiceButton(transfer.text ?: "Далее")
         button.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) = onTransferChosen(transfer)
         })
-        transfersTable.add(button).width(680f).height(50f).padBottom(8f).row()
+        transfersTable.add(button).width(700f).padBottom(8f).row()
     }
 
     private fun onTransferChosen(transfer: Transfer) {
@@ -108,8 +169,9 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
             if (textLabel.isRevealing) textLabel.skipToEnd()
             return
         }
-        val stage = currentStage ?: return
+        if (currentStage == null) return
         val chapterModel = chapter ?: return
+        val story = game.session.story ?: return
         val nextStage = chapterModel.getStage(transfer.stage.toLong())
         if (nextStage == null) {
             status.setText("Не удалось найти стадию ${transfer.stage}")
@@ -120,15 +182,14 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
         val (email, password) = game.session.credentialsOrThrow()
         status.setText("Синхронизация...")
 
-        // Mirrors QuestViewModel.prepareSync()/chooseTransfer(): sync this stage's actions to
-        // the server before moving on. The full local command pipeline (sound, notifications,
-        // Lua scripts, the "which commands actually need a sync" filtering CommandController
-        // does) isn't ported here - out of scope for this flow, see plan; every stage's actions
-        // are synced unconditionally instead.
-        runIO({ game.api.applyCommands(stage.actions ?: emptyMap(), email, password) }) { result ->
+        // Mirrors QuestViewModel.chooseTransfer() -> prepareSync() -> syncNow(): record the
+        // stage being entered as the current position; the server applies that stage's actions
+        // itself. The local-only command pipeline (sound, notifications, Lua) isn't ported here.
+        val chapterId = game.session.currentChapterId
+        runIO({ game.api.enterStage(story.id, chapterId, nextStage.id, email, password) }) { result ->
             result.onSuccess { dto ->
                 game.session.storyData = dto.toModel()
-                advanceTo(nextStage)
+                enter(nextStage)
             }.onFailure {
                 transfersLocked = false
                 status.setText("Ошибка синхронизации: ${it.message}")
@@ -136,36 +197,47 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
         }
     }
 
-    private fun advanceTo(stage: Stage) {
-        if (stage.typeStage == 4) {
-            loadMapAndHandOff(stage)
-        } else {
-            showStage(stage)
-        }
-    }
-
     private fun loadMapAndHandOff(stage: Stage) {
-        val data = stage.data
-        val mapId = data?.get("map")?.toLongOrNull()
+        val target = StageRules.mapTarget(stage)
         val story = game.session.story
-        if (mapId == null || story == null) {
+        if (target == null || story == null) {
             status.setText("Указан тип стадии - карта, но id не задан")
             transfersLocked = false
             return
         }
         val (email, password) = game.session.credentialsOrThrow()
+        titleLabel.setText(stage.title ?: "")
+        background.show(stage.background)
+        textLabel.setFullText("")
+        transfersTable.clear()
         status.setText("Загрузка карты...")
 
-        runIO({ game.api.getMap(story.id, mapId, email, password) }) { result ->
+        runIO({ game.api.getMap(story.id, target.mapId, email, password) }) { result ->
             result.onSuccess { dto ->
                 val map = dto.toModel()
-                data["pos"]?.let { map.defPos = it }
+                target.pos?.let { map.defPos = it }
                 startMap(map, email, password)
             }.onFailure {
                 transfersLocked = false
                 status.setText("Не удалось загрузить карту: ${it.message}")
+                // A map stage has no transfers of its own - without this there'd be no way on.
+                addRetryButton { loadMapAndHandOff(stage) }
             }
         }
+    }
+
+    /** StageFragment's answer button: full width, start-aligned, wrapping text. */
+    private fun choiceButton(text: String): TextButton = TextButton(text, skin, "choice").apply {
+        label.setAlignment(Align.left)
+        label.wrap = true
+    }
+
+    private fun addRetryButton(onRetry: () -> Unit) {
+        val button = choiceButton("Повторить")
+        button.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) = onRetry()
+        })
+        transfersTable.add(button).width(700f).padBottom(8f).row()
     }
 
     private fun startMap(map: GameMap, email: String, password: String) {
@@ -178,6 +250,8 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
         properties[PropertyFields.TESTER_MODE] = "false"
         properties[PropertyFields.GROUP_BOT_FREQ] = "60"
         properties[PropertyFields.SINGLE_BOT_FREQ] = "30"
+        // NetTextureAssetLoader's base for relative texture paths - unset, they resolved to "null...".
+        properties[PropertyFields.RESOURCE_URL] = FlowApiClient.RESOURCE_URL
 
         val adapter = GdxAdapter.Builder(FlowPlatformInterface(game.api, email, password))
             .storyData(storyData)
@@ -192,5 +266,15 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
             .build()
 
         game.goTo(GdxAdapterScreen(adapter))
+    }
+
+    override fun dispose() {
+        background.dispose()
+        super.dispose()
+    }
+
+    private companion object {
+        // Redirect chains are one or two hops in practice; more means stages point at each other.
+        const val MAX_JUMPS_IN_A_ROW = 10
     }
 }

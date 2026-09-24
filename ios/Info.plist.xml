@@ -7,7 +7,7 @@
     <key>CFBundleDisplayName</key>
     <string>PDA</string>
     <key>CFBundleExecutable</key>
-    <string>${executable}</string>
+    <string>PDA</string>
     <key>CFBundleIdentifier</key>
     <string>net.artux.pda</string>
     <key>CFBundleInfoDictionaryVersion</key>

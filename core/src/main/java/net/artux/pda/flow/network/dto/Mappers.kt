@@ -11,6 +11,7 @@ import net.artux.pda.model.quest.StoryItem
 import net.artux.pda.model.quest.StoryModel
 import net.artux.pda.model.quest.Text
 import net.artux.pda.model.quest.Transfer
+import net.artux.pda.model.quest.story.ParameterModel
 import net.artux.pda.model.quest.story.StoryDataModel
 import net.artux.pda.model.quest.story.StoryStateModel
 import net.artux.pda.model.user.Gang
@@ -110,7 +111,7 @@ fun GangRelationDto.toModel(): GangRelation {
 
 fun ItemDto.toModel(): ItemModel {
     val item = ItemModel()
-    item.type = ItemType.getByTypeId(type ?: 7)
+    item.type = itemType(type, ItemType.ITEM)
     item.icon = icon
     item.title = title
     item.baseId = baseId ?: 0
@@ -131,7 +132,7 @@ fun WeaponDto.toModel(): WeaponModel {
         distance = distance ?: 0f,
         sounds = null
     )
-    weapon.type = ItemType.getByTypeId(type ?: 0)
+    weapon.type = itemType(type, ItemType.PISTOL)
     weapon.icon = icon
     weapon.title = title
     weapon.baseId = baseId ?: 0
@@ -171,16 +172,23 @@ fun StoryDataDto.toModel(): StoryDataModel {
         money = money ?: 0,
         xp = xp ?: 0,
         pdaId = pdaId ?: 0,
-        gang = gang?.let { Gang.ofId(it) } ?: Gang.LONERS,
+        gang = Gang.values().firstOrNull { it.name == gang } ?: Gang.LONERS,
         relations = relations?.toModel() ?: GangRelation()
     )
     // avatar's getter does field!!.contains("http") - a null field NPEs the moment anything
     // reads it (see MockDataFactory's own comment on this same gotcha), so always set it.
     model.avatar = avatar ?: "0"
     model.storyStates = (storyStates?.map { it.toModel() } ?: emptyList()).toMutableList()
+    model.parameters = parameters.orEmpty()
+        .mapNotNull { p -> p.key?.let { ParameterModel(it, p.value ?: 0) } }
+        .toMutableList()
     weapons?.forEach { model.weapons.add(it.toModel()) }
     armors?.forEach { model.armors.add(it.toModel()) }
     bullets?.forEach { model.bullets.add(it.toModel()) }
     items?.forEach { model.items.add(it.toModel()) }
     return model
 }
+
+// Item types arrive as ItemType enum names ("RIFLE"), not ItemType.typeId.
+private fun itemType(name: String?, fallback: ItemType): ItemType =
+    ItemType.values().firstOrNull { it.name == name } ?: fallback

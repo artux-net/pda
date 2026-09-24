@@ -1,35 +1,44 @@
 package net.artux.pda.flow.ui
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.utils.Scaling
 import net.artux.pda.flow.PdaFlowGame
 
 class LoginScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
 
-    private val emailField = TextField("", skin)
+    private val emailField = TextField("", skin).apply { messageText = "Электронная почта" }
     private val passwordField = TextField("", skin).apply {
+        messageText = "Пароль"
         isPasswordMode = true
         setPasswordCharacter('*')
     }
     private val status = errorLabel()
-    private val loginButton = TextButton("Войти", skin)
-    private val registerLinkButton = TextButton("Нет аккаунта? Зарегистрироваться", skin, "menu")
+    private val loginButton = TextButton("ВОЙТИ", skin)
+    private val registerLinkButton = TextButton("РЕГИСТРАЦИЯ", skin)
 
     init {
-        root.add(Label("Вход", skin, "title")).padBottom(30f).row()
+        // activity_login.xml: banner on top, both fields in one row (hints, no labels), then the
+        // underlined actions aligned to the end.
+        root.add(Image(skin, "banner").apply { setScaling(Scaling.fit) })
+            .height(110f).width(FORM_WIDTH).padBottom(20f).row()
 
-        root.add(Label("Email", skin)).left().row()
-        root.add(emailField).width(400f).padBottom(10f).row()
+        val fields = Table()
+        fields.add(emailField).width(COLUMN_WIDTH).padRight(COLUMN_GAP)
+        fields.add(passwordField).width(COLUMN_WIDTH)
+        root.add(fields).padBottom(15f).row()
 
-        root.add(Label("Пароль", skin)).left().row()
-        root.add(passwordField).width(400f).padBottom(20f).row()
+        val actions = Table()
+        actions.add(loginButton).padRight(20f)
+        actions.add(registerLinkButton)
+        root.add(actions).width(FORM_WIDTH).right().padBottom(10f).row()
+        actions.right()
 
-        root.add(loginButton).width(400f).height(50f).padBottom(10f).row()
-        root.add(registerLinkButton).width(400f).padBottom(10f).row()
-        root.add(status).width(400f).row()
+        root.add(status).width(FORM_WIDTH).row()
 
         loginButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) = onLoginClicked()
@@ -63,5 +72,11 @@ class LoginScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
                 status.setText("Неверный логин или пароль")
             }
         }
+    }
+
+    private companion object {
+        const val COLUMN_WIDTH = 300f
+        const val COLUMN_GAP = 20f
+        const val FORM_WIDTH = COLUMN_WIDTH * 2 + COLUMN_GAP
     }
 }

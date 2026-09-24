@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import net.artux.pda.flow.network.FlowApiClient
+import net.artux.pda.flow.ui.BaseFlowScreen
 import net.artux.pda.flow.ui.FlowSkin
 import net.artux.pda.flow.ui.RegistrationScreen
 
@@ -18,12 +19,15 @@ import net.artux.pda.flow.ui.RegistrationScreen
  * MockDataFactory) - StageScreen builds a fresh FlowPlatformInterface only once real
  * credentials are known, right before handing off to the map.
  */
-class PdaFlowGame : Game() {
+class PdaFlowGame(val api: FlowApiClient = FlowApiClient()) : Game() {
 
     lateinit var skin: Skin
         private set
 
-    val api = FlowApiClient()
+    /** On-screen keyboard height in points (0 = hidden), reported by the platform. */
+    var keyboardHeight = 0f
+        private set
+
     val session = FlowSession()
 
     override fun create() {
@@ -40,6 +44,15 @@ class PdaFlowGame : Game() {
     fun goTo(next: Screen) {
         screen?.dispose()
         setScreen(next)
+    }
+
+    /**
+     * Called on the GL thread by the platform launcher whenever the on-screen keyboard shows,
+     * hides or changes size - libGDX itself has no API for this.
+     */
+    fun onKeyboardHeightChanged(height: Float) {
+        keyboardHeight = height
+        (screen as? BaseFlowScreen)?.updateKeyboardShift()
     }
 
     override fun dispose() {

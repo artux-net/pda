@@ -71,7 +71,8 @@ project(":core") {
         // (int/long/float) unconditionally, regardless of compile target - confirmed via
         // `javap` against robovm-rt-2.3.26.jar that RoboVM's runtime actually implements
         // these three despite them being JDK 8 additions, so they're not a real risk.
-        ignore("java.lang.Integer", "java.lang.Long", "java.lang.Float")
+        // Boolean.hashCode(boolean) likewise (data classes with a Boolean field), same check.
+        ignore("java.lang.Integer", "java.lang.Long", "java.lang.Float", "java.lang.Boolean")
     }
 
     dependencies {

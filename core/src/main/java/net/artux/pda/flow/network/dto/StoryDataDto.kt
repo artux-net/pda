@@ -12,8 +12,11 @@ data class StoryDataDto(
     @SerializedName("money") val money: Int? = null,
     @SerializedName("xp") val xp: Int? = null,
     @SerializedName("pdaId") val pdaId: Int? = null,
-    @SerializedName("gang") val gang: Int? = null,
+    // Enum name ("LONERS"), not Gang's numeric id - see app/api.json's StoryData schema.
+    @SerializedName("gang") val gang: String? = null,
     @SerializedName("relations") val relations: GangRelationDto? = null,
+    // What QuestUtil.check() evaluates transfer/text conditions against.
+    @SerializedName("parameters") val parameters: List<ParameterDto>? = null,
     @SerializedName("storyStates") val storyStates: List<StoryStateDto>? = null,
     @SerializedName("weapons") val weapons: List<WeaponDto>? = null,
     @SerializedName("armors") val armors: List<ArmorDto>? = null,
@@ -33,6 +36,11 @@ data class GangRelationDto(
     @SerializedName("clearSky") val clearSky: Int? = null
 )
 
+data class ParameterDto(
+    @SerializedName("key") val key: String? = null,
+    @SerializedName("value") val value: Int? = null
+)
+
 data class StoryStateDto(
     @SerializedName("current") val current: Boolean? = null,
     @SerializedName("over") val over: Boolean? = null,
@@ -42,7 +50,7 @@ data class StoryStateDto(
 )
 
 data class ItemDto(
-    @SerializedName("type") val type: Int? = null,
+    @SerializedName("type") val type: String? = null,
     @SerializedName("icon") val icon: String? = null,
     @SerializedName("title") val title: String? = null,
     @SerializedName("baseId") val baseId: Int? = null,
@@ -52,7 +60,7 @@ data class ItemDto(
 )
 
 data class WeaponDto(
-    @SerializedName("type") val type: Int? = null,
+    @SerializedName("type") val type: String? = null,
     @SerializedName("icon") val icon: String? = null,
     @SerializedName("title") val title: String? = null,
     @SerializedName("baseId") val baseId: Int? = null,
@@ -70,7 +78,7 @@ data class WeaponDto(
 )
 
 data class ArmorDto(
-    @SerializedName("type") val type: Int? = null,
+    @SerializedName("type") val type: String? = null,
     @SerializedName("icon") val icon: String? = null,
     @SerializedName("title") val title: String? = null,
     @SerializedName("baseId") val baseId: Int? = null,

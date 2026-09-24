@@ -1,46 +1,53 @@
 package net.artux.pda.flow.ui
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.utils.Scaling
 import net.artux.pda.flow.PdaFlowGame
 
 class RegistrationScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
 
-    private val nicknameField = TextField("", skin)
-    private val emailField = TextField("", skin)
+    private val nicknameField = TextField("", skin).apply { messageText = "Прозвище" }
+    private val emailField = TextField("", skin).apply { messageText = "Email" }
     private val passwordField = TextField("", skin).apply {
+        messageText = "Пароль"
         isPasswordMode = true
         setPasswordCharacter('*')
     }
     private val repeatPasswordField = TextField("", skin).apply {
+        messageText = "Повторите пароль"
         isPasswordMode = true
         setPasswordCharacter('*')
     }
     private val status = errorLabel()
-    private val registerButton = TextButton("Зарегистрироваться", skin)
-    private val loginLinkButton = TextButton("Уже есть аккаунт? Войти", skin, "menu")
+    private val registerButton = TextButton("РЕГИСТРАЦИЯ", skin)
+    private val loginLinkButton = TextButton("ВОЙТИ", skin)
 
     init {
-        root.add(Label("Регистрация", skin, "title")).padBottom(30f).row()
+        // activity_register.xml: banner, a 2x2 grid of hinted fields (email | nickname,
+        // password | repeat), then the underlined action at the end. Android gets back to login
+        // with the system back button; there's none here, hence the extra "ВОЙТИ" on the left.
+        root.add(Image(skin, "banner").apply { setScaling(Scaling.fit) })
+            .height(80f).width(FORM_WIDTH).padBottom(15f).row()
 
-        root.add(Label("Никнейм", skin)).left().row()
-        root.add(nicknameField).width(400f).padBottom(10f).row()
+        val fields = Table()
+        fields.defaults().width(COLUMN_WIDTH).padBottom(12f)
+        fields.add(emailField).padRight(COLUMN_GAP)
+        fields.add(nicknameField).row()
+        fields.add(passwordField).padRight(COLUMN_GAP)
+        fields.add(repeatPasswordField).row()
+        root.add(fields).padBottom(8f).row()
 
-        root.add(Label("Email", skin)).left().row()
-        root.add(emailField).width(400f).padBottom(10f).row()
+        val actions = Table()
+        actions.add(loginLinkButton).expandX().left()
+        actions.add(registerButton).right()
+        root.add(actions).width(FORM_WIDTH).padBottom(10f).row()
 
-        root.add(Label("Пароль", skin)).left().row()
-        root.add(passwordField).width(400f).padBottom(10f).row()
-
-        root.add(Label("Повторите пароль", skin)).left().row()
-        root.add(repeatPasswordField).width(400f).padBottom(20f).row()
-
-        root.add(registerButton).width(400f).height(50f).padBottom(10f).row()
-        root.add(loginLinkButton).width(400f).padBottom(10f).row()
-        root.add(status).width(400f).row()
+        root.add(status).width(FORM_WIDTH).row()
 
         registerButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) = onRegisterClicked()
@@ -90,5 +97,11 @@ class RegistrationScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
             return Result.failure(registerResult.exceptionOrNull()!!)
         }
         return game.api.checkLogin(email, password).map { }
+    }
+
+    private companion object {
+        const val COLUMN_WIDTH = 300f
+        const val COLUMN_GAP = 20f
+        const val FORM_WIDTH = COLUMN_WIDTH * 2 + COLUMN_GAP
     }
 }

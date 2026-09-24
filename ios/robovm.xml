@@ -25,6 +25,14 @@
                 <include>**</include>
             </includes>
         </resource>
+        <!-- iOS-only resources the pda-assets submodule shouldn't carry (e.g. the flow's
+             login banner, flow/banner.png) - merged into the same bundle root as ../assets. -->
+        <resource>
+            <directory>resources</directory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </resource>
     </resources>
 
     <frameworks>

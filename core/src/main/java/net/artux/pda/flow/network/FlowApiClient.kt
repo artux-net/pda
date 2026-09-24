@@ -1,6 +1,7 @@
 package net.artux.pda.flow.network
 
 import com.google.gson.Gson
+import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,6 +20,8 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.X509TrustManager
 
 /**
  * Plain OkHttp + Gson client for the subset of the pdanetwork REST API the iOS registration/
@@ -32,8 +35,23 @@ import java.util.concurrent.TimeUnit
  * are attached to every subsequent request and a request succeeding (not 401) is the proof.
  */
 class FlowApiClient(
-    private val baseUrl: String = "https://dev.artux.net/pdanetwork/"
+    private val baseUrl: String = DEFAULT_BASE_URL,
+    // Platform TLS override - iOS passes one that enables SNI (see ios' SniSSLSocketFactory);
+    // null keeps OkHttp's default, which is what the JVM tests use.
+    sslSocketFactory: SSLSocketFactory? = null,
+    trustManager: X509TrustManager? = null
 ) {
+    companion object {
+        const val DEFAULT_BASE_URL = "https://dev.artux.net/pdanetwork/"
+
+        /** Where stage backgrounds and other story resources live - Android's RESOURCE_URL. */
+        const val RESOURCE_URL = "https://cdn.artux.net/static/"
+
+        /** Same resolution as Android's URLHelper.getResourceURL(): relative paths are CDN-based. */
+        fun resourceUrl(path: String): String =
+            if (path.contains("http")) path else RESOURCE_URL + path.trimStart('/')
+    }
+
     private val gson = Gson()
     private val jsonMediaType = "application/json".toMediaType()
 
@@ -42,6 +60,11 @@ class FlowApiClient(
         .readTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(20, TimeUnit.SECONDS)
         .retryOnConnectionFailure(true)
+        .apply {
+            if (sslSocketFactory != null && trustManager != null) {
+                sslSocketFactory(sslSocketFactory, trustManager)
+            }
+        }
         .build()
 
     private fun url(path: String) = baseUrl.trimEnd('/') + "/" + path.trimStart('/')
@@ -74,8 +97,28 @@ class FlowApiClient(
                 }
             } catch (e: IOException) {
                 Result.failure(e)
+            } catch (e: JsonParseException) {
+                // Not an IOException - uncaught, it killed the caller's coroutine before it could
+                // post a result back, leaving the screen stuck on its loading text.
+                Result.failure(e)
             }
         }
+
+    /** Raw bytes of a public resource (stage backgrounds on the CDN) - no auth. */
+    suspend fun download(url: String): Result<ByteArray> = withContext(Dispatchers.IO) {
+        try {
+            val request = Request.Builder().url(url).get().build()
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Result.failure(IOException("HTTP ${response.code} for $url"))
+                } else {
+                    Result.success(response.body?.bytes() ?: ByteArray(0))
+                }
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        }
+    }
 
     suspend fun register(nickname: String, email: String, password: String): Result<Unit> {
         val body = RegisterRequestDto(email, password, nickname, avatar = "0")
@@ -154,6 +197,21 @@ class FlowApiClient(
             .build()
         return execute(request, GameMapDto::class.java)
     }
+
+    /**
+     * Records [stageId] as the player's current position - the same "state" command Android's
+     * CommandController.checkStage() queues on every stage entry. The server applies that
+     * stage's own actions itself when it receives this (confirmed against the dev backend), so
+     * callers must not also send stage.actions, or they'd be applied twice.
+     */
+    suspend fun enterStage(
+        storyId: Long,
+        chapterId: Long,
+        stageId: Long,
+        email: String,
+        password: String
+    ): Result<StoryDataDto> =
+        applyCommands(mapOf("state" to listOf("$storyId:$chapterId:$stageId")), email, password)
 
     suspend fun applyCommands(
         actions: Map<String, List<String>>,

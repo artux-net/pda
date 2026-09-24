@@ -4,7 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import net.artux.pda.flow.PdaFlowGame
 import net.artux.pda.flow.network.dto.StoryDataDto
@@ -22,7 +22,7 @@ class StorySelectionScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
 
         val scrollPane = ScrollPane(listTable, skin)
         scrollPane.setScrollingDisabled(true, false)
-        root.add(scrollPane).width(500f).height(400f).row()
+        root.add(scrollPane).width(CARD_WIDTH + 20f).height(280f).row()
 
         loadStories()
     }
@@ -37,18 +37,28 @@ class StorySelectionScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
                 listTable.clear()
                 stories.forEach { dto ->
                     val item = dto.toModel()
-                    val button = TextButton(item.title, skin)
-                    button.addListener(object : ClickListener() {
+                    val card = storyCard(item.title, item.desc)
+                    card.addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
                             selectStory(item.id.toLong())
                         }
                     })
-                    listTable.add(button).width(480f).height(60f).padBottom(8f).row()
+                    listTable.add(card).width(CARD_WIDTH).padBottom(8f).row()
                 }
             }.onFailure {
                 status.setText("Не удалось загрузить список сюжетов: ${it.message}")
             }
         }
+    }
+
+    /** item_story.xml's title + description (minus the icon), on a choice-style block. */
+    private fun storyCard(title: String, desc: String): Button {
+        val card = Button(skin, "choice")
+        card.add(Label(title, skin, "card-title").apply { wrap = true }).growX().row()
+        if (desc.isNotBlank()) {
+            card.add(Label(desc, skin, "hint").apply { wrap = true }).growX().padTop(4f)
+        }
+        return card
     }
 
     private fun selectStory(storyId: Long) {
@@ -86,5 +96,9 @@ class StorySelectionScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
         val dataResult = game.api.getStoryData(email, password)
         val data = dataResult.getOrElse { return Result.failure(it) }
         return Result.success(story to data)
+    }
+
+    private companion object {
+        const val CARD_WIDTH = 560f
     }
 }
