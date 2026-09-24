@@ -1,21 +1,17 @@
 import ru.vyarus.gradle.plugin.animalsniffer.AnimalSnifferExtension
 
-val kotlin_version = "2.0.0"
 val gdxVersion = "1.12.1"
 val ashleyVersion = "1.7.4"
-val dagger_version = "2.46.1"
+val dagger_version = "2.60.1"
 val aiVersion = "1.8.2"
 val gdxControllersVersion = "2.2.1"
 
 allprojects {
     repositories {
         google()
-        mavenLocal()
         mavenCentral()
 
         maven("https://jitpack.io")
-        maven("https://oss.sonatype.org/content/repositories/snapshots/")
-        maven("https://oss.sonatype.org/content/repositories/releases/")
     }
 }
 
@@ -83,7 +79,6 @@ project(":core") {
         "signature"("org.codehaus.mojo.signature:java17:1.0@signature")
 
         "implementation"("com.google.code.gson:gson:2.8.9")
-        "implementation"("org.apache.commons:commons-lang3:3.0")
         // Used by net.artux.pda.flow's network client (iOS registration/login/story flow).
         // Plain OkHttp, not Retrofit: Retrofit builds its API implementation via
         // java.lang.reflect.Proxy at runtime, which RoboVM's AOT compiler can't handle
@@ -100,12 +95,9 @@ project(":core") {
         //dagger
         "kapt"("com.google.dagger:dagger-compiler:$dagger_version")
         "implementation"("com.google.dagger:dagger:$dagger_version")
-        "annotationProcessor"("com.google.dagger:dagger-compiler:$dagger_version")
 
         //kotlin
-        "implementation"("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
         "implementation"("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-        "implementation"("org.jetbrains.kotlin:kotlin-reflect:$kotlin_version")
 
         // lua script engine
         // https://mvnrepository.com/artifact/org.luaj/luaj-jse

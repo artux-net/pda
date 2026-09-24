@@ -1,22 +1,20 @@
 buildscript {
     repositories {
         google()
-        mavenLocal()
         mavenCentral()
 
         maven("https://jitpack.io")
-        maven("https://oss.sonatype.org/content/repositories/snapshots/")
-        maven("https://oss.sonatype.org/content/repositories/releases/")
     }
 
     dependencies {
-        classpath("com.squareup:javapoet:1.13.0")
-        classpath("com.android.tools.build:gradle:8.9.0")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0")
-        classpath("com.google.dagger:hilt-android-gradle-plugin:2.51.1")
+        classpath("com.android.tools.build:gradle:9.4.1")
+        // Provides com.android.legacy-kapt (kapt under AGP 9's built-in Kotlin)
+        classpath("com.android.tools.build:gradle-kotlin:9.4.1")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.4.20")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.60.1")
 
-        classpath("com.google.gms:google-services:4.4.2")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.9.9")
+        classpath("com.google.gms:google-services:4.5.0")
+        classpath("com.google.firebase:firebase-crashlytics-gradle:3.0.8")
 
         // robovm-gradle-plugin is NOT declared here on purpose - it's a fat jar
         // shading its own unsigned org.bouncycastle.* classes, which collides
@@ -32,6 +30,11 @@ buildscript {
         // Kotlin ignores).
         classpath("ru.vyarus:gradle-animalsniffer-plugin:2.0.1")
     }
+}
+
+plugins {
+    // Lets Gradle download the JDK 17 toolchain :app asks for when it isn't installed locally
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 include(
