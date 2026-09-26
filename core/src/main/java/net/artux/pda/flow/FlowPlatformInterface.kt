@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import net.artux.pda.flow.network.FlowApiClient
+import net.artux.pda.flow.ui.StorySelectionScreen
 import net.artux.pda.map.utils.PlatformInterface
 
 /**
@@ -18,6 +19,7 @@ import net.artux.pda.map.utils.PlatformInterface
  * result contract (the Android implementation does the same via its own background scope).
  */
 class FlowPlatformInterface(
+    private val game: PdaFlowGame,
     private val api: FlowApiClient,
     private val email: String,
     private val password: String
@@ -48,8 +50,11 @@ class FlowPlatformInterface(
         Gdx.app.exit()
     }
 
+    // "Main screen" on Android returns to the app's own home screen; there's no such thing on
+    // iOS (one app, one window), so the nearest equivalent is leaving the story - back to
+    // StorySelectionScreen - rather than killing the process outright.
     override fun exit() {
-        Gdx.app.exit()
+        Gdx.app.postRunnable { game.goTo(StorySelectionScreen(game)) }
     }
 
     override fun openLogs() {

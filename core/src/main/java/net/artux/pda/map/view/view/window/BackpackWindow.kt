@@ -171,12 +171,12 @@ class BackpackWindow @Inject constructor(
 
                     itemModel.quantity = itemModel.quantity - 1
                     playerSystem.healthComponent.treat(itemModel)
-                    soundsSystem.playBySoundId("audio/sounds/person/medicine.ogg")
+                    soundsSystem.playBySoundId("audio/sounds/person/medicine.m4a")
                     dataRepository.update()
                 }
                 if (itemModel is WearableModel) {
                     lastDataModel.setCurrentWearable(itemModel as WearableModel?)
-                    soundsSystem.playBySoundId("audio/sounds/person/equip.ogg")
+                    soundsSystem.playBySoundId("audio/sounds/person/equip.m4a")
                     dataRepository.update()
                 }
             }

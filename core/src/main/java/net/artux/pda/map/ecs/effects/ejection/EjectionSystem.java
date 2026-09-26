@@ -64,7 +64,7 @@ public class EjectionSystem extends EntitySystem {
         this.audioSystem = audioSystem;
         this.notificationController = notificationController;
 
-        ejectionMusic = assetManager.get("audio/music/background/ejection.ogg", Music.class);
+        ejectionMusic = assetManager.get("audio/music/background/ejection.m4a", Music.class);
     }
 
     @Override

@@ -1,10 +1,18 @@
 package net.artux.pda.flow.network.dto
 
 import net.artux.pda.model.items.ArmorModel
+import net.artux.pda.model.items.ArtifactModel
+import net.artux.pda.model.items.DetectorModel
+import net.artux.pda.model.items.DetectorType
 import net.artux.pda.model.items.ItemModel
 import net.artux.pda.model.items.ItemType
+import net.artux.pda.model.items.ItemsContainerModel
+import net.artux.pda.model.items.MedicineModel
 import net.artux.pda.model.items.WeaponModel
 import net.artux.pda.model.map.GameMap
+import net.artux.pda.model.map.Point
+import net.artux.pda.model.map.SpawnModel
+import net.artux.pda.model.map.Strength
 import net.artux.pda.model.quest.ChapterModel
 import net.artux.pda.model.quest.Stage
 import net.artux.pda.model.quest.StoryItem
@@ -81,9 +89,43 @@ fun TextDto.toModel(): Text {
 fun GameMapDto.toModel(): GameMap = GameMap(
     id = id ?: 0L,
     title = title ?: "Карта",
+    level = level ?: 0,
     tmx = tmx ?: "kordon.tmx",
-    defPos = defPos ?: "500:500"
+    defPos = defPos ?: "500:500",
+    points = points.orEmpty().map { it.toModel() },
+    spawns = spawns.orEmpty().map { it.toModel() }
 )
+
+fun PointDto.toModel(): Point {
+    val point = Point(
+        id = id?.let { runCatching { java.util.UUID.fromString(it) }.getOrNull() }
+            ?: java.util.UUID.randomUUID(),
+        type = type ?: 0,
+        name = name ?: "point",
+        pos = pos ?: "500:500"
+    )
+    point.data = HashMap(data.orEmpty())
+    point.actions = HashMap(actions.orEmpty())
+    point.condition = HashMap(condition.orEmpty())
+    return point
+}
+
+fun SpawnDto.toModel(): SpawnModel {
+    val spawn = SpawnModel(
+        id = id ?: 0,
+        title = title ?: "",
+        description = description,
+        group = Gang.values().firstOrNull { it.name == group },
+        strength = Strength.values().firstOrNull { it.name == strength },
+        r = r ?: 0,
+        n = n ?: 0,
+        pos = pos ?: "500:500"
+    )
+    spawn.data = data.orEmpty()
+    spawn.actions = actions.orEmpty()
+    spawn.condition = condition.orEmpty()
+    return spawn
+}
 
 fun StoryStateDto.toModel(): StoryStateModel {
     val state = StoryStateModel()
@@ -192,3 +234,98 @@ fun StoryDataDto.toModel(): StoryDataModel {
 // Item types arrive as ItemType enum names ("RIFLE"), not ItemType.typeId.
 private fun itemType(name: String?, fallback: ItemType): ItemType =
     ItemType.values().firstOrNull { it.name == name } ?: fallback
+
+/** What StorySelectionScreen's profile panel shows - gang, rank/rating, days in game. */
+data class ProfileInfo(
+    val nickname: String,
+    val gang: Gang,
+    val rang: StoryDataModel.Rang,
+    val ratingPosition: Long,
+    val daysInGame: Int?
+)
+
+fun ProfileDto.toInfo(): ProfileInfo = ProfileInfo(
+    nickname = nickname ?: "",
+    gang = Gang.values().firstOrNull { it.name == gang } ?: Gang.LONERS,
+    rang = StoryDataModel.getRang(xp ?: 0),
+    ratingPosition = ratingPosition ?: 0L,
+    daysInGame = daysSince(registration)
+)
+
+fun ItemsContainerDto.toModel(): ItemsContainerModel {
+    val container = ItemsContainerModel()
+    container.armors = armors.orEmpty().map { it.toModel() }
+    container.weapons = weapons.orEmpty().map { it.toModel() }
+    container.artifacts = artifacts.orEmpty().map { it.toModel() }
+    container.bullets = bullets.orEmpty().map { it.toModel() }
+    container.usual = usual.orEmpty().map { it.toModel() }
+    container.medicines = medicines.orEmpty().map { it.toModel() }
+    container.detectors = detectors.orEmpty().map { it.toModel() }
+    return container
+}
+
+fun ArtifactCatalogDto.toModel(): ArtifactModel {
+    val artifact = ArtifactModel(
+        health = health ?: 0,
+        radio = radio ?: 0,
+        damage = damage ?: 0,
+        bleeding = bleeding ?: 0,
+        thermal = thermal ?: 0,
+        chemical = chemical ?: 0,
+        endurance = endurance ?: 0,
+        electric = electric ?: 0
+    )
+    artifact.type = itemType(type, ItemType.ARTIFACT)
+    artifact.icon = icon
+    artifact.title = title
+    artifact.baseId = baseId ?: 0
+    artifact.weight = weight ?: 0f
+    artifact.price = price ?: 0
+    artifact.quantity = quantity ?: 0
+    artifact.isEquipped = equipped ?: false
+    return artifact
+}
+
+fun MedicineDto.toModel(): MedicineModel {
+    val medicine = MedicineModel(
+        stamina = stamina ?: 0f,
+        radiation = radiation ?: 0f,
+        health = health ?: 0f
+    )
+    medicine.type = itemType(type, ItemType.MEDICINE)
+    medicine.icon = icon
+    medicine.title = title
+    medicine.baseId = baseId ?: 0
+    medicine.weight = weight ?: 0f
+    medicine.price = price ?: 0
+    medicine.quantity = quantity ?: 0
+    return medicine
+}
+
+fun DetectorCatalogDto.toModel(): DetectorModel {
+    val detector = DetectorModel(
+        detectorType = DetectorType.values().firstOrNull { it.name == detectorType } ?: DetectorType.BASIC
+    )
+    detector.type = itemType(type, ItemType.DETECTOR)
+    detector.icon = icon
+    detector.title = title
+    detector.baseId = baseId ?: 0
+    detector.weight = weight ?: 0f
+    detector.price = price ?: 0
+    detector.quantity = quantity ?: 0
+    detector.isEquipped = equipped ?: false
+    return detector
+}
+
+// java.time isn't available on RoboVM (confirmed nowhere else in this codebase uses it), so
+// this is hand-parsed from the ISO date's "yyyy-MM-dd" prefix via the classic java.text/util
+// APIs instead of Instant/OffsetDateTime.
+private fun daysSince(iso: String?): Int? {
+    if (iso.isNullOrBlank() || iso.length < 10) return null
+    return runCatching {
+        val format = java.text.SimpleDateFormat("yyyy-MM-dd")
+        val parsed = format.parse(iso.substring(0, 10)) ?: return null
+        val diffMs = System.currentTimeMillis() - parsed.time
+        (diffMs / (1000L * 60 * 60 * 24)).toInt().coerceAtLeast(0)
+    }.getOrNull()
+}

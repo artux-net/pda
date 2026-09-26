@@ -61,7 +61,9 @@ class StageBackground(private val api: FlowApiClient) : Disposable {
     private fun load(url: String) {
         if (!inFlight.add(url)) return
         scope.launch {
-            val pixmap = api.download(url).mapCatching { bytes -> Pixmap(bytes, 0, bytes.size) }
+            val pixmap = api.download(url).mapCatching { bytes ->
+                IosPixmapFix.apply(Pixmap(bytes, 0, bytes.size))
+            }
             Gdx.app.postRunnable { onLoaded(url, pixmap) }
         }
     }

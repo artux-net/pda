@@ -9,9 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Scaling
 import net.artux.pda.flow.PdaFlowGame
 
-class LoginScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
+class LoginScreen(game: PdaFlowGame, prefillEmail: String = "") : BaseFlowScreen(game) {
 
-    private val emailField = TextField("", skin).apply { messageText = "Электронная почта" }
+    private val emailField = TextField(prefillEmail, skin).apply { messageText = "Электронная почта" }
     private val passwordField = TextField("", skin).apply {
         messageText = "Пароль"
         isPasswordMode = true
@@ -67,6 +67,7 @@ class LoginScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
             result.onSuccess {
                 game.session.email = email
                 game.session.password = password
+                game.session.save()
                 game.goTo(StorySelectionScreen(game))
             }.onFailure {
                 status.setText("Неверный логин или пароль")

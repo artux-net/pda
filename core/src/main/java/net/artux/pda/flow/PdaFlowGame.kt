@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import net.artux.pda.flow.network.FlowApiClient
+import net.artux.pda.flow.ui.AutoLoginScreen
 import net.artux.pda.flow.ui.BaseFlowScreen
 import net.artux.pda.flow.ui.FlowSkin
 import net.artux.pda.flow.ui.RegistrationScreen
@@ -32,7 +33,11 @@ class PdaFlowGame(val api: FlowApiClient = FlowApiClient()) : Game() {
 
     override fun create() {
         skin = FlowSkin.load()
-        setScreen(RegistrationScreen(this))
+        val saved = FlowSession.savedCredentials()
+        setScreen(
+            if (saved != null) AutoLoginScreen(this, saved.first, saved.second)
+            else RegistrationScreen(this)
+        )
     }
 
     /**

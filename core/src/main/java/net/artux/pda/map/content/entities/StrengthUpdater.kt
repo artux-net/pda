@@ -28,8 +28,12 @@ class StrengthUpdater @Inject constructor(
             strength?.ordinal ?: 0
 
         val of = Strength.values().size
-        val weapon = itemsGenerator.getSpecificFromList(itemsContainerModel.getByType(ItemType.RIFLE), part, of) as WeaponModel
-        val armor = itemsGenerator.getSpecificFromList(itemsContainerModel.armors, part, of) as ArmorModel
+        // getSpecificFromList returns null on an empty list (see its own callers in
+        // ItemsGenerator, which all null-check it) - a plain "as" here NPEs instead of the
+        // catalog just being incomplete, which is exactly what surfaced before ItemsContainerModel
+        // was wired up to the real /api/v1/items/all catalog (see StageScreen.loadMapAndItems).
+        val weapon = itemsGenerator.getSpecificFromList(itemsContainerModel.getByType(ItemType.RIFLE), part, of) as? WeaponModel
+        val armor = itemsGenerator.getSpecificFromList(itemsContainerModel.armors, part, of) as? ArmorModel ?: ArmorModel()
         if (entity.getComponent(WeaponComponent::class.java) == null)
             entity.add(WeaponComponent(weapon, assetManager)
         ) else entity.getComponent(WeaponComponent::class.java).setWeaponModel(weapon)

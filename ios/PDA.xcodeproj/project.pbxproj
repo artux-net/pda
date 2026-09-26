@@ -1,0 +1,351 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		07527B2F54223A11ADC2FCEB /* robovm.xml */ = {isa = PBXFileReference; includeInIndex = 1; path = robovm.xml; sourceTree = "<group>"; };
+		14A31E8733AB4A2FBEDA5EA0 /* Info.plist.xml */ = {isa = PBXFileReference; includeInIndex = 1; path = Info.plist.xml; sourceTree = "<group>"; };
+		1D351730B85316A082469484 /* resources */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; path = resources; sourceTree = "<group>"; };
+		374FF3FCA8E2986BC205928A /* run-in-simulator.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; name = "run-in-simulator.sh"; path = "xcode/run-in-simulator.sh"; sourceTree = "<group>"; };
+		4293A5CBB8EF2A42648AB856 /* build.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; name = build.sh; path = xcode/build.sh; sourceTree = "<group>"; };
+		86DD92E8C16001BC601594DB /* src */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
+		8D8D9956AB07F7FE532E0C71 /* run-on-device.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; name = "run-on-device.sh"; path = "xcode/run-on-device.sh"; sourceTree = "<group>"; };
+		AEF785106A5E3A70AEF7DB45 /* build.gradle.kts */ = {isa = PBXFileReference; includeInIndex = 1; path = build.gradle.kts; sourceTree = "<group>"; };
+		C4F736435D0E46E60C792396 /* generate_xcodeproj.rb */ = {isa = PBXFileReference; includeInIndex = 1; name = generate_xcodeproj.rb; path = xcode/generate_xcodeproj.rb; sourceTree = "<group>"; };
+		C6A4E4F53506C4EC4C4CFBCE /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; path = README.md; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		6C63CC27E412CCD627BB1CBD = {
+			isa = PBXGroup;
+			children = (
+				E886715ED579898BC39449E2 /* Products */,
+				D9B5298599984460EBD667B7 /* Frameworks */,
+				FF82CAA74869B3914785C7E1 /* ios */,
+			);
+			sourceTree = "<group>";
+		};
+		A63D4BFB0175B91E4D47B352 /* xcode */ = {
+			isa = PBXGroup;
+			children = (
+				4293A5CBB8EF2A42648AB856 /* build.sh */,
+				8D8D9956AB07F7FE532E0C71 /* run-on-device.sh */,
+				374FF3FCA8E2986BC205928A /* run-in-simulator.sh */,
+				C4F736435D0E46E60C792396 /* generate_xcodeproj.rb */,
+			);
+			name = xcode;
+			sourceTree = "<group>";
+		};
+		D9B5298599984460EBD667B7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E886715ED579898BC39449E2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FF82CAA74869B3914785C7E1 /* ios */ = {
+			isa = PBXGroup;
+			children = (
+				07527B2F54223A11ADC2FCEB /* robovm.xml */,
+				14A31E8733AB4A2FBEDA5EA0 /* Info.plist.xml */,
+				AEF785106A5E3A70AEF7DB45 /* build.gradle.kts */,
+				C6A4E4F53506C4EC4C4CFBCE /* README.md */,
+				86DD92E8C16001BC601594DB /* src */,
+				1D351730B85316A082469484 /* resources */,
+				A63D4BFB0175B91E4D47B352 /* xcode */,
+			);
+			name = ios;
+			path = .;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		4B678563C29AE4571C1A4BC6 /* PDA (Run in Simulator) */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = E2DBC4A8A1FEDE4FD498E5EC /* Build configuration list for PBXLegacyTarget "PDA (Run in Simulator)" */;
+			buildPhases = (
+			);
+			buildToolPath = "$(SRCROOT)/xcode/run-in-simulator.sh";
+			buildWorkingDirectory = "$(SRCROOT)";
+			dependencies = (
+			);
+			name = "PDA (Run in Simulator)";
+			passBuildSettingsInEnvironment = 1;
+		};
+		94A979AA153440CAFD59BA64 /* PDA (Build) */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 6AF0B14267B4613FAE8AB8F9 /* Build configuration list for PBXLegacyTarget "PDA (Build)" */;
+			buildPhases = (
+			);
+			buildToolPath = "$(SRCROOT)/xcode/build.sh";
+			buildWorkingDirectory = "$(SRCROOT)";
+			dependencies = (
+			);
+			name = "PDA (Build)";
+			passBuildSettingsInEnvironment = 1;
+		};
+		D1331EF08C8B57FDA9E69857 /* PDA (Run on Device) */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 59145A6F6191A3EB17ED88E3 /* Build configuration list for PBXLegacyTarget "PDA (Run on Device)" */;
+			buildPhases = (
+			);
+			buildToolPath = "$(SRCROOT)/xcode/run-on-device.sh";
+			buildWorkingDirectory = "$(SRCROOT)";
+			dependencies = (
+			);
+			name = "PDA (Run on Device)";
+			passBuildSettingsInEnvironment = 1;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		31E911553DCAF8BAA46AD4DF /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = C57E271D4D3E3981D86018EE /* Build configuration list for PBXProject "PDA" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 6C63CC27E412CCD627BB1CBD;
+			minimizedProjectReferenceProxies = 0;
+			preferredProjectObjectVersion = 100;
+			productRefGroup = E886715ED579898BC39449E2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				94A979AA153440CAFD59BA64 /* PDA (Build) */,
+				D1331EF08C8B57FDA9E69857 /* PDA (Run on Device) */,
+				4B678563C29AE4571C1A4BC6 /* PDA (Run in Simulator) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		6E492FFE0B7628D2BBB18066 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+			};
+			name = Debug;
+		};
+		9AF75FCCAE2311FF24C4337F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+			};
+			name = Debug;
+		};
+		9DD1B691CC08A1A63F1FBC6B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+			};
+			name = Debug;
+		};
+		A25AB0565EC3177AFF47D921 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		AD7461ED6A4FA5E27068B562 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B4BD893D43DC68A224240192 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+			};
+			name = Release;
+		};
+		C1A1DA1C3932B552EB4244B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+			};
+			name = Release;
+		};
+		E92030ADEEEEA016A90B52A7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		59145A6F6191A3EB17ED88E3 /* Build configuration list for PBXLegacyTarget "PDA (Run on Device)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B4BD893D43DC68A224240192 /* Release */,
+				6E492FFE0B7628D2BBB18066 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6AF0B14267B4613FAE8AB8F9 /* Build configuration list for PBXLegacyTarget "PDA (Build)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1A1DA1C3932B552EB4244B6 /* Release */,
+				9DD1B691CC08A1A63F1FBC6B /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C57E271D4D3E3981D86018EE /* Build configuration list for PBXProject "PDA" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AD7461ED6A4FA5E27068B562 /* Debug */,
+				A25AB0565EC3177AFF47D921 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E2DBC4A8A1FEDE4FD498E5EC /* Build configuration list for PBXLegacyTarget "PDA (Run in Simulator)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E92030ADEEEEA016A90B52A7 /* Release */,
+				9AF75FCCAE2311FF24C4337F /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 31E911553DCAF8BAA46AD4DF /* Project object */;
+}

@@ -46,12 +46,12 @@ public class AudioSystem extends BaseSystem {
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        detections.add(assetManager.get("audio/sounds/pda/contact_0.ogg", Sound.class));
-        detections.add(assetManager.get("audio/sounds/pda/contact_1.ogg", Sound.class));
+        detections.add(assetManager.get("audio/sounds/pda/contact_0.m4a", Sound.class));
+        detections.add(assetManager.get("audio/sounds/pda/contact_1.m4a", Sound.class));
 
-        backgrounds.add(assetManager.get("audio/music/background/1.ogg", Music.class));
-        backgrounds.add(assetManager.get("audio/music/background/2.ogg", Music.class));
-        backgrounds.add(assetManager.get("audio/music/background/3.ogg", Music.class));
+        backgrounds.add(assetManager.get("audio/music/background/1.m4a", Music.class));
+        backgrounds.add(assetManager.get("audio/music/background/2.m4a", Music.class));
+        backgrounds.add(assetManager.get("audio/music/background/3.m4a", Music.class));
         for (Music m : backgrounds) {
             m.setVolume(0.71f);
         }

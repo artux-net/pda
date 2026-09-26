@@ -38,7 +38,7 @@ public class EffectsSystem extends BaseSystem {
         this.tiledNavigator = tiledNavigator;
         this.audioSystem = audioSystem;
 
-        geigerSound = assetManager.get("audio/sounds/pda/geiger.ogg");
+        geigerSound = assetManager.get("audio/sounds/pda/geiger.m4a");
     }
 
     @Override

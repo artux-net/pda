@@ -15,6 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import net.artux.pda.map.view.root.FontManager
 
 /**
@@ -58,11 +60,22 @@ object FlowSkin {
         skin.add("white", white)
 
         // 1162x390, drawn near 1:1 on a Retina phone - no mipmaps (NPOT on GLES2 can't have them).
-        val bannerTexture = Texture(Gdx.files.internal("flow/banner.png")).apply {
-            setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
-        }
+        val bannerTexture = loadTexture(skin, "flow/banner.png")
         skin.add("banner-texture", bannerTexture)
         skin.add("banner", TextureRegion(bannerTexture))
+
+        // activity_main.xml's PDA device chrome (MainActivity), reused on StorySelectionScreen
+        // for its two-panel look: main_*/title_*/bottom_* are the left (stories) panel, the
+        // additional_* ones the right (profile) panel - same asset names as app/res/drawable.
+        // Skin.add(name, resource) files it under resource.getClass() (TextureRegionDrawable),
+        // not Drawable - getDrawable()/skin.getDrawable("pda-main-bg") looks specifically under
+        // Drawable.class first and never finds it there, so the type has to be given explicitly.
+        skin.add("pda-main-bg", drawable(loadTexture(skin, "flow/pda/main_background.png")), Drawable::class.java)
+        skin.add("pda-title-bg", drawable(loadTexture(skin, "flow/pda/title_background.png")), Drawable::class.java)
+        skin.add("pda-bottom-bg", drawable(loadTexture(skin, "flow/pda/bottom_background.png")), Drawable::class.java)
+        skin.add("pda-side-bg", drawable(loadTexture(skin, "flow/pda/additional_background.png")), Drawable::class.java)
+        skin.add("pda-side-title-bg", drawable(loadTexture(skin, "flow/pda/additional_title_background.png")), Drawable::class.java)
+        skin.add("pda-side-bottom-bg", drawable(loadTexture(skin, "flow/pda/additional_bottom_background.png")), Drawable::class.java)
 
         val body = font(skin, "font", FontManager.LIBERAL_FONT, 17)
         val bold = font(skin, "font-bold", FontManager.LIBERAL_FONT, 17, bold = true)
@@ -151,6 +164,18 @@ object FlowSkin {
         skin.add(name, font)
         return font
     }
+
+    /** Decodes [path] through a Pixmap (so IosPixmapFix can run) rather than Texture(FileHandle). */
+    private fun loadTexture(skin: Skin, path: String): Texture {
+        val pixmap = Pixmap(Gdx.files.internal(path)).let(IosPixmapFix::apply)
+        val texture = Texture(pixmap).apply {
+            setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
+        }
+        pixmap.dispose()
+        return texture
+    }
+
+    private fun drawable(texture: Texture): TextureRegionDrawable = TextureRegionDrawable(TextureRegion(texture))
 
     private fun <T : BaseDrawable> T.pad(horizontal: Float, vertical: Float): T = apply {
         leftWidth = horizontal

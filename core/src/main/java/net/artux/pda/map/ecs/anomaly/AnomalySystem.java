@@ -72,7 +72,7 @@ public class AnomalySystem extends EntitySystem {
         for (Anomaly a : Anomaly.values()) {
             anomaliesWorkSounds.put(a, assetManager.get(a.getSoundId()));
         }
-        anomaly = assetManager.get("audio/sounds/pda/d-beep.ogg", Sound.class);
+        anomaly = assetManager.get("audio/sounds/pda/d-beep.m4a", Sound.class);
     }
 
     @Override

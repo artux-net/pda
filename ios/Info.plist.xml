@@ -23,6 +23,39 @@
     <key>CFBundleSignature</key>
     <string>????</string>
 
+    <!-- The radiation-symbol launcher icon (app/res/mipmap-xxxhdpi/ic_launcher.png, flattened
+         onto FlowSkin's #161719 background and resized), plain files rather than an
+         Assets.xcassets AppIcon set - MobiVM's resource bundling just copies files as-is (see
+         robovm.xml), it doesn't run actool to compile an asset catalog. -->
+    <key>CFBundleIcons</key>
+    <dict>
+        <key>CFBundlePrimaryIcon</key>
+        <dict>
+            <key>CFBundleIconFiles</key>
+            <array>
+                <string>Icon-20</string>
+                <string>Icon-29</string>
+                <string>Icon-40</string>
+                <string>Icon-60</string>
+            </array>
+        </dict>
+    </dict>
+    <key>CFBundleIcons~ipad</key>
+    <dict>
+        <key>CFBundlePrimaryIcon</key>
+        <dict>
+            <key>CFBundleIconFiles</key>
+            <array>
+                <string>Icon-20</string>
+                <string>Icon-29</string>
+                <string>Icon-40</string>
+                <string>Icon-60</string>
+                <string>Icon-76</string>
+                <string>Icon-83.5</string>
+            </array>
+        </dict>
+    </dict>
+
     <!-- Landscape only, matching every Android activity's screenOrientation="sensorLandscape". -->
     <key>UISupportedInterfaceOrientations</key>
     <array>

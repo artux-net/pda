@@ -19,7 +19,7 @@ import net.artux.pda.map.ecs.player.PlayerSystem;
 
 public enum Anomaly {
 
-    SPRINGBOARD("anomaly.springboard", "audio/sounds/anomalies/springboard/work.ogg") {
+    SPRINGBOARD("anomaly.springboard", "audio/sounds/anomalies/springboard/work.m4a") {
         @Override
         public void interact(Engine engine, Entity entity) {
             pm.get(entity).body.setLinearVelocity(random(-600000, 600000), random(-600000, 600000));
@@ -28,14 +28,14 @@ public enum Anomaly {
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.FLY, 1);
         }
     },
-    ELECTRA("anomaly.electra", "audio/sounds/anomalies/electra/work.ogg") {
+    ELECTRA("anomaly.electra", "audio/sounds/anomalies/electra/work.m4a") {
         @Override
         public void interact(Engine engine, Entity entity) {
             hcm.get(entity).electricDamage(random(10, 30));
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.STUCK, 5);
         }
     },
-    TELEPORT("anomaly.teleport", "audio/sounds/anomalies/teleport/work.ogg") {
+    TELEPORT("anomaly.teleport", "audio/sounds/anomalies/teleport/work.m4a") {
         @Override
         public void interact(Engine engine, Entity entity) {
             Vector2 nextPosition = engine.getSystem(MapOrientationSystem.class).getRandomFreePoint();
@@ -47,7 +47,7 @@ public enum Anomaly {
                 engine.getSystem(RenderSystem.class).setBlurEffect(10);
         }
     },
-    GRAVITY("anomaly.gravity", "audio/sounds/anomalies/gravity/work.ogg") {
+    GRAVITY("anomaly.gravity", "audio/sounds/anomalies/gravity/work.m4a") {
         @Override
         public void interact(Engine engine, Entity entity) {
             engine.getSystem(EffectsSystem.class).addEffect(entity, Effect.BROKE_GRAVITY, 5);

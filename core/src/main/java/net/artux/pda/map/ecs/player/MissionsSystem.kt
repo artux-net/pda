@@ -58,7 +58,7 @@ class MissionsSystem @Inject constructor(
     private var targetPosition: Vector2? = null
 
     init {
-        missionUpdatedSound = assetManager.get("audio/sounds/pda/pda_objective.ogg")
+        missionUpdatedSound = assetManager.get("audio/sounds/pda/pda_objective.m4a")
         mapDigraph = buildSystemFromStory()
         pathFinder = DijkstraPathFinder()
         currentStoryDataModel = dataRepository.initDataModel

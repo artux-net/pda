@@ -70,10 +70,10 @@ class WeaponComponent : Component {
                 reloadSoundName = pistolDefaultReloadSound
             }
 
-            var path = prefix + weaponModel.baseId + "/reload.ogg"
+            var path = prefix + weaponModel.baseId + "/reload.m4a"
             if (assetManager.contains(path))
                 reloadSoundName = path
-            path = prefix + weaponModel.baseId + "/shoot.ogg"
+            path = prefix + weaponModel.baseId + "/shoot.m4a"
             if (assetManager.contains(path))
                 shotSoundName = path
 
@@ -185,9 +185,9 @@ class WeaponComponent : Component {
 
     companion object {
         private const val prefix = "audio/sounds/weapons/"
-        private const val rifleDefaultShotSound = prefix + "rifle/ak74_shot.ogg"
-        private const val rifleDefaultReloadSound = prefix + "rifle/ak74_reload.ogg"
-        private const val pistolDefaultShotSound = prefix + "pistol/pm_shot.ogg"
-        private const val pistolDefaultReloadSound = prefix + "pistol/pm_reload.ogg"
+        private const val rifleDefaultShotSound = prefix + "rifle/ak74_shot.m4a"
+        private const val rifleDefaultReloadSound = prefix + "rifle/ak74_reload.m4a"
+        private const val pistolDefaultShotSound = prefix + "pistol/pm_shot.m4a"
+        private const val pistolDefaultReloadSound = prefix + "pistol/pm_reload.m4a"
     }
 }

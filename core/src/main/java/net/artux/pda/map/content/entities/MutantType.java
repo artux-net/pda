@@ -7,15 +7,15 @@ import net.artux.pda.map.ecs.effects.Effect;
 public enum MutantType {
 
     DOG("mutant.dog", "textures/avatars/mutants/dog.jpg", new String[]{
-            "audio/sounds/mutant/dog/1.ogg",
-            "audio/sounds/mutant/dog/2.ogg",
-            "audio/sounds/mutant/dog/3.ogg",
-            "audio/sounds/mutant/dog/4.ogg",
-            "audio/sounds/mutant/dog/5.ogg",
-            "audio/sounds/mutant/dog/6.ogg",
-            "audio/sounds/mutant/dog/7.ogg",
-            "audio/sounds/mutant/dog/8.ogg",
-            "audio/sounds/mutant/dog/9.ogg",
+            "audio/sounds/mutant/dog/1.m4a",
+            "audio/sounds/mutant/dog/2.m4a",
+            "audio/sounds/mutant/dog/3.m4a",
+            "audio/sounds/mutant/dog/4.m4a",
+            "audio/sounds/mutant/dog/5.m4a",
+            "audio/sounds/mutant/dog/6.m4a",
+            "audio/sounds/mutant/dog/7.m4a",
+            "audio/sounds/mutant/dog/8.m4a",
+            "audio/sounds/mutant/dog/9.m4a",
     }, false) {
         @Override
         InfightingComponent getInfightingComponent() {
@@ -23,10 +23,10 @@ public enum MutantType {
         }
     },
     BOAR("mutant.boar", "textures/avatars/mutants/boar.jpg", new String[]{
-            "audio/sounds/mutant/boar/1.ogg",
-            "audio/sounds/mutant/boar/2.ogg",
-            "audio/sounds/mutant/boar/3.ogg",
-            "audio/sounds/mutant/boar/4.ogg"
+            "audio/sounds/mutant/boar/1.m4a",
+            "audio/sounds/mutant/boar/2.m4a",
+            "audio/sounds/mutant/boar/3.m4a",
+            "audio/sounds/mutant/boar/4.m4a"
     }, false) {
         @Override
         InfightingComponent getInfightingComponent() {
@@ -35,8 +35,8 @@ public enum MutantType {
     },
     //DEAD_STALKER("mutant.stalker", "avatarId", false),
     CONTROLLER("mutant.controller", "textures/avatars/mutants/ctrl.jpg", new String[]{
-            "audio/sounds/mutant/controller/1.ogg",
-            "audio/sounds/mutant/controller/2.ogg"
+            "audio/sounds/mutant/controller/1.m4a",
+            "audio/sounds/mutant/controller/2.m4a"
     }, true){
         @Override
         InfightingComponent getInfightingComponent() {
@@ -46,9 +46,9 @@ public enum MutantType {
         }
     },
     BLOOD_HUNTER("mutant.blood_hunter", "textures/avatars/mutants/blood_hunter.jpg", new String[]{
-            "audio/sounds/mutant/blood_hunter/1.ogg",
-            "audio/sounds/mutant/blood_hunter/2.ogg",
-            "audio/sounds/mutant/blood_hunter/3.ogg"
+            "audio/sounds/mutant/blood_hunter/1.m4a",
+            "audio/sounds/mutant/blood_hunter/2.m4a",
+            "audio/sounds/mutant/blood_hunter/3.m4a"
     }, true) {
         @Override
         InfightingComponent getInfightingComponent() {

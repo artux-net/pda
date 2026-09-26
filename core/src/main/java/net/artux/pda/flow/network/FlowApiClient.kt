@@ -7,6 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.artux.pda.flow.network.dto.CommandBlockDto
 import net.artux.pda.flow.network.dto.GameMapDto
+import net.artux.pda.flow.network.dto.ItemsContainerDto
+import net.artux.pda.flow.network.dto.ProfileDto
 import net.artux.pda.flow.network.dto.RegisterRequestDto
 import net.artux.pda.flow.network.dto.StoryDataDto
 import net.artux.pda.flow.network.dto.StoryDto
@@ -187,6 +189,31 @@ class FlowApiClient(
             .get()
             .build()
         return execute(request, StoryDataDto::class.java)
+    }
+
+    /**
+     * GET api/v1/items/all: the item template catalog (weapons/armors/artifacts/bullets/usual/
+     * medicines/detectors) StrengthUpdater/ItemsGenerator draw from to equip stalkers and
+     * generate loot on the map. Fetched once per app run and cached on FlowSession - see
+     * StageScreen.loadItemsContainer.
+     */
+    suspend fun getItemsContainer(email: String, password: String): Result<ItemsContainerDto> {
+        val request = Request.Builder()
+            .url(url("api/v1/items/all"))
+            .auth(email, password)
+            .get()
+            .build()
+        return execute(request, ItemsContainerDto::class.java)
+    }
+
+    /** GET api/v1/profile: the authenticated user's own profile (gang, xp, rating, ...). */
+    suspend fun getProfile(email: String, password: String): Result<ProfileDto> {
+        val request = Request.Builder()
+            .url(url("api/v1/profile"))
+            .auth(email, password)
+            .get()
+            .build()
+        return execute(request, ProfileDto::class.java)
     }
 
     suspend fun getMap(storyId: Long, mapId: Long, email: String, password: String): Result<GameMapDto> {

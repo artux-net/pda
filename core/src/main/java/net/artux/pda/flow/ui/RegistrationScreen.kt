@@ -82,6 +82,7 @@ class RegistrationScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
             result.onSuccess {
                 game.session.email = email
                 game.session.password = password
+                game.session.save()
                 game.goTo(StorySelectionScreen(game))
             }.onFailure {
                 status.setText("Ошибка регистрации: ${it.message}")

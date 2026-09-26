@@ -212,11 +212,10 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
         transfersTable.clear()
         status.setText("Загрузка карты...")
 
-        runIO({ game.api.getMap(story.id, target.mapId, email, password) }) { result ->
-            result.onSuccess { dto ->
-                val map = dto.toModel()
+        runIO({ loadMapAndItems(story.id, target.mapId, email, password) }) { result ->
+            result.onSuccess { (map, items) ->
                 target.pos?.let { map.defPos = it }
-                startMap(map, email, password)
+                startMap(map, items, email, password)
             }.onFailure {
                 transfersLocked = false
                 status.setText("Не удалось загрузить карту: ${it.message}")
@@ -224,6 +223,29 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
                 addRetryButton { loadMapAndHandOff(stage) }
             }
         }
+    }
+
+    /**
+     * The item catalog (weapons/armors/...) is static, so it's fetched once and cached on
+     * FlowSession rather than on every map load - see StrengthUpdater.updateStalker, which force-
+     * casts whatever ItemsContainerModel.getByType returns and NPEs on an empty one.
+     */
+    private suspend fun loadMapAndItems(
+        storyId: Long,
+        mapId: Long,
+        email: String,
+        password: String
+    ): Result<Pair<GameMap, ItemsContainerModel>> {
+        val mapResult = game.api.getMap(storyId, mapId, email, password)
+        val map = mapResult.getOrElse { return Result.failure(it) }.toModel()
+
+        val cached = game.session.itemsContainer
+        if (cached != null) return Result.success(map to cached)
+
+        val itemsResult = game.api.getItemsContainer(email, password)
+        val items = itemsResult.getOrElse { return Result.failure(it) }.toModel()
+        game.session.itemsContainer = items
+        return Result.success(map to items)
     }
 
     /** StageFragment's answer button: full width, start-aligned, wrapping text. */
@@ -240,7 +262,7 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
         transfersTable.add(button).width(700f).padBottom(8f).row()
     }
 
-    private fun startMap(map: GameMap, email: String, password: String) {
+    private fun startMap(map: GameMap, items: ItemsContainerModel, email: String, password: String) {
         val storyData: StoryDataModel = game.session.storyData ?: return
         val story = game.session.story ?: return
 
@@ -253,11 +275,11 @@ class StageScreen(game: PdaFlowGame) : BaseFlowScreen(game) {
         // NetTextureAssetLoader's base for relative texture paths - unset, they resolved to "null...".
         properties[PropertyFields.RESOURCE_URL] = FlowApiClient.RESOURCE_URL
 
-        val adapter = GdxAdapter.Builder(FlowPlatformInterface(game.api, email, password))
+        val adapter = GdxAdapter.Builder(FlowPlatformInterface(game, game.api, email, password))
             .storyData(storyData)
             .story(story)
             .map(map)
-            .items(ItemsContainerModel())
+            .items(items)
             .props(properties)
             // Gdx.app is already set by this point (unlike MockDataFactory, which builds its
             // GdxAdapter before "new IOSApplication(...)" runs) - no need for a standalone

@@ -79,7 +79,7 @@ public class NotificationController {
      * Добавление сообщения на экран со звуком подсказки, работает как {@link #addSilentMessage(String, String, String, MessagesList.Length)}}
      */
     public void addMessage(String icon, String title, String content, MessagesList.Length length) {
-        audioSystem.playBySoundId("audio/sounds/pda/pda_tip.ogg");
+        audioSystem.playBySoundId("audio/sounds/pda/pda_tip.m4a");
         addSilentMessage(icon, title, content, length);
     }
 

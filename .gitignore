@@ -68,3 +68,10 @@ lint/reports/
 #pda maps
 app/assets/maps/
 app/api.json
+
+# Xcode per-user state (ios/PDA.xcodeproj) - xcshareddata/xcschemes IS committed
+ios/PDA.xcodeproj/xcuserdata/
+ios/PDA.xcodeproj/project.xcworkspace/xcuserdata/
+
+# macOS Finder metadata
+.DS_Store

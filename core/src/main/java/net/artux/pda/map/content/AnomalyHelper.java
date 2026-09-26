@@ -73,7 +73,7 @@ public class AnomalyHelper {
                     .name()
                     .toLowerCase();
 
-            anomalyEntity.add(new MusicComponent(assetManager.get(prefix + name + "/idle.ogg")));
+            anomalyEntity.add(new MusicComponent(assetManager.get(prefix + name + "/idle.m4a")));
 
             engine.addEntity(anomalyEntity);
         }

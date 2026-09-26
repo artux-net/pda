@@ -152,26 +152,26 @@ class PlayerMovingSystem @Inject constructor(
         val prefix = "audio/sounds/steps/"
         stepSounds[TileType.EMPTY] =
             ImmutablePair.of(
-                assetManager.get(prefix + "empty1.ogg"),
-                assetManager.get(prefix + "empty2.ogg")
+                assetManager.get(prefix + "empty1.m4a"),
+                assetManager.get(prefix + "empty2.m4a")
             )
         stepSounds[TileType.GROUND] =
             ImmutablePair.of(
-                assetManager.get(prefix + "empty1.ogg"),
-                assetManager.get(prefix + "empty2.ogg")
+                assetManager.get(prefix + "empty1.m4a"),
+                assetManager.get(prefix + "empty2.m4a")
             )
         stepSounds[TileType.ROAD] = ImmutablePair.of(
-            assetManager.get(prefix + "road1.ogg"),
-            assetManager.get(prefix + "road2.ogg")
+            assetManager.get(prefix + "road1.m4a"),
+            assetManager.get(prefix + "road2.m4a")
         )
         stepSounds[TileType.GRASS] = ImmutablePair.of(
-            assetManager.get(prefix + "grass1.ogg"),
-            assetManager.get(prefix + "grass2.ogg")
+            assetManager.get(prefix + "grass1.m4a"),
+            assetManager.get(prefix + "grass2.m4a")
         )
         stepSounds[TileType.SWAMP] =
             ImmutablePair.of(
-                assetManager.get(prefix + "swamp1.ogg"),
-                assetManager.get(prefix + "swamp2.ogg")
+                assetManager.get(prefix + "swamp1.m4a"),
+                assetManager.get(prefix + "swamp2.m4a")
             )
     }
 }
