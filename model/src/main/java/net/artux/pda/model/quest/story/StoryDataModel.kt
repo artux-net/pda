@@ -61,13 +61,10 @@ data class StoryDataModel(
     }
 
     private fun <T : ItemModel> addAsCountable(itemEntity: T) {
-        val optionalItem: Optional<out ItemModel> = allItems
-            .stream()
-            .filter { item: ItemModel -> item.baseId == itemEntity.baseId }
-            .findFirst()
-        if (optionalItem.isPresent) {
-            val item = optionalItem.get()
-            item.quantity = item.quantity + itemEntity.quantity
+        val optionalItem =
+            allItems.firstOrNull { item -> item.baseId == itemEntity.baseId }
+        if (optionalItem != null) {
+            optionalItem.quantity += itemEntity.quantity
         } else {
             addAsIs(itemEntity)
         }

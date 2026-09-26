@@ -4,7 +4,6 @@ import net.artux.pda.model.items.ItemModel
 import net.artux.pda.model.items.WearableModel
 import net.artux.pda.model.quest.story.StoryDataModel
 import java.util.LinkedList
-import java.util.stream.Collectors
 
 object QuestUtil {
 
@@ -104,23 +103,19 @@ object QuestUtil {
         val itemDifferences: MutableList<String> = LinkedList()
         //new items
         val newItems = newData.allItems
-            .stream()
-            .filter { itemModel: ItemModel -> itemModel.id == null }
-            .map { itemModel: ItemModel -> itemModel.baseId.toString() + ":" + itemModel.quantity }
-            .collect(Collectors.toList())
+            .filter { itemModel -> itemModel.id == null }
+            .map { itemModel -> itemModel.baseId.toString() + ":" + itemModel.quantity }
         itemDifferences.addAll(newItems)
 
 
         // quantity and quality difference
         for (newItem in newData.allItems) {
-            val quantityDifference = oldItems.stream()
-                .filter { itemModel: ItemModel ->
-                    itemModel.id != null
-                            && itemModel.id == newItem.id
-                            && itemModel.quantity != newItem.quantity
-                }
-                .findFirst()
-            quantityDifference.ifPresent { itemDifferences.add(newItem.id.toString() + ":" + newItem.quantity) }
+            val quantityDifference = oldItems.firstOrNull { itemModel ->
+                itemModel.id != null
+                        && itemModel.id == newItem.id
+                        && itemModel.quantity != newItem.quantity
+            }
+            quantityDifference?.let { itemDifferences.add(newItem.id.toString() + ":" + newItem.quantity) }
         }
         response["item"] = itemDifferences
 
@@ -131,10 +126,10 @@ object QuestUtil {
         response["xp"] = mutableListOf((newData.xp - oldData.xp).toString())
 
         // wearable difference
-        val wearableItems = mutableListOf<String>()
-        newData.allItems.stream()
-            .filter { itemModel: ItemModel -> itemModel.type.isWearable }
-            .map { it: ItemModel -> it as WearableModel }
+        var wearableItems = mutableListOf<String>()
+        newData.allItems
+            .filter { itemModel -> itemModel.type.isWearable }
+            .map { it as WearableModel }
             .forEach {
                 if (it.isEquipped)
                     if (it.id == null) {
@@ -144,13 +139,13 @@ object QuestUtil {
                     }
             }
 
-        oldItems.stream()
+        oldItems
             .filter { itemModel: ItemModel -> itemModel.type.isWearable }
             .map { it: ItemModel -> it as WearableModel }
-            .forEach { it ->
+            .forEach {
                 if (it.isEquipped) {
                     val id = it.id.toString()
-                    wearableItems.removeIf { it == id }
+                    wearableItems = wearableItems.filter { it != id }.toMutableList()
                 }
             }
         response["set"] = wearableItems
