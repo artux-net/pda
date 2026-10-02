@@ -46,6 +46,22 @@ class AuthViewModel @Inject constructor(
         login()
     }
 
+    /**
+     * Exchanges the server auth code obtained from Google Play Games sign-in
+     * for a pdanetwork session. The backend creates an account on the fly
+     * for a player it has never seen before.
+     */
+    fun loginWithGooglePlayGames(serverAuthCode: String) {
+        viewModelScope.launch {
+            userRepository.authenticateWithGooglePlayGames(serverAuthCode)
+                .onSuccess {
+                    dataManager.setJwtToken(it.token)
+                    login()
+                }
+                .onFailure { status.postValue(StatusModel(it)) }
+        }
+    }
+
     fun registerUser(registerUserDto: RegisterUserModel) {
         viewModelScope.launch {
             apiClient.apiAuthorizations.clear()

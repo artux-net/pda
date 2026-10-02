@@ -207,6 +207,9 @@ dependencies {
     implementation("com.google.firebase:firebase-config")
     implementation("com.google.firebase:firebase-crashlytics")
 
+    // Google Play Games Services (sign-in)
+    implementation("com.google.android.gms:play-services-games-v2:22.1.0")
+
     // ktx
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 

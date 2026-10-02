@@ -14,6 +14,15 @@
     <string name="quest_ads_usual_id" translatable="false">R-M-2151056-3</string>
     <string name="quest_ads_transfer_video_id" translatable="false">R-M-2151056-4</string>
 
+    <!-- TODO: fill in once Play Games Services is linked to this app in Google
+         Play Console: Play Console, Play Games Services, Setup, Credentials,
+         add/select the "Server" OAuth 2.0 Web client (the project's
+         google-services.json already has one web client under oauth_client,
+         client_type 3; confirm in Play Console whether that one should be
+         reused or a new one created before wiring it in). Until this is a
+         real client id, Google Play Games sign-in is disabled. -->
+    <string name="google_play_games_server_client_id" translatable="false">REPLACE_WITH_PLAY_GAMES_SERVER_CLIENT_ID</string>
+
 
     <string name="prompt_user">E-mail</string>
 
@@ -21,7 +30,10 @@
 
     <string name="action_sign_in">Sign in</string>
 
+    <string name="action_sign_in_google_play_games">Sign in with Google Play Games</string>
+
     <string name="error_login">This user is unable</string>
+    <string name="error_google_play_games_login">Could not sign in with Google Play Games</string>
 
     <!-- Strings related to login -->
     <string name="error_invalid_password">This password is too short</string>
