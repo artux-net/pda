@@ -4,6 +4,7 @@ import android.app.Application;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 
+import com.google.android.gms.games.PlayGamesSdk;
 import com.google.firebase.FirebaseApp;
 
 import net.artux.pda.BuildConfig;
@@ -34,6 +35,7 @@ public class PDAApplication extends Application {
     @Override
     public void onCreate() {
         FirebaseApp.initializeApp(this);
+        PlayGamesSdk.initialize(this);
         super.onCreate();
         for (Timber.Tree tree : logForest) {
             Timber.plant(tree);

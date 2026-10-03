@@ -14,6 +14,13 @@
     <string name="quest_ads_usual_id" translatable="false">R-M-2151056-3</string>
     <string name="quest_ads_transfer_video_id" translatable="false">R-M-2151056-4</string>
 
+    <!-- Server OAuth 2.0 Web client linked to Play Games Services for this
+         app in Google Play Console (Play Games Services, Setup, Credentials,
+         Server). Must match the GOOGLE_PLAY_GAMES_CLIENT_ID/SECRET configured
+         on the backend. -->
+    <string name="google_play_games_server_client_id" translatable="false">221131736658-u82m4k7qtgjpsg3hftkuuf79s2lv7p8f.apps.googleusercontent.com</string>
+    <string name="game_services_app_id" translatable="false">221131736658</string>
+
 
     <string name="prompt_user">E-mail</string>
 
@@ -21,7 +28,10 @@
 
     <string name="action_sign_in">Sign in</string>
 
+    <string name="action_sign_in_google_play_games">Sign in with Google Play Games</string>
+
     <string name="error_login">This user is unable</string>
+    <string name="error_google_play_games_login">Could not sign in with Google Play Games</string>
 
     <!-- Strings related to login -->
     <string name="error_invalid_password">This password is too short</string>
