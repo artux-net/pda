@@ -27,6 +27,10 @@
         android:theme="@style/AppTheme"
         android:networkSecurityConfig="@xml/network_security_config">
 
+        <meta-data
+            android:name="com.google.android.gms.games.APP_ID"
+            android:value="@string/game_services_app_id" />
+
         <activity
             android:name=".ui.activities.HelpActivity"
             android:exported="true"

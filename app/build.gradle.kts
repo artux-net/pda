@@ -100,7 +100,7 @@ android {
             isDebuggable = true
 
             buildConfigField("String", "PROTOCOL", "\"https\"")
-            buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
+            buildConfigField("String", "URL_API", "\"api-test.artux.net/pdanetwork/\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
             buildConfigField("String", "URL", "\"cdn.artux.net/static/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-3940256099942544/1033173712\"")
