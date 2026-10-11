@@ -6,11 +6,13 @@ import static com.badlogic.gdx.math.MathUtils.random;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
+import net.artux.engine.utils.LocaleBundle;
 import net.artux.pda.map.di.scope.PerGameMap;
 import net.artux.pda.model.chat.UserMessage;
 import net.artux.pda.model.items.ItemModel;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.inject.Inject;
 
@@ -36,7 +38,7 @@ public class ContentGenerator {
     }
 
     private String[] readFile(String file) {
-        FileHandle handle = Gdx.files.internal(file);
+        FileHandle handle = LocaleBundle.resolveForLocale(Gdx.files.internal(file), Locale.getDefault());
         String text = handle.readString();
         return text.split("\\r?\\n");
     }
