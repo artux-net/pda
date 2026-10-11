@@ -4,6 +4,10 @@ import static okhttp3.Protocol.HTTP_2;
 
 import android.os.LocaleList;
 
+import net.artux.engine.utils.LocaleBundle;
+
+import java.util.Locale;
+
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.gson.Gson;
@@ -62,7 +66,8 @@ public class NetworkModule {
             Request original = chain.request();
             Request.Builder requestBuilder = original
                     .newBuilder()
-                    .addHeader("Accept-Language", LocaleList.getDefault().toLanguageTags());
+                    .addHeader("Accept-Language", LocaleBundle.resolveLanguageTag(Locale.getDefault())
+                            + "," + LocaleList.getDefault().toLanguageTags());
 
             if (dataManager.isAuthenticated()) {
                 requestBuilder.addHeader("Authorization", dataManager.getAuthToken());
