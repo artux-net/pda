@@ -40,8 +40,15 @@ jobs:
           # so the PR's own head ref has to be checked out explicitly -
           # otherwise this silently builds main instead of the PR's branch.
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || format('refs/pull/{0}/head', github.event.issue.number) }}
-          submodules: recursive
           fetch-depth: 0
+
+      - name: Checkout assets submodule
+        # pda-assets is private now, so the default GITHUB_TOKEN (scoped
+        # to this repo only) can't clone it as a submodule - that needs a
+        # PAT with read access to artux-net/pda-assets.
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.PDA_ASSETS_TOKEN }}@github.com/artux-net/pda-assets.git".insteadOf "https://github.com/artux-net/pda-assets.git"
+          git submodule update --init --recursive
 
       - name: Build & Deploy
         # Pinned to @main (not ./.github/assembly): this checks out an
