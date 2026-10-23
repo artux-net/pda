@@ -2,6 +2,8 @@ package net.artux.pda.repositories
 
 import net.artux.pda.model.user.UserRelation
 import net.artux.pdanetwork.api.DefaultApi
+import net.artux.pdanetwork.model.AuthTokenDto
+import net.artux.pdanetwork.model.GooglePlayGamesAuthDto
 import net.artux.pdanetwork.model.Profile
 import net.artux.pdanetwork.model.RegisterUserDto
 import net.artux.pdanetwork.model.ResponsePageSimpleUserDto
@@ -72,6 +74,25 @@ class UserRepository @Inject constructor(
                 }
 
             })
+        }
+    }
+
+    suspend fun authenticateWithGooglePlayGames(serverAuthCode: String): Result<AuthTokenDto> {
+        return suspendCoroutine {
+            webservice.authenticateWithGooglePlayGames(GooglePlayGamesAuthDto().serverAuthCode(serverAuthCode))
+                .enqueue(object : Callback<AuthTokenDto> {
+                    override fun onResponse(call: Call<AuthTokenDto>, response: Response<AuthTokenDto>) {
+                        val data = response.body()
+                        if (data != null) {
+                            it.resume(Result.success(data))
+                        } else
+                            it.resume(Result.failure(Exception(response.toString())))
+                    }
+
+                    override fun onFailure(call: Call<AuthTokenDto>, t: Throwable) {
+                        it.resume(Result.failure(java.lang.Exception(t)))
+                    }
+                })
         }
     }
 

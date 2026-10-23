@@ -27,12 +27,29 @@ public class DataManager {
 
     public void setLoginUser(LoginUser user) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.remove("jwt");
         editor.putString("login", user.getEmailOrLogin());
         editor.putString("pass", user.getPassword());
         editor.commit();
     }
 
+    /**
+     * Stores the token issued after signing in with Google Play Games. That
+     * account has no login/password the player ever typed, so this replaces
+     * the Basic Auth credentials rather than living alongside them.
+     */
+    public void setJwtToken(String token) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.remove("login");
+        editor.remove("pass");
+        editor.putString("jwt", token);
+        editor.commit();
+    }
+
     public boolean isAuthenticated() {
+        if (!mSharedPreferences.getString("jwt", "").isEmpty()) {
+            return true;
+        }
         if (mSharedPreferences.contains("login") && mSharedPreferences.contains("pass")){
             String login = mSharedPreferences.getString("login", "");
             String pass = mSharedPreferences.getString("pass", "");
@@ -50,6 +67,9 @@ public class DataManager {
     }
 
     public String getAuthToken() {
+        String jwt = mSharedPreferences.getString("jwt", "");
+        if (!jwt.isEmpty())
+            return "Bearer " + jwt;
         if (isAuthenticated())
             return Credentials.basic(mSharedPreferences.getString("login", ""), mSharedPreferences.getString("pass", ""));
         else return "";
