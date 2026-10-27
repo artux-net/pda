@@ -27,6 +27,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.games.GamesSignInClient
+import com.google.android.gms.games.PlayGames
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.logEvent
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -88,6 +90,7 @@ open class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cu
             findViewById<View>(R.id.register).setOnClickListener(this)
             findViewById<View>(R.id.help).setOnClickListener(this)
             findViewById<View>(R.id.email_sign_in_button).setOnClickListener(this)
+            findViewById<View>(R.id.google_play_games_sign_in_button).setOnClickListener(this)
             findViewById<View>(R.id.logo).setOnLongClickListener {
                 var info =
                     "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE}) ${BuildConfig.BUILD_TYPE}"
@@ -153,6 +156,52 @@ open class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cu
         }
     }
 
+
+    private fun signInWithGooglePlayGames() {
+        val serverClientId = getString(R.string.google_play_games_server_client_id)
+        if (serverClientId == "REPLACE_WITH_PLAY_GAMES_SERVER_CLIENT_ID") {
+            Timber.w("Google Play Games sign-in is not configured yet (missing server client id)")
+            Toast.makeText(this, getString(R.string.error_google_play_games_login), Toast.LENGTH_LONG).show()
+            return
+        }
+
+        showProgress(true)
+        val gamesSignInClient = PlayGames.getGamesSignInClient(this)
+        gamesSignInClient.isAuthenticated().addOnCompleteListener { authTask ->
+            if (authTask.isSuccessful && authTask.result.isAuthenticated) {
+                requestServerAuthCode(gamesSignInClient)
+            } else {
+                gamesSignInClient.signIn().addOnCompleteListener { signInTask ->
+                    if (signInTask.isSuccessful && signInTask.result.isAuthenticated) {
+                        requestServerAuthCode(gamesSignInClient)
+                    } else {
+                        Timber.w(signInTask.exception, "Google Play Games sign-in failed")
+                        showProgress(false)
+                        Toast.makeText(this, getString(R.string.error_google_play_games_login), Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun requestServerAuthCode(gamesSignInClient: GamesSignInClient) {
+        val serverClientId = getString(R.string.google_play_games_server_client_id)
+        gamesSignInClient.requestServerSideAccess(serverClientId, false)
+            .addOnCompleteListener { task ->
+                val authCode = if (task.isSuccessful) task.result else null
+                if (authCode != null) {
+                    firebaseAnalytics.logEvent("account_login") {
+                        param("app_version", BuildConfig.VERSION_NAME)
+                        param("method", "google_play_games")
+                    }
+                    authViewModel.loginWithGooglePlayGames(authCode)
+                } else {
+                    Timber.w(task.exception, "Could not obtain a Google Play Games server auth code")
+                    showProgress(false)
+                    Toast.makeText(this, getString(R.string.error_google_play_games_login), Toast.LENGTH_LONG).show()
+                }
+            }
+    }
 
     private fun isAppSupported() =
         (application as PDAApplication).versionCode < firebaseRemoteConfig.getLong(PropertyFields.MINIMUM_VERSION)
@@ -273,6 +322,9 @@ open class LoginActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cu
     override fun onClick(v: View) {
         if (v.id == R.id.email_sign_in_button) {
             attemptLogin()
+        }
+        if (v.id == R.id.google_play_games_sign_in_button) {
+            signInWithGooglePlayGames()
         }
         if (v.id == R.id.forgotPassword) {
             val builder = AlertDialog.Builder(this@LoginActivity, R.style.PDADialogStyle)

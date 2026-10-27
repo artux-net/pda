@@ -100,7 +100,7 @@ android {
             isDebuggable = true
 
             buildConfigField("String", "PROTOCOL", "\"https\"")
-            buildConfigField("String", "URL_API", "\"dev.artux.net/pdanetwork/\"")
+            buildConfigField("String", "URL_API", "\"api-test.artux.net/pdanetwork/\"")
             buildConfigField("String", "WS_PROTOCOL", "\"wss\"")
             buildConfigField("String", "URL", "\"cdn.artux.net/static/\"")
             buildConfigField("String", "QuestAdId", "\"ca-app-pub-3940256099942544/1033173712\"")
@@ -206,6 +206,9 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-config")
     implementation("com.google.firebase:firebase-crashlytics")
+
+    // Google Play Games Services (sign-in)
+    implementation("com.google.android.gms:play-services-games-v2:22.1.0")
 
     // ktx
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
