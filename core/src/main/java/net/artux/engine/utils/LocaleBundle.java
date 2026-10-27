@@ -59,16 +59,12 @@ public class LocaleBundle {
     public static FileHandle resolveForLocale(FileHandle fileHandle, Locale locale) {
         if (locale == null) return fileHandle;
 
-        String language = locale.getLanguage();
-        if (language != null && !language.isEmpty()) {
-            FileHandle exact = sibling(fileHandle, language);
-            if (exact.exists()) return exact;
+        if ("en".equals(resolveLanguageTag(locale))) {
+            FileHandle en = sibling(fileHandle, "en");
+            if (en.exists()) return en;
         }
 
-        if (isCis(locale)) return fileHandle;
-
-        FileHandle en = sibling(fileHandle, "en");
-        return en.exists() ? en : fileHandle;
+        return fileHandle;
     }
 
     private static FileHandle sibling(FileHandle fileHandle, String language) {

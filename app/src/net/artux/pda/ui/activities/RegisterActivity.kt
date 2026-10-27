@@ -133,15 +133,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun openLocalized(path: String): InputStream {
-        val locale = Locale.getDefault()
-        val language = locale.language
-        if (language.isNotEmpty()) {
-            try {
-                return assets.open("${path}_$language")
-            } catch (ignored: IOException) {
-            }
-        }
-        if (!LocaleBundle.isCis(locale)) {
+        if (LocaleBundle.resolveLanguageTag(Locale.getDefault()) == "en") {
             try {
                 return assets.open("${path}_en")
             } catch (ignored: IOException) {
