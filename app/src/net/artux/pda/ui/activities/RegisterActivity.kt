@@ -22,6 +22,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.logEvent
 import dagger.hilt.android.AndroidEntryPoint
+import net.artux.engine.utils.LocaleBundle
 import net.artux.pda.BuildConfig
 import net.artux.pda.R
 import net.artux.pda.model.StatusModel
@@ -31,8 +32,10 @@ import net.artux.pda.ui.viewmodels.AuthViewModel
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.IOException
+import java.io.InputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
+import java.util.Locale
 import java.util.Random
 import javax.inject.Inject
 
@@ -108,7 +111,7 @@ class RegisterActivity : AppCompatActivity() {
     fun loadTemplates() {
         try {
             val nicknameBuilder = StringBuilder()
-            var resource = assets.open("templates/names")
+            var resource = openLocalized("templates/names")
             var br = BufferedReader(InputStreamReader(resource, StandardCharsets.UTF_8))
             val random = Random()
             br.lines()
@@ -116,7 +119,7 @@ class RegisterActivity : AppCompatActivity() {
                 .findAny()
                 .ifPresent { name: String -> nicknameBuilder.append(name) }
             br.close()
-            resource = assets.open("templates/nicks")
+            resource = openLocalized("templates/nicks")
             br = BufferedReader(InputStreamReader(resource, StandardCharsets.UTF_8))
             br.lines()
                 .skip(random.nextInt(34).toLong())
@@ -127,6 +130,16 @@ class RegisterActivity : AppCompatActivity() {
         } catch (ignored: IOException) {
             Timber.e(ignored)
         }
+    }
+
+    private fun openLocalized(path: String): InputStream {
+        if (LocaleBundle.resolveLanguageTag(Locale.getDefault()) == "en") {
+            try {
+                return assets.open("${path}_en")
+            } catch (ignored: IOException) {
+            }
+        }
+        return assets.open(path)
     }
 
     private fun isViewWithIncorrectData(editText: EditText, regex: String): Boolean {

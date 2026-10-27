@@ -5,9 +5,12 @@ import com.badlogic.gdx.utils.ObjectMap;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.Properties;
+import java.util.Set;
 
 public class LocaleBundle {
 
@@ -36,26 +39,41 @@ public class LocaleBundle {
         }
     }
 
-    /**
-     * Bundle files follow the convention "name.properties" (base, historically
-     * Russian) / "name_en.properties" (English), sitting next to each other.
-     * Falls back to the base file whenever a translated sibling for the
-     * requested locale doesn't exist, so untranslated locales keep working.
-     */
-    private static FileHandle resolveForLocale(FileHandle fileHandle, Locale locale) {
-        if (locale == null) return fileHandle;
+    private static final Set<String> CIS_COUNTRIES = new HashSet<>(Arrays.asList(
+            "RU", "BY", "KZ", "KG", "TJ", "UZ", "AM", "AZ", "MD", "GE", "UA", "TM"
+    ));
+
+    public static boolean isCis(Locale locale) {
+        return locale != null && CIS_COUNTRIES.contains(locale.getCountry());
+    }
+
+    public static String resolveLanguageTag(Locale locale) {
+        if (locale == null) return "en";
 
         String language = locale.getLanguage();
-        if (language == null || language.isEmpty()) return fileHandle;
+        if ("ru".equals(language) || "en".equals(language)) return language;
 
+        return isCis(locale) ? "ru" : "en";
+    }
+
+    public static FileHandle resolveForLocale(FileHandle fileHandle, Locale locale) {
+        if (locale == null) return fileHandle;
+
+        if ("en".equals(resolveLanguageTag(locale))) {
+            FileHandle en = sibling(fileHandle, "en");
+            if (en.exists()) return en;
+        }
+
+        return fileHandle;
+    }
+
+    private static FileHandle sibling(FileHandle fileHandle, String language) {
         String extension = fileHandle.extension();
         String nameWithoutExtension = fileHandle.nameWithoutExtension();
         String localizedName = extension.isEmpty()
                 ? nameWithoutExtension + "_" + language
                 : nameWithoutExtension + "_" + language + "." + extension;
-
-        FileHandle localized = fileHandle.sibling(localizedName);
-        return localized.exists() ? localized : fileHandle;
+        return fileHandle.sibling(localizedName);
     }
 
     public String get(String key) {
