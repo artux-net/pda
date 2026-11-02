@@ -7,7 +7,7 @@ plugins {
 }
 
 dependencies {
-    implementation("org.apache.commons:commons-lang3:3.17.0")
+    implementation("org.apache.commons:commons-lang3:3.21.0")
 }
 
 java {
