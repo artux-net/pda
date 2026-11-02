@@ -43,6 +43,8 @@ public class AssetsFinder implements Disposable {
         if (assetManager == null) {
             logger.log("Assets", "Setup assets for loading.");
             assetManager = new AssetManager();
+            assetManager.setErrorListener((asset, throwable) ->
+                    logger.error("Assets", "Failed to load asset: " + asset.fileName, throwable));
 
             for (int i = 0; i < 31; i++) {
                 assetManager.load("textures/avatars/a" + i + ".png", Texture.class);
